@@ -1,6 +1,3 @@
-const DashboardLoteNuevo = () => (
-  <div className="flex min-h-screen items-center justify-center bg-background">
-    <p className="text-muted-foreground font-body">Crear lote — Próximamente</p>
-  </div>
-);
+import LoteFormPage from "@/components/LoteFormPage";
+const DashboardLoteNuevo = () => <LoteFormPage />;
 export default DashboardLoteNuevo;
