@@ -3,6 +3,8 @@ import Logo from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+
 interface LoteCardProps {
   id: string;
   nombre: string;
@@ -10,6 +12,8 @@ interface LoteCardProps {
   area_m2: number;
   precio_m2: number;
   estado: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 const formatCOP = (value: number) =>
