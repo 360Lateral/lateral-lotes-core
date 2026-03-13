@@ -13,7 +13,7 @@ const Index = () => {
       // Fetch featured lotes with their latest price
       const { data: lotesData, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, barrio, area_total_m2, estado_disponibilidad, destacado")
+        .select("id, nombre_lote, barrio, area_total_m2, estado_disponibilidad, destacado, lat, lng")
         .eq("destacado", true)
         .limit(6);
 
@@ -80,6 +80,8 @@ const Index = () => {
                 area_m2={Number(lote.area_total_m2) || 0}
                 precio_m2={Number(lote.precio_m2) || 0}
                 estado={lote.estado_disponibilidad}
+                lat={lote.lat ? Number(lote.lat) : null}
+                lng={lote.lng ? Number(lote.lng) : null}
               />
             ))}
           </div>
