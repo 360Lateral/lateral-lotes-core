@@ -83,6 +83,7 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng }: 
       </Button>
     </div>
   </div>
-);
+  );
+};
 
 export default LoteCard;
