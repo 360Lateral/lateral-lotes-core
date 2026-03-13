@@ -47,7 +47,7 @@ const Index = () => {
           Visor Estratégico Lotes
         </h1>
         <p className="mt-4 max-w-xl font-body text-base text-gray-light md:text-lg">
-          Accede a los mejores predios de Colombia con información técnica, normativa y financiera completa
+          Accede a los mejores predios con información técnica, normativa y financiera completa
         </p>
         <Button variant="hero" size="xl" className="mt-8" asChild>
           <Link to="/lotes">Explorar lotes</Link>
