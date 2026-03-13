@@ -37,12 +37,21 @@ const estadoBadgeVariant = (estado: string) => {
   }
 };
 
-const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado }: LoteCardProps) => (
+const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng }: LoteCardProps) => {
+  const hasCoords = lat != null && lng != null;
+  const staticMapUrl = hasCoords
+    ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+1D3461(${lng},${lat})/${lng},${lat},14,0/400x176@2x?access_token=${MAPBOX_TOKEN}`
+    : null;
+
+  return (
   <div className="flex flex-col overflow-hidden rounded-lg border border-gray-light bg-card">
-    {/* Placeholder image */}
-    <div className="flex h-44 items-center justify-center bg-secondary">
-      <Logo variant="on-navy" className="opacity-40" />
-    </div>
+    {staticMapUrl ? (
+      <img src={staticMapUrl} alt={`Mapa de ${nombre}`} className="h-44 w-full object-cover" />
+    ) : (
+      <div className="flex h-44 items-center justify-center bg-secondary">
+        <Logo variant="on-navy" className="opacity-40" />
+      </div>
+    )}
 
     <div className="flex flex-1 flex-col gap-2 p-4">
       <div className="flex items-start justify-between gap-2">
