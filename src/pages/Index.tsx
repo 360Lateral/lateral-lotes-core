@@ -44,10 +44,10 @@ const Index = () => {
       {/* Hero */}
       <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
         <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
-          Encuentra tu lote de inversión ideal
+          Visor Estratégico Lotes
         </h1>
         <p className="mt-4 max-w-xl font-body text-base text-gray-light md:text-lg">
-          Accede a los mejores predios de Colombia con información técnica, normativa y financiera completa
+          Accede a los mejores predios con información técnica, normativa y financiera completa
         </p>
         <Button variant="hero" size="xl" className="mt-8" asChild>
           <Link to="/lotes">Explorar lotes</Link>
