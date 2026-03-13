@@ -13,7 +13,7 @@ const Index = () => {
       // Fetch featured lotes with their latest price
       const { data: lotesData, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, barrio, area_total_m2, estado_disponibilidad, destacado")
+        .select("id, nombre_lote, barrio, area_total_m2, estado_disponibilidad, destacado, lat, lng")
         .eq("destacado", true)
         .limit(6);
 
