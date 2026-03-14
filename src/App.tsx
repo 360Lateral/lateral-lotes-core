@@ -44,6 +44,10 @@ const App = () => (
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/leads" element={<ProtectedRoute><DashboardLeads /></ProtectedRoute>} />
 
+            {/* Rutas developer */}
+            <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />
+            <Route path="/dashboard/notificaciones" element={<ProtectedRoute requireDeveloper><DashboardNotificaciones /></ProtectedRoute>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
