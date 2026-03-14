@@ -55,6 +55,11 @@ const Navbar = () => {
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>
               )}
+              {!isAdminOrAsesor && isDeveloper && (
+                <Button variant="default" size="sm" asChild>
+                  <Link to="/dashboard/developer">Dashboard</Link>
+                </Button>
+              )}
             </>
           ) : (
             <>
