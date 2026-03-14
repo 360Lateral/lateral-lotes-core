@@ -16,6 +16,8 @@ import DashboardLoteNuevo from "./pages/DashboardLoteNuevo";
 import DashboardLoteEditar from "./pages/DashboardLoteEditar";
 import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
+import DashboardDeveloper from "./pages/DashboardDeveloper";
+import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
