@@ -43,7 +43,35 @@ const DashboardLayout = ({ children }: Props) => {
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
 
-  const allItems = [...navItems, ...(isAdmin ? adminOnlyItems : [])];
+  const developerItems = isDeveloper ? [
+    { label: "Mis Alertas", href: "/dashboard/developer", icon: BellRing },
+    { label: "Notificaciones", href: "/dashboard/notificaciones", icon: Bell },
+  ] : [];
+
+  const allItems = [
+    ...(isAdminOrAsesor ? navItems : []),
+    ...(isAdmin ? adminOnlyItems : []),
+    ...developerItems,
+  ];
+
+  // If no admin items and no developer items, show at least dashboard
+  const finalItems = allItems.length > 0 ? allItems : [navItems[0]];
+
+  // Unread notification count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["unread-count", user?.id],
+    enabled: !!user && isDeveloper,
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("notificaciones")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("leida", false);
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
 
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
