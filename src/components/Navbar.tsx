@@ -110,6 +110,13 @@ const Navbar = () => {
                       </Link>
                     </Button>
                   )}
+                  {!isAdminOrAsesor && isDeveloper && (
+                    <Button variant="default" size="sm" asChild>
+                      <Link to="/dashboard/developer" onClick={() => setMobileOpen(false)}>
+                        Dashboard
+                      </Link>
+                    </Button>
+                  )}
                 </>
               ) : (
                 <>
