@@ -89,8 +89,9 @@ const DashboardLayout = ({ children }: Props) => {
 
       {/* Nav links */}
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
-        {allItems.map((item) => {
+        {finalItems.map((item) => {
           const active = isActive(item.href, (item as any).end);
+          const isNotifLink = item.href === "/dashboard/notificaciones";
           return (
             <Link
               key={item.href}
@@ -104,6 +105,11 @@ const DashboardLayout = ({ children }: Props) => {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
+              {isNotifLink && unreadCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 font-body text-[10px] font-bold text-primary-foreground">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
