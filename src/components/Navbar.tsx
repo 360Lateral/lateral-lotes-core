@@ -12,7 +12,7 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user, isAdminOrAsesor, loading } = useAuth();
+  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
