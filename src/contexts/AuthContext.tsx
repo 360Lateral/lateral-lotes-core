@@ -10,6 +10,7 @@ interface AuthContextType {
   roles: AppRole[];
   loading: boolean;
   isAdminOrAsesor: boolean;
+  isDeveloper: boolean;
   signOut: () => Promise<void>;
 }
 
