@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      alertas: {
+        Row: {
+          activa: boolean
+          area_max: number | null
+          area_min: number | null
+          ciudad: string | null
+          created_at: string
+          id: string
+          precio_max_m2: number | null
+          user_id: string
+          uso_suelo: string | null
+        }
+        Insert: {
+          activa?: boolean
+          area_max?: number | null
+          area_min?: number | null
+          ciudad?: string | null
+          created_at?: string
+          id?: string
+          precio_max_m2?: number | null
+          user_id: string
+          uso_suelo?: string | null
+        }
+        Update: {
+          activa?: boolean
+          area_max?: number | null
+          area_min?: number | null
+          ciudad?: string | null
+          created_at?: string
+          id?: string
+          precio_max_m2?: number | null
+          user_id?: string
+          uso_suelo?: string | null
+        }
+        Relationships: []
+      }
       analisis_documentos: {
         Row: {
           categoria: Database["public"]["Enums"]["categoria_documento"]
@@ -231,6 +267,41 @@ export type Database = {
           },
         ]
       }
+      notificaciones: {
+        Row: {
+          created_at: string
+          id: string
+          leida: boolean
+          lote_id: string
+          mensaje: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          leida?: boolean
+          lote_id: string
+          mensaje: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          leida?: boolean
+          lote_id?: string
+          mensaje?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           activo: boolean | null
@@ -355,7 +426,7 @@ export type Database = {
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "super_admin" | "admin" | "asesor" | "inversor"
+      app_role: "super_admin" | "admin" | "asesor" | "inversor" | "developer"
       categoria_documento:
         | "financiero"
         | "tecnico"
@@ -498,7 +569,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "admin", "asesor", "inversor"],
+      app_role: ["super_admin", "admin", "asesor", "inversor", "developer"],
       categoria_documento: [
         "financiero",
         "tecnico",

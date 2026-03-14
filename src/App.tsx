@@ -16,6 +16,8 @@ import DashboardLoteNuevo from "./pages/DashboardLoteNuevo";
 import DashboardLoteEditar from "./pages/DashboardLoteEditar";
 import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
+import DashboardDeveloper from "./pages/DashboardDeveloper";
+import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +43,10 @@ const App = () => (
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/leads" element={<ProtectedRoute><DashboardLeads /></ProtectedRoute>} />
+
+            {/* Rutas developer */}
+            <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />
+            <Route path="/dashboard/notificaciones" element={<ProtectedRoute requireDeveloper><DashboardNotificaciones /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

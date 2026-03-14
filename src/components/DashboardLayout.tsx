@@ -1,4 +1,6 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,8 @@ import {
   LogOut,
   Menu,
   X,
+  Bell,
+  BellRing,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -29,16 +33,45 @@ interface Props {
 }
 
 const DashboardLayout = ({ children }: Props) => {
-  const { user, roles, signOut } = useAuth();
+  const { user, roles, signOut, isDeveloper } = useAuth();
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
+  const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "asesor"].includes(r));
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
 
-  const allItems = [...navItems, ...(isAdmin ? adminOnlyItems : [])];
+  const developerItems = isDeveloper ? [
+    { label: "Mis Alertas", href: "/dashboard/developer", icon: BellRing },
+    { label: "Notificaciones", href: "/dashboard/notificaciones", icon: Bell },
+  ] : [];
+
+  const allItems = [
+    ...(isAdminOrAsesor ? navItems : []),
+    ...(isAdmin ? adminOnlyItems : []),
+    ...developerItems,
+  ];
+
+  // If no admin items and no developer items, show at least dashboard
+  const finalItems = allItems.length > 0 ? allItems : [navItems[0]];
+
+  // Unread notification count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["unread-count", user?.id],
+    enabled: !!user && isDeveloper,
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("notificaciones")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("leida", false);
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
 
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
@@ -56,8 +89,9 @@ const DashboardLayout = ({ children }: Props) => {
 
       {/* Nav links */}
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
-        {allItems.map((item) => {
+        {finalItems.map((item) => {
           const active = isActive(item.href, (item as any).end);
+          const isNotifLink = item.href === "/dashboard/notificaciones";
           return (
             <Link
               key={item.href}
@@ -71,6 +105,11 @@ const DashboardLayout = ({ children }: Props) => {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
+              {isNotifLink && unreadCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 font-body text-[10px] font-bold text-primary-foreground">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}

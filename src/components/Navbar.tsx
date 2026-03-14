@@ -12,7 +12,7 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user, isAdminOrAsesor, loading } = useAuth();
+  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -53,6 +53,11 @@ const Navbar = () => {
               {isAdminOrAsesor && (
                 <Button variant="default" size="sm" asChild>
                   <Link to="/dashboard">Dashboard</Link>
+                </Button>
+              )}
+              {!isAdminOrAsesor && isDeveloper && (
+                <Button variant="default" size="sm" asChild>
+                  <Link to="/dashboard/developer">Dashboard</Link>
                 </Button>
               )}
             </>
@@ -101,6 +106,13 @@ const Navbar = () => {
                   {isAdminOrAsesor && (
                     <Button variant="default" size="sm" asChild>
                       <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                        Dashboard
+                      </Link>
+                    </Button>
+                  )}
+                  {!isAdminOrAsesor && isDeveloper && (
+                    <Button variant="default" size="sm" asChild>
+                      <Link to="/dashboard/developer" onClick={() => setMobileOpen(false)}>
                         Dashboard
                       </Link>
                     </Button>

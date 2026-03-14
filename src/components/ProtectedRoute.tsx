@@ -1,8 +1,13 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdminOrAsesor, loading } = useAuth();
+interface Props {
+  children: React.ReactNode;
+  requireDeveloper?: boolean;
+}
+
+const ProtectedRoute = ({ children, requireDeveloper }: Props) => {
+  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
 
   if (loading) {
     return (
@@ -16,7 +21,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isAdminOrAsesor) {
+  if (requireDeveloper && !isDeveloper && !isAdminOrAsesor) {
+    return <Navigate to="/lotes" replace />;
+  }
+
+  if (!requireDeveloper && !isAdminOrAsesor && !isDeveloper) {
     return <Navigate to="/lotes" replace />;
   }
 
