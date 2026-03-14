@@ -1,4 +1,6 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,8 @@ import {
   LogOut,
   Menu,
   X,
+  Bell,
+  BellRing,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
