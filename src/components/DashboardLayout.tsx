@@ -33,12 +33,13 @@ interface Props {
 }
 
 const DashboardLayout = ({ children }: Props) => {
-  const { user, roles, signOut } = useAuth();
+  const { user, roles, signOut, isDeveloper } = useAuth();
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
+  const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "asesor"].includes(r));
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
 
