@@ -96,9 +96,11 @@ const categoriasDoc = [
 
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, isDeveloper } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [contactOpen, setContactOpen] = useState(false);
+  const [creatingNeg, setCreatingNeg] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
