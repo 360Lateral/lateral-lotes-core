@@ -381,9 +381,42 @@ const LoteDetalle = () => {
                 variant="default"
                 size="lg"
                 className="w-full"
-                onClick={() => setContactOpen(true)}
+                disabled={creatingNeg}
+                onClick={async () => {
+                  if (isDeveloper && user) {
+                    setCreatingNeg(true);
+                    try {
+                      // Check existing negociacion
+                      const { data: existing } = await supabase
+                        .from("negociaciones")
+                        .select("id")
+                        .eq("lote_id", id!)
+                        .eq("developer_id", user.id)
+                        .in("estado", ["activa", "en_revision"] as any)
+                        .limit(1)
+                        .maybeSingle();
+                      if (existing) {
+                        navigate(`/negociacion/${existing.id}`);
+                      } else {
+                        const { data: nuevo, error } = await supabase
+                          .from("negociaciones")
+                          .insert({ lote_id: id!, developer_id: user.id } as any)
+                          .select("id")
+                          .single();
+                        if (error) throw error;
+                        navigate(`/negociacion/${nuevo.id}`);
+                      }
+                    } catch {
+                      toast({ title: "Error", description: "No se pudo iniciar la negociación.", variant: "destructive" });
+                    } finally {
+                      setCreatingNeg(false);
+                    }
+                  } else {
+                    setContactOpen(true);
+                  }
+                }}
               >
-                Me interesa este lote
+                {creatingNeg ? "Iniciando..." : "Me interesa este lote"}
               </Button>
             )}
 

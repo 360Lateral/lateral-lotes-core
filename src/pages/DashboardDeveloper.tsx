@@ -209,7 +209,85 @@ const DashboardDeveloper = () => {
           ))}
         </div>
       )}
+
+      {/* Mis Negociaciones */}
+      <MisNegociaciones userId={user?.id} />
     </DashboardLayout>
+  );
+};
+
+/* ---- Sub-component for negociaciones ---- */
+const estadoNegBadge = (e: string) => {
+  switch (e) {
+    case "activa": return "disponible" as const;
+    case "en_revision": return "reservado" as const;
+    case "cerrada": return "vendido" as const;
+    case "concretada": return "disponible" as const;
+    default: return "default" as const;
+  }
+};
+const estadoNegLabel = (e: string) => {
+  switch (e) {
+    case "activa": return "Activa";
+    case "en_revision": return "En revisión";
+    case "cerrada": return "Cerrada";
+    case "concretada": return "Concretada";
+    default: return e;
+  }
+};
+
+const MisNegociaciones = ({ userId }: { userId?: string }) => {
+  const { data: negociaciones = [], isLoading } = useQuery({
+    queryKey: ["dev-negociaciones", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("negociaciones")
+        .select("*, lotes(nombre_lote, ciudad)")
+        .eq("developer_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <>
+      <h2 className="mb-4 mt-8 font-body text-lg font-bold text-foreground">Mis Negociaciones</h2>
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2].map((i) => <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />)}
+        </div>
+      ) : negociaciones.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-12">
+          <Handshake className="mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="font-body text-sm text-muted-foreground">No tienes negociaciones activas.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {negociaciones.map((n: any) => (
+            <Card key={n.id}>
+              <CardContent className="p-4">
+                <div className="mb-2 flex items-start justify-between">
+                  <span className="font-body text-sm font-semibold text-foreground">
+                    {(n.lotes as any)?.nombre_lote ?? "Lote"}
+                  </span>
+                  <Badge variant={estadoNegBadge(n.estado)} className="text-xs">
+                    {estadoNegLabel(n.estado)}
+                  </Badge>
+                </div>
+                <p className="font-body text-xs text-muted-foreground mb-3">
+                  {(n.lotes as any)?.ciudad ?? ""} · {new Date(n.created_at).toLocaleDateString("es-CO")}
+                </p>
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link to={`/negociacion/${n.id}`}>Ir a sala</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
