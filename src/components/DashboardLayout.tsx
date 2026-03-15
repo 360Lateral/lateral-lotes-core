@@ -14,6 +14,7 @@ import {
   X,
   Bell,
   BellRing,
+  Handshake,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
