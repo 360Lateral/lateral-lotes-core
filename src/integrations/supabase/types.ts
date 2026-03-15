@@ -205,6 +205,76 @@ export type Database = {
         }
         Relationships: []
       }
+      mensajes: {
+        Row: {
+          contenido: string
+          created_at: string
+          id: string
+          negociacion_id: string
+          sender_id: string
+        }
+        Insert: {
+          contenido: string
+          created_at?: string
+          id?: string
+          negociacion_id: string
+          sender_id: string
+        }
+        Update: {
+          contenido?: string
+          created_at?: string
+          id?: string
+          negociacion_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensajes_negociacion_id_fkey"
+            columns: ["negociacion_id"]
+            isOneToOne: false
+            referencedRelation: "negociaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negociaciones: {
+        Row: {
+          contacto_visible: boolean
+          created_at: string
+          developer_id: string
+          estado: Database["public"]["Enums"]["estado_negociacion"]
+          id: string
+          lote_id: string
+          owner_id: string | null
+        }
+        Insert: {
+          contacto_visible?: boolean
+          created_at?: string
+          developer_id: string
+          estado?: Database["public"]["Enums"]["estado_negociacion"]
+          id?: string
+          lote_id: string
+          owner_id?: string | null
+        }
+        Update: {
+          contacto_visible?: boolean
+          created_at?: string
+          developer_id?: string
+          estado?: Database["public"]["Enums"]["estado_negociacion"]
+          id?: string
+          lote_id?: string
+          owner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negociaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       normativa_urbana: {
         Row: {
           aislamiento_frontal_m: number | null
@@ -424,6 +494,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
+      is_negociacion_participant: {
+        Args: { _negociacion_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "asesor" | "inversor" | "developer"
@@ -441,6 +515,7 @@ export type Database = {
         | "negociacion"
         | "cerrado"
         | "descartado"
+      estado_negociacion: "activa" | "en_revision" | "cerrada" | "concretada"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
     }
     CompositeTypes: {
@@ -586,6 +661,7 @@ export const Constants = {
         "cerrado",
         "descartado",
       ],
+      estado_negociacion: ["activa", "en_revision", "cerrada", "concretada"],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
     },
   },

@@ -18,6 +18,8 @@ import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
 import DashboardDeveloper from "./pages/DashboardDeveloper";
 import DashboardNotificaciones from "./pages/DashboardNotificaciones";
+import DashboardNegociaciones from "./pages/DashboardNegociaciones";
+import SalaNegociacion from "./pages/SalaNegociacion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +49,10 @@ const App = () => (
             {/* Rutas developer */}
             <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />
             <Route path="/dashboard/notificaciones" element={<ProtectedRoute requireDeveloper><DashboardNotificaciones /></ProtectedRoute>} />
+
+            {/* Negociaciones */}
+            <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
+            <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
