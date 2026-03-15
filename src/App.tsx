@@ -18,6 +18,8 @@ import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
 import DashboardDeveloper from "./pages/DashboardDeveloper";
 import DashboardNotificaciones from "./pages/DashboardNotificaciones";
+import DashboardNegociaciones from "./pages/DashboardNegociaciones";
+import SalaNegociacion from "./pages/SalaNegociacion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
