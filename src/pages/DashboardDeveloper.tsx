@@ -14,8 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, Plus, Trash2, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Bell, Plus, Trash2, X, Handshake } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const usosOptions = ["Cualquiera", "Residencial", "Comercial", "Industrial", "Rural"];
 
