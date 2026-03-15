@@ -26,6 +26,7 @@ const navItems = [
 ];
 
 const adminOnlyItems = [
+  { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
   { label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog },
 ];
 
