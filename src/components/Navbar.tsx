@@ -2,8 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   { label: "Lotes", href: "/lotes" },
@@ -13,9 +14,15 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
+  const { user, isAdminOrAsesor, isDeveloper, loading, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/", { replace: true });
+  };
 
   // Get display name from user metadata or email
   const displayName =
@@ -61,6 +68,14 @@ const Navbar = () => {
                   <Link to="/dashboard/developer">Dashboard</Link>
                 </Button>
               )}
+              <button
+                onClick={handleSignOut}
+                className="text-secondary-foreground/60 transition-colors hover:text-orange"
+                aria-label="Cerrar sesión"
+                title="Cerrar sesión"
+              >
+                <LogOut size={18} />
+              </button>
             </>
           ) : (
             <>
@@ -118,6 +133,15 @@ const Navbar = () => {
                       </Link>
                     </Button>
                   )}
+                  <Button
+                    variant="navOutline"
+                    size="sm"
+                    onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                    className="flex items-center gap-2"
+                  >
+                    <LogOut size={16} />
+                    Cerrar sesión
+                  </Button>
                 </>
               ) : (
                 <>
