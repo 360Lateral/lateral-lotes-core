@@ -186,6 +186,7 @@ export type Database = {
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato: number | null
           fondo_ml: number | null
+          foto_url: string | null
           frente_ml: number | null
           has_resolutoria: boolean | null
           id: string
@@ -209,6 +210,7 @@ export type Database = {
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato?: number | null
           fondo_ml?: number | null
+          foto_url?: string | null
           frente_ml?: number | null
           has_resolutoria?: boolean | null
           id?: string
@@ -232,6 +234,7 @@ export type Database = {
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato?: number | null
           fondo_ml?: number | null
+          foto_url?: string | null
           frente_ml?: number | null
           has_resolutoria?: boolean | null
           id?: string
