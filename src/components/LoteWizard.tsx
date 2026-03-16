@@ -31,6 +31,8 @@ import {
   FileText,
   CheckCircle2,
 } from "lucide-react";
+import { calculateLoteScore } from "@/lib/loteScore";
+import LoteScoreResult from "@/components/LoteScoreResult";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
@@ -386,31 +388,30 @@ const LoteWizard = () => {
 
   // ---- Confirmation screen ----
   if (published) {
+    const serviciosCount = Object.values(form.servicios).filter(Boolean).length;
+    const scoreResult = calculateLoteScore({
+      tiene_escritura: form.tiene_escritura,
+      departamento: form.departamento,
+      ciudad: form.ciudad,
+      area_total_m2: form.area_total_m2,
+      photosCount: photos.length,
+      precio_cop: form.precio_cop,
+      serviciosCount,
+      tiene_deudas: form.tiene_deudas,
+      problema_juridico: form.problema_juridico,
+      docsCount: docs.length,
+      matricula_inmobiliaria: "",
+    });
+
     return (
       <DashboardLayout>
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success/20">
-            <CheckCircle2 className="h-10 w-10 text-success" />
-          </div>
-          <h1 className="font-body text-2xl font-bold text-foreground">
-            ¡Tu lote fue enviado exitosamente!
-          </h1>
-          <p className="max-w-md font-body text-muted-foreground">
-            El equipo 360 Lateral lo revisará en menos de 24 horas. Te
-            notificaremos cuando esté activo.
-          </p>
-          <div className="flex gap-3">
-            <Button onClick={() => navigate("/dashboard/lotes")}>
-              Ver mis lotes
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/diagnostico")}
-            >
-              Solicitar Diagnóstico 360°
-            </Button>
-          </div>
-        </div>
+        <h1 className="mb-6 font-body text-xl font-bold text-foreground">
+          ¡Tu lote fue enviado exitosamente!
+        </h1>
+        <p className="mb-6 text-center font-body text-sm text-muted-foreground">
+          El equipo 360 Lateral lo revisará en menos de 24 horas. Mientras tanto, revisa el estado de tu publicación:
+        </p>
+        <LoteScoreResult result={scoreResult} />
       </DashboardLayout>
     );
   }
