@@ -487,6 +487,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
               <Switch checked={form.destacado} onCheckedChange={(v) => update("destacado", v)} />
               <Label className="text-xs">Lote destacado</Label>
             </div>
+            {isAdminOrAsesor && (
+              <div className="flex items-center gap-3">
+                <Switch checked={form.es_publico} onCheckedChange={(v) => update("es_publico", v)} />
+                <Label className="text-xs">Lote público</Label>
+                <span className="font-body text-xs text-muted-foreground">
+                  {form.es_publico ? "Visible en el catálogo público" : "Solo visible para el dueño y admins"}
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
