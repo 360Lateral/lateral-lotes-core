@@ -41,7 +41,7 @@ const estadoBadgeVariant = (estado: string) => {
   }
 };
 
-const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng }: LoteCardProps) => {
+const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios }: LoteCardProps) => {
   const hasCoords = lat != null && lng != null;
   const staticMapUrl = hasCoords
     ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+1D3461(${lng},${lat})/${lng},${lat},14,0/400x176@2x?access_token=${MAPBOX_TOKEN}`
