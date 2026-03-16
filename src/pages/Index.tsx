@@ -247,6 +247,8 @@ const Index = () => {
                 score_juridico={lote.score_juridico}
                 score_normativo={lote.score_normativo}
                 score_servicios={lote.score_servicios}
+                uso_principal={lote.uso_principal}
+                has_resolutoria={lote.has_resolutoria}
               />
             ))}
           </div>
