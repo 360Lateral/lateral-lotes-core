@@ -22,6 +22,7 @@ const Index = () => {
       if (roles.includes("admin")) return "Administrador";
       return "Asesor";
     }
+    if (userType === "comisionista") return "Comisionista";
     if (isDueno) return "Dueño de Lote";
     if (isDeveloper) return "Desarrollador / Inversionista";
     return "Usuario";
