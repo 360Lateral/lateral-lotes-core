@@ -55,31 +55,49 @@ const Index = () => {
   const renderHero = () => {
     if (authLoading) return null;
 
+    // Profile badge component for logged-in users
+    const ProfileBadge = () => (
+      <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
+        <User className="h-4 w-4 text-primary" />
+        <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
+        <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
+      </div>
+    );
+
     // Logged-in owner
     if (user && isDueno) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
-          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
-            <User className="h-4 w-4 text-primary" />
-            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
-            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
-          </div>
+          <ProfileBadge />
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
-            Gestiona tus lotes
+            Bienvenido a tu panel de lotes
           </h1>
           <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
-            Publica, edita y da seguimiento a tus terrenos. El equipo 360Lateral te ayuda a conectar con compradores calificados.
+            Desde aquí puedes publicar nuevos terrenos, ver el estado de tus lotes actuales, solicitar diagnósticos y dar seguimiento a tus negociaciones.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/dashboard/lotes/nuevo">
-                <Plus className="mr-2 h-5 w-5" />
-                Publicar nuevo lote
+              <Link to="/dashboard/owner">
+                <LayoutDashboard className="mr-2 h-5 w-5" />
+                Ir a Mi Panel
               </Link>
             </Button>
             <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-              <Link to="/diagnostico">Solicitar Diagnóstico 360°</Link>
+              <Link to="/dashboard/owner/lotes">
+                <MapPin className="mr-2 h-5 w-5" />
+                Ver mis lotes
+              </Link>
             </Button>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-secondary-foreground/50">
+            <Link to="/dashboard/lotes/nuevo" className="flex items-center gap-1.5 font-body text-sm hover:text-secondary-foreground transition-colors">
+              <Plus className="h-4 w-4" />
+              Publicar nuevo lote
+            </Link>
+            <Link to="/diagnostico" className="flex items-center gap-1.5 font-body text-sm hover:text-secondary-foreground transition-colors">
+              <FileCheck className="h-4 w-4" />
+              Solicitar diagnóstico
+            </Link>
           </div>
         </section>
       );
@@ -89,11 +107,7 @@ const Index = () => {
     if (user && isDeveloper) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
-          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
-            <User className="h-4 w-4 text-primary" />
-            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
-            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
-          </div>
+          <ProfileBadge />
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
             Encuentra tu próximo terreno
           </h1>
@@ -122,11 +136,7 @@ const Index = () => {
     if (user && isAdminOrAsesor) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
-          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
-            <User className="h-4 w-4 text-primary" />
-            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
-            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
-          </div>
+          <ProfileBadge />
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
             Panel de administración
           </h1>
@@ -145,7 +155,36 @@ const Index = () => {
       );
     }
 
-    // Not logged in — simplified hero focused on registration
+    // Logged-in but no specific type matched — generic fallback
+    if (user) {
+      return (
+        <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <ProfileBadge />
+          <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
+            Bienvenido a 360Lateral
+          </h1>
+          <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
+            Gestiona tus lotes o explora oportunidades de inversión en terrenos.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/lotes">
+                <Search className="mr-2 h-5 w-5" />
+                Explorar lotes
+              </Link>
+            </Button>
+            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
+              <Link to="/diagnostico">
+                <FileCheck className="mr-2 h-5 w-5" />
+                Solicitar diagnóstico
+              </Link>
+            </Button>
+          </div>
+        </section>
+      );
+    }
+
+    // Not logged in
     return (
       <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
         <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
