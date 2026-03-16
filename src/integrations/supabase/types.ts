@@ -99,28 +99,52 @@ export type Database = {
           area_m2: number | null
           ciudad: string | null
           created_at: string
+          departamento: string | null
           email: string | null
+          estado: string | null
           id: string
           nombre: string | null
           notas: string | null
+          objetivo: string | null
+          problema_juridico: string | null
+          servicios: string[] | null
+          telefono: string | null
+          tiene_escritura: boolean | null
+          tipo_lote: string | null
         }
         Insert: {
           area_m2?: number | null
           ciudad?: string | null
           created_at?: string
+          departamento?: string | null
           email?: string | null
+          estado?: string | null
           id?: string
           nombre?: string | null
           notas?: string | null
+          objetivo?: string | null
+          problema_juridico?: string | null
+          servicios?: string[] | null
+          telefono?: string | null
+          tiene_escritura?: boolean | null
+          tipo_lote?: string | null
         }
         Update: {
           area_m2?: number | null
           ciudad?: string | null
           created_at?: string
+          departamento?: string | null
           email?: string | null
+          estado?: string | null
           id?: string
           nombre?: string | null
           notas?: string | null
+          objetivo?: string | null
+          problema_juridico?: string | null
+          servicios?: string[] | null
+          telefono?: string | null
+          tiene_escritura?: boolean | null
+          tipo_lote?: string | null
         }
         Relationships: []
       }
