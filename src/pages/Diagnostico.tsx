@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type TipoLote = "Urbano" | "Rural" | "Expansión urbana";
 
@@ -37,13 +39,29 @@ const formatCOP = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 
+const serviciosOptions = ["Agua", "Energía", "Gas", "Alcantarillado", "Ninguno"];
+
 const Diagnostico = () => {
+  const { toast } = useToast();
+
+  // Estimation fields
   const [municipio, setMunicipio] = useState("");
   const [area, setArea] = useState("");
   const [tipo, setTipo] = useState<TipoLote | "">("");
   const [loading, setLoading] = useState(false);
   const [estimacion, setEstimacion] = useState<Estimacion | null>(null);
   const [searched, setSearched] = useState(false);
+
+  // Extended form fields
+  const [departamento, setDepartamento] = useState("");
+  const [escritura, setEscritura] = useState("");
+  const [problemaJuridico, setProblemaJuridico] = useState("");
+  const [serviciosSeleccionados, setServiciosSeleccionados] = useState<string[]>([]);
+  const [objetivo, setObjetivo] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const canEstimate = municipio.trim() && area && Number(area) > 0 && tipo;
 
@@ -115,6 +133,63 @@ const Diagnostico = () => {
       setEstimacion(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleServicio = (s: string) => {
+    if (s === "Ninguno") {
+      setServiciosSeleccionados((prev) =>
+        prev.includes("Ninguno") ? [] : ["Ninguno"]
+      );
+      return;
+    }
+    setServiciosSeleccionados((prev) => {
+      const without = prev.filter((x) => x !== "Ninguno");
+      return without.includes(s)
+        ? without.filter((x) => x !== s)
+        : [...without, s];
+    });
+  };
+
+  const handleSubmitDiagnostico = async () => {
+    if (!nombre.trim() || !email.trim()) {
+      toast({ title: "Campos requeridos", description: "Nombre y email son obligatorios.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("diagnosticos").insert({
+        ciudad: municipio.trim() || null,
+        departamento: departamento.trim() || null,
+        area_m2: area ? Number(area) : null,
+        tipo_lote: tipo || null,
+        tiene_escritura: escritura === "si" ? true : escritura === "no" ? false : null,
+        problema_juridico: problemaJuridico || null,
+        servicios: serviciosSeleccionados.length > 0 ? serviciosSeleccionados : null,
+        objetivo: objetivo || null,
+        nombre: nombre.trim(),
+        email: email.trim(),
+        telefono: telefono.trim() || null,
+        estado: "nuevo",
+      } as any);
+      if (error) throw error;
+      toast({
+        title: "¡Diagnóstico recibido!",
+        description: "En menos de 24 horas tendrás tu reporte en el email registrado.",
+      });
+      // Reset extended fields
+      setDepartamento("");
+      setEscritura("");
+      setProblemaJuridico("");
+      setServiciosSeleccionados([]);
+      setObjetivo("");
+      setNombre("");
+      setEmail("");
+      setTelefono("");
+    } catch {
+      toast({ title: "Error", description: "No se pudo enviar el diagnóstico. Intenta de nuevo.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -232,6 +307,18 @@ const Diagnostico = () => {
                       {estimacion.count > 1 ? "es" : ""} en la plataforma. Para un avalúo
                       preciso, solicita tu Diagnóstico 360° completo.
                     </p>
+
+                    <div className="mt-6 flex flex-col gap-3">
+                      <Button
+                        className="w-full bg-orange hover:bg-orange/90 text-white"
+                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
+                      >
+                        Quiero la Resolutoría completa
+                      </Button>
+                      <p className="text-white/50 text-xs text-center">
+                        Análisis de 8 áreas + Teaser Financiero desde 1.7 SMLMV
+                      </p>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -242,6 +329,134 @@ const Diagnostico = () => {
               )}
             </div>
           )}
+
+          {/* Extended form — Solicitar diagnóstico */}
+          <div className="mt-12 border-t border-border pt-8">
+            <h2 className="font-heading text-xl font-bold text-secondary mb-2">
+              ¿Quieres que el equipo 360 Lateral analice tu lote?
+            </h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              Déjanos tus datos:
+            </p>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="departamento">Departamento</Label>
+                <Input
+                  id="departamento"
+                  placeholder="Ej: Antioquia"
+                  value={departamento}
+                  onChange={(e) => setDepartamento(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>¿Tiene escritura pública?</Label>
+                <Select value={escritura} onValueChange={setEscritura}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una opción" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="si">Sí</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>¿Conoce algún problema jurídico?</Label>
+                <Select value={problemaJuridico} onValueChange={setProblemaJuridico}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una opción" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="si">Sí</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                    <SelectItem value="no_seguro">No estoy seguro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Servicios disponibles</Label>
+                <div className="flex flex-wrap gap-4 mt-1">
+                  {serviciosOptions.map((s) => (
+                    <label key={s} className="flex items-center gap-2 font-body text-sm cursor-pointer">
+                      <Checkbox
+                        checked={serviciosSeleccionados.includes(s)}
+                        onCheckedChange={() => handleToggleServicio(s)}
+                      />
+                      {s}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>¿Cuál es tu objetivo?</Label>
+                <Select value={objetivo} onValueChange={setObjetivo}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tu objetivo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vender">Vender</SelectItem>
+                    <SelectItem value="desarrollar">Desarrollar</SelectItem>
+                    <SelectItem value="conocer_valor">Conocer su valor</SelectItem>
+                    <SelectItem value="buscar_socio">Buscar socio</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre completo *</Label>
+                <Input
+                  id="nombre"
+                  placeholder="Tu nombre"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                  maxLength={100}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="diag-email">Email *</Label>
+                <Input
+                  id="diag-email"
+                  type="email"
+                  placeholder="tu@correo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  maxLength={255}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="diag-telefono">Teléfono (opcional)</Label>
+                <Input
+                  id="diag-telefono"
+                  type="tel"
+                  placeholder="Ej: 300 123 4567"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+
+              <Button
+                onClick={handleSubmitDiagnostico}
+                disabled={submitting || !nombre.trim() || !email.trim()}
+                className="w-full bg-orange hover:bg-orange/90 text-white"
+                size="lg"
+              >
+                {submitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Solicitar mi Diagnóstico Gratuito
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />
