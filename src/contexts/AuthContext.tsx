@@ -8,6 +8,7 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   roles: AppRole[];
+  userType: string | null;
   loading: boolean;
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   roles: [],
+  userType: null,
   loading: true,
   isAdminOrAsesor: false,
   isDeveloper: false,
@@ -30,6 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
+  const [userType, setUserType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchRoles = async (userId: string) => {
@@ -42,16 +45,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const fetchUserType = async (userId: string) => {
+    const { data } = await supabase
+      .from("perfiles")
+      .select("user_type")
+      .eq("id", userId)
+      .single();
+    if (data) {
+      setUserType((data as any).user_type ?? null);
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Use setTimeout to avoid Supabase deadlock
-          setTimeout(() => fetchRoles(session.user.id), 0);
+          setTimeout(() => {
+            fetchRoles(session.user.id);
+            fetchUserType(session.user.id);
+          }, 0);
         } else {
           setRoles([]);
+          setUserType(null);
         }
         setLoading(false);
       }
@@ -62,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchRoles(session.user.id);
+        fetchUserType(session.user.id);
       }
       setLoading(false);
     });
@@ -78,10 +96,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setRoles([]);
+    setUserType(null);
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, roles, loading, isAdminOrAsesor, isDeveloper, signOut }}>
+    <AuthContext.Provider value={{ session, user, roles, userType, loading, isAdminOrAsesor, isDeveloper, signOut }}>
       {children}
     </AuthContext.Provider>
   );
