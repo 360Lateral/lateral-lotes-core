@@ -21,6 +21,7 @@ interface LoteCardProps {
   score_servicios?: number | null;
   uso_principal?: string | null;
   has_resolutoria?: boolean | null;
+  foto_url?: string | null;
 }
 
 const formatCOP = (value: number) =>
