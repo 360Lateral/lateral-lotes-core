@@ -874,6 +874,7 @@ const LoteDetalle = () => {
                   </div>
                 )}
               </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
