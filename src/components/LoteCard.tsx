@@ -54,8 +54,8 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
 
   return (
   <div className="flex flex-col overflow-hidden rounded-lg border border-gray-light bg-card">
-    {staticMapUrl ? (
-      <img src={staticMapUrl} alt={`Mapa de ${nombre}`} className="h-22 w-full object-cover" />
+    {imageUrl ? (
+      <img src={imageUrl} alt={`Foto de ${nombre}`} className="h-22 w-full object-cover" />
     ) : (
       <div className="flex h-22 items-center justify-center bg-secondary">
         <Logo variant="on-navy" className="opacity-40" />
