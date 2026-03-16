@@ -131,6 +131,9 @@ const Index = () => {
           <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
             <Link to="/login">Iniciar sesión</Link>
           </Button>
+          <Button variant="ghost" size="xl" asChild>
+            <Link to="/lotes">Explorar lotes</Link>
+          </Button>
         </div>
         <Link to="/diagnostico" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
           ¿Tienes un lote? Descubre su valor gratis →
