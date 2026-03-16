@@ -97,7 +97,7 @@ const categoriasDoc = [
 
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
-  const { user, isDeveloper } = useAuth();
+  const { user, isDeveloper, isAdminOrAsesor } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [contactOpen, setContactOpen] = useState(false);
