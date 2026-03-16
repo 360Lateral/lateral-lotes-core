@@ -34,6 +34,7 @@ import {
   FileText,
   Download,
   Lock,
+  Pencil,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
