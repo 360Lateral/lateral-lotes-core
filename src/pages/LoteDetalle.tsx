@@ -310,9 +310,13 @@ const LoteDetalle = () => {
         <div className="grid gap-8 lg:grid-cols-5">
           {/* LEFT COLUMN (60%) */}
           <div className="flex flex-col gap-6 lg:col-span-3">
-            {/* Gallery / Placeholder */}
+            {/* Gallery / Photo / Placeholder */}
             <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
-              <Logo variant="on-navy" className="opacity-40" />
+              {(lote as any).foto_url ? (
+                <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
+              ) : (
+                <Logo variant="on-navy" className="opacity-40" />
+              )}
             </div>
 
             {/* Mini map */}
