@@ -94,6 +94,36 @@ export type Database = {
           },
         ]
       }
+      diagnosticos: {
+        Row: {
+          area_m2: number | null
+          ciudad: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nombre: string | null
+          notas: string | null
+        }
+        Insert: {
+          area_m2?: number | null
+          ciudad?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          notas?: string | null
+        }
+        Update: {
+          area_m2?: number | null
+          ciudad?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          notas?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           asignado_a: string | null
@@ -157,6 +187,7 @@ export type Database = {
           estrato: number | null
           fondo_ml: number | null
           frente_ml: number | null
+          has_resolutoria: boolean | null
           id: string
           lat: number | null
           lng: number | null
@@ -179,6 +210,7 @@ export type Database = {
           estrato?: number | null
           fondo_ml?: number | null
           frente_ml?: number | null
+          has_resolutoria?: boolean | null
           id?: string
           lat?: number | null
           lng?: number | null
@@ -201,6 +233,7 @@ export type Database = {
           estrato?: number | null
           fondo_ml?: number | null
           frente_ml?: number | null
+          has_resolutoria?: boolean | null
           id?: string
           lat?: number | null
           lng?: number | null
