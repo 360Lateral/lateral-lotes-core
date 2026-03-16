@@ -9,7 +9,7 @@ import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } fro
 
 const Index = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
-  const isDueno = userType === "dueno";
+  const isDueno = userType === "dueno" || userType === "comisionista";
 
   const displayName =
     user?.user_metadata?.full_name ||
