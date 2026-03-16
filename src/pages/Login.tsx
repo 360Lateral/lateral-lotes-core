@@ -32,8 +32,8 @@ const Login = () => {
 
     if (isAdminOrAsesor) {
       navigate("/dashboard", { replace: true });
-    } else if (userType === "dueno") {
-      navigate("/diagnostico", { replace: true });
+    } else if (userType === "dueno" || userType === "comisionista") {
+      navigate("/dashboard/owner", { replace: true });
     } else if (userType === "developer") {
       navigate("/lotes", { replace: true });
     } else {

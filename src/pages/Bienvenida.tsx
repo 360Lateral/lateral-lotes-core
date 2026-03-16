@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Home, Building2, Check } from "lucide-react";
+import { Home, Building2, UserCheck, Check } from "lucide-react";
 
-type Perfil = "dueno" | "developer";
+type Perfil = "dueno" | "developer" | "comisionista";
 
 const perfiles: {
   id: Perfil;
@@ -30,6 +30,20 @@ const perfiles: {
     accentClass: "border-orange text-orange",
     borderClass: "hover:border-orange",
     checkClass: "text-orange",
+  },
+  {
+    id: "comisionista",
+    icon: UserCheck,
+    titulo: "Represento a un dueño",
+    descripcion: "Soy comisionista o representante autorizado de un propietario",
+    beneficios: [
+      "Gestiona lotes en nombre del propietario",
+      "Deberás subir un documento de autorización",
+      "Conecta con compradores calificados",
+    ],
+    accentClass: "border-emerald-500 text-emerald-500",
+    borderClass: "hover:border-emerald-500",
+    checkClass: "text-emerald-500",
   },
   {
     id: "developer",
@@ -59,7 +73,7 @@ const Bienvenida = () => {
     if (!loading && user) {
       if (isAdminOrAsesor) {
         navigate("/dashboard", { replace: true });
-      } else if (userType === "dueno") {
+      } else if (userType === "dueno" || userType === "comisionista") {
         navigate("/dashboard/owner", { replace: true });
       } else if (userType === "developer") {
         navigate("/dashboard/developer", { replace: true });
@@ -92,7 +106,7 @@ const Bienvenida = () => {
       </p>
 
       {/* Cards */}
-      <div className="grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-3">
         {perfiles.map((perfil) => {
           const isSelected = selected === perfil.id;
           const Icon = perfil.icon;
@@ -112,6 +126,8 @@ const Bienvenida = () => {
                   isSelected
                     ? perfil.id === "dueno"
                       ? "bg-orange/20 text-orange"
+                      : perfil.id === "comisionista"
+                      ? "bg-emerald-500/20 text-emerald-500"
                       : "bg-blue-500/20 text-blue-500"
                     : "bg-white/10 text-white/60"
                 }`}

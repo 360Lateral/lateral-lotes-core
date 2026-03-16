@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children, requireDeveloper, allowOwner }: Props) => {
     return <Navigate to="/login" replace />;
   }
 
-  const isOwner = userType === "dueno";
+  const isOwner = userType === "dueno" || userType === "comisionista";
 
   if (requireDeveloper && !isDeveloper && !isAdminOrAsesor) {
     return <Navigate to="/lotes" replace />;

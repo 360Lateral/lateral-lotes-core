@@ -33,12 +33,14 @@ import {
 import { Loader2, Search, ShieldPlus, ShieldMinus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-const ALL_ROLES = ["super_admin", "admin", "asesor", "inversor", "developer"] as const;
+const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
   admin: "Administrador",
   asesor: "Asesor",
+  dueno: "Dueño",
+  comisionista: "Comisionista",
   inversor: "Inversor",
   developer: "Developer",
 };
@@ -47,6 +49,8 @@ const ROLE_COLORS: Record<string, string> = {
   super_admin: "bg-destructive text-destructive-foreground",
   admin: "bg-primary text-primary-foreground",
   asesor: "bg-accent text-accent-foreground",
+  dueno: "bg-primary/80 text-primary-foreground",
+  comisionista: "bg-accent/80 text-accent-foreground",
   inversor: "bg-muted text-muted-foreground",
   developer: "bg-secondary text-secondary-foreground",
 };
@@ -58,6 +62,7 @@ interface UserRecord {
   user_type: string | null;
   activo: boolean;
   roles: string[];
+  comisionista_doc_estado: string | null;
   created_at: string;
   last_sign_in_at: string | null;
 }
@@ -151,6 +156,7 @@ const DashboardUsuarios = () => {
 
   const userTypeLabel = (t: string | null) => {
     if (t === "dueno") return "Dueño";
+    if (t === "comisionista") return "Comisionista";
     if (t === "developer") return "Developer";
     return t ?? "—";
   };
@@ -217,9 +223,32 @@ const DashboardUsuarios = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {userTypeLabel(u.user_type)}
-                            </span>
+                            <div>
+                              <span className="text-sm text-muted-foreground">
+                                {userTypeLabel(u.user_type)}
+                              </span>
+                              {u.user_type === "comisionista" && (
+                                <div className="mt-0.5">
+                                  <Badge variant="outline" className={`text-[10px] ${
+                                    u.comisionista_doc_estado === "aprobado"
+                                      ? "border-green-500 text-green-600"
+                                      : u.comisionista_doc_estado === "pendiente"
+                                      ? "border-yellow-500 text-yellow-600"
+                                      : u.comisionista_doc_estado === "rechazado"
+                                      ? "border-destructive text-destructive"
+                                      : "border-muted text-muted-foreground"
+                                  }`}>
+                                    {u.comisionista_doc_estado === "aprobado"
+                                      ? "Doc. aprobado"
+                                      : u.comisionista_doc_estado === "pendiente"
+                                      ? "Doc. pendiente"
+                                      : u.comisionista_doc_estado === "rechazado"
+                                      ? "Doc. rechazado"
+                                      : "Sin documento"}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">

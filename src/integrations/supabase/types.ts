@@ -148,6 +148,47 @@ export type Database = {
         }
         Relationships: []
       }
+      documentos_comisionista: {
+        Row: {
+          created_at: string
+          estado: string
+          id: string
+          lote_id: string | null
+          nombre_documento: string
+          notas_admin: string | null
+          url_storage: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          estado?: string
+          id?: string
+          lote_id?: string | null
+          nombre_documento: string
+          notas_admin?: string | null
+          url_storage: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          estado?: string
+          id?: string
+          lote_id?: string | null
+          nombre_documento?: string
+          notas_admin?: string | null
+          url_storage?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favoritos: {
         Row: {
           created_at: string
@@ -657,7 +698,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "super_admin" | "admin" | "asesor" | "inversor" | "developer"
+      app_role:
+        | "super_admin"
+        | "admin"
+        | "asesor"
+        | "inversor"
+        | "developer"
+        | "dueno"
+        | "comisionista"
       categoria_documento:
         | "financiero"
         | "tecnico"
@@ -805,7 +853,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "admin", "asesor", "inversor", "developer"],
+      app_role: [
+        "super_admin",
+        "admin",
+        "asesor",
+        "inversor",
+        "developer",
+        "dueno",
+        "comisionista",
+      ],
       categoria_documento: [
         "financiero",
         "tecnico",

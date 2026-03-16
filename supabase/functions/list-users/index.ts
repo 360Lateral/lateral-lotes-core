@@ -55,16 +55,29 @@ Deno.serve(async (req) => {
     const { data: { users }, error } = await adminClient.auth.admin.listUsers({ perPage: 1000 });
     if (error) throw error;
 
-    // Get all profiles and roles
-    const { data: perfiles } = await adminClient.from("perfiles").select("*");
-    const { data: roles } = await adminClient.from("user_roles").select("*");
+    // Get all profiles, roles, and comisionista docs
+    const [perfilesRes, rolesRes, comDocsRes] = await Promise.all([
+      adminClient.from("perfiles").select("*"),
+      adminClient.from("user_roles").select("*"),
+      adminClient.from("documentos_comisionista").select("user_id, estado"),
+    ]);
 
-    const perfilesMap = new Map((perfiles ?? []).map((p: any) => [p.id, p]));
+    const perfiles = perfilesRes.data ?? [];
+    const roles = rolesRes.data ?? [];
+    const comDocs = comDocsRes.data ?? [];
+
+    const perfilesMap = new Map(perfiles.map((p: any) => [p.id, p]));
     const rolesMap = new Map<string, string[]>();
-    for (const r of roles ?? []) {
+    for (const r of roles) {
       const existing = rolesMap.get(r.user_id) ?? [];
       existing.push(r.role);
       rolesMap.set(r.user_id, existing);
+    }
+
+    // Comisionista doc status per user
+    const comDocStatus = new Map<string, string>();
+    for (const d of comDocs) {
+      comDocStatus.set(d.user_id, d.estado);
     }
 
     const result = users.map((u: any) => {
@@ -76,6 +89,7 @@ Deno.serve(async (req) => {
         user_type: perfil?.user_type ?? null,
         activo: perfil?.activo ?? true,
         roles: rolesMap.get(u.id) ?? [],
+        comisionista_doc_estado: comDocStatus.get(u.id) ?? null,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at,
       };
