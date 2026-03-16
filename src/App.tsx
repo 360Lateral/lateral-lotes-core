@@ -25,6 +25,9 @@ import Diagnostico from "./pages/Diagnostico";
 import DiagnosticoResultado from "./pages/DiagnosticoResultado";
 import Mercado from "./pages/Mercado";
 import DashboardOwner from "./pages/DashboardOwner";
+import DashboardOwnerLotes from "./pages/DashboardOwnerLotes";
+import DashboardOwnerDiagnosticos from "./pages/DashboardOwnerDiagnosticos";
+import DashboardOwnerNegociaciones from "./pages/DashboardOwnerNegociaciones";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
