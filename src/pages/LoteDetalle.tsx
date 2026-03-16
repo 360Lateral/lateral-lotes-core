@@ -128,6 +128,20 @@ const LoteDetalle = () => {
     enabled: !!id,
   });
 
+  // Fetch fotos
+  const { data: fotos = [] } = useQuery({
+    queryKey: ["lote-fotos", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("fotos_lotes")
+        .select("url, orden")
+        .eq("lote_id", id!)
+        .order("orden", { ascending: true });
+      return data ?? [];
+    },
+    enabled: !!id,
+  });
+
   // Fetch precio
   const { data: precio } = useQuery({
     queryKey: ["lote-precio", id],
@@ -143,6 +157,22 @@ const LoteDetalle = () => {
       return data;
     },
     enabled: !!id,
+  });
+
+  // Fetch precio referencia zona
+  const { data: precioRef } = useQuery({
+    queryKey: ["precio-ref", lote?.ciudad],
+    enabled: !!lote?.ciudad,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("precios")
+        .select("precio_m2_cop, lotes!inner(ciudad)")
+        .eq("lotes.ciudad", lote!.ciudad!)
+        .not("lote_id", "eq", id);
+      if (!data || data.length === 0) return null;
+      const avg = data.reduce((s, r) => s + Number(r.precio_m2_cop), 0) / data.length;
+      return Math.round(avg);
+    },
   });
 
   // Fetch normativa
@@ -328,14 +358,72 @@ const LoteDetalle = () => {
         <div className="grid gap-8 lg:grid-cols-5">
           {/* LEFT COLUMN (60%) */}
           <div className="flex flex-col gap-6 lg:col-span-3">
-            {/* Gallery / Photo / Placeholder */}
-            <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
-              {(lote as any).foto_url ? (
-                <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
-              ) : (
-                <Logo variant="on-navy" className="opacity-40" />
+            {/* Gallery */}
+            <div className="relative flex flex-col gap-2">
+              <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
+                {fotos.length > 0 ? (
+                  <>
+                    <img src={fotos[galleryIndex]?.url} alt={`${lote.nombre_lote} - foto ${galleryIndex + 1}`} className="h-full w-full object-cover" />
+                    {fotos.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setGalleryIndex((prev) => (prev - 1 + fotos.length) % fotos.length)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => setGalleryIndex((prev) => (prev + 1) % fotos.length)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (lote as any).foto_url ? (
+                  <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
+                ) : (
+                  <Logo variant="on-navy" className="opacity-40" />
+                )}
+              </div>
+              {/* Thumbnails */}
+              {fotos.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto">
+                  {fotos.slice(0, 5).map((f, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setGalleryIndex(i)}
+                      className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-colors ${
+                        i === galleryIndex ? "border-primary" : "border-transparent"
+                      }`}
+                    >
+                      <img src={f.url} alt={`Miniatura ${i + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
+
+            {/* Video */}
+            {(lote as any).video_url && (
+              <div>
+                {(lote as any).video_url.includes("youtube") || (lote as any).video_url.includes("youtu.be") ? (
+                  <iframe
+                    src={(lote as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                    className="w-full rounded-lg h-48 md:h-64"
+                    allowFullScreen
+                    title="Video del lote"
+                  />
+                ) : (
+                  <video
+                    src={(lote as any).video_url}
+                    controls
+                    className="w-full rounded-lg max-h-64"
+                  />
+                )}
+              </div>
+            )}
 
             {/* Mini map */}
             {lote.lat && lote.lng && (
@@ -404,9 +492,14 @@ const LoteDetalle = () => {
                     {formatCOP(Number(precio.precio_cop))}
                   </p>
                 )}
-                {precio.precio_m2_cop != null && (
+                 {precio.precio_m2_cop != null && (
                   <p className="font-body text-sm text-muted-foreground">
                     {formatCOP(Number(precio.precio_m2_cop))}/m²
+                  </p>
+                )}
+                {precioRef && (
+                  <p className="font-body text-xs text-muted-foreground">
+                    Promedio zona: {formatCOP(precioRef)}/m²
                   </p>
                 )}
               </div>
@@ -513,6 +606,9 @@ const LoteDetalle = () => {
                 </TabsTrigger>
                 <TabsTrigger value="documentos" className="flex-1 font-body text-xs">
                   Documentos
+                </TabsTrigger>
+                <TabsTrigger value="resolutoria" className="flex-1 font-body text-xs">
+                  Resolutoría
                 </TabsTrigger>
               </TabsList>
 
@@ -742,6 +838,40 @@ const LoteDetalle = () => {
                   <p className="py-6 text-center font-body text-sm text-muted-foreground">
                     No hay documentos para este lote.
                   </p>
+                )}
+              </TabsContent>
+
+              {/* Tab: Resolutoría */}
+              <TabsContent value="resolutoria">
+                {(lote as any).has_resolutoria === true ? (
+                  <div className="flex flex-col gap-4">
+                    <Badge variant="disponible" className="w-fit gap-1 text-sm px-3 py-1">
+                      <Check className="h-4 w-4" /> Resolutoría 360° Completada
+                    </Badge>
+                    <div className="grid grid-cols-2 gap-2">
+                      {["Normativo", "Jurídico", "Servicios Públicos", "Suelos", "Mercado", "Ambiental", "Topográfico", "Urbanístico"].map((area) => (
+                        <div key={area} className="flex items-center gap-2 font-body text-sm text-foreground">
+                          <Check className="h-4 w-4 text-green-600 shrink-0" />
+                          {area}
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="outline" asChild className="w-fit">
+                      <Link to="/planes">Ver Teaser Financiero</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 py-6 text-center">
+                    <p className="font-body text-sm font-semibold text-foreground">
+                      Este lote aún no tiene Resolutoría 360°
+                    </p>
+                    <p className="font-body text-xs text-muted-foreground max-w-sm">
+                      Análisis de 8 áreas que transforma tu lote en un activo comercializable con Teaser Financiero.
+                    </p>
+                    <Button className="bg-orange-500 hover:bg-orange-600 text-white" asChild>
+                      <Link to={`/diagnostico?lote_id=${id}`}>Solicitar Resolutoría</Link>
+                    </Button>
+                  </div>
                 )}
               </TabsContent>
             </Tabs>
