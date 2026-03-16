@@ -146,6 +146,15 @@ const SalaNegociacion = () => {
     onSuccess: () => {
       setMensaje("");
       queryClient.invalidateQueries({ queryKey: ["mensajes", id] });
+      // Notificar al otro usuario
+      if (otherUserId) {
+        supabase.from("notificaciones").insert({
+          user_id: otherUserId,
+          lote_id: negociacion?.lote_id,
+          mensaje: `Nuevo mensaje en la negociación de ${loteData?.nombre_lote ?? "tu lote"}`,
+          leida: false,
+        } as any).then(() => {});
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "No se pudo enviar el mensaje.", variant: "destructive" });
@@ -215,9 +224,35 @@ const SalaNegociacion = () => {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {mensajes.length === 0 && (
+        {mensajes.length === 0 && canChat && (
+          <div className="mx-auto max-w-sm rounded-xl border border-border bg-background p-5 text-center mt-8">
+            <p className="font-body text-sm font-semibold text-foreground mb-2">
+              Sala de Negociación 360°
+            </p>
+            <p className="font-body text-xs text-muted-foreground mb-4">
+              Esta conversación es privada y moderada por el equipo 360 Lateral.
+              Inicia presentándote y describiendo tu interés en el lote.
+            </p>
+            <div className="flex flex-col gap-2">
+              {[
+                "Hola, me interesa conocer más sobre este lote",
+                "¿Cuál es el precio negociable?",
+                "¿Tiene estudios de suelos disponibles?",
+              ].map((sugerencia) => (
+                <button
+                  key={sugerencia}
+                  onClick={() => setMensaje(sugerencia)}
+                  className="rounded-lg border border-border px-3 py-2 font-body text-xs text-muted-foreground text-left hover:bg-accent transition-colors"
+                >
+                  {sugerencia}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {mensajes.length === 0 && !canChat && (
           <p className="py-8 text-center font-body text-sm text-muted-foreground">
-            No hay mensajes aún. ¡Inicia la conversación!
+            No hay mensajes aún.
           </p>
         )}
         {mensajes.map((m: any) => {
