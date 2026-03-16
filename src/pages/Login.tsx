@@ -23,7 +23,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const navigate = useNavigate();
-  const { user, roles, userType, loading: authLoading, isAdminOrAsesor } = useAuth();
+  const { user, userType, loading: authLoading, isAdminOrAsesor } = useAuth();
 
   // Redirect based on AuthContext state after login
   useEffect(() => {
