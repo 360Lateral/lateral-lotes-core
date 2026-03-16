@@ -613,10 +613,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <Label className="text-xs">Score Jurídico</Label>
-              <Select value={form.score_juridico} onValueChange={(v) => update("score_juridico", v)}>
+              <Select value={form.score_juridico || "none"} onValueChange={(v) => update("score_juridico", v === "none" ? "" : v)}>
                 <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="none">Sin asignar</SelectItem>
                   <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
                   <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
                   <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
@@ -625,10 +625,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </div>
             <div>
               <Label className="text-xs">Score Normativo</Label>
-              <Select value={form.score_normativo} onValueChange={(v) => update("score_normativo", v)}>
+              <Select value={form.score_normativo || "none"} onValueChange={(v) => update("score_normativo", v === "none" ? "" : v)}>
                 <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="none">Sin asignar</SelectItem>
                   <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
                   <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
                   <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
@@ -637,10 +637,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </div>
             <div>
               <Label className="text-xs">Score Servicios</Label>
-              <Select value={form.score_servicios} onValueChange={(v) => update("score_servicios", v)}>
+              <Select value={form.score_servicios || "none"} onValueChange={(v) => update("score_servicios", v === "none" ? "" : v)}>
                 <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="none">Sin asignar</SelectItem>
                   <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
                   <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
                   <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
