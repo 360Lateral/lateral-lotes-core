@@ -18,6 +18,31 @@ const Index = () => {
   const [areaMin, setAreaMin] = useState<string>("");
   const [areaMax, setAreaMax] = useState<string>("");
 
+  // Trust bar stats
+  const { data: trustStats = [
+    { label: "Lotes disponibles", value: "—" },
+    { label: "Municipios", value: "—" },
+    { label: "Diagnósticos realizados", value: "—" },
+    { label: "Resolutoría 360° Verificada", value: "—" },
+  ] } = useQuery({
+    queryKey: ["trust-stats"],
+    queryFn: async () => {
+      const [lotesRes, ciudadesRes, diagRes, resoRes] = await Promise.all([
+        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("estado_disponibilidad", "Disponible"),
+        supabase.from("lotes").select("ciudad"),
+        supabase.from("diagnosticos").select("id", { count: "exact", head: true }),
+        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("has_resolutoria", true),
+      ]);
+      const uniqueCiudades = new Set((ciudadesRes.data ?? []).map((l: any) => l.ciudad).filter(Boolean));
+      return [
+        { label: "Lotes disponibles", value: String(lotesRes.count ?? 0) },
+        { label: "Municipios", value: String(uniqueCiudades.size) },
+        { label: "Diagnósticos realizados", value: String(diagRes.count ?? 0) },
+        { label: "Resolutoría 360° Verificada", value: String(resoRes.count ?? 0) },
+      ];
+    },
+  });
+
   const { data: lotes, isLoading } = useQuery({
     queryKey: ["lotes-home"],
     queryFn: async () => {
