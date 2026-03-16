@@ -133,7 +133,15 @@ const Navbar = () => {
                       </Link>
                     </Button>
                   )}
-                </>
+                  <Button
+                    variant="navOutline"
+                    size="sm"
+                    onClick={() => { setMobileOpen(false); handleSignOut(); }}
+                    className="flex items-center gap-2"
+                  >
+                    <LogOut size={16} />
+                    Cerrar sesión
+                  </Button>
               ) : (
                 <>
                   <Button variant="navOutline" size="sm" asChild>
