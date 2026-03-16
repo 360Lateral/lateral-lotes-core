@@ -8,9 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
 
 const Index = () => {
-  const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
+  const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
   const isDueno = userType === "dueno";
-  const isDeveloper = userType === "developer";
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Usuario";
+
+  const getProfileLabel = () => {
+    if (isAdminOrAsesor) {
+      if (roles.includes("super_admin")) return "Super Admin";
+      if (roles.includes("admin")) return "Administrador";
+      return "Asesor";
+    }
+    if (isDueno) return "Dueño de Lote";
+    if (isDeveloper) return "Desarrollador / Inversionista";
+    return "Usuario";
+  };
 
   // Trust bar stats
   const { data: trustStats = [
