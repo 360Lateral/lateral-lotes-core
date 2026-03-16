@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Plus, Trash2, X, Handshake } from "lucide-react";
+import { Bell, Plus, Trash2, X, Handshake, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 
