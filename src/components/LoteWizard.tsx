@@ -980,9 +980,12 @@ const LoteWizard = () => {
             onClick={handlePublish}
             disabled={publishMutation.isPending}
           >
-            {publishMutation.isPending
-              ? "Publicando…"
-              : "Publicar mi lote"}
+            {publishMutation.isPending ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Subiendo fotos y documentos...
+              </span>
+            ) : "Publicar mi lote"}
           </Button>
         )}
       </div>
