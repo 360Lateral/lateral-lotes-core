@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, FolderOpen, Eye, Star } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload } from "lucide-react";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -45,11 +45,18 @@ const DashboardLotes = () => {
     <DashboardLayout>
       <div className="mb-4 flex items-center justify-between gap-4">
         <h1 className="font-body text-xl font-bold text-foreground">Lotes</h1>
-        <Button variant="default" size="sm" asChild>
-          <Link to="/dashboard/lotes/nuevo">
-            <Plus className="mr-1 h-4 w-4" /> Nuevo lote
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/dashboard/lotes/importar">
+              <Upload className="mr-1 h-4 w-4" /> Importar Excel
+            </Link>
+          </Button>
+          <Button variant="default" size="sm" asChild>
+            <Link to="/dashboard/lotes/nuevo">
+              <Plus className="mr-1 h-4 w-4" /> Nuevo lote
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Input

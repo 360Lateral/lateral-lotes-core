@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DashboardLotes from "./pages/DashboardLotes";
 import DashboardLoteNuevo from "./pages/DashboardLoteNuevo";
+import DashboardLotesImportar from "./pages/DashboardLotesImportar";
 import DashboardLoteEditar from "./pages/DashboardLoteEditar";
 import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/lotes" element={<ProtectedRoute><DashboardLotes /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute><DashboardLoteNuevo /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes/importar" element={<ProtectedRoute><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/leads" element={<ProtectedRoute><DashboardLeads /></ProtectedRoute>} />
