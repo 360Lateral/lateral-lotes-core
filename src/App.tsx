@@ -20,6 +20,7 @@ import DashboardDeveloper from "./pages/DashboardDeveloper";
 import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import DashboardNegociaciones from "./pages/DashboardNegociaciones";
 import SalaNegociacion from "./pages/SalaNegociacion";
+import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
