@@ -104,6 +104,7 @@ const emptyForm: LoteForm = {
   score_juridico: "",
   score_normativo: "",
   score_servicios: "",
+  es_publico: true,
 };
 
 interface ServicioRow {
