@@ -64,6 +64,7 @@ const App = () => (
             {/* Negociaciones */}
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/owner" element={<ProtectedRoute allowOwner><DashboardOwner /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
