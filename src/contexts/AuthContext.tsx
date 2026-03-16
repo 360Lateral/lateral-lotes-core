@@ -53,6 +53,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .single();
     if (data) {
       setUserType((data as any).user_type ?? null);
+    } else {
+      // Crear perfil vacío si no existe
+      await supabase
+        .from("perfiles")
+        .upsert({ id: userId, user_type: null })
+        .eq("id", userId);
+    }
+
+    // Fallback: leer userType desde metadata si sigue null
+    if (!(data as any)?.user_type) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const metaType = user?.user_metadata?.perfil;
+      if (metaType) setUserType(metaType);
     }
   };
 
@@ -91,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     ["super_admin", "admin", "asesor"].includes(r)
   );
 
-  const isDeveloper = roles.some((r) => r === "developer");
+  const isDeveloper = userType === "developer" || roles.some((r) => r === "developer");
 
   const signOut = async () => {
     await supabase.auth.signOut();
