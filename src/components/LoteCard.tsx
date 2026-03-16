@@ -3,6 +3,7 @@ import Logo from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ScoreIndicator from "@/components/ScoreIndicator";
+import { Landmark } from "lucide-react";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
@@ -18,6 +19,8 @@ interface LoteCardProps {
   score_juridico?: number | null;
   score_normativo?: number | null;
   score_servicios?: number | null;
+  uso_principal?: string | null;
+  has_resolutoria?: boolean | null;
 }
 
 const formatCOP = (value: number) =>
@@ -41,7 +44,7 @@ const estadoBadgeVariant = (estado: string) => {
   }
 };
 
-const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios }: LoteCardProps) => {
+const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios, uso_principal, has_resolutoria }: LoteCardProps) => {
   const hasCoords = lat != null && lng != null;
   const staticMapUrl = hasCoords
     ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+1D3461(${lng},${lat})/${lng},${lat},14,0/400x176@2x?access_token=${MAPBOX_TOKEN}`
@@ -50,9 +53,9 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
   return (
   <div className="flex flex-col overflow-hidden rounded-lg border border-gray-light bg-card">
     {staticMapUrl ? (
-      <img src={staticMapUrl} alt={`Mapa de ${nombre}`} className="h-44 w-full object-cover" />
+      <img src={staticMapUrl} alt={`Mapa de ${nombre}`} className="h-22 w-full object-cover" />
     ) : (
-      <div className="flex h-44 items-center justify-center bg-secondary">
+      <div className="flex h-22 items-center justify-center bg-secondary">
         <Logo variant="on-navy" className="opacity-40" />
       </div>
     )}
@@ -66,6 +69,21 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
       </div>
 
       <p className="font-body text-sm text-muted-foreground">{barrio}</p>
+
+      {/* Uso de suelo + Resolutoría */}
+      <div className="flex flex-wrap items-center gap-2">
+        {uso_principal && (
+          <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 font-body text-xs text-muted-foreground">
+            <Landmark className="h-3 w-3" />
+            {uso_principal}
+          </span>
+        )}
+        {has_resolutoria && (
+          <span className="inline-flex items-center gap-1 rounded bg-[#2ecc71]/15 px-2 py-0.5 font-body text-xs font-medium text-[#2ecc71]">
+            ✓ Norma 360° Verificada
+          </span>
+        )}
+      </div>
 
       <div className="mt-auto flex items-end justify-between pt-3">
         <div>
