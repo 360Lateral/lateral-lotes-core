@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { SlidersHorizontal, X } from "lucide-react";
 
 const Index = () => {
+  const { user, isAdminOrAsesor } = useAuth();
+
   // Filters
   const [ciudad, setCiudad] = useState<string>("todas");
   const [uso, setUso] = useState<string>("todos");
