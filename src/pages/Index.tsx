@@ -10,7 +10,7 @@ import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake } from "luc
 const Index = () => {
   const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
   const isDueno = userType === "dueno";
-  const isDeveloper = userType === "desarrollador";
+  const isDeveloper = userType === "developer";
 
   // Trust bar stats
   const { data: trustStats = [
@@ -130,6 +130,9 @@ const Index = () => {
           </Button>
           <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
             <Link to="/login">Iniciar sesión</Link>
+          </Button>
+          <Button variant="ghost" size="xl" asChild>
+            <Link to="/lotes">Explorar lotes</Link>
           </Button>
         </div>
         <Link to="/diagnostico" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
