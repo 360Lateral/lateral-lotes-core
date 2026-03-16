@@ -1,3 +1,3 @@
-import LoteFormPage from "@/components/LoteFormPage";
-const DashboardLoteNuevo = () => <LoteFormPage />;
+import LoteWizard from "@/components/LoteWizard";
+const DashboardLoteNuevo = () => <LoteWizard />;
 export default DashboardLoteNuevo;
