@@ -435,7 +435,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </div>
             <div>
               <Label className="text-xs">Estado</Label>
-              <Select value={form.estado_disponibilidad} onValueChange={(v) => update("estado_disponibilidad", v)}>
+              <Select value={form.estado_disponibilidad || "Disponible"} onValueChange={(v) => update("estado_disponibilidad", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Disponible">Disponible</SelectItem>
