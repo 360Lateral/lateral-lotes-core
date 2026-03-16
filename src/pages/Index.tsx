@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake } from "lucide-react";
+import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
 
 const Index = () => {
   const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
