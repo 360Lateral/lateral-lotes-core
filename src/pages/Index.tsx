@@ -5,12 +5,27 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake } from "lucide-react";
+import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
 
 const Index = () => {
-  const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
+  const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
   const isDueno = userType === "dueno";
-  const isDeveloper = userType === "developer";
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Usuario";
+
+  const getProfileLabel = () => {
+    if (isAdminOrAsesor) {
+      if (roles.includes("super_admin")) return "Super Admin";
+      if (roles.includes("admin")) return "Administrador";
+      return "Asesor";
+    }
+    if (isDueno) return "Dueño de Lote";
+    if (isDeveloper) return "Desarrollador / Inversionista";
+    return "Usuario";
+  };
 
   // Trust bar stats
   const { data: trustStats = [
@@ -44,6 +59,11 @@ const Index = () => {
     if (user && isDueno) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
+            <User className="h-4 w-4 text-primary" />
+            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
+          </div>
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
             Gestiona tus lotes
           </h1>
@@ -69,6 +89,11 @@ const Index = () => {
     if (user && isDeveloper) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
+            <User className="h-4 w-4 text-primary" />
+            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
+          </div>
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
             Encuentra tu próximo terreno
           </h1>
@@ -97,6 +122,11 @@ const Index = () => {
     if (user && isAdminOrAsesor) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
+            <User className="h-4 w-4 text-primary" />
+            <span className="font-body text-sm font-semibold text-secondary-foreground">{displayName}</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 font-body text-[11px] font-bold text-primary-foreground">{getProfileLabel()}</span>
+          </div>
           <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
             Panel de administración
           </h1>
