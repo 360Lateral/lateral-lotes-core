@@ -120,10 +120,10 @@ const Index = () => {
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Button variant="hero" size="xl" asChild>
-            <Link to="/lotes">Explorar lotes</Link>
+            <Link to={user ? "/lotes" : "/bienvenida"}>Explorar lotes</Link>
           </Button>
           <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-            <Link to="/dashboard/lotes/nuevo">Publicar mi lote gratis</Link>
+            <Link to={user ? (isAdminOrAsesor ? "/dashboard/lotes/nuevo" : "/dashboard") : "/bienvenida?preselect=dueno"}>Publicar mi lote gratis</Link>
           </Button>
         </div>
         <Link to="/diagnostico" className="mt-4 font-body text-sm text-gray-light hover:text-secondary-foreground transition-colors">
