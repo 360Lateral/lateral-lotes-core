@@ -1,0 +1,1 @@
+ALTER TABLE public.perfiles ADD COLUMN user_type text DEFAULT null;
