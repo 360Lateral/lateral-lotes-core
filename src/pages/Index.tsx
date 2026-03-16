@@ -48,7 +48,7 @@ const Index = () => {
     queryFn: async () => {
       const { data: lotesData, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, destacado, lat, lng, score_juridico, score_normativo, score_servicios");
+        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, destacado, lat, lng, score_juridico, score_normativo, score_servicios, has_resolutoria");
 
       if (error) throw error;
 
@@ -247,6 +247,8 @@ const Index = () => {
                 score_juridico={lote.score_juridico}
                 score_normativo={lote.score_normativo}
                 score_servicios={lote.score_servicios}
+                uso_principal={lote.uso_principal}
+                has_resolutoria={lote.has_resolutoria}
               />
             ))}
           </div>
