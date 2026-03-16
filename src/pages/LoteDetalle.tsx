@@ -606,6 +606,9 @@ const LoteDetalle = () => {
                 <TabsTrigger value="documentos" className="flex-1 font-body text-xs">
                   Documentos
                 </TabsTrigger>
+                <TabsTrigger value="resolutoria" className="flex-1 font-body text-xs">
+                  Resolutoría
+                </TabsTrigger>
               </TabsList>
 
               {/* Tab: Normativa */}
