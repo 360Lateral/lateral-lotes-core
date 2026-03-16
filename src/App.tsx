@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DashboardLotes from "./pages/DashboardLotes";
 import DashboardLoteNuevo from "./pages/DashboardLoteNuevo";
+import DashboardLotesImportar from "./pages/DashboardLotesImportar";
 import DashboardLoteEditar from "./pages/DashboardLoteEditar";
 import DashboardLoteDocs from "./pages/DashboardLoteDocs";
 import DashboardLeads from "./pages/DashboardLeads";
