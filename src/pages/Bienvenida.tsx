@@ -73,7 +73,7 @@ const Bienvenida = () => {
     if (!loading && user) {
       if (isAdminOrAsesor) {
         navigate("/dashboard", { replace: true });
-      } else if (userType === "dueno") {
+      } else if (userType === "dueno" || userType === "comisionista") {
         navigate("/dashboard/owner", { replace: true });
       } else if (userType === "developer") {
         navigate("/dashboard/developer", { replace: true });
