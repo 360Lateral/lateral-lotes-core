@@ -122,8 +122,8 @@ const Navbar = () => {
               ) : (
                 <>
                   <Button variant="navOutline" size="sm" asChild>
-                    <Link to="/login" onClick={() => setMobileOpen(false)}>
-                      Iniciar sesión
+                    <Link to="/bienvenida" onClick={() => setMobileOpen(false)}>
+                      Registrarse
                     </Link>
                   </Button>
                   <Button variant="default" size="sm" asChild>
