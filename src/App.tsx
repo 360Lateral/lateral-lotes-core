@@ -22,6 +22,9 @@ import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import DashboardNegociaciones from "./pages/DashboardNegociaciones";
 import SalaNegociacion from "./pages/SalaNegociacion";
 import Diagnostico from "./pages/Diagnostico";
+import DiagnosticoResultado from "./pages/DiagnosticoResultado";
+import Mercado from "./pages/Mercado";
+import DashboardOwner from "./pages/DashboardOwner";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
