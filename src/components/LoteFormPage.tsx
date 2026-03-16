@@ -484,6 +484,37 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
+        {/* Foto del lote */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">Foto del lote</CardTitle></CardHeader>
+          <CardContent>
+            {(photoPreview || existingPhotoUrl) ? (
+              <div className="relative">
+                <img
+                  src={photoPreview || existingPhotoUrl!}
+                  alt="Foto del lote"
+                  className="h-48 w-full rounded-lg object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute right-2 top-2 h-8 w-8"
+                  onClick={removePhoto}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50 transition-colors hover:bg-muted">
+                <ImagePlus className="mb-2 h-8 w-8 text-muted-foreground" />
+                <span className="font-body text-sm text-muted-foreground">Haz clic para subir una foto</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+              </label>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Ubicación */}
         <Card>
           <CardHeader><CardTitle className="text-base">Ubicación</CardTitle></CardHeader>
