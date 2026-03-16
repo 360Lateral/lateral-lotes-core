@@ -60,7 +60,9 @@ const Bienvenida = () => {
       if (isAdminOrAsesor) {
         navigate("/dashboard", { replace: true });
       } else if (userType === "dueno") {
-        navigate("/diagnostico", { replace: true });
+        navigate("/dashboard/owner", { replace: true });
+      } else if (userType === "developer") {
+        navigate("/dashboard/developer", { replace: true });
       } else {
         navigate("/lotes", { replace: true });
       }
