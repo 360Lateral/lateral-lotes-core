@@ -118,6 +118,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAdminOrAsesor } = useAuth();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
   const [servicios, setServicios] = useState<ServicioRow[]>(SERVICIOS_DEFAULT);
