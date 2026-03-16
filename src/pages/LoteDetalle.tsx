@@ -492,12 +492,16 @@ const LoteDetalle = () => {
                     {formatCOP(Number(precio.precio_cop))}
                   </p>
                 )}
-                {precio.precio_m2_cop != null && (
+                 {precio.precio_m2_cop != null && (
                   <p className="font-body text-sm text-muted-foreground">
                     {formatCOP(Number(precio.precio_m2_cop))}/m²
                   </p>
                 )}
-              </div>
+                {precioRef && (
+                  <p className="font-body text-xs text-muted-foreground">
+                    Promedio zona: {formatCOP(precioRef)}/m²
+                  </p>
+                )}
             )}
 
             {/* Contact button */}
