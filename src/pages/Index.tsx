@@ -18,6 +18,31 @@ const Index = () => {
   const [areaMin, setAreaMin] = useState<string>("");
   const [areaMax, setAreaMax] = useState<string>("");
 
+  // Trust bar stats
+  const { data: trustStats = [
+    { label: "Lotes disponibles", value: "—" },
+    { label: "Municipios", value: "—" },
+    { label: "Diagnósticos realizados", value: "—" },
+    { label: "Resolutoría 360° Verificada", value: "—" },
+  ] } = useQuery({
+    queryKey: ["trust-stats"],
+    queryFn: async () => {
+      const [lotesRes, ciudadesRes, diagRes, resoRes] = await Promise.all([
+        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("estado_disponibilidad", "Disponible"),
+        supabase.from("lotes").select("ciudad"),
+        supabase.from("diagnosticos").select("id", { count: "exact", head: true }),
+        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("has_resolutoria", true),
+      ]);
+      const uniqueCiudades = new Set((ciudadesRes.data ?? []).map((l: any) => l.ciudad).filter(Boolean));
+      return [
+        { label: "Lotes disponibles", value: String(lotesRes.count ?? 0) },
+        { label: "Municipios", value: String(uniqueCiudades.size) },
+        { label: "Diagnósticos realizados", value: String(diagRes.count ?? 0) },
+        { label: "Resolutoría 360° Verificada", value: String(resoRes.count ?? 0) },
+      ];
+    },
+  });
+
   const { data: lotes, isLoading } = useQuery({
     queryKey: ["lotes-home"],
     queryFn: async () => {
@@ -85,14 +110,36 @@ const Index = () => {
       {/* Hero */}
       <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
         <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
-          Visor Estratégico Lotes
+          Tu lote tiene más valor del que crees
         </h1>
         <p className="mt-4 max-w-xl font-body text-base text-gray-light md:text-lg">
-          Accede a los mejores predios con información técnica, normativa y financiera completa
+          Conectamos tierra con su mejor destino: venta, desarrollo o viabilización. Con información técnica, normativa y financiera completa.
         </p>
-        <Button variant="hero" size="xl" className="mt-8" asChild>
-          <Link to="/lotes">Explorar lotes</Link>
-        </Button>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Button variant="hero" size="xl" asChild>
+            <Link to="/lotes">Explorar lotes</Link>
+          </Button>
+          <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
+            <Link to="/dashboard/lotes/nuevo">Publicar mi lote gratis</Link>
+          </Button>
+        </div>
+        <Link to="/diagnostico" className="mt-4 font-body text-sm text-gray-light hover:text-secondary-foreground transition-colors">
+          ¿Tienes un lote? Descubre su valor gratis →
+        </Link>
+      </section>
+
+      {/* Trust bar */}
+      <section className="border-b border-border bg-background py-8">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
+          {trustStats.map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center">
+              <span className="font-body text-3xl font-bold" style={{ color: "#E8951A" }}>
+                {stat.value}
+              </span>
+              <span className="mt-1 font-body text-xs text-muted-foreground">{stat.label}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Lotes con filtros */}
