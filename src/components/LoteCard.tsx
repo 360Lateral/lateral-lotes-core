@@ -15,6 +15,9 @@ interface LoteCardProps {
   estado: string;
   lat?: number | null;
   lng?: number | null;
+  score_juridico?: number | null;
+  score_normativo?: number | null;
+  score_servicios?: number | null;
 }
 
 const formatCOP = (value: number) =>
