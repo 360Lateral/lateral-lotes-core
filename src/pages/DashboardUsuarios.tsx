@@ -223,9 +223,32 @@ const DashboardUsuarios = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {userTypeLabel(u.user_type)}
-                            </span>
+                            <div>
+                              <span className="text-sm text-muted-foreground">
+                                {userTypeLabel(u.user_type)}
+                              </span>
+                              {u.user_type === "comisionista" && (
+                                <div className="mt-0.5">
+                                  <Badge variant="outline" className={`text-[10px] ${
+                                    u.comisionista_doc_estado === "aprobado"
+                                      ? "border-green-500 text-green-600"
+                                      : u.comisionista_doc_estado === "pendiente"
+                                      ? "border-yellow-500 text-yellow-600"
+                                      : u.comisionista_doc_estado === "rechazado"
+                                      ? "border-destructive text-destructive"
+                                      : "border-muted text-muted-foreground"
+                                  }`}>
+                                    {u.comisionista_doc_estado === "aprobado"
+                                      ? "Doc. aprobado"
+                                      : u.comisionista_doc_estado === "pendiente"
+                                      ? "Doc. pendiente"
+                                      : u.comisionista_doc_estado === "rechazado"
+                                      ? "Doc. rechazado"
+                                      : "Sin documento"}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
