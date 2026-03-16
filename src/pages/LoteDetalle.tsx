@@ -502,6 +502,7 @@ const LoteDetalle = () => {
                     Promedio zona: {formatCOP(precioRef)}/m²
                   </p>
                 )}
+              </div>
             )}
 
             {/* Contact button */}
