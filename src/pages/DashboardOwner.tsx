@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, FileSearch, MapPin, Loader2 } from "lucide-react";
+import { Plus, FileSearch, MapPin, Loader2, Handshake } from "lucide-react";
 
 const DashboardOwner = () => {
   const { user } = useAuth();
@@ -36,6 +36,22 @@ const DashboardOwner = () => {
         .select("*")
         .eq("email", user!.email!)
         .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  // Negociaciones activas
+  const { data: negociaciones } = useQuery({
+    queryKey: ["owner-negociaciones", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("negociaciones")
+        .select("id, estado, created_at, lotes(nombre_lote)")
+        .eq("owner_id", user!.id)
+        .eq("estado", "activa")
+        .order("created_at", { ascending: false })
+        .limit(5);
       return data ?? [];
     },
   });
@@ -78,6 +94,40 @@ const DashboardOwner = () => {
           </div>
         ) : (
           <>
+            {/* Tarjetas de resumen */}
+            <div className="grid grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-primary">
+                    {lotes?.length ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Lotes publicados
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-primary">
+                    {lotes?.filter(l => l.estado_disponibilidad === "Disponible").length ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Lotes activos
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-primary">
+                    {diagnosticos?.length ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Diagnósticos
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Mis Lotes */}
             <section>
               <h2 className="font-heading text-lg font-semibold text-foreground mb-4">
@@ -169,14 +219,58 @@ const DashboardOwner = () => {
                             {d.area_m2.toLocaleString("es-CO")} m²
                           </p>
                         )}
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(d.created_at).toLocaleDateString("es-CO")}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(d.created_at).toLocaleDateString("es-CO")}
+                          </p>
+                          <Badge variant={
+                            (d as any).estado === "Entregado" ? "default" :
+                            (d as any).estado === "En proceso" ? "secondary" :
+                            "outline"
+                          }>
+                            {(d as any).estado ?? "Nuevo"}
+                          </Badge>
+                        </div>
                         {d.notas && (
                           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                             {d.notas}
                           </p>
                         )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Negociaciones activas */}
+            <section>
+              <h2 className="font-heading text-lg font-semibold text-foreground mb-4">
+                Negociaciones activas
+              </h2>
+              {!negociaciones || negociaciones.length === 0 ? (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    <Handshake className="mx-auto mb-3 h-8 w-8 text-muted-foreground/50" />
+                    <p>No tienes negociaciones activas por el momento.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {negociaciones.map((n) => (
+                    <Card key={n.id}>
+                      <CardContent className="pt-6 flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="font-medium text-foreground">
+                            {(n.lotes as any)?.nombre_lote ?? "Lote"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(n.created_at).toLocaleDateString("es-CO")}
+                          </p>
+                        </div>
+                        <Button size="sm" asChild>
+                          <Link to={`/negociacion/${n.id}`}>Ir a sala</Link>
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
