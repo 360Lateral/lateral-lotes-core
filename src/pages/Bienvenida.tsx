@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Home, Building2, Check } from "lucide-react";
+import { Home, Building2, UserCheck, Check } from "lucide-react";
 
-type Perfil = "dueno" | "developer";
+type Perfil = "dueno" | "developer" | "comisionista";
 
 const perfiles: {
   id: Perfil;
@@ -30,6 +30,20 @@ const perfiles: {
     accentClass: "border-orange text-orange",
     borderClass: "hover:border-orange",
     checkClass: "text-orange",
+  },
+  {
+    id: "comisionista",
+    icon: UserCheck,
+    titulo: "Represento a un dueño",
+    descripcion: "Soy comisionista o representante autorizado de un propietario",
+    beneficios: [
+      "Gestiona lotes en nombre del propietario",
+      "Deberás subir un documento de autorización",
+      "Conecta con compradores calificados",
+    ],
+    accentClass: "border-emerald-500 text-emerald-500",
+    borderClass: "hover:border-emerald-500",
+    checkClass: "text-emerald-500",
   },
   {
     id: "developer",
