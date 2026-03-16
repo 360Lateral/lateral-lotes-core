@@ -839,7 +839,40 @@ const LoteDetalle = () => {
                   </p>
                 )}
               </TabsContent>
-            </Tabs>
+
+              {/* Tab: Resolutoría */}
+              <TabsContent value="resolutoria">
+                {(lote as any).has_resolutoria === true ? (
+                  <div className="flex flex-col gap-4">
+                    <Badge variant="disponible" className="w-fit gap-1 text-sm px-3 py-1">
+                      <Check className="h-4 w-4" /> Resolutoría 360° Completada
+                    </Badge>
+                    <div className="grid grid-cols-2 gap-2">
+                      {["Normativo", "Jurídico", "Servicios Públicos", "Suelos", "Mercado", "Ambiental", "Topográfico", "Urbanístico"].map((area) => (
+                        <div key={area} className="flex items-center gap-2 font-body text-sm text-foreground">
+                          <Check className="h-4 w-4 text-green-600 shrink-0" />
+                          {area}
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="outline" asChild className="w-fit">
+                      <Link to="/planes">Ver Teaser Financiero</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 py-6 text-center">
+                    <p className="font-body text-sm font-semibold text-foreground">
+                      Este lote aún no tiene Resolutoría 360°
+                    </p>
+                    <p className="font-body text-xs text-muted-foreground max-w-sm">
+                      Análisis de 8 áreas que transforma tu lote en un activo comercializable con Teaser Financiero.
+                    </p>
+                    <Button className="bg-orange-500 hover:bg-orange-600 text-white" asChild>
+                      <Link to={`/diagnostico?lote_id=${id}`}>Solicitar Resolutoría</Link>
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
           </div>
         </div>
       </main>
