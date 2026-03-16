@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, FolderOpen, Eye, Star } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload } from "lucide-react";
 
 const estadoVariant = (e: string) => {
   switch (e) {
