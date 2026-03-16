@@ -130,12 +130,64 @@ const DashboardDeveloper = () => {
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-body text-xl font-bold text-foreground">Mis Alertas</h1>
-        {!showForm && (
-          <Button variant="default" size="sm" onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Crear alerta nueva
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/lotes">
+              <Search className="mr-2 h-4 w-4" />
+              Explorar lotes
+            </Link>
           </Button>
-        )}
+          <Button variant="ghost" size="sm" asChild className="relative">
+            <Link to="/dashboard/notificaciones">
+              <Bell className="h-4 w-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-white font-bold">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          </Button>
+          {!showForm && (
+            <Button variant="default" size="sm" onClick={() => setShowForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Crear alerta nueva
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Tarjetas de resumen */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-primary">
+              {alertas.length}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Alertas activas
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-primary">
+              {favoritosCount}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Lotes guardados
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-primary">
+              {negociacionesCount}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Negociaciones
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Create alert form */}
