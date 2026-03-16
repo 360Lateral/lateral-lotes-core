@@ -36,13 +36,14 @@ interface Props {
 }
 
 const DashboardLayout = ({ children }: Props) => {
-  const { user, roles, signOut, isDeveloper } = useAuth();
+  const { user, roles, signOut, isDeveloper, userType } = useAuth();
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
   const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "asesor"].includes(r));
+  const isOwner = userType === "dueno";
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
 
@@ -51,13 +52,20 @@ const DashboardLayout = ({ children }: Props) => {
     { label: "Notificaciones", href: "/dashboard/notificaciones", icon: Bell },
   ] : [];
 
+  const ownerItems = isOwner && !isAdminOrAsesor ? [
+    { label: "Mi Panel", href: "/dashboard/owner", icon: LayoutDashboard, end: true },
+    { label: "Mis Lotes", href: "/dashboard/owner/lotes", icon: MapPin },
+    { label: "Diagnósticos", href: "/dashboard/owner/diagnosticos", icon: FileSearch },
+    { label: "Negociaciones", href: "/dashboard/owner/negociaciones", icon: Handshake },
+  ] : [];
+
   const allItems = [
     ...(isAdminOrAsesor ? navItems : []),
     ...(isAdmin ? adminOnlyItems : []),
     ...developerItems,
+    ...ownerItems,
   ];
 
-  // If no admin items and no developer items, show at least dashboard
   const finalItems = allItems.length > 0 ? allItems : [navItems[0]];
 
   // Unread notification count
