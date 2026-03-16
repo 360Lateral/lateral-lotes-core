@@ -126,6 +126,8 @@ const Bienvenida = () => {
                   isSelected
                     ? perfil.id === "dueno"
                       ? "bg-orange/20 text-orange"
+                      : perfil.id === "comisionista"
+                      ? "bg-emerald-500/20 text-emerald-500"
                       : "bg-blue-500/20 text-blue-500"
                     : "bg-white/10 text-white/60"
                 }`}
