@@ -190,6 +190,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
       score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
       score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
+      es_publico: existingLote.es_publico ?? true,
     }));
     if ((existingLote as any).foto_url) {
       setExistingPhotoUrl((existingLote as any).foto_url);
