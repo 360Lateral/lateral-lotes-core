@@ -249,6 +249,7 @@ const Index = () => {
                 score_servicios={lote.score_servicios}
                 uso_principal={lote.uso_principal}
                 has_resolutoria={lote.has_resolutoria}
+                foto_url={(lote as any).foto_url}
               />
             ))}
           </div>
