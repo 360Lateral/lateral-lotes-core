@@ -52,14 +52,20 @@ const Bienvenida = () => {
   const preselect = searchParams.get("preselect") as Perfil | null;
   const [selected, setSelected] = useState<Perfil | null>(preselect);
   const navigate = useNavigate();
-  const { user, isAdminOrAsesor, loading } = useAuth();
+  const { user, isAdminOrAsesor, userType, loading } = useAuth();
 
-  // If already logged in, redirect
+  // If already logged in, redirect based on role/userType
   useEffect(() => {
     if (!loading && user) {
-      navigate(isAdminOrAsesor ? "/dashboard" : "/lotes", { replace: true });
+      if (isAdminOrAsesor) {
+        navigate("/dashboard", { replace: true });
+      } else if (userType === "dueno") {
+        navigate("/diagnostico", { replace: true });
+      } else {
+        navigate("/lotes", { replace: true });
+      }
     }
-  }, [user, loading, isAdminOrAsesor, navigate]);
+  }, [user, loading, isAdminOrAsesor, userType, navigate]);
 
   const handleContinue = () => {
     if (!selected) return;
