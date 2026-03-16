@@ -32,6 +32,9 @@ export interface LoteWithPrecio {
   lat: number | null;
   lng: number | null;
   precio_m2: number;
+  score_juridico: number | null;
+  score_normativo: number | null;
+  score_servicios: number | null;
 }
 
 export interface Filters {
