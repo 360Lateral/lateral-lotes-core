@@ -65,7 +65,7 @@ const Navbar = () => {
           ) : (
             <>
               <Button variant="navOutline" size="sm" asChild>
-                <Link to="/login">Iniciar sesión</Link>
+                <Link to="/bienvenida">Registrarse</Link>
               </Button>
               <Button variant="default" size="sm" asChild>
                 <Link to="/lotes">Ver lotes</Link>
