@@ -155,6 +155,7 @@ const DashboardUsuarios = () => {
 
   const userTypeLabel = (t: string | null) => {
     if (t === "dueno") return "Dueño";
+    if (t === "comisionista") return "Comisionista";
     if (t === "developer") return "Developer";
     return t ?? "—";
   };
