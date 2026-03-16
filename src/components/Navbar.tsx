@@ -115,7 +115,7 @@ const Navbar = () => {
                 <Link to="/bienvenida">Registrarse</Link>
               </Button>
               <Button variant="default" size="sm" asChild>
-                <Link to="/lotes">Ver lotes</Link>
+                <Link to="/login">Iniciar sesión</Link>
               </Button>
             </>
           )}
