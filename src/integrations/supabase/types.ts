@@ -124,6 +124,38 @@ export type Database = {
         }
         Relationships: []
       }
+      fotos_lotes: {
+        Row: {
+          created_at: string
+          id: string
+          lote_id: string
+          orden: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lote_id: string
+          orden?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lote_id?: string
+          orden?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fotos_lotes_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           asignado_a: string | null
@@ -181,6 +213,7 @@ export type Database = {
           barrio: string | null
           ciudad: string | null
           created_at: string
+          departamento: string | null
           destacado: boolean | null
           direccion: string | null
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
@@ -195,16 +228,22 @@ export type Database = {
           matricula_inmobiliaria: string | null
           nombre_lote: string
           notas: string | null
+          problema_juridico: string | null
           score_juridico: number | null
           score_normativo: number | null
           score_servicios: number | null
+          tiene_deudas: string | null
+          tiene_escritura: boolean | null
+          tipo_lote: string | null
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           area_total_m2?: number | null
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
@@ -219,16 +258,22 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote: string
           notas?: string | null
+          problema_juridico?: string | null
           score_juridico?: number | null
           score_normativo?: number | null
           score_servicios?: number | null
+          tiene_deudas?: string | null
+          tiene_escritura?: boolean | null
+          tipo_lote?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           area_total_m2?: number | null
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
@@ -243,10 +288,15 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote?: string
           notas?: string | null
+          problema_juridico?: string | null
           score_juridico?: number | null
           score_normativo?: number | null
           score_servicios?: number | null
+          tiene_deudas?: string | null
+          tiene_escritura?: boolean | null
+          tipo_lote?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -556,7 +606,11 @@ export type Database = {
         | "normativo"
         | "juridico"
         | "otro"
-      estado_disponibilidad: "Disponible" | "Reservado" | "Vendido"
+      estado_disponibilidad:
+        | "Disponible"
+        | "Reservado"
+        | "Vendido"
+        | "En revisión"
       estado_lead:
         | "nuevo"
         | "contactado"
@@ -701,7 +755,12 @@ export const Constants = {
         "juridico",
         "otro",
       ],
-      estado_disponibilidad: ["Disponible", "Reservado", "Vendido"],
+      estado_disponibilidad: [
+        "Disponible",
+        "Reservado",
+        "Vendido",
+        "En revisión",
+      ],
       estado_lead: [
         "nuevo",
         "contactado",
