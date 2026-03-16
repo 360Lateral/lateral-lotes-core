@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import ScoreIndicator from "@/components/ScoreIndicator";
 import type { LoteWithPrecio } from "@/pages/Lotes";
 
 const formatCOP = (v: number) =>
