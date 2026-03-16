@@ -142,6 +142,7 @@ const Navbar = () => {
                     <LogOut size={16} />
                     Cerrar sesión
                   </Button>
+                </>
               ) : (
                 <>
                   <Button variant="navOutline" size="sm" asChild>
