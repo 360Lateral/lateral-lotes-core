@@ -82,6 +82,12 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
         </div>
       </div>
 
+      <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+        <ScoreIndicator score={score_juridico ?? null} label="Jurídico" emoji="⚖️" size="sm" />
+        <ScoreIndicator score={score_normativo ?? null} label="Normativo" emoji="📋" size="sm" />
+        <ScoreIndicator score={score_servicios ?? null} label="Servicios" emoji="🔌" size="sm" />
+      </div>
+
       <Button variant="default" size="sm" className="mt-3 w-full" asChild>
         <Link to={`/lotes/${id}`}>Ver detalle</Link>
       </Button>
