@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import mapboxgl from "mapbox-gl";
@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { ImagePlus, Trash2 } from "lucide-react";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
@@ -117,6 +118,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
   const [servicios, setServicios] = useState<ServicioRow[]>(SERVICIOS_DEFAULT);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -183,7 +187,23 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
       score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
     }));
+    if ((existingLote as any).foto_url) {
+      setExistingPhotoUrl((existingLote as any).foto_url);
+    }
   }, [existingLote]);
+
+  const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setExistingPhotoUrl(null);
+  };
 
   useEffect(() => {
     if (!existingNormativa) return;
@@ -332,6 +352,19 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         loteId = data.id;
       }
 
+      // Upload photo if selected
+      if (photoFile && loteId) {
+        const ext = photoFile.name.split(".").pop();
+        const path = `${loteId}/foto.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("fotos-lotes").upload(path, photoFile, { upsert: true });
+        if (uploadErr) throw uploadErr;
+        const { data: urlData } = supabase.storage.from("fotos-lotes").getPublicUrl(path);
+        await supabase.from("lotes").update({ foto_url: urlData.publicUrl } as any).eq("id", loteId);
+      } else if (!existingPhotoUrl && isEdit && id) {
+        // Photo was removed
+        await supabase.from("lotes").update({ foto_url: null } as any).eq("id", id);
+      }
+
       // Normativa
       const normPayload = {
         lote_id: loteId!,
@@ -448,6 +481,37 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
               <Switch checked={form.destacado} onCheckedChange={(v) => update("destacado", v)} />
               <Label className="text-xs">Lote destacado</Label>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Foto del lote */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">Foto del lote</CardTitle></CardHeader>
+          <CardContent>
+            {(photoPreview || existingPhotoUrl) ? (
+              <div className="relative">
+                <img
+                  src={photoPreview || existingPhotoUrl!}
+                  alt="Foto del lote"
+                  className="h-48 w-full rounded-lg object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute right-2 top-2 h-8 w-8"
+                  onClick={removePhoto}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50 transition-colors hover:bg-muted">
+                <ImagePlus className="mb-2 h-8 w-8 text-muted-foreground" />
+                <span className="font-body text-sm text-muted-foreground">Haz clic para subir una foto</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+              </label>
+            )}
           </CardContent>
         </Card>
 
