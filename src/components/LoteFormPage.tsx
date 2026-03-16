@@ -179,6 +179,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       fondo_ml: existingLote.fondo_ml != null ? String(existingLote.fondo_ml) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
+      score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
+      score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
+      score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
     }));
   }, [existingLote]);
 
