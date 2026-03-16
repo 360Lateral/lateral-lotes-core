@@ -4,10 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Props {
   children: React.ReactNode;
   requireDeveloper?: boolean;
+  allowOwner?: boolean;
 }
 
-const ProtectedRoute = ({ children, requireDeveloper }: Props) => {
-  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
+const ProtectedRoute = ({ children, requireDeveloper, allowOwner }: Props) => {
+  const { user, isAdminOrAsesor, isDeveloper, userType, loading } = useAuth();
 
   if (loading) {
     return (
@@ -21,12 +22,23 @@ const ProtectedRoute = ({ children, requireDeveloper }: Props) => {
     return <Navigate to="/login" replace />;
   }
 
+  const isOwner = userType === "dueno";
+
   if (requireDeveloper && !isDeveloper && !isAdminOrAsesor) {
     return <Navigate to="/lotes" replace />;
   }
 
-  if (!requireDeveloper && !isAdminOrAsesor && !isDeveloper) {
+  if (allowOwner && isOwner) {
+    return <>{children}</>;
+  }
+
+  if (!requireDeveloper && !isAdminOrAsesor && !isDeveloper && !isOwner) {
     return <Navigate to="/lotes" replace />;
+  }
+
+  // Owners without allowOwner on admin-only routes
+  if (!requireDeveloper && !allowOwner && isOwner && !isAdminOrAsesor) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
