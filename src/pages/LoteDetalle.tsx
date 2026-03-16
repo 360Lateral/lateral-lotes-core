@@ -128,6 +128,20 @@ const LoteDetalle = () => {
     enabled: !!id,
   });
 
+  // Fetch fotos
+  const { data: fotos = [] } = useQuery({
+    queryKey: ["lote-fotos", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("fotos_lotes")
+        .select("url, orden")
+        .eq("lote_id", id!)
+        .order("orden", { ascending: true });
+      return data ?? [];
+    },
+    enabled: !!id,
+  });
+
   // Fetch precio
   const { data: precio } = useQuery({
     queryKey: ["lote-precio", id],
@@ -143,6 +157,22 @@ const LoteDetalle = () => {
       return data;
     },
     enabled: !!id,
+  });
+
+  // Fetch precio referencia zona
+  const { data: precioRef } = useQuery({
+    queryKey: ["precio-ref", lote?.ciudad],
+    enabled: !!lote?.ciudad,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("precios")
+        .select("precio_m2_cop, lotes!inner(ciudad)")
+        .eq("lotes.ciudad", lote!.ciudad!)
+        .not("lote_id", "eq", id);
+      if (!data || data.length === 0) return null;
+      const avg = data.reduce((s, r) => s + Number(r.precio_m2_cop), 0) / data.length;
+      return Math.round(avg);
+    },
   });
 
   // Fetch normativa
