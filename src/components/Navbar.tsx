@@ -197,8 +197,8 @@ const Navbar = () => {
                     </Link>
                   </Button>
                   <Button variant="default" size="sm" asChild>
-                    <Link to="/lotes" onClick={() => setMobileOpen(false)}>
-                      Ver lotes
+                    <Link to="/login" onClick={() => setMobileOpen(false)}>
+                      Iniciar sesión
                     </Link>
                   </Button>
                 </>
