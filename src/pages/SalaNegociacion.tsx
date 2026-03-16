@@ -146,6 +146,15 @@ const SalaNegociacion = () => {
     onSuccess: () => {
       setMensaje("");
       queryClient.invalidateQueries({ queryKey: ["mensajes", id] });
+      // Notificar al otro usuario
+      if (otherUserId) {
+        supabase.from("notificaciones").insert({
+          user_id: otherUserId,
+          lote_id: negociacion?.lote_id,
+          mensaje: `Nuevo mensaje en la negociación de ${loteData?.nombre_lote ?? "tu lote"}`,
+          leida: false,
+        } as any).then(() => {});
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "No se pudo enviar el mensaje.", variant: "destructive" });
