@@ -10,7 +10,7 @@ import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake } from "luc
 const Index = () => {
   const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
   const isDueno = userType === "dueno";
-  const isDeveloper = userType === "desarrollador";
+  const isDeveloper = userType === "developer";
 
   // Trust bar stats
   const { data: trustStats = [
