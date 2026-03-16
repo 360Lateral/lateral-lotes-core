@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,13 +34,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [userType, setUserType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
 
   const fetchRoles = async (userId: string) => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    if (data) {
+    if (data && mountedRef.current) {
       setRoles(data.map((r) => r.role as AppRole));
     }
   };
@@ -51,9 +52,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .select("user_type")
       .eq("id", userId)
       .single();
-    if (data) {
+    if (data && mountedRef.current) {
       setUserType((data as any).user_type ?? null);
-    } else {
+    } else if (mountedRef.current) {
       // Crear perfil vacío si no existe
       await supabase
         .from("perfiles")
@@ -62,42 +63,59 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Fallback: leer userType desde metadata si sigue null
-    if (!(data as any)?.user_type) {
+    if (!(data as any)?.user_type && mountedRef.current) {
       const { data: { user } } = await supabase.auth.getUser();
       const metaType = user?.user_metadata?.perfil;
-      if (metaType) setUserType(metaType);
+      if (metaType && mountedRef.current) setUserType(metaType);
     }
   };
 
-  const loadUserData = async (userId: string) => {
-    await Promise.all([fetchRoles(userId), fetchUserType(userId)]);
+  const applySession = async (newSession: Session | null) => {
+    try {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      if (newSession?.user) {
+        await Promise.all([
+          fetchRoles(newSession.user.id),
+          fetchUserType(newSession.user.id),
+        ]);
+      } else {
+        setRoles([]);
+        setUserType(null);
+      }
+    } catch (err) {
+      console.error("Error loading user data:", err);
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
+    mountedRef.current = true;
+
+    // Initial session load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      applySession(session);
+    });
+
+    // Listen for auth changes — keep callback synchronous, defer async work
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await loadUserData(session.user.id);
-        } else {
-          setRoles([]);
-          setUserType(null);
-        }
-        setLoading(false);
+      (_event, newSession) => {
+        // Defer to avoid deadlock with Supabase auth internals
+        setTimeout(() => {
+          if (mountedRef.current) {
+            applySession(newSession);
+          }
+        }, 0);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await loadUserData(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      mountedRef.current = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const isAdminOrAsesor = roles.some((r) =>
