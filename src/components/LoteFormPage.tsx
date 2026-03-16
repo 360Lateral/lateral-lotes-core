@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -67,6 +68,7 @@ interface LoteForm {
   score_juridico: string;
   score_normativo: string;
   score_servicios: string;
+  es_publico: boolean;
 }
 
 const emptyForm: LoteForm = {
@@ -102,6 +104,7 @@ const emptyForm: LoteForm = {
   score_juridico: "",
   score_normativo: "",
   score_servicios: "",
+  es_publico: true,
 };
 
 interface ServicioRow {
@@ -115,6 +118,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAdminOrAsesor } = useAuth();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
   const [servicios, setServicios] = useState<ServicioRow[]>(SERVICIOS_DEFAULT);
@@ -186,6 +190,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
       score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
       score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
+      es_publico: existingLote.es_publico ?? true,
     }));
     if ((existingLote as any).foto_url) {
       setExistingPhotoUrl((existingLote as any).foto_url);
@@ -339,6 +344,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
         score_normativo: form.score_normativo ? parseInt(form.score_normativo) : null,
         score_servicios: form.score_servicios ? parseInt(form.score_servicios) : null,
+        es_publico: form.es_publico,
       };
 
       let loteId = id;
@@ -481,6 +487,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
               <Switch checked={form.destacado} onCheckedChange={(v) => update("destacado", v)} />
               <Label className="text-xs">Lote destacado</Label>
             </div>
+            {isAdminOrAsesor && (
+              <div className="flex items-center gap-3">
+                <Switch checked={form.es_publico} onCheckedChange={(v) => update("es_publico", v)} />
+                <Label className="text-xs">Lote público</Label>
+                <span className="font-body text-xs text-muted-foreground">
+                  {form.es_publico ? "Visible en el catálogo público" : "Solo visible para el dueño y admins"}
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
