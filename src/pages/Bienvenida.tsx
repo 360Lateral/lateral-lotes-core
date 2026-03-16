@@ -106,7 +106,7 @@ const Bienvenida = () => {
       </p>
 
       {/* Cards */}
-      <div className="grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-3">
         {perfiles.map((perfil) => {
           const isSelected = selected === perfil.id;
           const Icon = perfil.icon;
