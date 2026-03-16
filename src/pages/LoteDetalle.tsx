@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import ScoreIndicator from "@/components/ScoreIndicator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Logo from "@/components/ui/Logo";
@@ -457,6 +458,13 @@ const LoteDetalle = () => {
                 />
               </CardContent>
             </Card>
+
+            {/* Score de viabilidad */}
+            <div className="flex items-start gap-6 rounded-lg border border-border p-4">
+              <ScoreIndicator score={lote.score_juridico} label="Jurídico" emoji="⚖️" size="lg" />
+              <ScoreIndicator score={lote.score_normativo} label="Normativo" emoji="📋" size="lg" />
+              <ScoreIndicator score={lote.score_servicios} label="Servicios" emoji="🔌" size="lg" />
+            </div>
 
             {/* Tabs */}
             <Tabs defaultValue="normativa" className="w-full">

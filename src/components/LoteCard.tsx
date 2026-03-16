@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Logo from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ScoreIndicator from "@/components/ScoreIndicator";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
@@ -14,6 +15,9 @@ interface LoteCardProps {
   estado: string;
   lat?: number | null;
   lng?: number | null;
+  score_juridico?: number | null;
+  score_normativo?: number | null;
+  score_servicios?: number | null;
 }
 
 const formatCOP = (value: number) =>
@@ -37,7 +41,7 @@ const estadoBadgeVariant = (estado: string) => {
   }
 };
 
-const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng }: LoteCardProps) => {
+const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios }: LoteCardProps) => {
   const hasCoords = lat != null && lng != null;
   const staticMapUrl = hasCoords
     ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+1D3461(${lng},${lat})/${lng},${lat},14,0/400x176@2x?access_token=${MAPBOX_TOKEN}`
@@ -76,6 +80,12 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng }: 
             {formatCOP(precio_m2)}
           </p>
         </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+        <ScoreIndicator score={score_juridico ?? null} label="Jurídico" emoji="⚖️" size="sm" />
+        <ScoreIndicator score={score_normativo ?? null} label="Normativo" emoji="📋" size="sm" />
+        <ScoreIndicator score={score_servicios ?? null} label="Servicios" emoji="🔌" size="sm" />
       </div>
 
       <Button variant="default" size="sm" className="mt-3 w-full" asChild>

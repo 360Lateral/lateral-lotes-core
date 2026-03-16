@@ -62,6 +62,10 @@ interface LoteForm {
   // Precio
   precio_cop: string;
   precio_m2_cop: string;
+  // Scores
+  score_juridico: string;
+  score_normativo: string;
+  score_servicios: string;
 }
 
 const emptyForm: LoteForm = {
@@ -94,6 +98,9 @@ const emptyForm: LoteForm = {
   cesion_tipo_a_pct: "",
   precio_cop: "",
   precio_m2_cop: "",
+  score_juridico: "",
+  score_normativo: "",
+  score_servicios: "",
 };
 
 interface ServicioRow {
@@ -172,6 +179,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       fondo_ml: existingLote.fondo_ml != null ? String(existingLote.fondo_ml) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
+      score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
+      score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
+      score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
     }));
   }, [existingLote]);
 
@@ -306,6 +316,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         fondo_ml: form.fondo_ml ? parseFloat(form.fondo_ml) : null,
         matricula_inmobiliaria: form.matricula_inmobiliaria || null,
         notas: form.notas || null,
+        score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
+        score_normativo: form.score_normativo ? parseInt(form.score_normativo) : null,
+        score_servicios: form.score_servicios ? parseInt(form.score_servicios) : null,
       };
 
       let loteId = id;
@@ -590,6 +603,49 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             <div>
               <Label className="text-xs">Precio por m² COP</Label>
               <Input type="number" value={form.precio_m2_cop} onChange={(e) => handlePrecioChange("precio_m2_cop", e.target.value)} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Score de viabilidad */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">Score de viabilidad</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+              <Label className="text-xs">Score Jurídico</Label>
+              <Select value={form.score_juridico} onValueChange={(v) => update("score_juridico", v)}>
+                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
+                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
+                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Score Normativo</Label>
+              <Select value={form.score_normativo} onValueChange={(v) => update("score_normativo", v)}>
+                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
+                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
+                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Score Servicios</Label>
+              <Select value={form.score_servicios} onValueChange={(v) => update("score_servicios", v)}>
+                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Sin asignar</SelectItem>
+                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
+                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
+                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

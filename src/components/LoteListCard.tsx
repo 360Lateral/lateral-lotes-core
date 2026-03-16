@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import ScoreIndicator from "@/components/ScoreIndicator";
 import type { LoteWithPrecio } from "@/pages/Lotes";
 
 const formatCOP = (v: number) =>
@@ -48,6 +49,12 @@ const LoteListCard = ({ lote, onMouseEnter, onMouseLeave, onClick }: Props) => (
       <span className="font-body text-sm font-semibold text-primary">
         {formatCOP(lote.precio_m2)}/m²
       </span>
+    </div>
+
+    <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
+      <ScoreIndicator score={lote.score_juridico ?? null} label="Jurídico" emoji="⚖️" size="sm" />
+      <ScoreIndicator score={lote.score_normativo ?? null} label="Normativo" emoji="📋" size="sm" />
+      <ScoreIndicator score={lote.score_servicios ?? null} label="Servicios" emoji="🔌" size="sm" />
     </div>
   </div>
 );
