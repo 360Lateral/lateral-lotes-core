@@ -62,6 +62,7 @@ interface UserRecord {
   user_type: string | null;
   activo: boolean;
   roles: string[];
+  comisionista_doc_estado: string | null;
   created_at: string;
   last_sign_in_at: string | null;
 }
