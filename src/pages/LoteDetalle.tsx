@@ -358,14 +358,72 @@ const LoteDetalle = () => {
         <div className="grid gap-8 lg:grid-cols-5">
           {/* LEFT COLUMN (60%) */}
           <div className="flex flex-col gap-6 lg:col-span-3">
-            {/* Gallery / Photo / Placeholder */}
-            <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
-              {(lote as any).foto_url ? (
-                <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
-              ) : (
-                <Logo variant="on-navy" className="opacity-40" />
+            {/* Gallery */}
+            <div className="relative flex flex-col gap-2">
+              <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
+                {fotos.length > 0 ? (
+                  <>
+                    <img src={fotos[galleryIndex]?.url} alt={`${lote.nombre_lote} - foto ${galleryIndex + 1}`} className="h-full w-full object-cover" />
+                    {fotos.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setGalleryIndex((prev) => (prev - 1 + fotos.length) % fotos.length)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => setGalleryIndex((prev) => (prev + 1) % fotos.length)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (lote as any).foto_url ? (
+                  <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
+                ) : (
+                  <Logo variant="on-navy" className="opacity-40" />
+                )}
+              </div>
+              {/* Thumbnails */}
+              {fotos.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto">
+                  {fotos.slice(0, 5).map((f, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setGalleryIndex(i)}
+                      className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-colors ${
+                        i === galleryIndex ? "border-primary" : "border-transparent"
+                      }`}
+                    >
+                      <img src={f.url} alt={`Miniatura ${i + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
+
+            {/* Video */}
+            {(lote as any).video_url && (
+              <div>
+                {(lote as any).video_url.includes("youtube") || (lote as any).video_url.includes("youtu.be") ? (
+                  <iframe
+                    src={(lote as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                    className="w-full rounded-lg h-48 md:h-64"
+                    allowFullScreen
+                    title="Video del lote"
+                  />
+                ) : (
+                  <video
+                    src={(lote as any).video_url}
+                    controls
+                    className="w-full rounded-lg max-h-64"
+                  />
+                )}
+              </div>
+            )}
 
             {/* Mini map */}
             {lote.lat && lote.lng && (
