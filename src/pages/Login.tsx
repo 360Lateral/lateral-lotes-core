@@ -49,7 +49,25 @@ const Login = () => {
         ["super_admin", "admin", "asesor"].includes(r.role)
       );
 
-      navigate(isAdmin ? "/dashboard" : "/lotes", { replace: true });
+      if (isAdmin) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        // Check user_type for personalized redirect
+        const { data: perfil } = await supabase
+          .from("perfiles")
+          .select("user_type")
+          .eq("id", user.id)
+          .single();
+
+        const ut = (perfil as any)?.user_type;
+        if (ut === "dueno") {
+          navigate("/diagnostico", { replace: true });
+        } else if (ut === "developer") {
+          navigate("/lotes", { replace: true });
+        } else {
+          navigate("/lotes", { replace: true });
+        }
+      }
     }
 
     setLoading(false);
