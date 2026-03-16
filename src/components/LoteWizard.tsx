@@ -104,6 +104,7 @@ interface DocFile {
 const LoteWizard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<WizardForm>(emptyWizard);
