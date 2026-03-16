@@ -22,6 +22,9 @@ import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import DashboardNegociaciones from "./pages/DashboardNegociaciones";
 import SalaNegociacion from "./pages/SalaNegociacion";
 import Diagnostico from "./pages/Diagnostico";
+import DiagnosticoResultado from "./pages/DiagnosticoResultado";
+import Mercado from "./pages/Mercado";
+import DashboardOwner from "./pages/DashboardOwner";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +45,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/bienvenida" element={<Bienvenida />} />
             <Route path="/diagnostico" element={<Diagnostico />} />
+            <Route path="/diagnostico/resultado" element={<DiagnosticoResultado />} />
+            <Route path="/mercado" element={<Mercado />} />
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -59,6 +64,7 @@ const App = () => (
             {/* Negociaciones */}
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/owner" element={<ProtectedRoute allowOwner><DashboardOwner /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
