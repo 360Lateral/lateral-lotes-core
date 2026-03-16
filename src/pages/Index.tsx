@@ -197,6 +197,9 @@ const Index = () => {
                 estado={lote.estado_disponibilidad}
                 lat={lote.lat ? Number(lote.lat) : null}
                 lng={lote.lng ? Number(lote.lng) : null}
+                score_juridico={lote.score_juridico}
+                score_normativo={lote.score_normativo}
+                score_servicios={lote.score_servicios}
               />
             ))}
           </div>

@@ -98,6 +98,9 @@ const emptyForm: LoteForm = {
   cesion_tipo_a_pct: "",
   precio_cop: "",
   precio_m2_cop: "",
+  score_juridico: "",
+  score_normativo: "",
+  score_servicios: "",
 };
 
 interface ServicioRow {
