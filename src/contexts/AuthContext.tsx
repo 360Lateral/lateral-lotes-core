@@ -56,6 +56,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loadUserData = async (userId: string) => {
+    await Promise.all([fetchRoles(userId), fetchUserType(userId)]);
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
