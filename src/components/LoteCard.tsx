@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Logo from "@/components/ui/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ScoreIndicator from "@/components/ScoreIndicator";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
