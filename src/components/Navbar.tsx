@@ -14,9 +14,15 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { user, isAdminOrAsesor, isDeveloper, loading } = useAuth();
+  const { user, isAdminOrAsesor, isDeveloper, loading, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/", { replace: true });
+  };
 
   // Get display name from user metadata or email
   const displayName =
