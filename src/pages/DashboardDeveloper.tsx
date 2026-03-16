@@ -47,6 +47,43 @@ const DashboardDeveloper = () => {
     },
   });
 
+  const { data: favoritosCount = 0 } = useQuery({
+    queryKey: ["dev-favoritos-count", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("favoritos")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      return count ?? 0;
+    },
+  });
+
+  const { data: negociacionesCount = 0 } = useQuery({
+    queryKey: ["dev-negociaciones-count", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("negociaciones")
+        .select("*", { count: "exact", head: true })
+        .eq("developer_id", user!.id);
+      return count ?? 0;
+    },
+  });
+
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["unread-notif", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("notificaciones")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("leida", false);
+      return count ?? 0;
+    },
+  });
+
   const createAlerta = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("alertas").insert({
