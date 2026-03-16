@@ -38,6 +38,7 @@ const App = () => (
             <Route path="/lotes" element={<Lotes />} />
             <Route path="/lotes/:id" element={<LoteDetalle />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/diagnostico" element={<Diagnostico />} />
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
