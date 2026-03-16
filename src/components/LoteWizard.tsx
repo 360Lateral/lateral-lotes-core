@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,6 +104,7 @@ interface DocFile {
 const LoteWizard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<WizardForm>(emptyWizard);
@@ -262,6 +264,8 @@ const LoteWizard = () => {
           problema_juridico: form.problema_juridico || null,
           video_url: videoUrl || null,
           estado_disponibilidad: "En revisión" as any,
+          owner_id: user?.id || null,
+          es_publico: false,
         } as any)
         .select("id")
         .single();

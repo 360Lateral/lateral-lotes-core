@@ -10,10 +10,17 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, Plus, LayoutDashboard, Search } from "lucide-react";
 
 const Index = () => {
-  const { user, isAdminOrAsesor } = useAuth();
+  const { user, userType, isAdminOrAsesor, loading: authLoading } = useAuth();
+
+  // Determine profile type
+  const isDueno = userType === "dueno";
+  const isDeveloper = userType === "desarrollador";
+
+  // Tab for owners: "mis" or "publicos"
+  const [ownerTab, setOwnerTab] = useState<"mis" | "publicos">("mis");
 
   // Filters
   const [ciudad, setCiudad] = useState<string>("todas");
@@ -51,7 +58,7 @@ const Index = () => {
     queryFn: async () => {
       const { data: lotesData, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, destacado, lat, lng, score_juridico, score_normativo, score_servicios, has_resolutoria, foto_url");
+        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, destacado, lat, lng, score_juridico, score_normativo, score_servicios, has_resolutoria, foto_url, owner_id, es_publico");
 
       if (error) throw error;
 
@@ -87,7 +94,19 @@ const Index = () => {
   // Apply filters client-side
   const filteredLotes = useMemo(() => {
     if (!lotes) return [];
-    return lotes.filter((l) => {
+
+    let subset = lotes;
+
+    // For owners viewing "mis lotes", show only their lots
+    if (user && isDueno && ownerTab === "mis") {
+      subset = subset.filter((l) => (l as any).owner_id === user.id);
+    } else if (user && isDueno && ownerTab === "publicos") {
+      subset = subset.filter((l) => (l as any).es_publico === true);
+    }
+    // For developers or anonymous, RLS already filters — just show what's returned
+    // (public lots for anon, public+own for authenticated)
+
+    return subset.filter((l) => {
       if (ciudad !== "todas" && l.ciudad !== ciudad) return false;
       if (uso !== "todos" && l.uso_principal !== uso) return false;
       const area = Number(l.area_total_m2) || 0;
@@ -95,7 +114,7 @@ const Index = () => {
       if (areaMax && area > Number(areaMax)) return false;
       return true;
     });
-  }, [lotes, ciudad, uso, areaMin, areaMax]);
+  }, [lotes, ciudad, uso, areaMin, areaMax, user, isDueno, ownerTab]);
 
   const hasActiveFilters = ciudad !== "todas" || uso !== "todos" || areaMin !== "" || areaMax !== "";
 
@@ -106,37 +125,124 @@ const Index = () => {
     setAreaMax("");
   };
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
+  // Hero content based on profile
+  const renderHero = () => {
+    if (authLoading) return null;
 
-      {/* Hero */}
+    // Logged-in owner
+    if (user && isDueno) {
+      return (
+        <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
+            Gestiona tus lotes
+          </h1>
+          <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
+            Publica, edita y da seguimiento a tus terrenos. El equipo 360Lateral te ayuda a conectar con compradores calificados.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/dashboard/lotes/nuevo">
+                <Plus className="mr-2 h-5 w-5" />
+                Publicar nuevo lote
+              </Link>
+            </Button>
+            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
+              <Link to="/diagnostico">Solicitar Diagnóstico 360°</Link>
+            </Button>
+          </div>
+        </section>
+      );
+    }
+
+    // Logged-in developer
+    if (user && isDeveloper) {
+      return (
+        <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
+            Encuentra tu próximo terreno
+          </h1>
+          <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
+            Explora lotes verificados con información técnica, normativa y financiera completa para tomar decisiones informadas.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/lotes">
+                <Search className="mr-2 h-5 w-5" />
+                Explorar catálogo
+              </Link>
+            </Button>
+            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
+              <Link to="/dashboard/developer">
+                <LayoutDashboard className="mr-2 h-5 w-5" />
+                Mi dashboard
+              </Link>
+            </Button>
+          </div>
+        </section>
+      );
+    }
+
+    // Logged-in admin — keep current generic hero with dashboard access
+    if (user && isAdminOrAsesor) {
+      return (
+        <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
+          <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
+            Tu lote tiene más valor del que crees
+          </h1>
+          <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
+            Conectamos tierra con su mejor destino: venta, desarrollo o viabilización.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/dashboard">
+                <LayoutDashboard className="mr-2 h-5 w-5" />
+                Ir al Dashboard
+              </Link>
+            </Button>
+            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
+              <Link to="/lotes">Explorar lotes</Link>
+            </Button>
+          </div>
+        </section>
+      );
+    }
+
+    // Not logged in — default hero
+    return (
       <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
         <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
           Tu lote tiene más valor del que crees
         </h1>
-        <p className="mt-4 max-w-xl font-body text-base text-gray-light md:text-lg">
+        <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
           Conectamos tierra con su mejor destino: venta, desarrollo o viabilización. Con información técnica, normativa y financiera completa.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Button variant="hero" size="xl" asChild>
-            <Link to={user ? "/lotes" : "/bienvenida"}>Explorar lotes</Link>
+            <Link to="/bienvenida">Explorar lotes</Link>
           </Button>
           <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-            <Link to={user ? (isAdminOrAsesor ? "/dashboard/lotes/nuevo" : "/dashboard") : "/bienvenida?preselect=dueno"}>Publicar mi lote gratis</Link>
+            <Link to="/bienvenida?preselect=dueno">Publicar mi lote gratis</Link>
           </Button>
         </div>
-        <Link to="/diagnostico" className="mt-4 font-body text-sm text-gray-light hover:text-secondary-foreground transition-colors">
+        <Link to="/diagnostico" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
           ¿Tienes un lote? Descubre su valor gratis →
         </Link>
       </section>
+    );
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+
+      {renderHero()}
 
       {/* Trust bar */}
       <section className="border-b border-border bg-background py-8">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
           {trustStats.map((stat) => (
             <div key={stat.label} className="flex flex-col items-center">
-              <span className="font-body text-3xl font-bold" style={{ color: "#E8951A" }}>
+              <span className="font-body text-3xl font-bold text-primary">
                 {stat.value}
               </span>
               <span className="mt-1 font-body text-xs text-muted-foreground">{stat.label}</span>
@@ -145,24 +251,46 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Lotes con filtros */}
+      {/* Lotes section */}
       <section className="mx-auto w-full max-w-7xl px-4 py-16">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="font-body text-2xl font-bold text-carbon">
-            Lotes disponibles
+          <h2 className="font-body text-2xl font-bold text-foreground">
+            {user && isDueno
+              ? ownerTab === "mis" ? "Mis lotes" : "Catálogo público"
+              : "Lotes disponibles"}
           </h2>
           <p className="font-body text-sm text-muted-foreground">
             Mostrando {filteredLotes.length} de {lotes?.length ?? 0} lotes
           </p>
         </div>
 
+        {/* Owner tabs */}
+        {user && isDueno && (
+          <div className="mb-6 flex gap-2">
+            <Button
+              variant={ownerTab === "mis" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setOwnerTab("mis")}
+            >
+              Mis lotes
+            </Button>
+            <Button
+              variant={ownerTab === "publicos" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setOwnerTab("publicos")}
+            >
+              Catálogo público
+            </Button>
+          </div>
+        )}
+
         {/* Filter bar */}
-        <div className="mb-8 rounded-lg border border-gray-light bg-card p-4">
+        <div className="mb-8 rounded-lg border border-border bg-card p-4">
           <div className="mb-3 flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-orange" />
-            <span className="font-body text-sm font-semibold text-carbon">Filtros</span>
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+            <span className="font-body text-sm font-semibold text-foreground">Filtros</span>
             {hasActiveFilters && (
-              <button onClick={clearFilters} className="ml-auto flex items-center gap-1 font-body text-xs text-muted-foreground hover:text-carbon">
+              <button onClick={clearFilters} className="ml-auto flex items-center gap-1 font-body text-xs text-muted-foreground hover:text-foreground">
                 <X className="h-3 w-3" /> Limpiar
               </button>
             )}
@@ -221,18 +349,33 @@ const Index = () => {
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-80 animate-pulse rounded-lg border border-gray-light bg-muted" />
+              <div key={i} className="h-80 animate-pulse rounded-lg border border-border bg-muted" />
             ))}
           </div>
         ) : filteredLotes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-light py-16">
-            <p className="font-body text-lg font-semibold text-carbon">No se encontraron lotes</p>
-            <p className="mt-1 font-body text-sm text-muted-foreground">Intenta ajustar los filtros</p>
-            {hasActiveFilters && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16">
+            <p className="font-body text-lg font-semibold text-foreground">
+              {user && isDueno && ownerTab === "mis"
+                ? "Aún no tienes lotes publicados"
+                : "No se encontraron lotes"}
+            </p>
+            <p className="mt-1 font-body text-sm text-muted-foreground">
+              {user && isDueno && ownerTab === "mis"
+                ? "Publica tu primer lote y conéctalo con compradores"
+                : "Intenta ajustar los filtros"}
+            </p>
+            {user && isDueno && ownerTab === "mis" ? (
+              <Button variant="default" size="sm" className="mt-4" asChild>
+                <Link to="/dashboard/lotes/nuevo">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Publicar lote
+                </Link>
+              </Button>
+            ) : hasActiveFilters ? (
               <Button variant="outline" size="sm" className="mt-4" onClick={clearFilters}>
                 Limpiar filtros
               </Button>
-            )}
+            ) : null}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

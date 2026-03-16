@@ -294,6 +294,24 @@ const LoteDetalle = () => {
     );
   }
 
+  // Protect private lots: if not public and user is not owner or admin
+  const isPrivate = (lote as any).es_publico === false;
+  const isOwner = user && (lote as any).owner_id === user.id;
+  if (isPrivate && !isOwner && !isAdminOrAsesor) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
+          <p className="font-body text-lg font-semibold text-foreground">Este lote no está disponible</p>
+          <p className="font-body text-sm text-muted-foreground">El lote es privado o está en revisión.</p>
+          <Button variant="default" asChild>
+            <Link to="/lotes">Ver lotes disponibles</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
