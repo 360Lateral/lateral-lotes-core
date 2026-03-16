@@ -68,6 +68,7 @@ interface LoteForm {
   score_juridico: string;
   score_normativo: string;
   score_servicios: string;
+  es_publico: boolean;
 }
 
 const emptyForm: LoteForm = {
