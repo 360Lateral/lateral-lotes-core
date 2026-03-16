@@ -25,6 +25,9 @@ import Diagnostico from "./pages/Diagnostico";
 import DiagnosticoResultado from "./pages/DiagnosticoResultado";
 import Mercado from "./pages/Mercado";
 import DashboardOwner from "./pages/DashboardOwner";
+import DashboardOwnerLotes from "./pages/DashboardOwnerLotes";
+import DashboardOwnerDiagnosticos from "./pages/DashboardOwnerDiagnosticos";
+import DashboardOwnerNegociaciones from "./pages/DashboardOwnerNegociaciones";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
@@ -65,6 +68,9 @@ const App = () => (
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
             <Route path="/dashboard/owner" element={<ProtectedRoute allowOwner><DashboardOwner /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowOwner><DashboardOwnerLotes /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowOwner><DashboardOwnerDiagnosticos /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowOwner><DashboardOwnerNegociaciones /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
