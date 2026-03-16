@@ -22,6 +22,7 @@ import DashboardNotificaciones from "./pages/DashboardNotificaciones";
 import DashboardNegociaciones from "./pages/DashboardNegociaciones";
 import SalaNegociacion from "./pages/SalaNegociacion";
 import Diagnostico from "./pages/Diagnostico";
+import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
