@@ -27,50 +27,54 @@ const Login = () => {
     setError("");
     setLoading(true);
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError("Correo o contraseña incorrectos. Intenta de nuevo.");
-      setLoading(false);
-      return;
-    }
+      if (authError) {
+        setError("Correo o contraseña incorrectos. Intenta de nuevo.");
+        return;
+      }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: userRoles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userRoles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
 
-      const isAdmin = userRoles?.some((r) =>
-        ["super_admin", "admin", "asesor"].includes(r.role)
-      );
+        const isAdmin = userRoles?.some((r) =>
+          ["super_admin", "admin", "asesor"].includes(r.role)
+        );
 
-      if (isAdmin) {
-        navigate("/dashboard", { replace: true });
-      } else {
-        // Check user_type for personalized redirect
-        const { data: perfil } = await supabase
-          .from("perfiles")
-          .select("user_type")
-          .eq("id", user.id)
-          .single();
-
-        const ut = (perfil as any)?.user_type;
-        if (ut === "dueno") {
-          navigate("/diagnostico", { replace: true });
-        } else if (ut === "developer") {
-          navigate("/lotes", { replace: true });
+        if (isAdmin) {
+          navigate("/dashboard", { replace: true });
         } else {
-          navigate("/lotes", { replace: true });
+          // Check user_type for personalized redirect
+          const { data: perfil } = await supabase
+            .from("perfiles")
+            .select("user_type")
+            .eq("id", user.id)
+            .single();
+
+          const ut = (perfil as any)?.user_type;
+          if (ut === "dueno") {
+            navigate("/diagnostico", { replace: true });
+          } else if (ut === "developer") {
+            navigate("/lotes", { replace: true });
+          } else {
+            navigate("/lotes", { replace: true });
+          }
         }
       }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Ocurrió un error inesperado. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
