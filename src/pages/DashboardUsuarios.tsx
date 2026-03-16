@@ -33,12 +33,14 @@ import {
 import { Loader2, Search, ShieldPlus, ShieldMinus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-const ALL_ROLES = ["super_admin", "admin", "asesor", "inversor", "developer"] as const;
+const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
   admin: "Administrador",
   asesor: "Asesor",
+  dueno: "Dueño",
+  comisionista: "Comisionista",
   inversor: "Inversor",
   developer: "Developer",
 };
@@ -47,6 +49,8 @@ const ROLE_COLORS: Record<string, string> = {
   super_admin: "bg-destructive text-destructive-foreground",
   admin: "bg-primary text-primary-foreground",
   asesor: "bg-accent text-accent-foreground",
+  dueno: "bg-primary/80 text-primary-foreground",
+  comisionista: "bg-accent/80 text-accent-foreground",
   inversor: "bg-muted text-muted-foreground",
   developer: "bg-secondary text-secondary-foreground",
 };
