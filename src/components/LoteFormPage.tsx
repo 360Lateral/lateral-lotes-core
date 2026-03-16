@@ -352,6 +352,19 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         loteId = data.id;
       }
 
+      // Upload photo if selected
+      if (photoFile && loteId) {
+        const ext = photoFile.name.split(".").pop();
+        const path = `${loteId}/foto.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("fotos-lotes").upload(path, photoFile, { upsert: true });
+        if (uploadErr) throw uploadErr;
+        const { data: urlData } = supabase.storage.from("fotos-lotes").getPublicUrl(path);
+        await supabase.from("lotes").update({ foto_url: urlData.publicUrl } as any).eq("id", loteId);
+      } else if (!existingPhotoUrl && isEdit && id) {
+        // Photo was removed
+        await supabase.from("lotes").update({ foto_url: null } as any).eq("id", id);
+      }
+
       // Normativa
       const normPayload = {
         lote_id: loteId!,
