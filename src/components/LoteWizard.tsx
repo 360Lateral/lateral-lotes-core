@@ -412,6 +412,14 @@ const LoteWizard = () => {
           El equipo 360 Lateral lo revisará en menos de 24 horas. Mientras tanto, revisa el estado de tu publicación:
         </p>
         <LoteScoreResult result={scoreResult} />
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Button variant="default" asChild>
+            <Link to="/dashboard/owner">Ver mis lotes</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/diagnostico">Solicitar Diagnóstico 360°</Link>
+          </Button>
+        </div>
       </DashboardLayout>
     );
   }
