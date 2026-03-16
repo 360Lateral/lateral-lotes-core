@@ -435,7 +435,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </div>
             <div>
               <Label className="text-xs">Estado</Label>
-              <Select value={form.estado_disponibilidad} onValueChange={(v) => update("estado_disponibilidad", v)}>
+              <Select value={form.estado_disponibilidad || "Disponible"} onValueChange={(v) => update("estado_disponibilidad", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Disponible">Disponible</SelectItem>
@@ -568,7 +568,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                   <tr key={s.tipo} className="border-b border-border last:border-0">
                     <td className="py-2 text-foreground">{s.tipo}</td>
                     <td className="py-2">
-                      <Select value={s.estado} onValueChange={(v) => updateServicio(i, "estado", v)}>
+                      <Select value={s.estado || "Disponible"} onValueChange={(v) => updateServicio(i, "estado", v)}>
                         <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Disponible">Disponible</SelectItem>
