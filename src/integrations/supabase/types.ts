@@ -163,6 +163,9 @@ export type Database = {
           matricula_inmobiliaria: string | null
           nombre_lote: string
           notas: string | null
+          score_juridico: number | null
+          score_normativo: number | null
+          score_servicios: number | null
           updated_at: string
         }
         Insert: {
@@ -182,6 +185,9 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote: string
           notas?: string | null
+          score_juridico?: number | null
+          score_normativo?: number | null
+          score_servicios?: number | null
           updated_at?: string
         }
         Update: {
@@ -201,6 +207,9 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote?: string
           notas?: string | null
+          score_juridico?: number | null
+          score_normativo?: number | null
+          score_servicios?: number | null
           updated_at?: string
         }
         Relationships: []
