@@ -216,6 +216,7 @@ export type Database = {
           departamento: string | null
           destacado: boolean | null
           direccion: string | null
+          es_publico: boolean
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato: number | null
           fondo_ml: number | null
@@ -228,6 +229,7 @@ export type Database = {
           matricula_inmobiliaria: string | null
           nombre_lote: string
           notas: string | null
+          owner_id: string | null
           problema_juridico: string | null
           score_juridico: number | null
           score_normativo: number | null
@@ -246,6 +248,7 @@ export type Database = {
           departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
+          es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato?: number | null
           fondo_ml?: number | null
@@ -258,6 +261,7 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote: string
           notas?: string | null
+          owner_id?: string | null
           problema_juridico?: string | null
           score_juridico?: number | null
           score_normativo?: number | null
@@ -276,6 +280,7 @@ export type Database = {
           departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
+          es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estrato?: number | null
           fondo_ml?: number | null
@@ -288,6 +293,7 @@ export type Database = {
           matricula_inmobiliaria?: string | null
           nombre_lote?: string
           notas?: string | null
+          owner_id?: string | null
           problema_juridico?: string | null
           score_juridico?: number | null
           score_normativo?: number | null
