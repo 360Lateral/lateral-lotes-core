@@ -264,6 +264,8 @@ const LoteWizard = () => {
           problema_juridico: form.problema_juridico || null,
           video_url: videoUrl || null,
           estado_disponibilidad: "En revisión" as any,
+          owner_id: user?.id || null,
+          es_publico: false,
         } as any)
         .select("id")
         .single();
