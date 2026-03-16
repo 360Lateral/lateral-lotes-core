@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,35 @@ const Login = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const navigate = useNavigate();
+  const { user, userType, loading: authLoading, isAdminOrAsesor } = useAuth();
+
+  // Redirect based on AuthContext state after login
+  useEffect(() => {
+    if (!loginSuccess || authLoading) return;
+    if (!user) return;
+
+    if (isAdminOrAsesor) {
+      navigate("/dashboard", { replace: true });
+    } else if (userType === "dueno") {
+      navigate("/diagnostico", { replace: true });
+    } else if (userType === "developer") {
+      navigate("/lotes", { replace: true });
+    } else {
+      navigate("/lotes", { replace: true });
+    }
+  }, [loginSuccess, authLoading, user, isAdminOrAsesor, userType, navigate]);
+
+  // Also redirect if user arrives at /login already authenticated
+  useEffect(() => {
+    if (authLoading || !user || loginSuccess) return;
+    if (isAdminOrAsesor) {
+      navigate("/dashboard", { replace: true });
+    } else {
+      navigate("/lotes", { replace: true });
+    }
+  }, [authLoading, user, isAdminOrAsesor, navigate, loginSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,37 +67,9 @@ const Login = () => {
         return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: userRoles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id);
-
-        const isAdmin = userRoles?.some((r) =>
-          ["super_admin", "admin", "asesor"].includes(r.role)
-        );
-
-        if (isAdmin) {
-          navigate("/dashboard", { replace: true });
-        } else {
-          // Check user_type for personalized redirect
-          const { data: perfil } = await supabase
-            .from("perfiles")
-            .select("user_type")
-            .eq("id", user.id)
-            .single();
-
-          const ut = (perfil as any)?.user_type;
-          if (ut === "dueno") {
-            navigate("/diagnostico", { replace: true });
-          } else if (ut === "developer") {
-            navigate("/lotes", { replace: true });
-          } else {
-            navigate("/lotes", { replace: true });
-          }
-        }
-      }
+      // Signal that login was successful — let useEffect handle redirect
+      // after AuthContext finishes loading roles
+      setLoginSuccess(true);
     } catch (err) {
       console.error("Login error:", err);
       setError("Ocurrió un error inesperado. Intenta de nuevo.");
@@ -182,8 +183,8 @@ const Login = () => {
 
             {error && <p className="text-sm text-danger font-body">{error}</p>}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Ingresando..." : "Iniciar sesión"}
+            <Button type="submit" className="w-full" disabled={loading || loginSuccess}>
+              {loading ? "Ingresando..." : loginSuccess ? "Redirigiendo..." : "Iniciar sesión"}
             </Button>
           </form>
         ) : (
