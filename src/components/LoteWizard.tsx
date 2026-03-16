@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -412,6 +412,14 @@ const LoteWizard = () => {
           El equipo 360 Lateral lo revisará en menos de 24 horas. Mientras tanto, revisa el estado de tu publicación:
         </p>
         <LoteScoreResult result={scoreResult} />
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Button variant="default" asChild>
+            <Link to="/dashboard/owner">Ver mis lotes</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/diagnostico">Solicitar Diagnóstico 360°</Link>
+          </Button>
+        </div>
       </DashboardLayout>
     );
   }
@@ -545,7 +553,15 @@ const LoteWizard = () => {
             value={form.precio_cop}
             onChange={(e) => update("precio_cop", e.target.value)}
             placeholder="Ej: 350000000"
-          />
+           />
+          {form.precio_cop && (
+            <p className="mt-1 font-body text-xs text-muted-foreground">
+              = ${parseInt(form.precio_cop).toLocaleString("es-CO")} COP
+              {form.area_total_m2 && ` · $${Math.round(
+                parseInt(form.precio_cop) / parseFloat(form.area_total_m2)
+              ).toLocaleString("es-CO")}/m²`}
+            </p>
+          )}
         </div>
         <div>
           <Label className="text-xs">Descripción del lote (opcional)</Label>
@@ -964,9 +980,12 @@ const LoteWizard = () => {
             onClick={handlePublish}
             disabled={publishMutation.isPending}
           >
-            {publishMutation.isPending
-              ? "Publicando…"
-              : "Publicar mi lote"}
+            {publishMutation.isPending ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Subiendo fotos y documentos...
+              </span>
+            ) : "Publicar mi lote"}
           </Button>
         )}
       </div>
