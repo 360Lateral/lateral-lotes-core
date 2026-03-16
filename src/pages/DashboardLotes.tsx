@@ -1,13 +1,24 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -20,6 +31,10 @@ const estadoVariant = (e: string) => {
 
 const DashboardLotes = () => {
   const [search, setSearch] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteName, setDeleteName] = useState("");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: lotes = [], isLoading } = useQuery({
     queryKey: ["dash-lotes-list"],
@@ -30,6 +45,22 @@ const DashboardLotes = () => {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("lotes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Lote eliminado correctamente" });
+      queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
+      setDeleteId(null);
+    },
+    onError: (err: any) => {
+      toast({ title: "Error al eliminar", description: err.message, variant: "destructive" });
+      setDeleteId(null);
     },
   });
 
@@ -108,6 +139,13 @@ const DashboardLotes = () => {
                       <Link to={`/lotes/${l.id}`} target="_blank" title="Ver ficha">
                         <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                       </Link>
+                      <button
+                        type="button"
+                        title="Eliminar"
+                        onClick={() => { setDeleteId(l.id); setDeleteName(l.nombre_lote); }}
+                      >
+                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -123,6 +161,27 @@ const DashboardLotes = () => {
           </table>
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar lote?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Estás a punto de eliminar <strong>{deleteName}</strong>. Esta acción no se puede deshacer y eliminará también sus datos asociados (normativa, precios, servicios, documentos).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Eliminando…" : "Eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
