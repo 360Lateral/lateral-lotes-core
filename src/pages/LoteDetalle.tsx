@@ -337,9 +337,22 @@ const LoteDetalle = () => {
 
           {/* RIGHT COLUMN (40%) */}
           <div className="flex flex-col gap-5 lg:col-span-2">
-            <h1 className="font-body text-2xl font-bold text-secondary md:text-3xl">
-              {lote.nombre_lote}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-body text-2xl font-bold text-secondary md:text-3xl">
+                {lote.nombre_lote}
+              </h1>
+              {isAdminOrAsesor && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/dashboard/lotes/${id}/editar`)}
+                  className="shrink-0"
+                >
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                  Editar
+                </Button>
+              )}
+            </div>
 
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary" />
