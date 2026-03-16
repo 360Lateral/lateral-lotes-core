@@ -344,6 +344,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
         score_normativo: form.score_normativo ? parseInt(form.score_normativo) : null,
         score_servicios: form.score_servicios ? parseInt(form.score_servicios) : null,
+        es_publico: form.es_publico,
       };
 
       let loteId = id;
