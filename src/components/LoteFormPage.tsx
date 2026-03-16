@@ -187,7 +187,23 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
       score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
     }));
+    if ((existingLote as any).foto_url) {
+      setExistingPhotoUrl((existingLote as any).foto_url);
+    }
   }, [existingLote]);
+
+  const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setExistingPhotoUrl(null);
+  };
 
   useEffect(() => {
     if (!existingNormativa) return;
