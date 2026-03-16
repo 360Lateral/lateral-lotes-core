@@ -68,6 +68,14 @@ const Navbar = () => {
                   <Link to="/dashboard/developer">Dashboard</Link>
                 </Button>
               )}
+              <button
+                onClick={handleSignOut}
+                className="text-secondary-foreground/60 transition-colors hover:text-orange"
+                aria-label="Cerrar sesión"
+                title="Cerrar sesión"
+              >
+                <LogOut size={18} />
+              </button>
             </>
           ) : (
             <>
