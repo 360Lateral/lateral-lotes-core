@@ -62,6 +62,10 @@ interface LoteForm {
   // Precio
   precio_cop: string;
   precio_m2_cop: string;
+  // Scores
+  score_juridico: string;
+  score_normativo: string;
+  score_servicios: string;
 }
 
 const emptyForm: LoteForm = {
