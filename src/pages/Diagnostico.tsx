@@ -187,6 +187,7 @@ const Diagnostico = () => {
       setNombre("");
       setEmail("");
       setTelefono("");
+      setTimeout(() => { navigate("/"); }, 2000);
     } catch {
       toast({ title: "Error", description: "No se pudo enviar el diagnóstico. Intenta de nuevo.", variant: "destructive" });
     } finally {
