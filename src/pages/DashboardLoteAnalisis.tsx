@@ -76,7 +76,10 @@ const DashboardLoteAnalisis = () => {
         <h1 className="font-body text-xl font-bold text-foreground">
           Análisis 360° — {lote?.nombre_lote ?? "Lote"}
         </h1>
-        <ExcelAnalisisImporter />
+        <div className="flex items-center gap-2">
+          <ExcelAnalisisExporter loteId={id!} />
+          <ExcelAnalisisImporter />
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">
