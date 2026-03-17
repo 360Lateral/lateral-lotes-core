@@ -137,6 +137,7 @@ const Resolutoria = () => {
                     {p.nombre}
                   </h3>
                   <p className="mt-2 text-2xl font-bold text-primary">{p.precio}</p>
+                  <p className="text-xs text-muted-foreground">{p.cop}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{p.areas}</p>
                   <Button asChild className="mt-auto pt-6">
                     <Link to="/diagnostico">Solicitar este plan</Link>
