@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 
 /* ─── helpers ──────────────────────────────────── */
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
 const SectionHeader = ({ icon: Icon, label, completed, open }: { icon: any; label: string; completed: boolean; open: boolean }) => (
   <div className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-4 py-3">
