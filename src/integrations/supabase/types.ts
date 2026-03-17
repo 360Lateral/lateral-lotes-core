@@ -50,6 +50,106 @@ export type Database = {
         }
         Relationships: []
       }
+      analisis_ambiental: {
+        Row: {
+          amenaza_inundacion: string | null
+          amenaza_remocion: string | null
+          distancia_ronda_m: number | null
+          id: string
+          lote_id: string
+          observaciones: string | null
+          pasivo_ambiental: boolean | null
+          requiere_licencia_ambiental: boolean | null
+          reserva_forestal: boolean | null
+          ronda_hidrica: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          amenaza_inundacion?: string | null
+          amenaza_remocion?: string | null
+          distancia_ronda_m?: number | null
+          id?: string
+          lote_id: string
+          observaciones?: string | null
+          pasivo_ambiental?: boolean | null
+          requiere_licencia_ambiental?: boolean | null
+          reserva_forestal?: boolean | null
+          ronda_hidrica?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          amenaza_inundacion?: string | null
+          amenaza_remocion?: string | null
+          distancia_ronda_m?: number | null
+          id?: string
+          lote_id?: string
+          observaciones?: string | null
+          pasivo_ambiental?: boolean | null
+          requiere_licencia_ambiental?: boolean | null
+          reserva_forestal?: boolean | null
+          ronda_hidrica?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_ambiental_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_arquitectonico: {
+        Row: {
+          area_vendible_pct: number | null
+          eficiencia_lote_pct: number | null
+          forma_lote: string | null
+          id: string
+          lote_id: string
+          m2_construibles_total: number | null
+          observaciones: string | null
+          permite_sotano: boolean | null
+          tipologias: string | null
+          unidades_estimadas: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_vendible_pct?: number | null
+          eficiencia_lote_pct?: number | null
+          forma_lote?: string | null
+          id?: string
+          lote_id: string
+          m2_construibles_total?: number | null
+          observaciones?: string | null
+          permite_sotano?: boolean | null
+          tipologias?: string | null
+          unidades_estimadas?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_vendible_pct?: number | null
+          eficiencia_lote_pct?: number | null
+          forma_lote?: string | null
+          id?: string
+          lote_id?: string
+          m2_construibles_total?: number | null
+          observaciones?: string | null
+          permite_sotano?: boolean | null
+          tipologias?: string | null
+          unidades_estimadas?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_arquitectonico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analisis_documentos: {
         Row: {
           categoria: Database["public"]["Enums"]["categoria_documento"]
@@ -87,6 +187,256 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "analisis_documentos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_financiero: {
+        Row: {
+          costo_construccion_m2: number | null
+          id: string
+          ingresos_proyectados: number | null
+          lote_id: string
+          margen_bruto_pct: number | null
+          observaciones: string | null
+          punto_equilibrio_pct: number | null
+          tir_pct: number | null
+          updated_at: string | null
+          valor_compra_lote: number | null
+          vpn: number | null
+        }
+        Insert: {
+          costo_construccion_m2?: number | null
+          id?: string
+          ingresos_proyectados?: number | null
+          lote_id: string
+          margen_bruto_pct?: number | null
+          observaciones?: string | null
+          punto_equilibrio_pct?: number | null
+          tir_pct?: number | null
+          updated_at?: string | null
+          valor_compra_lote?: number | null
+          vpn?: number | null
+        }
+        Update: {
+          costo_construccion_m2?: number | null
+          id?: string
+          ingresos_proyectados?: number | null
+          lote_id?: string
+          margen_bruto_pct?: number | null
+          observaciones?: string | null
+          punto_equilibrio_pct?: number | null
+          tir_pct?: number | null
+          updated_at?: string | null
+          valor_compra_lote?: number | null
+          vpn?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_financiero_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_geotecnico: {
+        Row: {
+          capacidad_portante_ton_m2: number | null
+          id: string
+          lote_id: string
+          nivel_freatico_m: number | null
+          observaciones: string | null
+          pendiente_pct: number | null
+          sistema_cimentacion: string | null
+          sobrecosto_cimentacion_estimado: number | null
+          tipo_suelo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          capacidad_portante_ton_m2?: number | null
+          id?: string
+          lote_id: string
+          nivel_freatico_m?: number | null
+          observaciones?: string | null
+          pendiente_pct?: number | null
+          sistema_cimentacion?: string | null
+          sobrecosto_cimentacion_estimado?: number | null
+          tipo_suelo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          capacidad_portante_ton_m2?: number | null
+          id?: string
+          lote_id?: string
+          nivel_freatico_m?: number | null
+          observaciones?: string | null
+          pendiente_pct?: number | null
+          sistema_cimentacion?: string | null
+          sobrecosto_cimentacion_estimado?: number | null
+          tipo_suelo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_geotecnico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_juridico: {
+        Row: {
+          cadena_tradicion: string | null
+          deuda_predial: boolean | null
+          discrepancia_areas: boolean | null
+          gravamenes: boolean | null
+          hipoteca_activa: boolean | null
+          id: string
+          litigio_activo: boolean | null
+          lote_id: string
+          observaciones: string | null
+          proceso_sucesion: boolean | null
+          servidumbres: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          cadena_tradicion?: string | null
+          deuda_predial?: boolean | null
+          discrepancia_areas?: boolean | null
+          gravamenes?: boolean | null
+          hipoteca_activa?: boolean | null
+          id?: string
+          litigio_activo?: boolean | null
+          lote_id: string
+          observaciones?: string | null
+          proceso_sucesion?: boolean | null
+          servidumbres?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          cadena_tradicion?: string | null
+          deuda_predial?: boolean | null
+          discrepancia_areas?: boolean | null
+          gravamenes?: boolean | null
+          hipoteca_activa?: boolean | null
+          id?: string
+          litigio_activo?: boolean | null
+          lote_id?: string
+          observaciones?: string | null
+          proceso_sucesion?: boolean | null
+          servidumbres?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_juridico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_mercado: {
+        Row: {
+          id: string
+          lote_id: string
+          observaciones: string | null
+          perfil_comprador: string | null
+          precio_unidad_promedio: number | null
+          precio_venta_m2_zona: number | null
+          proyectos_competidores: number | null
+          updated_at: string | null
+          valorizacion_anual_pct: number | null
+          velocidad_absorcion_unidades_mes: number | null
+        }
+        Insert: {
+          id?: string
+          lote_id: string
+          observaciones?: string | null
+          perfil_comprador?: string | null
+          precio_unidad_promedio?: number | null
+          precio_venta_m2_zona?: number | null
+          proyectos_competidores?: number | null
+          updated_at?: string | null
+          valorizacion_anual_pct?: number | null
+          velocidad_absorcion_unidades_mes?: number | null
+        }
+        Update: {
+          id?: string
+          lote_id?: string
+          observaciones?: string | null
+          perfil_comprador?: string | null
+          precio_unidad_promedio?: number | null
+          precio_venta_m2_zona?: number | null
+          proyectos_competidores?: number | null
+          updated_at?: string | null
+          valorizacion_anual_pct?: number | null
+          velocidad_absorcion_unidades_mes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_mercado_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analisis_sspp: {
+        Row: {
+          acueducto_disponible: boolean | null
+          alcantarillado_disponible: boolean | null
+          capacidad_red_kva: number | null
+          costo_extension_estimado: number | null
+          distancia_red_matriz_m: number | null
+          energia_disponible: boolean | null
+          gas_disponible: boolean | null
+          id: string
+          lote_id: string
+          observaciones: string | null
+          updated_at: string | null
+          via_pavimentada: boolean | null
+        }
+        Insert: {
+          acueducto_disponible?: boolean | null
+          alcantarillado_disponible?: boolean | null
+          capacidad_red_kva?: number | null
+          costo_extension_estimado?: number | null
+          distancia_red_matriz_m?: number | null
+          energia_disponible?: boolean | null
+          gas_disponible?: boolean | null
+          id?: string
+          lote_id: string
+          observaciones?: string | null
+          updated_at?: string | null
+          via_pavimentada?: boolean | null
+        }
+        Update: {
+          acueducto_disponible?: boolean | null
+          alcantarillado_disponible?: boolean | null
+          capacidad_red_kva?: number | null
+          costo_extension_estimado?: number | null
+          distancia_red_matriz_m?: number | null
+          energia_disponible?: boolean | null
+          gas_disponible?: boolean | null
+          id?: string
+          lote_id?: string
+          observaciones?: string | null
+          updated_at?: string | null
+          via_pavimentada?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analisis_sspp_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"

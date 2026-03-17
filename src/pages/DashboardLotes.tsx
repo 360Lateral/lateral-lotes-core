@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2 } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const estadoVariant = (e: string) => {
@@ -137,6 +137,9 @@ const DashboardLotes = () => {
                       </Link>
                       <Link to={`/dashboard/lotes/${l.id}/docs`} title="Documentos">
                         <FolderOpen className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                      </Link>
+                      <Link to={`/dashboard/lotes/${l.id}/analisis`} title="Análisis 360°">
+                        <BarChart3 className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                       </Link>
                       <Link to={`/lotes/${l.id}`} target="_blank" title="Ver ficha">
                         <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
