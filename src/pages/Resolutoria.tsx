@@ -26,9 +26,9 @@ const areas = [
 ];
 
 const planes = [
-  { nombre: "Básico", precio: "4 SMLMV", areas: "3 áreas", destacado: false },
-  { nombre: "Pro", precio: "6 SMLMV", areas: "5 áreas", destacado: true },
-  { nombre: "Premium", precio: "12 SMLMV", areas: "8 áreas completas", destacado: false },
+  { nombre: "Básico", precio: "4 SMLMV", cop: "$7.003.620", areas: "3 áreas", destacado: false },
+  { nombre: "Pro", precio: "6 SMLMV", cop: "$10.505.430", areas: "5 áreas", destacado: true },
+  { nombre: "Premium", precio: "12 SMLMV", cop: "$21.010.860", areas: "8 áreas completas", destacado: false },
 ];
 
 const resultados = [
@@ -137,6 +137,7 @@ const Resolutoria = () => {
                     {p.nombre}
                   </h3>
                   <p className="mt-2 text-2xl font-bold text-primary">{p.precio}</p>
+                  <p className="text-xs text-muted-foreground">{p.cop}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{p.areas}</p>
                   <Button asChild className="mt-auto pt-6">
                     <Link to="/diagnostico">Solicitar este plan</Link>
