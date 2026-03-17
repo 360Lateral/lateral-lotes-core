@@ -259,7 +259,7 @@ const LoteDetalle = () => {
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: [Number(lote.lng), Number(lote.lat)],
       zoom: 15,
       interactive: false,
