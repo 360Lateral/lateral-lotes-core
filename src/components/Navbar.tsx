@@ -29,7 +29,7 @@ const Navbar = () => {
   const getNavLinks = () => {
     if (user && userType === "dueno") {
       return [
-        { label: "Mis lotes", href: "/" },
+        { label: "Mi panel", href: "/dashboard/owner" },
         { label: "Diagnóstico", href: "/diagnostico" },
         { label: "Catálogo público", href: "/lotes" },
       ];
