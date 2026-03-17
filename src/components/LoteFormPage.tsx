@@ -259,7 +259,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     const lng = parseFloat(form.lng) || -75.5736;
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: [lng, lat],
       zoom: 13,
     });

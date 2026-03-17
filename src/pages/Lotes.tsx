@@ -141,7 +141,7 @@ const Lotes = () => {
       el.style.height = "18px";
       el.style.borderRadius = "50%";
       el.style.backgroundColor = color;
-      el.style.border = "2px solid white";
+      el.style.border = "3px solid white";
       el.style.cursor = "pointer";
       el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
       el.style.transition = "transform 0.15s";
