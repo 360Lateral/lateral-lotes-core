@@ -179,7 +179,14 @@ const AsistenteChat = ({ loteId, loteContext }: Props) => {
                       : "bg-background text-foreground"
                   }`}
                 >
-                  {msg.content}
+                  {msg.role === "assistant"
+                    ? msg.content.split("\n").map((line, li) => (
+                        <span key={li}>
+                          {line}
+                          {li < msg.content.split("\n").length - 1 && <br />}
+                        </span>
+                      ))
+                    : msg.content}
                 </div>
               </div>
             ))}
