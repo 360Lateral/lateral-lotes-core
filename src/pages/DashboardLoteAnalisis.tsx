@@ -130,13 +130,12 @@ function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, any>) => {
-      // check existing
-      const { data: existing } = await (supabase.from as any)(table).select("id").eq("lote_id", loteId).maybeSingle();
+      const { data: existing } = await supabase.from(table as any).select("id").eq("lote_id", loteId).maybeSingle();
       if (existing) {
-        const { error } = await (supabase.from as any)(table).update({ ...values, updated_at: new Date().toISOString() }).eq("id", existing.id);
+        const { error } = await supabase.from(table as any).update({ ...values, updated_at: new Date().toISOString() }).eq("id", (existing as any).id);
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from as any)(table).insert({ ...values, lote_id: loteId });
+        const { error } = await supabase.from(table as any).insert({ ...values, lote_id: loteId });
         if (error) throw error;
       }
     },
@@ -157,8 +156,8 @@ const JuridicoSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_juridico" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_juridico").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -214,8 +213,8 @@ const AmbientalSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_ambiental" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_ambiental").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -288,8 +287,8 @@ const SSPPSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_sspp" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_sspp").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -346,8 +345,8 @@ const SuelosSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_geotecnico" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_geotecnico").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -423,8 +422,8 @@ const MercadoSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_mercado" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_mercado").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -489,8 +488,8 @@ const ArquitectonicoSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_arquitectonico" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_arquitectonico").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
@@ -556,8 +555,8 @@ const FinancieroSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_financiero" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_financiero").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
