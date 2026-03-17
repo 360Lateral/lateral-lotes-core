@@ -741,7 +741,22 @@ const LoteDetalle = () => {
                         />
                       )}
                     </div>
-                  </div>
+
+                    {/* Alertas automáticas */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {normativa.indice_construccion != null && Number(normativa.indice_construccion) >= 2.5 && (
+                        <Badge variant="disponible" className="text-xs">IC alto — potencial de densificación</Badge>
+                      )}
+                      {normativa.indice_construccion != null && Number(normativa.indice_construccion) < 1.5 && (
+                        <Badge variant="vendido" className="text-xs">IC bajo — construcción limitada</Badge>
+                      )}
+                      {normativa.altura_max_pisos != null && normativa.altura_max_pisos >= 8 && (
+                        <Badge variant="disponible" className="text-xs">Alta densidad permitida</Badge>
+                      )}
+                      {normativa.cesion_tipo_a_pct != null && Number(normativa.cesion_tipo_a_pct) >= 25 && (
+                        <Badge variant="reservado" className="text-xs">Cesión alta — revisar área útil resultante</Badge>
+                      )}
+                    </div>
                 ) : (
                   <p className="py-6 text-center font-body text-sm text-muted-foreground">
                     No hay datos de normativa para este lote.
