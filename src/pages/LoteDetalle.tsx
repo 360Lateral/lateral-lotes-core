@@ -36,6 +36,7 @@ import {
   Lock,
   Pencil,
 } from "lucide-react";
+import AsistenteChat from "@/components/AsistenteChat";
 import { useToast } from "@/hooks/use-toast";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
@@ -594,6 +595,29 @@ const LoteDetalle = () => {
               <ScoreIndicator score={lote.score_normativo} label="Normativo" emoji="📋" size="lg" />
               <ScoreIndicator score={lote.score_servicios} label="Servicios" emoji="🔌" size="lg" />
             </div>
+
+            {/* Asistente IA 360° */}
+            <AsistenteChat
+              loteId={id!}
+              loteContext={{
+                nombre_lote: lote.nombre_lote,
+                ciudad: lote.ciudad,
+                departamento: lote.departamento,
+                area_total_m2: lote.area_total_m2 ? Number(lote.area_total_m2) : null,
+                uso_principal: normativa?.uso_principal ?? null,
+                indice_construccion: normativa?.indice_construccion ? Number(normativa.indice_construccion) : null,
+                indice_ocupacion: normativa?.indice_ocupacion ? Number(normativa.indice_ocupacion) : null,
+                altura_max_pisos: normativa?.altura_max_pisos ?? null,
+                altura_max_metros: normativa?.altura_max_metros ? Number(normativa.altura_max_metros) : null,
+                zona_pot: normativa?.zona_pot ?? null,
+                tratamiento: normativa?.tratamiento ?? null,
+                norma_vigente: normativa?.norma_vigente ?? null,
+                score_juridico: lote.score_juridico,
+                score_normativo: lote.score_normativo,
+                score_servicios: lote.score_servicios,
+                notas: lote.notas,
+              }}
+            />
 
             {/* Tabs */}
             <Tabs defaultValue="normativa" className="w-full">
