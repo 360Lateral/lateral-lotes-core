@@ -44,6 +44,7 @@ const serviciosOptions = ["Agua", "Energía", "Gas", "Alcantarillado", "Ninguno"
 
 const Diagnostico = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Estimation fields
   const [municipio, setMunicipio] = useState("");
