@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import PlantillaLotesExporter from "@/components/PlantillaLotesExporter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,44 +15,52 @@ interface ParsedRow {
   nombre_lote: string;
   direccion: string | null;
   ciudad: string | null;
+  departamento: string | null;
   matricula_inmobiliaria: string | null;
   lat: number | null;
   lng: number | null;
   area_total_m2: number | null;
   barrio: string | null;
+  estrato: number | null;
+  tipo_lote: string | null;
+  nombre_propietario: string | null;
+  notas: string | null;
   valid: boolean;
+  action: "nuevo" | "actualizar";
+  existingId?: string;
 }
 
-const HEADER_MAP: Record<string, keyof Omit<ParsedRow, "valid">> = {};
-const ALIASES: [RegExp, keyof Omit<ParsedRow, "valid">][] = [
+const ALIASES: [RegExp, string][] = [
   [/^nombre.*(lote)?|^lote$/i, "nombre_lote"],
   [/^direcci[oó]n|^address/i, "direccion"],
   [/^ciudad|^municipio|^city/i, "ciudad"],
+  [/^departamento/i, "departamento"],
   [/^matr[ií]cula|^matricula_inmobiliaria/i, "matricula_inmobiliaria"],
   [/^latitud|^lat$/i, "lat"],
   [/^longitud|^lng$|^lon$/i, "lng"],
   [/^[aá]rea|^area_total|^m2|^metros/i, "area_total_m2"],
   [/^barrio|^neighborhood/i, "barrio"],
-  [/^ubicaci[oó]n|^google.?maps|^link|^url/i, "_location_url" as any],
+  [/^estrato/i, "estrato"],
+  [/^tipo.*(lote|predio)|^tipo_lote/i, "tipo_lote"],
+  [/^propietario|^nombre.propietario/i, "nombre_propietario"],
+  [/^notas|^observaciones|^comentarios/i, "notas"],
+  [/^ubicaci[oó]n|^google.?maps|^link|^url/i, "_location_url"],
 ];
 
-function matchHeader(header: string): keyof Omit<ParsedRow, "valid"> | "_location_url" | null {
+function matchHeader(header: string): string | null {
   const h = header.trim();
   for (const [regex, field] of ALIASES) {
-    if (regex.test(h)) return field as any;
+    if (regex.test(h)) return field;
   }
   return null;
 }
 
 function extractCoordsFromUrl(url: string): { lat: number; lng: number } | null {
   if (!url || typeof url !== "string") return null;
-  // @XX.XXXX,YY.YYYY or /@lat,lng
   const m1 = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
   if (m1) return { lat: parseFloat(m1[1]), lng: parseFloat(m1[2]) };
-  // q=lat,lng
   const m2 = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
   if (m2) return { lat: parseFloat(m2[1]), lng: parseFloat(m2[2]) };
-  // place/lat,lng
   const m3 = url.match(/place\/(-?\d+\.?\d*),(-?\d+\.?\d*)/);
   if (m3) return { lat: parseFloat(m3[1]), lng: parseFloat(m3[2]) };
   return null;
@@ -63,6 +72,14 @@ function toNum(v: any): number | null {
   return isNaN(n) ? null : n;
 }
 
+function toInt(v: any): number | null {
+  const n = toNum(v);
+  return n != null ? Math.round(n) : null;
+}
+
+const NUM_FIELDS = new Set(["lat", "lng", "area_total_m2"]);
+const INT_FIELDS = new Set(["estrato"]);
+
 const DashboardLotesImportar = () => {
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -70,17 +87,32 @@ const DashboardLotesImportar = () => {
   const [fileName, setFileName] = useState("");
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<{ ok: number; errors: number } | null>(null);
+  const [result, setResult] = useState<{ created: number; updated: number; errors: number } | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const processFile = useCallback((file: File) => {
+  const processFile = useCallback(async (file: File) => {
     setFileName(file.name);
     setResult(null);
+
+    // Fetch existing lotes for matching
+    const { data: existingLotes } = await supabase
+      .from("lotes")
+      .select("id, nombre_lote")
+      .order("nombre_lote");
+
+    const existingMap = new Map<string, string>();
+    (existingLotes ?? []).forEach((l) => {
+      existingMap.set(l.nombre_lote.trim().toLowerCase(), l.id);
+    });
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const data = new Uint8Array(e.target?.result as ArrayBuffer);
       const wb = XLSX.read(data, { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
+
+      // Try "Lotes" sheet first, fallback to first sheet
+      const sheetName = wb.SheetNames.includes("Lotes") ? "Lotes" : wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
       const json: Record<string, any>[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
       if (!json.length) {
@@ -88,7 +120,6 @@ const DashboardLotesImportar = () => {
         return;
       }
 
-      // Map headers
       const headers = Object.keys(json[0]);
       const mapping: Record<string, string> = {};
       let locationUrlCol: string | null = null;
@@ -107,17 +138,24 @@ const DashboardLotesImportar = () => {
           nombre_lote: "",
           direccion: null,
           ciudad: null,
+          departamento: null,
           matricula_inmobiliaria: null,
           lat: null,
           lng: null,
           area_total_m2: null,
           barrio: null,
+          estrato: null,
+          tipo_lote: null,
+          nombre_propietario: null,
+          notas: null,
         };
 
         for (const [col, field] of Object.entries(mapping)) {
           const val = row[col];
-          if (field === "lat" || field === "lng" || field === "area_total_m2") {
+          if (NUM_FIELDS.has(field)) {
             r[field] = toNum(val);
+          } else if (INT_FIELDS.has(field)) {
+            r[field] = toInt(val);
           } else {
             r[field] = val ? String(val).trim() : null;
           }
@@ -146,7 +184,13 @@ const DashboardLotesImportar = () => {
           }
         }
 
+        const nameKey = (r.nombre_lote ?? "").trim().toLowerCase();
+        const existingId = existingMap.get(nameKey);
+
         r.valid = !!r.nombre_lote && r.nombre_lote.length > 0;
+        r.action = existingId ? "actualizar" : "nuevo";
+        r.existingId = existingId;
+
         return r as ParsedRow;
       });
 
@@ -168,39 +212,72 @@ const DashboardLotesImportar = () => {
 
     setImporting(true);
     setProgress(0);
-    let ok = 0;
+    let created = 0;
+    let updated = 0;
     let errors = 0;
     const batchSize = 20;
 
-    for (let i = 0; i < valid.length; i += batchSize) {
-      const batch = valid.slice(i, i + batchSize).map(({ valid: _, ...r }) => ({
-        nombre_lote: r.nombre_lote,
-        direccion: r.direccion,
-        ciudad: r.ciudad,
-        matricula_inmobiliaria: r.matricula_inmobiliaria,
-        lat: r.lat,
-        lng: r.lng,
-        area_total_m2: r.area_total_m2,
-        barrio: r.barrio,
-      }));
+    const toInsert = valid.filter((r) => r.action === "nuevo");
+    const toUpdate = valid.filter((r) => r.action === "actualizar");
 
+    const buildPayload = (r: ParsedRow) => ({
+      nombre_lote: r.nombre_lote,
+      direccion: r.direccion,
+      ciudad: r.ciudad,
+      departamento: r.departamento,
+      matricula_inmobiliaria: r.matricula_inmobiliaria,
+      lat: r.lat,
+      lng: r.lng,
+      area_total_m2: r.area_total_m2,
+      barrio: r.barrio,
+      estrato: r.estrato,
+      tipo_lote: r.tipo_lote,
+      nombre_propietario: r.nombre_propietario,
+      notas: r.notas,
+    });
+
+    const total = valid.length;
+    let processed = 0;
+
+    // Insert new lots in batches
+    for (let i = 0; i < toInsert.length; i += batchSize) {
+      const batch = toInsert.slice(i, i + batchSize).map(buildPayload);
       const { error, data } = await supabase.from("lotes").insert(batch).select("id");
       if (error) {
         errors += batch.length;
       } else {
-        ok += data.length;
+        created += data.length;
       }
-      setProgress(Math.round(((i + batch.length) / valid.length) * 100));
+      processed += batch.length;
+      setProgress(Math.round((processed / total) * 100));
+    }
+
+    // Update existing lots one by one
+    for (const r of toUpdate) {
+      const { error } = await supabase
+        .from("lotes")
+        .update(buildPayload(r))
+        .eq("id", r.existingId!);
+      if (error) {
+        errors++;
+      } else {
+        updated++;
+      }
+      processed++;
+      setProgress(Math.round((processed / total) * 100));
     }
 
     setImporting(false);
-    setResult({ ok, errors });
-    if (ok > 0) toast.success(`${ok} lotes importados correctamente`);
+    setResult({ created, updated, errors });
+    if (created > 0) toast.success(`${created} lotes creados`);
+    if (updated > 0) toast.success(`${updated} lotes actualizados`);
     if (errors > 0) toast.error(`${errors} lotes con error`);
   };
 
   const validCount = rows.filter((r) => r.valid).length;
   const invalidCount = rows.length - validCount;
+  const newCount = rows.filter((r) => r.valid && r.action === "nuevo").length;
+  const updateCount = rows.filter((r) => r.valid && r.action === "actualizar").length;
 
   return (
     <DashboardLayout>
@@ -215,6 +292,17 @@ const DashboardLotesImportar = () => {
       {rows.length === 0 && (
         <Card>
           <CardContent className="p-8">
+            {/* Download template button */}
+            <div className="mb-6 flex items-center justify-between rounded-lg border border-border bg-muted/50 p-4">
+              <div>
+                <p className="text-sm font-semibold text-foreground">¿Necesitas la plantilla?</p>
+                <p className="text-xs text-muted-foreground">
+                  Descarga un Excel con los lotes actuales para editar y reimportar.
+                </p>
+              </div>
+              <PlantillaLotesExporter />
+            </div>
+
             <div
               className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors ${
                 dragOver ? "border-primary bg-primary/5" : "border-border"
@@ -248,12 +336,12 @@ const DashboardLotesImportar = () => {
             <div className="mt-6 rounded-md bg-muted p-4">
               <p className="mb-2 text-sm font-semibold text-foreground">Columnas soportadas:</p>
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                {["Nombre del lote", "Dirección", "Ciudad / Municipio", "Matrícula", "Área m²", "Latitud", "Longitud", "Barrio", "Link Google Maps"].map((c) => (
+                {["Nombre del lote", "Dirección", "Ciudad / Municipio", "Departamento", "Matrícula", "Área m²", "Estrato", "Tipo de lote", "Barrio", "Latitud", "Longitud", "Link Google Maps", "Nombre propietario", "Notas"].map((c) => (
                   <Badge key={c} variant="secondary">{c}</Badge>
                 ))}
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Si incluyes un link de Google Maps, las coordenadas se extraerán automáticamente.
+                Si el nombre del lote coincide con uno existente, se actualizará en lugar de crear uno nuevo.
               </p>
             </div>
           </CardContent>
@@ -270,7 +358,8 @@ const DashboardLotesImportar = () => {
                 {fileName} — {rows.length} filas detectadas
               </CardTitle>
               <div className="flex items-center gap-2">
-                <Badge variant="default" className="bg-green-600">{validCount} válidas</Badge>
+                {newCount > 0 && <Badge variant="default" className="bg-green-600">{newCount} nuevos</Badge>}
+                {updateCount > 0 && <Badge variant="secondary">{updateCount} a actualizar</Badge>}
                 {invalidCount > 0 && <Badge variant="destructive">{invalidCount} sin nombre</Badge>}
               </div>
             </div>
@@ -280,13 +369,13 @@ const DashboardLotesImportar = () => {
               <thead>
                 <tr className="border-b border-border bg-muted">
                   <th className="px-3 py-2 font-semibold text-foreground w-8">#</th>
+                  <th className="px-3 py-2 font-semibold text-foreground">Acción</th>
                   <th className="px-3 py-2 font-semibold text-foreground">Nombre</th>
                   <th className="px-3 py-2 font-semibold text-foreground">Dirección</th>
                   <th className="px-3 py-2 font-semibold text-foreground">Ciudad</th>
-                  <th className="px-3 py-2 font-semibold text-foreground">Matrícula</th>
+                  <th className="px-3 py-2 font-semibold text-foreground">Depto</th>
                   <th className="px-3 py-2 font-semibold text-foreground">Área m²</th>
-                  <th className="px-3 py-2 font-semibold text-foreground">Lat</th>
-                  <th className="px-3 py-2 font-semibold text-foreground">Lng</th>
+                  <th className="px-3 py-2 font-semibold text-foreground">Estrato</th>
                   <th className="px-3 py-2 font-semibold text-foreground">Barrio</th>
                   <th className="px-3 py-2 font-semibold text-foreground w-8"></th>
                 </tr>
@@ -295,13 +384,23 @@ const DashboardLotesImportar = () => {
                 {rows.slice(0, 100).map((r, i) => (
                   <tr key={i} className={`border-b border-border last:border-0 ${!r.valid ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
                     <td className="px-3 py-2 text-muted-foreground">{i + 1}</td>
+                    <td className="px-3 py-2">
+                      {r.valid ? (
+                        r.action === "actualizar" ? (
+                          <Badge variant="secondary" className="text-xs">Actualizar</Badge>
+                        ) : (
+                          <Badge variant="default" className="bg-green-600 text-xs">Nuevo</Badge>
+                        )
+                      ) : (
+                        <Badge variant="destructive" className="text-xs">Inválido</Badge>
+                      )}
+                    </td>
                     <td className="px-3 py-2 font-medium text-foreground">{r.nombre_lote || "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.direccion || "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.ciudad || "—"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{r.matricula_inmobiliaria || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.departamento || "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.area_total_m2?.toLocaleString("es-CO") || "—"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{r.lat?.toFixed(5) || "—"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{r.lng?.toFixed(5) || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.estrato ?? "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.barrio || "—"}</td>
                     <td className="px-3 py-2">
                       {r.valid ? (
@@ -333,7 +432,9 @@ const DashboardLotesImportar = () => {
                 onClick={handleImport}
                 disabled={importing || validCount === 0}
               >
-                {importing ? `Importando… ${progress}%` : `Importar ${validCount} lotes`}
+                {importing
+                  ? `Importando… ${progress}%`
+                  : `Importar ${validCount} lotes (${newCount} nuevos, ${updateCount} actualizar)`}
               </Button>
             </div>
           </div>
@@ -347,7 +448,8 @@ const DashboardLotesImportar = () => {
             <CheckCircle2 className="h-12 w-12 text-green-600" />
             <p className="text-lg font-semibold text-foreground">Importación completada</p>
             <div className="flex gap-4">
-              <Badge variant="default" className="bg-green-600 text-sm">{result.ok} importados</Badge>
+              {result.created > 0 && <Badge variant="default" className="bg-green-600 text-sm">{result.created} creados</Badge>}
+              {result.updated > 0 && <Badge variant="secondary" className="text-sm">{result.updated} actualizados</Badge>}
               {result.errors > 0 && <Badge variant="destructive" className="text-sm">{result.errors} errores</Badge>}
             </div>
             <div className="flex gap-3 mt-4">
