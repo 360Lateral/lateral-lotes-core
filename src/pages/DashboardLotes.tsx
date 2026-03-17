@@ -41,7 +41,7 @@ const DashboardLotes = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado")
+        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -103,6 +103,7 @@ const DashboardLotes = () => {
             <thead>
               <tr className="border-b border-border bg-muted">
                 <th className="px-4 py-3 font-semibold text-foreground">Nombre</th>
+                <th className="px-4 py-3 font-semibold text-foreground">Propietario</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Ciudad</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Área m²</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
@@ -114,6 +115,7 @@ const DashboardLotes = () => {
               {filtered.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted/50">
                   <td className="px-4 py-3 font-medium text-foreground">{l.nombre_lote}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {l.area_total_m2 ? Number(l.area_total_m2).toLocaleString("es-CO") : "—"}
@@ -152,7 +154,7 @@ const DashboardLotes = () => {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                     No se encontraron lotes.
                   </td>
                 </tr>

@@ -47,6 +47,7 @@ const STEPS = [
 interface WizardForm {
   // Step 1
   nombre_lote: string;
+  nombre_propietario: string;
   tipo_lote: string;
   area_total_m2: string;
   frente_ml: string;
@@ -72,6 +73,7 @@ interface WizardForm {
 
 const emptyWizard: WizardForm = {
   nombre_lote: "",
+  nombre_propietario: "",
   tipo_lote: "",
   area_total_m2: "",
   frente_ml: "",
@@ -215,6 +217,7 @@ const LoteWizard = () => {
     const errs: Record<string, boolean> = {};
     if (s === 1) {
       if (!form.nombre_lote.trim()) errs.nombre_lote = true;
+      if (!form.nombre_propietario.trim()) errs.nombre_propietario = true;
       if (!form.tipo_lote) errs.tipo_lote = true;
       if (!form.area_total_m2) errs.area_total_m2 = true;
       if (!form.precio_cop) errs.precio_cop = true;
@@ -243,6 +246,7 @@ const LoteWizard = () => {
         .from("lotes")
         .insert({
           nombre_lote: form.nombre_lote,
+          nombre_propietario: form.nombre_propietario || null,
           tipo_lote: form.tipo_lote,
           area_total_m2: form.area_total_m2
             ? parseFloat(form.area_total_m2)
@@ -494,6 +498,17 @@ const LoteWizard = () => {
             value={form.nombre_lote}
             onChange={(e) => update("nombre_lote", e.target.value)}
             placeholder="Ej: Lote La Pradera"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">
+            Nombre del propietario <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            className={errClass("nombre_propietario")}
+            value={form.nombre_propietario}
+            onChange={(e) => update("nombre_propietario", e.target.value)}
+            placeholder="Ej: Juan Pérez o Constructora XYZ"
           />
         </div>
         <div>

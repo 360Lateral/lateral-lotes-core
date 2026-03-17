@@ -34,6 +34,7 @@ const SERVICIOS_DEFAULT = [
 
 interface LoteForm {
   nombre_lote: string;
+  nombre_propietario: string;
   ciudad: string;
   barrio: string;
   direccion: string;
@@ -73,6 +74,7 @@ interface LoteForm {
 
 const emptyForm: LoteForm = {
   nombre_lote: "",
+  nombre_propietario: "",
   ciudad: "Medellín",
   barrio: "",
   direccion: "",
@@ -174,6 +176,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     setForm((prev) => ({
       ...prev,
       nombre_lote: existingLote.nombre_lote,
+      nombre_propietario: (existingLote as any).nombre_propietario ?? "",
       ciudad: existingLote.ciudad ?? "Medellín",
       barrio: existingLote.barrio ?? "",
       direccion: existingLote.direccion ?? "",
@@ -328,6 +331,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     mutationFn: async () => {
       const lotePayload = {
         nombre_lote: form.nombre_lote,
+        nombre_propietario: form.nombre_propietario || null,
         ciudad: form.ciudad || null,
         barrio: form.barrio || null,
         direccion: form.direccion || null,
@@ -455,6 +459,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             <div>
               <Label className="text-xs">Nombre del lote *</Label>
               <Input required value={form.nombre_lote} onChange={(e) => update("nombre_lote", e.target.value)} />
+            </div>
+            <div>
+              <Label className="text-xs">Nombre del propietario</Label>
+              <Input value={form.nombre_propietario} onChange={(e) => update("nombre_propietario", e.target.value)} placeholder="Ej: Juan Pérez o Constructora XYZ" />
             </div>
             <div>
               <Label className="text-xs">Ciudad</Label>

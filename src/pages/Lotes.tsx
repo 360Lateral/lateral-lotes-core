@@ -145,6 +145,7 @@ const Lotes = () => {
       el.style.cursor = "pointer";
       el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
       el.style.transition = "transform 0.15s";
+      el.style.transformOrigin = "center center";
       el.dataset.loteId = lote.id;
 
       // Tooltip on hover
