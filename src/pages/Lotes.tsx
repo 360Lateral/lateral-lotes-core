@@ -107,7 +107,7 @@ const Lotes = () => {
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: MEDELLIN_CENTER,
       zoom: 12,
     });
