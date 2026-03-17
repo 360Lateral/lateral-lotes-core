@@ -555,8 +555,8 @@ const FinancieroSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_financiero" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_financiero").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
