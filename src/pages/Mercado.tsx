@@ -116,49 +116,87 @@ const Mercado = () => {
               Aún no hay datos de mercado disponibles.
             </p>
           ) : (
-            <div className="rounded-xl border border-border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-secondary text-secondary-foreground">
-                    <TableHead className="text-secondary-foreground font-semibold">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> Municipio
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-secondary-foreground font-semibold text-right">
-                      Mín / m²
-                    </TableHead>
-                    <TableHead className="text-secondary-foreground font-semibold text-right">
-                      Promedio / m²
-                    </TableHead>
-                    <TableHead className="text-secondary-foreground font-semibold text-right">
-                      Máx / m²
-                    </TableHead>
-                    <TableHead className="text-secondary-foreground font-semibold text-center">
-                      Lotes
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stats.map((s) => (
-                    <TableRow key={s.ciudad}>
-                      <TableCell className="font-medium">{s.ciudad}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {formatCOP(s.min)}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold text-primary">
-                        {formatCOP(s.avg)}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {formatCOP(s.max)}
-                      </TableCell>
-                      <TableCell className="text-center">{s.count}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <>
+              <Input
+                placeholder="Buscar municipio..."
+                className="mb-6 max-w-sm"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+              {(() => {
+                const statsFiltrados = (stats ?? []).filter(s =>
+                  s.ciudad.toLowerCase().includes(busqueda.toLowerCase())
+                );
+                return (
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-secondary text-secondary-foreground">
+                          <TableHead className="text-secondary-foreground font-semibold">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" /> Municipio
+                            </div>
+                          </TableHead>
+                          <TableHead className="text-secondary-foreground font-semibold text-right">
+                            Mín / m²
+                          </TableHead>
+                          <TableHead className="text-secondary-foreground font-semibold text-right">
+                            Promedio / m²
+                          </TableHead>
+                          <TableHead className="text-secondary-foreground font-semibold text-right">
+                            Máx / m²
+                          </TableHead>
+                          <TableHead className="text-secondary-foreground font-semibold text-center">
+                            Lotes
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {statsFiltrados.map((s) => (
+                          <TableRow key={s.ciudad}>
+                            <TableCell className="font-medium">{s.ciudad}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">
+                              {formatCOP(s.min)}
+                            </TableCell>
+                            <TableCell className="text-right font-semibold text-primary">
+                              {formatCOP(s.avg)}
+                            </TableCell>
+                            <TableCell className="text-right text-muted-foreground">
+                              {formatCOP(s.max)}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {s.count >= 3 ? (
+                                <Badge variant="default" className="bg-success text-white text-xs">
+                                  {s.count} lotes
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs text-muted-foreground">
+                                  {s.count} lote — referencia limitada
+                                </Badge>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                );
+              })()}
+            </>
           )}
+
+          {/* Banner de conversión */}
+          <div className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-8 text-center">
+            <h2 className="font-heading text-xl font-bold text-secondary mb-2">
+              ¿Tu lote no aparece en este índice?
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+              Solicita tu Diagnóstico 360° gratuito y te decimos cuánto vale tu tierra con base en referencias reales de mercado.
+            </p>
+            <Button asChild size="lg">
+              <Link to="/diagnostico">Solicitar diagnóstico gratuito</Link>
+            </Button>
+          </div>
         </div>
       </main>
       <Footer />
