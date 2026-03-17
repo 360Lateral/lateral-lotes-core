@@ -31,7 +31,7 @@ interface ParsedRow {
 }
 
 const ALIASES: [RegExp, string][] = [
-  [/^nombre.*(lote)?|^lote$/i, "nombre_lote"],
+  [/^nombre.*lote|^lote$/i, "nombre_lote"],
   [/^direcci[oó]n|^address/i, "direccion"],
   [/^ciudad|^municipio|^city/i, "ciudad"],
   [/^departamento/i, "departamento"],
