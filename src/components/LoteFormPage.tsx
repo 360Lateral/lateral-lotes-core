@@ -34,6 +34,7 @@ const SERVICIOS_DEFAULT = [
 
 interface LoteForm {
   nombre_lote: string;
+  nombre_propietario: string;
   ciudad: string;
   barrio: string;
   direccion: string;
