@@ -757,6 +757,7 @@ const LoteDetalle = () => {
                         <Badge variant="reservado" className="text-xs">Cesión alta — revisar área útil resultante</Badge>
                       )}
                     </div>
+                  </div>
                 ) : (
                   <p className="py-6 text-center font-body text-sm text-muted-foreground">
                     No hay datos de normativa para este lote.
