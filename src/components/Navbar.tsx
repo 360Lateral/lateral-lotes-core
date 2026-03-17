@@ -34,7 +34,7 @@ const Navbar = () => {
         { label: "Catálogo público", href: "/lotes" },
       ];
     }
-    if (user && (userType === "desarrollador" || isDeveloper)) {
+    if (user && (userType === "developer" || isDeveloper)) {
       return [
         { label: "Catálogo", href: "/lotes" },
         { label: "Diagnóstico", href: "/diagnostico" },
