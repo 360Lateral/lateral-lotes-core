@@ -317,7 +317,7 @@ const Diagnostico = () => {
                         Quiero la Resolutoría completa
                       </Button>
                       <p className="text-white/50 text-xs text-center">
-                        Análisis de 8 áreas + Teaser Financiero desde 1.7 SMLMV
+                        Análisis de 8 áreas + Teaser Financiero desde 4 SMLMV
                       </p>
                     </div>
                   </div>
