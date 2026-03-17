@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const serviciosOptions = ["Agua", "Energía", "Gas", "Alcantarillado", "Ninguno"
 
 const Diagnostico = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Estimation fields
   const [municipio, setMunicipio] = useState("");
@@ -186,6 +188,7 @@ const Diagnostico = () => {
       setNombre("");
       setEmail("");
       setTelefono("");
+      setTimeout(() => { navigate("/"); }, 2000);
     } catch {
       toast({ title: "Error", description: "No se pudo enviar el diagnóstico. Intenta de nuevo.", variant: "destructive" });
     } finally {
@@ -316,7 +319,7 @@ const Diagnostico = () => {
                         Quiero la Resolutoría completa
                       </Button>
                       <p className="text-white/50 text-xs text-center">
-                        Análisis de 8 áreas + Teaser Financiero desde 1.7 SMLMV
+                        Análisis de 8 áreas + Teaser Financiero desde 4 SMLMV
                       </p>
                     </div>
                   </div>
