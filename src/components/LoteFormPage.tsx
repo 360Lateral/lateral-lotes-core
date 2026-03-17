@@ -74,6 +74,7 @@ interface LoteForm {
 
 const emptyForm: LoteForm = {
   nombre_lote: "",
+  nombre_propietario: "",
   ciudad: "Medellín",
   barrio: "",
   direccion: "",
