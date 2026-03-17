@@ -213,8 +213,8 @@ const AmbientalSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_ambiental" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_ambiental").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
