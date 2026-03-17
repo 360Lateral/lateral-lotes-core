@@ -24,6 +24,8 @@ import SalaNegociacion from "./pages/SalaNegociacion";
 import Diagnostico from "./pages/Diagnostico";
 import DiagnosticoResultado from "./pages/DiagnosticoResultado";
 import Mercado from "./pages/Mercado";
+import Resolutoria from "./pages/Resolutoria";
+import Planes from "./pages/Planes";
 import DashboardOwner from "./pages/DashboardOwner";
 import DashboardOwnerLotes from "./pages/DashboardOwnerLotes";
 import DashboardOwnerDiagnosticos from "./pages/DashboardOwnerDiagnosticos";
