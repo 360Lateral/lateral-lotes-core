@@ -138,6 +138,9 @@ const DashboardLotes = () => {
                       <Link to={`/dashboard/lotes/${l.id}/docs`} title="Documentos">
                         <FolderOpen className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                       </Link>
+                      <Link to={`/dashboard/lotes/${l.id}/analisis`} title="Análisis 360°">
+                        <BarChart3 className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                      </Link>
                       <Link to={`/lotes/${l.id}`} target="_blank" title="Ver ficha">
                         <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                       </Link>

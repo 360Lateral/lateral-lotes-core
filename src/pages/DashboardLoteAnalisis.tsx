@@ -136,7 +136,7 @@ function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
         const { error } = await (supabase.from as any)(table).update({ ...values, updated_at: new Date().toISOString() }).eq("id", existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from(table as any).insert({ ...values, lote_id: loteId } as any);
+        const { error } = await (supabase.from as any)(table).insert({ ...values, lote_id: loteId });
         if (error) throw error;
       }
     },
