@@ -1,4 +1,5 @@
-import logoImg from "@/assets/logo-360lateral.png";
+import logoOnWhite from "@/assets/logo-on-white.png";
+import logoOnDark from "@/assets/logo-on-dark.png";
 
 interface LogoProps {
   variant?: "on-navy" | "on-white";
@@ -6,9 +7,10 @@ interface LogoProps {
 }
 
 const Logo = ({ variant = "on-white", className = "" }: LogoProps) => {
+  const src = variant === "on-navy" ? logoOnDark : logoOnWhite;
   return (
     <img
-      src={logoImg}
+      src={src}
       alt="360 Lateral"
       className={`h-8 w-auto object-contain ${className}`}
     />
