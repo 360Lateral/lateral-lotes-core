@@ -47,6 +47,7 @@ const STEPS = [
 interface WizardForm {
   // Step 1
   nombre_lote: string;
+  nombre_propietario: string;
   tipo_lote: string;
   area_total_m2: string;
   frente_ml: string;
