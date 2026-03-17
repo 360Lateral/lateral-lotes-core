@@ -29,12 +29,12 @@ const Navbar = () => {
   const getNavLinks = () => {
     if (user && userType === "dueno") {
       return [
-        { label: "Mis lotes", href: "/" },
+        { label: "Mi panel", href: "/dashboard/owner" },
         { label: "Diagnóstico", href: "/diagnostico" },
         { label: "Catálogo público", href: "/lotes" },
       ];
     }
-    if (user && (userType === "desarrollador" || isDeveloper)) {
+    if (user && (userType === "developer" || isDeveloper)) {
       return [
         { label: "Catálogo", href: "/lotes" },
         { label: "Diagnóstico", href: "/diagnostico" },
