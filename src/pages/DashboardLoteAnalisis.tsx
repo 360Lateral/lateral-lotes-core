@@ -50,8 +50,6 @@ const CheckField = ({ label, checked, onChange }: { label: string; checked: bool
 /* ─── main page ────────────────────────────────── */
 const DashboardLoteAnalisis = () => {
   const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const qc = useQueryClient();
 
   const { data: lote, isLoading: loadingLote } = useQuery({
     queryKey: ["analisis-lote", id],
