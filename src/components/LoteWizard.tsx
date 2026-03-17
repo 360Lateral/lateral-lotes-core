@@ -246,6 +246,7 @@ const LoteWizard = () => {
         .from("lotes")
         .insert({
           nombre_lote: form.nombre_lote,
+          nombre_propietario: form.nombre_propietario || null,
           tipo_lote: form.tipo_lote,
           area_total_m2: form.area_total_m2
             ? parseFloat(form.area_total_m2)
