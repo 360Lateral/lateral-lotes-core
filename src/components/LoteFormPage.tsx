@@ -461,6 +461,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
               <Input required value={form.nombre_lote} onChange={(e) => update("nombre_lote", e.target.value)} />
             </div>
             <div>
+              <Label className="text-xs">Nombre del propietario</Label>
+              <Input value={form.nombre_propietario} onChange={(e) => update("nombre_propietario", e.target.value)} placeholder="Ej: Juan Pérez o Constructora XYZ" />
+            </div>
+            <div>
               <Label className="text-xs">Ciudad</Label>
               <Input value={form.ciudad} onChange={(e) => update("ciudad", e.target.value)} />
             </div>
