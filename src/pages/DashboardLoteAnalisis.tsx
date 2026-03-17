@@ -71,9 +71,12 @@ const DashboardLoteAnalisis = () => {
       <Link to="/dashboard/lotes" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-muted-foreground hover:text-primary">
         <ChevronLeft className="h-4 w-4" /> Volver a lotes
       </Link>
-      <h1 className="mb-6 font-body text-xl font-bold text-foreground">
-        Análisis 360° — {lote?.nombre_lote ?? "Lote"}
-      </h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-body text-xl font-bold text-foreground">
+          Análisis 360° — {lote?.nombre_lote ?? "Lote"}
+        </h1>
+        <ExcelAnalisisImporter />
+      </div>
 
       <div className="flex flex-col gap-3">
         <NormativaSection loteId={id!} />
