@@ -34,6 +34,7 @@ const formatCOP = (n: number) =>
   }).format(n);
 
 const Mercado = () => {
+  const [busqueda, setBusqueda] = useState("");
   const { data: stats, isLoading } = useQuery({
     queryKey: ["mercado-index"],
     queryFn: async () => {
