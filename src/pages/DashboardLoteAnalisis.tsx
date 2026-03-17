@@ -156,8 +156,8 @@ const JuridicoSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_juridico" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_juridico").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
