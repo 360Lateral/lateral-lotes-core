@@ -73,6 +73,7 @@ interface WizardForm {
 
 const emptyWizard: WizardForm = {
   nombre_lote: "",
+  nombre_propietario: "",
   tipo_lote: "",
   area_total_m2: "",
   frente_ml: "",
