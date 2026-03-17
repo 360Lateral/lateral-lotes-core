@@ -46,7 +46,7 @@ const planes = [
     nombre: "Premium",
     precio: "12 SMLMV",
     subprecio: "$21.010.860",
-    included: [true, true, true, true, true, true, true, true, true, true],
+    included: [true, true, true, true, true, true, true, false, false, false],
     destacado: false,
     badge: null,
   },
