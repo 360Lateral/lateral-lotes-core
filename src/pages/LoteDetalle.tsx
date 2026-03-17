@@ -873,7 +873,7 @@ const LoteDetalle = () => {
                       <Check className="h-4 w-4" /> Resolutoría 360° Completada
                     </Badge>
                     <div className="grid grid-cols-2 gap-2">
-                      {["Normativo", "Jurídico", "Servicios Públicos", "Suelos", "Mercado", "Ambiental", "Topográfico", "Urbanístico"].map((area) => (
+                      {["Normativo", "Jurídico", "SSPP", "Suelos", "Mercado", "Ambiental", "Arquitectónico", "Financiero"].map((area) => (
                         <div key={area} className="flex items-center gap-2 font-body text-sm text-foreground">
                           <Check className="h-4 w-4 text-green-600 shrink-0" />
                           {area}
