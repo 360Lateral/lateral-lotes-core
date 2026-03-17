@@ -115,6 +115,7 @@ const DashboardLotes = () => {
               {filtered.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted/50">
                   <td className="px-4 py-3 font-medium text-foreground">{l.nombre_lote}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {l.area_total_m2 ? Number(l.area_total_m2).toLocaleString("es-CO") : "—"}
