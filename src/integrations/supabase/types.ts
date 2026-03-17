@@ -322,6 +322,7 @@ export type Database = {
           lng: number | null
           matricula_inmobiliaria: string | null
           nombre_lote: string
+          nombre_propietario: string | null
           notas: string | null
           owner_id: string | null
           problema_juridico: string | null
@@ -354,6 +355,7 @@ export type Database = {
           lng?: number | null
           matricula_inmobiliaria?: string | null
           nombre_lote: string
+          nombre_propietario?: string | null
           notas?: string | null
           owner_id?: string | null
           problema_juridico?: string | null
@@ -386,6 +388,7 @@ export type Database = {
           lng?: number | null
           matricula_inmobiliaria?: string | null
           nombre_lote?: string
+          nombre_propietario?: string | null
           notas?: string | null
           owner_id?: string | null
           problema_juridico?: string | null
