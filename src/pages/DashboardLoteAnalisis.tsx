@@ -422,8 +422,8 @@ const MercadoSection = ({ loteId }: { loteId: string }) => {
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
-      const { data } = await supabase.from("analisis_mercado" as any).select("*").eq("lote_id", loteId).maybeSingle();
-      return data as any;
+      const { data } = await supabase.from("analisis_mercado").select("*").eq("lote_id", loteId).maybeSingle();
+      return data;
     },
   });
   const [form, setForm] = useState<any>({});
