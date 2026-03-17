@@ -131,9 +131,9 @@ function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
   return useMutation({
     mutationFn: async (values: Record<string, any>) => {
       // check existing
-      const { data: existing } = await supabase.from(table as any).select("id").eq("lote_id", loteId).maybeSingle();
+      const { data: existing } = await (supabase.from as any)(table).select("id").eq("lote_id", loteId).maybeSingle();
       if (existing) {
-        const { error } = await supabase.from(table as any).update({ ...values, updated_at: new Date().toISOString() } as any).eq("id", existing.id);
+        const { error } = await (supabase.from as any)(table).update({ ...values, updated_at: new Date().toISOString() }).eq("id", existing.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from(table as any).insert({ ...values, lote_id: loteId } as any);
