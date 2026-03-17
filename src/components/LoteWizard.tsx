@@ -217,6 +217,7 @@ const LoteWizard = () => {
     const errs: Record<string, boolean> = {};
     if (s === 1) {
       if (!form.nombre_lote.trim()) errs.nombre_lote = true;
+      if (!form.nombre_propietario.trim()) errs.nombre_propietario = true;
       if (!form.tipo_lote) errs.tipo_lote = true;
       if (!form.area_total_m2) errs.area_total_m2 = true;
       if (!form.precio_cop) errs.precio_cop = true;
