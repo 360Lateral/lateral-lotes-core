@@ -94,6 +94,41 @@ export type Database = {
           },
         ]
       }
+      consultas_ia: {
+        Row: {
+          created_at: string
+          id: string
+          lote_id: string
+          pregunta: string
+          respuesta: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lote_id: string
+          pregunta: string
+          respuesta: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lote_id?: string
+          pregunta?: string
+          respuesta?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultas_ia_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnosticos: {
         Row: {
           area_m2: number | null
