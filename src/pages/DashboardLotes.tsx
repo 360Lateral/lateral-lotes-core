@@ -41,7 +41,7 @@ const DashboardLotes = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado")
+        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
