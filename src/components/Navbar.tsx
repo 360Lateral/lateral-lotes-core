@@ -42,6 +42,7 @@ const Navbar = () => {
       ];
     }
     return [
+      { label: "Índice de mercado", href: "/mercado" },
       { label: "Diagnóstico", href: "/diagnostico" },
       { label: "Nosotros", href: "/#nosotros" },
       { label: "Contacto", href: "/#contacto" },
