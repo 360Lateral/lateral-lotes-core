@@ -500,6 +500,17 @@ const LoteWizard = () => {
         </div>
         <div>
           <Label className="text-xs">
+            Nombre del propietario <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            className={errClass("nombre_propietario")}
+            value={form.nombre_propietario}
+            onChange={(e) => update("nombre_propietario", e.target.value)}
+            placeholder="Ej: Juan Pérez o Constructora XYZ"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">
             Tipo de lote <span className="text-destructive">*</span>
           </Label>
           <Select
