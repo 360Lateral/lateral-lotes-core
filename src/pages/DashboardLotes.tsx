@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2 } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const estadoVariant = (e: string) => {
