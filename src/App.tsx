@@ -31,6 +31,7 @@ import DashboardOwnerLotes from "./pages/DashboardOwnerLotes";
 import DashboardOwnerDiagnosticos from "./pages/DashboardOwnerDiagnosticos";
 import DashboardOwnerNegociaciones from "./pages/DashboardOwnerNegociaciones";
 import DashboardUsuarios from "./pages/DashboardUsuarios";
+import DashboardLoteAnalisis from "./pages/DashboardLoteAnalisis";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
