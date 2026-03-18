@@ -61,6 +61,7 @@ const DashboardUsuarios = () => {
   const { roles: myRoles } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("todos");
 
   // Unified edit dialog state
   const [editOpen, setEditOpen] = useState(false);
