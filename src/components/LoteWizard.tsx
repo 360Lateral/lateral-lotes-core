@@ -131,56 +131,14 @@ const LoteWizard = () => {
       servicios: { ...p.servicios, [s]: !p.servicios[s] },
     }));
 
-  // ---- Map (only init when step 2 visible) ----
-  useEffect(() => {
-    if (step !== 2 || !mapContainer.current || mapInitialized.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const lat = parseFloat(form.lat) || 6.253;
-    const lng = parseFloat(form.lng) || -75.5736;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [lng, lat],
-      zoom: 13,
-    });
-    const marker = new mapboxgl.Marker({ draggable: true })
-      .setLngLat([lng, lat])
-      .addTo(map);
-    marker.on("dragend", () => {
-      const ll = marker.getLngLat();
-      setForm((p) => ({
-        ...p,
-        lat: ll.lat.toFixed(6),
-        lng: ll.lng.toFixed(6),
-      }));
-    });
-    map.on("click", (e) => {
-      marker.setLngLat(e.lngLat);
-      setForm((p) => ({
-        ...p,
-        lat: e.lngLat.lat.toFixed(6),
-        lng: e.lngLat.lng.toFixed(6),
-      }));
-    });
-    mapRef.current = map;
-    markerRef.current = marker;
-    mapInitialized.current = true;
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-      mapInitialized.current = false;
-    };
-  }, [step]);
-
-  useEffect(() => {
-    const lat = parseFloat(form.lat);
-    const lng = parseFloat(form.lng);
-    if (!isNaN(lat) && !isNaN(lng) && markerRef.current && mapRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-      mapRef.current.flyTo({ center: [lng, lat], zoom: 15 });
-    }
-  }, [form.lat, form.lng]);
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+    setForm((p) => ({
+      ...p,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
+  }, []);
 
   // ---- Photo handlers ----
   const handlePhotos = (e: ChangeEvent<HTMLInputElement>) => {
