@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
