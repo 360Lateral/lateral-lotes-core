@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent, useCallback } from "react";
+import { useState, ChangeEvent, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
