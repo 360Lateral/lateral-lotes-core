@@ -129,7 +129,7 @@ const LoteWizard = () => {
       servicios: { ...p.servicios, [s]: !p.servicios[s] },
     }));
 
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+  const handleMapClick = useCallback((e: any) => {
     if (!e.latLng) return;
     setForm((p) => ({
       ...p,
