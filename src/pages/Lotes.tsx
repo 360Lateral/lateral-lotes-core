@@ -62,11 +62,6 @@ const Lotes = () => {
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
 
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: mapsKey ?? "",
-    id: "google-map-script",
-  });
 
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
