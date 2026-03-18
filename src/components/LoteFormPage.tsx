@@ -128,8 +128,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Fetch existing data for edit mode
   const { data: existingLote } = useQuery({
