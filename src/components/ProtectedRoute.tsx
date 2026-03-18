@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children, requireDeveloper, allowOwner }: Props) => {
   }
 
   if (!requireDeveloper && !isAdminOrAsesor && !isDeveloper && !isOwner) {
-    return <Navigate to="/lotes" replace />;
+    return <Navigate to="/bienvenida" replace />;
   }
 
   // Owners without allowOwner on admin-only routes
