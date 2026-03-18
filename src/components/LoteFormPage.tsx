@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ImagePlus, Trash2 } from "lucide-react";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+
 
 const SERVICIOS_DEFAULT = [
   { tipo: "Agua", estado: "Disponible", operador: "" },
@@ -128,9 +128,8 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Fetch existing data for edit mode
   const { data: existingLote } = useQuery({
@@ -251,60 +250,14 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     }));
   }, [existingPrecio]);
 
-  // Mini map
-  useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const lat = parseFloat(form.lat) || 6.253;
-    const lng = parseFloat(form.lng) || -75.5736;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [lng, lat],
-      zoom: 13,
-    });
-
-    const marker = new mapboxgl.Marker({ draggable: true })
-      .setLngLat([lng, lat])
-      .addTo(map);
-
-    marker.on("dragend", () => {
-      const lngLat = marker.getLngLat();
-      setForm((prev) => ({
-        ...prev,
-        lat: lngLat.lat.toFixed(6),
-        lng: lngLat.lng.toFixed(6),
-      }));
-    });
-
-    map.on("click", (e) => {
-      marker.setLngLat(e.lngLat);
-      setForm((prev) => ({
-        ...prev,
-        lat: e.lngLat.lat.toFixed(6),
-        lng: e.lngLat.lng.toFixed(6),
-      }));
-    });
-
-    mapRef.current = map;
-    markerRef.current = marker;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-    };
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+    setForm((prev) => ({
+      ...prev,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
   }, []);
-
-  // Update marker when lat/lng typed
-  useEffect(() => {
-    const lat = parseFloat(form.lat);
-    const lng = parseFloat(form.lng);
-    if (!isNaN(lat) && !isNaN(lng) && markerRef.current && mapRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-      mapRef.current.flyTo({ center: [lng, lat], zoom: 15 });
-    }
-  }, [form.lat, form.lng]);
 
   // Auto-calc price
   const handlePrecioChange = (field: "precio_cop" | "precio_m2_cop", value: string) => {
@@ -552,7 +505,30 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                 <Input value={form.lng} onChange={(e) => update("lng", e.target.value)} placeholder="-75.5736" />
               </div>
             </div>
-            <div ref={mapContainer} className="h-56 w-full rounded-lg" />
+            {isLoaded && mapsKey ? (
+              <div className="h-56 w-full rounded-lg overflow-hidden">
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={{ lat: parseFloat(form.lat) || 6.253, lng: parseFloat(form.lng) || -75.5736 }}
+                  zoom={13}
+                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                  onClick={handleMapClick}
+                >
+                  {form.lat && form.lng && (
+                    <MarkerF
+                      position={{ lat: parseFloat(form.lat), lng: parseFloat(form.lng) }}
+                      draggable
+                      onDragEnd={(e) => {
+                        if (!e.latLng) return;
+                        setForm((prev) => ({ ...prev, lat: e.latLng!.lat().toFixed(6), lng: e.latLng!.lng().toFixed(6) }));
+                      }}
+                    />
+                  )}
+                </GoogleMap>
+              </div>
+            ) : (
+              <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
+            )}
           </CardContent>
         </Card>
 

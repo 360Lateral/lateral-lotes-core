@@ -1,8 +1,8 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useState } from "react";
+import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import ScoreIndicator from "@/components/ScoreIndicator";
@@ -39,7 +39,7 @@ import {
 import AsistenteChat from "@/components/AsistenteChat";
 import { useToast } from "@/hooks/use-toast";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+
 
 const formatCOP = (v: number) =>
   new Intl.NumberFormat("es-CO", {
@@ -105,8 +105,8 @@ const LoteDetalle = () => {
   const [contactOpen, setContactOpen] = useState(false);
   const [creatingNeg, setCreatingNeg] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Form state
   const [formNombre, setFormNombre] = useState("");
@@ -252,38 +252,7 @@ const LoteDetalle = () => {
     },
   });
 
-  // Mini map
-  useEffect(() => {
-    if (!mapContainer.current || !lote?.lat || !lote?.lng || mapRef.current) return;
-
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [Number(lote.lng), Number(lote.lat)],
-      zoom: 15,
-      interactive: false,
-    });
-
-    const el = document.createElement("div");
-    el.style.width = "16px";
-    el.style.height = "16px";
-    el.style.borderRadius = "50%";
-    el.style.backgroundColor = "#F49D15";
-    el.style.border = "2px solid white";
-    el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-
-    new mapboxgl.Marker({ element: el })
-      .setLngLat([Number(lote.lng), Number(lote.lat)])
-      .addTo(map);
-
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, [lote?.lat, lote?.lng]);
+  // Mini map is now rendered declaratively via GoogleMap component
 
   const handleDownload = async (storagePath: string | null, fileName: string) => {
     if (!storagePath) return;
@@ -427,11 +396,20 @@ const LoteDetalle = () => {
             )}
 
             {/* Mini map */}
-            {lote.lat && lote.lng && (
-              <div
-                ref={mapContainer}
-                className="h-48 w-full overflow-hidden rounded-lg md:h-64"
-              />
+            {lote.lat && lote.lng && isLoaded && mapsKey && (
+              <div className="h-48 w-full overflow-hidden rounded-lg md:h-64">
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                  zoom={15}
+                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                >
+                  <MarkerF
+                    position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                    icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
+                  />
+                </GoogleMap>
+              </div>
             )}
 
             {/* Notes */}

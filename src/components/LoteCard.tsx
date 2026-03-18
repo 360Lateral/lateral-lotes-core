@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import ScoreIndicator from "@/components/ScoreIndicator";
 import { Landmark } from "lucide-react";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 
 interface LoteCardProps {
   id: string;
@@ -46,9 +46,10 @@ const estadoBadgeVariant = (estado: string) => {
 };
 
 const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios, uso_principal, has_resolutoria, foto_url }: LoteCardProps) => {
+  const { data: mapsKey } = useGoogleMapsKey();
   const hasCoords = lat != null && lng != null;
-  const staticMapUrl = hasCoords
-    ? `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/pin-s+1D3461(${lng},${lat})/${lng},${lat},14,0/400x176@2x?access_token=${MAPBOX_TOKEN}`
+  const staticMapUrl = hasCoords && mapsKey
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=400x176&scale=2&maptype=hybrid&markers=color:0x1D3461%7C${lat},${lng}&key=${mapsKey}`
     : null;
   const imageUrl = foto_url || staticMapUrl;
 

@@ -1,20 +1,18 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import { supabase } from "@/integrations/supabase/client";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
 import { List, Map as MapIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
-
-const MEDELLIN_CENTER: [number, number] = [-75.5736, 6.2530];
+const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
 const PIN_COLORS: Record<string, string> = {
   Disponible: "#22C55E",
@@ -62,11 +60,13 @@ const Lotes = () => {
   const [showList, setShowList] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
+  const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
 
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: mapsKey ?? "",
+    id: "google-map-script",
+  });
 
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
@@ -101,101 +101,14 @@ const Lotes = () => {
     });
   }, [allLotes, filters]);
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: MEDELLIN_CENTER,
-      zoom: 12,
-    });
-    map.addControl(new mapboxgl.NavigationControl(), "top-left");
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  // Sync markers
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    // Remove old markers
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current.clear();
-
-    const filteredIds = new Set(filteredLotes.map((l) => l.id));
-
-    filteredLotes.forEach((lote) => {
-      if (lote.lat == null || lote.lng == null) return;
-
-      const color = PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF";
-
-      const el = document.createElement("div");
-      el.style.width = "18px";
-      el.style.height = "18px";
-      el.style.borderRadius = "50%";
-      el.style.backgroundColor = color;
-      el.style.border = "3px solid white";
-      el.style.cursor = "pointer";
-      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-      el.style.transition = "transform 0.15s";
-      el.style.transformOrigin = "center center";
-      el.dataset.loteId = lote.id;
-
-      // Tooltip on hover
-      el.addEventListener("mouseenter", () => {
-        el.style.transform = "scale(1.4)";
-        el.title = lote.nombre_lote;
-      });
-      el.addEventListener("mouseleave", () => {
-        el.style.transform = "scale(1)";
-      });
-
-      // Popup on click
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        popupRef.current?.remove();
-        const popup = new mapboxgl.Popup({ offset: 15, closeButton: true, maxWidth: "240px" })
-          .setLngLat([lote.lng!, lote.lat!])
-          .setHTML(`
-            <div style="font-family:Montserrat,sans-serif;padding:4px 0;">
-              <p style="font-weight:700;font-size:14px;margin:0 0 4px;">${lote.nombre_lote}</p>
-              <p style="font-size:12px;color:#666;margin:0 0 2px;">Área: ${(lote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
-              <p style="font-size:12px;color:#666;margin:0 0 8px;">Precio/m²: ${formatCOP(lote.precio_m2)}</p>
-              <a href="/lotes/${lote.id}" style="display:inline-block;background:hsl(37,91%,52%);color:white;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">Ver ficha</a>
-            </div>
-          `)
-          .addTo(map);
-        popupRef.current = popup;
-      });
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([lote.lng!, lote.lat!])
-        .addTo(map);
-
-      markersRef.current.set(lote.id, marker);
-    });
-  }, [filteredLotes]);
-
-  // Highlight pin on card hover
-  useEffect(() => {
-    markersRef.current.forEach((marker, id) => {
-      const el = marker.getElement();
-      if (id === hoveredLoteId) {
-        el.style.transform = "scale(1.6)";
-        el.style.zIndex = "10";
-      } else {
-        el.style.transform = "scale(1)";
-        el.style.zIndex = "1";
-      }
-    });
-  }, [hoveredLoteId]);
+  const mapOptions = useMemo(() => ({
+    mapTypeId: "hybrid" as google.maps.MapTypeId,
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+  }), []);
 
   const handleApplyFilters = useCallback((newFilters: Filters) => {
     setFilters(newFilters);
@@ -211,10 +124,57 @@ const Lotes = () => {
 
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
-        <div
-          ref={mapContainer}
-          className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}
-        />
+        <div className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
+          {isLoaded && mapsKey ? (
+            <GoogleMap
+              mapContainerStyle={{ width: "100%", height: "100%" }}
+              center={MEDELLIN_CENTER}
+              zoom={12}
+              options={mapOptions}
+            >
+              {filteredLotes
+                .filter((l) => l.lat != null && l.lng != null)
+                .map((lote) => (
+                  <Marker
+                    key={lote.id}
+                    position={{ lat: lote.lat!, lng: lote.lng! }}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE,
+                      fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
+                      fillOpacity: 1,
+                      strokeColor: "#FFFFFF",
+                      strokeWeight: 3,
+                      scale: hoveredLoteId === lote.id ? 12 : 8,
+                    }}
+                    onClick={() => setSelectedLote(lote)}
+                    zIndex={hoveredLoteId === lote.id ? 10 : 1}
+                  />
+                ))}
+              {selectedLote && selectedLote.lat && selectedLote.lng && (
+                <InfoWindow
+                  position={{ lat: selectedLote.lat, lng: selectedLote.lng }}
+                  onCloseClick={() => setSelectedLote(null)}
+                >
+                  <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
+                    <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
+                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {(selectedLote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
+                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>
+                    <a
+                      href={`/lotes/${selectedLote.id}`}
+                      style={{ display: "inline-block", background: "hsl(37,91%,52%)", color: "white", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                    >
+                      Ver ficha
+                    </a>
+                  </div>
+                </InfoWindow>
+              )}
+            </GoogleMap>
+          ) : (
+            <div className="flex h-full items-center justify-center bg-muted">
+              <p className="text-muted-foreground">Cargando mapa…</p>
+            </div>
+          )}
+        </div>
 
         {/* Desktop panel */}
         {!isMobile && (

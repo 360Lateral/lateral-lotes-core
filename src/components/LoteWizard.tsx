@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, ChangeEvent, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -34,8 +34,6 @@ import {
 import { calculateLoteScore } from "@/lib/loteScore";
 import LoteScoreResult from "@/components/LoteScoreResult";
 
-const MAPBOX_TOKEN =
-  "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
 const STEPS = [
   { num: 1, label: "Datos básicos" },
@@ -121,10 +119,8 @@ const LoteWizard = () => {
   const [docs, setDocs] = useState<DocFile[]>([]);
   const [published, setPublished] = useState(false);
 
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
-  const mapInitialized = useRef(false);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   const update = (key: keyof WizardForm, value: any) =>
     setForm((p) => ({ ...p, [key]: value }));
@@ -135,56 +131,14 @@ const LoteWizard = () => {
       servicios: { ...p.servicios, [s]: !p.servicios[s] },
     }));
 
-  // ---- Map (only init when step 2 visible) ----
-  useEffect(() => {
-    if (step !== 2 || !mapContainer.current || mapInitialized.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const lat = parseFloat(form.lat) || 6.253;
-    const lng = parseFloat(form.lng) || -75.5736;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [lng, lat],
-      zoom: 13,
-    });
-    const marker = new mapboxgl.Marker({ draggable: true })
-      .setLngLat([lng, lat])
-      .addTo(map);
-    marker.on("dragend", () => {
-      const ll = marker.getLngLat();
-      setForm((p) => ({
-        ...p,
-        lat: ll.lat.toFixed(6),
-        lng: ll.lng.toFixed(6),
-      }));
-    });
-    map.on("click", (e) => {
-      marker.setLngLat(e.lngLat);
-      setForm((p) => ({
-        ...p,
-        lat: e.lngLat.lat.toFixed(6),
-        lng: e.lngLat.lng.toFixed(6),
-      }));
-    });
-    mapRef.current = map;
-    markerRef.current = marker;
-    mapInitialized.current = true;
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-      mapInitialized.current = false;
-    };
-  }, [step]);
-
-  useEffect(() => {
-    const lat = parseFloat(form.lat);
-    const lng = parseFloat(form.lng);
-    if (!isNaN(lat) && !isNaN(lng) && markerRef.current && mapRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-      mapRef.current.flyTo({ center: [lng, lat], zoom: 15 });
-    }
-  }, [form.lat, form.lng]);
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+    setForm((p) => ({
+      ...p,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
+  }, []);
 
   // ---- Photo handlers ----
   const handlePhotos = (e: ChangeEvent<HTMLInputElement>) => {
@@ -641,7 +595,30 @@ const LoteWizard = () => {
           <Label className="mb-2 block text-xs">
             Marca la ubicación aproximada en el mapa
           </Label>
-          <div ref={mapContainer} className="h-56 w-full rounded-lg" />
+          {isLoaded && mapsKey ? (
+            <div className="h-56 w-full rounded-lg overflow-hidden">
+              <GoogleMap
+                mapContainerStyle={{ width: "100%", height: "100%" }}
+                center={{ lat: parseFloat(form.lat) || 6.253, lng: parseFloat(form.lng) || -75.5736 }}
+                zoom={13}
+                options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                onClick={handleMapClick}
+              >
+                {form.lat && form.lng && (
+                  <MarkerF
+                    position={{ lat: parseFloat(form.lat), lng: parseFloat(form.lng) }}
+                    draggable
+                    onDragEnd={(e) => {
+                      if (!e.latLng) return;
+                      setForm((p) => ({ ...p, lat: e.latLng!.lat().toFixed(6), lng: e.latLng!.lng().toFixed(6) }));
+                    }}
+                  />
+                )}
+              </GoogleMap>
+            </div>
+          ) : (
+            <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
+          )}
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Latitud</Label>
