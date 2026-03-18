@@ -66,6 +66,7 @@ Deno.serve(async (req) => {
     const perfiles = perfilesRes.data ?? [];
     const roles = rolesRes.data ?? [];
     const comDocs = comDocsRes.data ?? [];
+    const ownerAssocs = ownerAssocRes.data ?? [];
 
     const perfilesMap = new Map(perfiles.map((p: any) => [p.id, p]));
     const rolesMap = new Map<string, string[]>();
@@ -79,6 +80,14 @@ Deno.serve(async (req) => {
     const comDocStatus = new Map<string, string>();
     for (const d of comDocs) {
       comDocStatus.set(d.user_id, d.estado);
+    }
+
+    // Owner associations per user
+    const ownerAssocMap = new Map<string, string[]>();
+    for (const a of ownerAssocs) {
+      const existing = ownerAssocMap.get(a.user_id) ?? [];
+      existing.push(a.owner_id);
+      ownerAssocMap.set(a.user_id, existing);
     }
 
     const result = users.map((u: any) => {
