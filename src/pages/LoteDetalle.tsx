@@ -312,6 +312,11 @@ const LoteDetalle = () => {
   // Protect private lots: if not public and user is not owner or admin
   const isPrivate = (lote as any).es_publico === false;
   const isOwner = user && (lote as any).owner_id === user.id;
+  const canViewDocs =
+    isAdminOrAsesor ||
+    isOwner ||
+    !!negociacionActiva;
+
   if (isPrivate && !isOwner && !isAdminOrAsesor) {
     return (
       <div className="flex min-h-screen flex-col">
