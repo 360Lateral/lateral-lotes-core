@@ -105,8 +105,6 @@ const LoteDetalle = () => {
   const [contactOpen, setContactOpen] = useState(false);
   const [creatingNeg, setCreatingNeg] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Form state
   const [formNombre, setFormNombre] = useState("");
