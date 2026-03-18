@@ -44,6 +44,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <ErrorBoundary>
         <BrowserRouter>
           <Routes>
             {/* Rutas públicas */}
