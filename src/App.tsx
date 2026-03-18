@@ -47,6 +47,7 @@ const App = () => (
         <Sonner />
         <ErrorBoundary>
         <BrowserRouter>
+          <HomeButton />
           <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Index />} />
