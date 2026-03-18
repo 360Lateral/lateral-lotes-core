@@ -13,15 +13,6 @@ import { Handshake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-const estadoLabel = (e: string) => {
-  switch (e) {
-    case "activa": return "Activa";
-    case "en_revision": return "En revisión";
-    case "cerrada": return "Cerrada";
-    case "concretada": return "Concretada";
-    default: return e;
-  }
-};
 
 const DashboardNegociaciones = () => {
   const { toast } = useToast();

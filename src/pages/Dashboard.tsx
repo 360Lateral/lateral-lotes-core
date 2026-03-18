@@ -84,15 +84,6 @@ const Dashboard = () => {
     },
   });
 
-  const { data: usuariosCount = 0 } = useQuery({
-    queryKey: ["dash-usuarios"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("perfiles")
-        .select("*", { count: "exact", head: true });
-      return count ?? 0;
-    },
-  });
 
   const { data: lotesPendientes = [] } = useQuery({
     queryKey: ["dash-lotes-pendientes"],
