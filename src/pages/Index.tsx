@@ -5,7 +5,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import { LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
+
+const HERO_IMG = "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=85";
 
 const Index = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
