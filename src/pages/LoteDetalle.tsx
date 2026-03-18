@@ -831,6 +831,25 @@ const LoteDetalle = () => {
                       </Button>
                     </CardContent>
                   </Card>
+                ) : !canViewDocs ? (
+                  <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                      <Lock className="h-8 w-8 text-muted-foreground" />
+                      <p className="font-body text-sm font-semibold text-foreground">
+                        Documentos restringidos
+                      </p>
+                      <p className="font-body text-xs text-muted-foreground max-w-xs">
+                        Los documentos técnicos y legales están disponibles una vez que inicies una negociación activa sobre este lote.
+                      </p>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setContactOpen(true)}
+                      >
+                        Me interesa este lote
+                      </Button>
+                    </CardContent>
+                  </Card>
                 ) : documentos.length > 0 ? (
                   <div className="flex flex-col gap-4">
                     {categoriasDoc.map((cat) => {
