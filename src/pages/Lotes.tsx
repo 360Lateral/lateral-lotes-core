@@ -97,7 +97,7 @@ const Lotes = () => {
   }, [allLotes, filters]);
 
   const mapOptions = useMemo(() => ({
-    mapTypeId: "hybrid" as google.maps.MapTypeId,
+    mapTypeId: "hybrid",
     disableDefaultUI: false,
     zoomControl: true,
     mapTypeControl: false,
