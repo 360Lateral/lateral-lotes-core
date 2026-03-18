@@ -217,6 +217,23 @@ const LoteDetalle = () => {
     enabled: !!id && !!user,
   });
 
+  // Check if developer has an active negotiation for this lot
+  const { data: negociacionActiva } = useQuery({
+    queryKey: ["neg-activa", id, user?.id],
+    enabled: !!id && !!user && !isAdminOrAsesor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("negociaciones")
+        .select("id")
+        .eq("lote_id", id!)
+        .eq("developer_id", user!.id)
+        .in("estado", ["activa", "en_revision", "concretada"])
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   // Lead mutation
   const leadMutation = useMutation({
     mutationFn: async () => {
@@ -295,6 +312,11 @@ const LoteDetalle = () => {
   // Protect private lots: if not public and user is not owner or admin
   const isPrivate = (lote as any).es_publico === false;
   const isOwner = user && (lote as any).owner_id === user.id;
+  const canViewDocs =
+    isAdminOrAsesor ||
+    isOwner ||
+    !!negociacionActiva;
+
   if (isPrivate && !isOwner && !isAdminOrAsesor) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -806,6 +828,25 @@ const LoteDetalle = () => {
                       </p>
                       <Button variant="default" size="sm" asChild>
                         <Link to="/login">Iniciar sesión</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : !canViewDocs ? (
+                  <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                      <Lock className="h-8 w-8 text-muted-foreground" />
+                      <p className="font-body text-sm font-semibold text-foreground">
+                        Documentos restringidos
+                      </p>
+                      <p className="font-body text-xs text-muted-foreground max-w-xs">
+                        Los documentos técnicos y legales están disponibles una vez que inicies una negociación activa sobre este lote.
+                      </p>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setContactOpen(true)}
+                      >
+                        Me interesa este lote
                       </Button>
                     </CardContent>
                   </Card>
