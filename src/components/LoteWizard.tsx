@@ -32,6 +32,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { calculateLoteScore } from "@/lib/loteScore";
+import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import LoteScoreResult from "@/components/LoteScoreResult";
 
 
