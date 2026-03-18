@@ -12,14 +12,29 @@ const DashboardOwnerLotes = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: lotes, isLoading } = useQuery({
-    queryKey: ["owner-lotes", user?.id],
+  // Get owner associations for this user
+  const { data: ownerIds = [] } = useQuery({
+    queryKey: ["user-owner-assoc", user?.id],
     enabled: !!user,
     queryFn: async () => {
       const { data } = await supabase
+        .from("usuario_owner")
+        .select("owner_id")
+        .eq("user_id", user!.id);
+      return data?.map((r) => r.owner_id) ?? [];
+    },
+  });
+
+  const { data: lotes, isLoading } = useQuery({
+    queryKey: ["owner-lotes", user?.id, ownerIds],
+    enabled: !!user,
+    queryFn: async () => {
+      // Get own lotes + lotes from associated owners
+      const allOwnerIds = [user!.id, ...ownerIds];
+      const { data } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, departamento, area_total_m2, es_publico, estado_disponibilidad, created_at")
-        .eq("owner_id", user!.id)
+        .select("id, nombre_lote, ciudad, departamento, area_total_m2, es_publico, estado_disponibilidad, created_at, owner_id, nombre_propietario")
+        .in("owner_id", allOwnerIds)
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -46,36 +61,26 @@ const DashboardOwnerLotes = () => {
             <p className="font-body text-sm text-muted-foreground">
               Aún no has publicado ningún lote.
             </p>
-            <Button
-              variant="link"
-              className="mt-2 text-primary"
-              onClick={() => navigate("/dashboard/lotes/nuevo")}
-            >
+            <Button variant="link" className="mt-2 text-primary" onClick={() => navigate("/dashboard/lotes/nuevo")}>
               Publicar mi primer lote
             </Button>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {lotes.map((lote) => (
-              <Card
-                key={lote.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/lotes/${lote.id}`)}
-              >
+              <Card key={lote.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/lotes/${lote.id}`)}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold truncate">
-                    {lote.nombre_lote}
-                  </CardTitle>
+                  <CardTitle className="text-base font-semibold truncate">{lote.nombre_lote}</CardTitle>
+                  {lote.owner_id !== user?.id && (
+                    <p className="text-xs text-muted-foreground">Propietario: {lote.nombre_propietario ?? "—"}</p>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    {lote.ciudad}
-                    {lote.departamento ? `, ${lote.departamento}` : ""}
+                    {lote.ciudad}{lote.departamento ? `, ${lote.departamento}` : ""}
                   </p>
                   {lote.area_total_m2 && (
-                    <p className="text-sm">
-                      {lote.area_total_m2.toLocaleString("es-CO")} m²
-                    </p>
+                    <p className="text-sm">{lote.area_total_m2.toLocaleString("es-CO")} m²</p>
                   )}
                   <div className="flex items-center gap-2">
                     <Badge variant={lote.es_publico ? "default" : "secondary"}>

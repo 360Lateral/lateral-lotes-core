@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,10 +42,24 @@ const DashboardLotes = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario")
+        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario, es_publico")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const togglePublicoMutation = useMutation({
+    mutationFn: async ({ id, es_publico }: { id: string; es_publico: boolean }) => {
+      const { error } = await supabase.from("lotes").update({ es_publico }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
+      toast({ title: "Visibilidad actualizada" });
+    },
+    onError: (err: any) => {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     },
   });
 
@@ -107,6 +122,7 @@ const DashboardLotes = () => {
                 <th className="px-4 py-3 font-semibold text-foreground">Ciudad</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Área m²</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
+                <th className="px-4 py-3 font-semibold text-foreground">Público</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Dest.</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Acciones</th>
               </tr>
@@ -124,6 +140,12 @@ const DashboardLotes = () => {
                     <Badge variant={estadoVariant(l.estado_disponibilidad)} className="text-xs">
                       {l.estado_disponibilidad}
                     </Badge>
+                   </td>
+                  <td className="px-4 py-3">
+                    <Switch
+                      checked={l.es_publico}
+                      onCheckedChange={(checked) => togglePublicoMutation.mutate({ id: l.id, es_publico: checked })}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <Star
@@ -157,7 +179,7 @@ const DashboardLotes = () => {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                     No se encontraron lotes.
                   </td>
                 </tr>
