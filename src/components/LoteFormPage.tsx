@@ -2,8 +2,8 @@ import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import { GoogleMap, MarkerF } from "@react-google-maps/api";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -128,8 +128,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Fetch existing data for edit mode
   const { data: existingLote } = useQuery({
@@ -505,7 +503,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                 <Input value={form.lng} onChange={(e) => update("lng", e.target.value)} placeholder="-75.5736" />
               </div>
             </div>
-            {isLoaded && mapsKey ? (
+            <GoogleMapsGate
+              fallback={<div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>}
+            >
               <div className="h-56 w-full rounded-lg overflow-hidden">
                 <GoogleMap
                   mapContainerStyle={{ width: "100%", height: "100%" }}
@@ -526,9 +526,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                   )}
                 </GoogleMap>
               </div>
-            ) : (
-              <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
-            )}
+            </GoogleMapsGate>
           </CardContent>
         </Card>
 

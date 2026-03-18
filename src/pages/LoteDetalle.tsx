@@ -1,8 +1,8 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import { GoogleMap, MarkerF } from "@react-google-maps/api";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import ScoreIndicator from "@/components/ScoreIndicator";
@@ -105,8 +105,6 @@ const LoteDetalle = () => {
   const [contactOpen, setContactOpen] = useState(false);
   const [creatingNeg, setCreatingNeg] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   // Form state
   const [formNombre, setFormNombre] = useState("");
@@ -396,20 +394,24 @@ const LoteDetalle = () => {
             )}
 
             {/* Mini map */}
-            {lote.lat && lote.lng && isLoaded && mapsKey && (
-              <div className="h-48 w-full overflow-hidden rounded-lg md:h-64">
-                <GoogleMap
-                  mapContainerStyle={{ width: "100%", height: "100%" }}
-                  center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                  zoom={15}
-                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
-                >
-                  <MarkerF
-                    position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                    icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
-                  />
-                </GoogleMap>
-              </div>
+            {lote.lat && lote.lng && (
+              <GoogleMapsGate
+                fallback={<div className="h-48 w-full overflow-hidden rounded-lg bg-muted md:h-64" />}
+              >
+                <div className="h-48 w-full overflow-hidden rounded-lg md:h-64">
+                  <GoogleMap
+                    mapContainerStyle={{ width: "100%", height: "100%" }}
+                    center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                    zoom={15}
+                    options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                  >
+                    <MarkerF
+                      position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                      icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
+                    />
+                  </GoogleMap>
+                </div>
+              </GoogleMapsGate>
             )}
 
             {/* Notes */}

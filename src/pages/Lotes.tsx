@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { supabase } from "@/integrations/supabase/client";
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import Navbar from "@/components/Navbar";
 
 import LotesFilterPanel from "@/components/LotesFilterPanel";
@@ -62,11 +62,6 @@ const Lotes = () => {
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
 
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: mapsKey ?? "",
-    id: "google-map-script",
-  });
 
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
@@ -125,7 +120,13 @@ const Lotes = () => {
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
         <div className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
-          {isLoaded && mapsKey ? (
+          <GoogleMapsGate
+            fallback={
+              <div className="flex h-full items-center justify-center bg-muted">
+                <p className="text-muted-foreground">Cargando mapa…</p>
+              </div>
+            }
+          >
             <GoogleMap
               mapContainerStyle={{ width: "100%", height: "100%" }}
               center={MEDELLIN_CENTER}
@@ -169,11 +170,7 @@ const Lotes = () => {
                 </InfoWindow>
               )}
             </GoogleMap>
-          ) : (
-            <div className="flex h-full items-center justify-center bg-muted">
-              <p className="text-muted-foreground">Cargando mapa…</p>
-            </div>
-          )}
+          </GoogleMapsGate>
         </div>
 
         {/* Desktop panel */}

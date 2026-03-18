@@ -1,8 +1,8 @@
 import { useState, ChangeEvent, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import { GoogleMap, MarkerF } from "@react-google-maps/api";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -119,8 +119,6 @@ const LoteWizard = () => {
   const [docs, setDocs] = useState<DocFile[]>([]);
   const [published, setPublished] = useState(false);
 
-  const { data: mapsKey } = useGoogleMapsKey();
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   const update = (key: keyof WizardForm, value: any) =>
     setForm((p) => ({ ...p, [key]: value }));
@@ -595,7 +593,9 @@ const LoteWizard = () => {
           <Label className="mb-2 block text-xs">
             Marca la ubicación aproximada en el mapa
           </Label>
-          {isLoaded && mapsKey ? (
+          <GoogleMapsGate
+            fallback={<div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>}
+          >
             <div className="h-56 w-full rounded-lg overflow-hidden">
               <GoogleMap
                 mapContainerStyle={{ width: "100%", height: "100%" }}
@@ -616,9 +616,7 @@ const LoteWizard = () => {
                 )}
               </GoogleMap>
             </div>
-          ) : (
-            <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
-          )}
+          </GoogleMapsGate>
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Latitud</Label>
