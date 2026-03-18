@@ -468,7 +468,6 @@ const Diagnostico = () => {
             </div>
           </div>
         </div>
-        </div>
       </main>
       <Footer />
     </div>
