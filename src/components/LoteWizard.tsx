@@ -34,8 +34,6 @@ import {
 import { calculateLoteScore } from "@/lib/loteScore";
 import LoteScoreResult from "@/components/LoteScoreResult";
 
-const MAPBOX_TOKEN =
-  "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
 
 const STEPS = [
   { num: 1, label: "Datos básicos" },
