@@ -2,7 +2,10 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import { Check, X } from "lucide-react";
+
+const PLANES_IMG = "https://images.unsplash.com/photo-1448630360428-65456885c650?w=1600&q=85";
 
 const features = [
   "Valoración referencial por m²",
@@ -57,15 +60,19 @@ const Planes = () => {
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <main className="flex-1">
-        <section className="py-16 lg:py-20">
-          <div className="mx-auto max-w-6xl px-4">
-            <h1 className="font-heading text-3xl font-bold text-secondary text-center md:text-4xl">
+        <HeroImage imageUrl={PLANES_IMG} height="200px" overlay="split">
+          <div className="mx-auto max-w-2xl px-4 text-center">
+            <h1 className="font-heading text-3xl font-bold text-white md:text-4xl">
               Planes y precios
             </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
+            <p className="mx-auto mt-3 max-w-2xl text-center text-white/70">
               Elige el nivel de análisis que necesitas para tu lote.
             </p>
+          </div>
+        </HeroImage>
 
+        <section className="py-16 lg:py-20">
+          <div className="mx-auto max-w-6xl px-4">
             {/* Desktop table */}
             <div className="mt-12 hidden md:block overflow-x-auto">
               <table className="w-full text-sm">

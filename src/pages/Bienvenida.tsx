@@ -3,7 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import { Home, Building2, UserCheck, Check } from "lucide-react";
+
+const BIENVENIDA_IMG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85";
 
 type Perfil = "dueno" | "developer" | "comisionista";
 
@@ -91,7 +94,8 @@ const Bienvenida = () => {
   if (loading) return null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: "#1a2744" }}>
+    <HeroImage imageUrl={BIENVENIDA_IMG} height="100vh" overlay="dark">
+    <div className="flex flex-col items-center px-4 py-12">
       {/* Logo */}
       <div className="mb-8">
         <Logo variant="on-navy" />
@@ -177,6 +181,7 @@ const Bienvenida = () => {
         ← Volver al inicio
       </a>
     </div>
+    </HeroImage>
   );
 };
 

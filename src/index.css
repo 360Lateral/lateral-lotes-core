@@ -73,3 +73,15 @@
     @apply bg-background text-foreground font-body antialiased;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .animate-ken-burns {
+    animation: none !important;
+  }
+}
