@@ -140,6 +140,12 @@ const DashboardLotes = () => {
                     <Badge variant={estadoVariant(l.estado_disponibilidad)} className="text-xs">
                       {l.estado_disponibilidad}
                     </Badge>
+                   </td>
+                  <td className="px-4 py-3">
+                    <Switch
+                      checked={l.es_publico}
+                      onCheckedChange={(checked) => togglePublicoMutation.mutate({ id: l.id, es_publico: checked })}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <Star
