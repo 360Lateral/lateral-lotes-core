@@ -39,7 +39,7 @@ import {
 import AsistenteChat from "@/components/AsistenteChat";
 import { useToast } from "@/hooks/use-toast";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+
 
 const formatCOP = (v: number) =>
   new Intl.NumberFormat("es-CO", {
