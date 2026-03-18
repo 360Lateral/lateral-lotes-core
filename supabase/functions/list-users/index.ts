@@ -100,6 +100,7 @@ Deno.serve(async (req) => {
         activo: perfil?.activo ?? true,
         roles: rolesMap.get(u.id) ?? [],
         comisionista_doc_estado: comDocStatus.get(u.id) ?? null,
+        owner_ids: ownerAssocMap.get(u.id) ?? [],
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at,
       };
