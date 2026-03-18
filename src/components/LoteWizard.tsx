@@ -1,8 +1,8 @@
 import { useState, ChangeEvent, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { GoogleMap, MarkerF } from "@react-google-maps/api";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
+import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
