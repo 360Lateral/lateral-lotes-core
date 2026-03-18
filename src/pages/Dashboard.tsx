@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -11,21 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake, Check, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
-
-const estadoVariant = (e: string) => {
-  switch (e) {
-    case "Disponible": return "disponible" as const;
-    case "Reservado": return "reservado" as const;
-    case "Vendido": return "vendido" as const;
-    default: return "default" as const;
-  }
-};
 
 const leadEstadoVariant = (e: string) => {
   switch (e) {
@@ -41,6 +35,7 @@ const leadEstadoVariant = (e: string) => {
 const Dashboard = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: lotes = [] } = useQuery({
     queryKey: ["dash-lotes"],
@@ -69,7 +64,7 @@ const Dashboard = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("diagnosticos")
-        .select("id, estado, created_at, nombre, ciudad, area_m2, objetivo" as any)
+        .select("id, estado, created_at, nombre, objetivo" as any)
         .order("created_at", { ascending: false })
         .limit(10);
       return (data as any[]) ?? [];
@@ -87,15 +82,6 @@ const Dashboard = () => {
     },
   });
 
-  const { data: usuariosCount = 0 } = useQuery({
-    queryKey: ["dash-usuarios"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("perfiles")
-        .select("*", { count: "exact", head: true });
-      return count ?? 0;
-    },
-  });
 
   const { data: lotesPendientes = [] } = useQuery({
     queryKey: ["dash-lotes-pendientes"],
@@ -199,53 +185,71 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Lotes pendientes */}
-      {lotesPendientes.length > 0 && (
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-              Lotes pendientes de aprobación
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-body text-sm">
-                <thead>
-                  <tr className="border-b border-border text-xs text-muted-foreground">
-                    <th className="pb-2">Lote</th>
-                    <th className="pb-2">Ciudad</th>
-                    <th className="pb-2">Área</th>
-                    <th className="pb-2">Fecha</th>
-                    <th className="pb-2">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lotesPendientes.map((l: any) => (
-                    <tr key={l.id} className="border-b border-border last:border-0">
-                      <td className="py-2 text-foreground">{l.nombre_lote}</td>
-                      <td className="py-2 text-muted-foreground">{l.ciudad ?? "—"}</td>
-                      <td className="py-2 text-muted-foreground">
-                        {l.area_total_m2 ? `${Number(l.area_total_m2).toLocaleString("es-CO")} m²` : "—"}
-                      </td>
-                      <td className="py-2 text-xs text-muted-foreground">
-                        {new Date(l.created_at).toLocaleDateString("es-CO")}
-                      </td>
-                      <td className="py-2">
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="default" onClick={() => handleAprobar(l.id)}>
-                            Aprobar
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleRechazar(l.id)}>
-                            Rechazar
-                          </Button>
-                        </div>
-                      </td>
+      {/* Lotes pendientes — compact approve/reject icons */}
+      <TooltipProvider>
+        {lotesPendientes.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
+                Lotes pendientes de aprobación
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left font-body text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-xs text-muted-foreground">
+                      <th className="pb-2">Lote</th>
+                      <th className="pb-2">Ciudad</th>
+                      <th className="pb-2">Área</th>
+                      <th className="pb-2">Fecha</th>
+                      <th className="pb-2 text-right">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  </thead>
+                  <tbody>
+                    {lotesPendientes.map((l: any) => (
+                      <tr key={l.id} className="border-b border-border last:border-0">
+                        <td className="py-2 text-foreground">{l.nombre_lote}</td>
+                        <td className="py-2 text-muted-foreground">{l.ciudad ?? "—"}</td>
+                        <td className="py-2 text-muted-foreground">
+                          {l.area_total_m2 ? `${Number(l.area_total_m2).toLocaleString("es-CO")} m²` : "—"}
+                        </td>
+                        <td className="py-2 text-xs text-muted-foreground">
+                          {new Date(l.created_at).toLocaleDateString("es-CO")}
+                        </td>
+                        <td className="py-2 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => handleAprobar(l.id)}
+                                  className="rounded-md p-1.5 text-success hover:bg-success/10 transition-colors"
+                                >
+                                  <Check className="h-4 w-4" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Aprobar</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => handleRechazar(l.id)}
+                                  className="rounded-md p-1.5 text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Rechazar</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </TooltipProvider>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent leads */}
@@ -323,7 +327,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Diagnósticos recientes */}
+        {/* Diagnósticos recientes — reduced columns */}
         <Card>
           <CardContent className="p-4">
             <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
@@ -335,8 +339,6 @@ const Dashboard = () => {
                   <tr className="border-b border-border text-xs text-muted-foreground">
                     <th className="pb-2">Fecha</th>
                     <th className="pb-2">Nombre</th>
-                    <th className="pb-2">Municipio</th>
-                    <th className="pb-2">Área</th>
                     <th className="pb-2">Objetivo</th>
                     <th className="pb-2">Estado</th>
                   </tr>
@@ -348,10 +350,6 @@ const Dashboard = () => {
                         {new Date(d.created_at).toLocaleDateString("es-CO")}
                       </td>
                       <td className="py-2 text-foreground">{d.nombre ?? "—"}</td>
-                      <td className="py-2 text-muted-foreground">{d.ciudad ?? "—"}</td>
-                      <td className="py-2 text-muted-foreground">
-                        {d.area_m2 ? `${Number(d.area_m2).toLocaleString("es-CO")} m²` : "—"}
-                      </td>
                       <td className="py-2 text-muted-foreground">{d.objetivo ?? "—"}</td>
                       <td className="py-2">
                         <Select
@@ -372,7 +370,7 @@ const Dashboard = () => {
                   ))}
                   {diagnosticos.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-4 text-center text-muted-foreground">
+                      <td colSpan={4} className="py-4 text-center text-muted-foreground">
                         No hay diagnósticos aún.
                       </td>
                     </tr>
@@ -383,7 +381,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Negociaciones activas */}
+        {/* Negociaciones activas — clickable rows, no Estado column, no Ver sala button */}
         <Card>
           <CardContent className="p-4">
             <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
@@ -395,32 +393,26 @@ const Dashboard = () => {
                   <tr className="border-b border-border text-xs text-muted-foreground">
                     <th className="pb-2">Lote</th>
                     <th className="pb-2">Fecha inicio</th>
-                    <th className="pb-2">Estado</th>
-                    <th className="pb-2"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {negociacionesActivas.map((n: any) => (
-                    <tr key={n.id} className="border-b border-border last:border-0">
+                    <tr
+                      key={n.id}
+                      className="border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => navigate(`/negociacion/${n.id}`)}
+                    >
                       <td className="py-2 text-foreground">
                         {(n.lotes as any)?.nombre_lote ?? "Lote"}
                       </td>
                       <td className="py-2 text-xs text-muted-foreground">
                         {new Date(n.created_at).toLocaleDateString("es-CO")}
                       </td>
-                      <td className="py-2">
-                        <Badge variant="disponible" className="text-xs">Activa</Badge>
-                      </td>
-                      <td className="py-2">
-                        <Button size="sm" variant="outline" asChild>
-                          <Link to={`/negociacion/${n.id}`}>Ver sala</Link>
-                        </Button>
-                      </td>
                     </tr>
                   ))}
                   {negociacionesActivas.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-4 text-center text-muted-foreground">
+                      <td colSpan={2} className="py-4 text-center text-muted-foreground">
                         No hay negociaciones activas.
                       </td>
                     </tr>

@@ -1,15 +1,13 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, loading, signOut } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -23,11 +21,20 @@ const Navbar = () => {
     user?.email?.split("@")[0] ||
     "Usuario";
 
-  const profileLabel = userType === "dueno" ? "Dueño de lote" : userType === "desarrollador" ? "Desarrollador" : isAdminOrAsesor ? "Administrador" : null;
+  // Single dashboard route based on role
+  const getDashboardRoute = () => {
+    if (isAdminOrAsesor) return "/dashboard";
+    if (isDeveloper) return "/dashboard/developer";
+    if (userType === "dueno" || userType === "comisionista") return "/dashboard/owner";
+    return null;
+  };
+
+  const dashboardRoute = getDashboardRoute();
+  const dashboardLabel = userType === "dueno" || userType === "comisionista" ? "Mi Panel" : "Dashboard";
 
   // Contextual nav links based on user type
   const getNavLinks = () => {
-    if (user && userType === "dueno") {
+    if (user && (userType === "dueno" || userType === "comisionista")) {
       return [
         { label: "Mi panel", href: "/dashboard/owner" },
         { label: "Diagnóstico", href: "/diagnostico" },
@@ -77,29 +84,12 @@ const Navbar = () => {
         <div className="hidden items-center gap-3 md:flex">
           {loading ? null : user ? (
             <>
-              <div className="flex items-center gap-2">
-                <span className="font-body text-sm text-secondary-foreground">
-                  {displayName}
-                </span>
-                {profileLabel && (
-                  <Badge variant="outline" className="border-secondary-foreground/30 text-secondary-foreground/70 text-[10px] px-1.5 py-0">
-                    {profileLabel}
-                  </Badge>
-                )}
-              </div>
-              {isAdminOrAsesor && (
+              <span className="font-body text-sm text-secondary-foreground">
+                {displayName}
+              </span>
+              {dashboardRoute && (
                 <Button variant="default" size="sm" asChild>
-                  <Link to="/dashboard">Dashboard</Link>
-                </Button>
-              )}
-              {!isAdminOrAsesor && isDeveloper && (
-                <Button variant="default" size="sm" asChild>
-                  <Link to="/dashboard/developer">Dashboard</Link>
-                </Button>
-              )}
-              {!isAdminOrAsesor && !isDeveloper && userType === "dueno" && (
-                <Button variant="default" size="sm" asChild>
-                  <Link to="/dashboard/lotes/nuevo">Publicar lote</Link>
+                  <Link to={dashboardRoute}>{dashboardLabel}</Link>
                 </Button>
               )}
               <button
@@ -150,34 +140,13 @@ const Navbar = () => {
             <div className="mt-2 flex flex-col gap-2">
               {loading ? null : user ? (
                 <>
-                  <div className="flex items-center gap-2">
-                    <span className="font-body text-sm text-secondary-foreground">
-                      {displayName}
-                    </span>
-                    {profileLabel && (
-                      <Badge variant="outline" className="border-secondary-foreground/30 text-secondary-foreground/70 text-[10px] px-1.5 py-0">
-                        {profileLabel}
-                      </Badge>
-                    )}
-                  </div>
-                  {isAdminOrAsesor && (
+                  <span className="font-body text-sm text-secondary-foreground">
+                    {displayName}
+                  </span>
+                  {dashboardRoute && (
                     <Button variant="default" size="sm" asChild>
-                      <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
-                        Dashboard
-                      </Link>
-                    </Button>
-                  )}
-                  {!isAdminOrAsesor && isDeveloper && (
-                    <Button variant="default" size="sm" asChild>
-                      <Link to="/dashboard/developer" onClick={() => setMobileOpen(false)}>
-                        Dashboard
-                      </Link>
-                    </Button>
-                  )}
-                  {!isAdminOrAsesor && !isDeveloper && userType === "dueno" && (
-                    <Button variant="default" size="sm" asChild>
-                      <Link to="/dashboard/lotes/nuevo" onClick={() => setMobileOpen(false)}>
-                        Publicar lote
+                      <Link to={dashboardRoute} onClick={() => setMobileOpen(false)}>
+                        {dashboardLabel}
                       </Link>
                     </Button>
                   )}
