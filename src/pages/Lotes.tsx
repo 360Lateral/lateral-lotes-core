@@ -120,7 +120,13 @@ const Lotes = () => {
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
         <div className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
-          {isLoaded && mapsKey ? (
+          <GoogleMapsGate
+            fallback={
+              <div className="flex h-full items-center justify-center bg-muted">
+                <p className="text-muted-foreground">Cargando mapa…</p>
+              </div>
+            }
+          >
             <GoogleMap
               mapContainerStyle={{ width: "100%", height: "100%" }}
               center={MEDELLIN_CENTER}
@@ -164,11 +170,7 @@ const Lotes = () => {
                 </InfoWindow>
               )}
             </GoogleMap>
-          ) : (
-            <div className="flex h-full items-center justify-center bg-muted">
-              <p className="text-muted-foreground">Cargando mapa…</p>
-            </div>
-          )}
+          </GoogleMapsGate>
         </div>
 
         {/* Desktop panel */}

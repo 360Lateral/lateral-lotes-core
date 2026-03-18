@@ -593,7 +593,9 @@ const LoteWizard = () => {
           <Label className="mb-2 block text-xs">
             Marca la ubicación aproximada en el mapa
           </Label>
-          {isLoaded && mapsKey ? (
+          <GoogleMapsGate
+            fallback={<div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>}
+          >
             <div className="h-56 w-full rounded-lg overflow-hidden">
               <GoogleMap
                 mapContainerStyle={{ width: "100%", height: "100%" }}
@@ -614,9 +616,7 @@ const LoteWizard = () => {
                 )}
               </GoogleMap>
             </div>
-          ) : (
-            <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
-          )}
+          </GoogleMapsGate>
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Latitud</Label>
