@@ -217,6 +217,23 @@ const LoteDetalle = () => {
     enabled: !!id && !!user,
   });
 
+  // Check if developer has an active negotiation for this lot
+  const { data: negociacionActiva } = useQuery({
+    queryKey: ["neg-activa", id, user?.id],
+    enabled: !!id && !!user && !isAdminOrAsesor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("negociaciones")
+        .select("id")
+        .eq("lote_id", id!)
+        .eq("developer_id", user!.id)
+        .in("estado", ["activa", "en_revision", "concretada"])
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   // Lead mutation
   const leadMutation = useMutation({
     mutationFn: async () => {
