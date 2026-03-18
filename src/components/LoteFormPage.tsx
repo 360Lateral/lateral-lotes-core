@@ -2,8 +2,8 @@ import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { GoogleMap, MarkerF } from "@react-google-maps/api";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
+import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -249,6 +249,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   }, [existingPrecio]);
 
   const handleMapClick = useCallback((e: any) => {
+    if (!e.latLng) return;
+    setForm((prev) => ({
+      ...prev,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
+  }, []);
+
+  const handleMarkerDragEnd = useCallback((e: any) => {
     if (!e.latLng) return;
     setForm((prev) => ({
       ...prev,
@@ -506,26 +515,12 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             <GoogleMapsGate
               fallback={<div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>}
             >
-              <div className="h-56 w-full rounded-lg overflow-hidden">
-                <GoogleMap
-                  mapContainerStyle={{ width: "100%", height: "100%" }}
-                  center={{ lat: parseFloat(form.lat) || 6.253, lng: parseFloat(form.lng) || -75.5736 }}
-                  zoom={13}
-                  options={{ mapTypeId: "hybrid", mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
-                  onClick={handleMapClick}
-                >
-                  {form.lat && form.lng && (
-                    <MarkerF
-                      position={{ lat: parseFloat(form.lat), lng: parseFloat(form.lng) }}
-                      draggable
-                      onDragEnd={(e) => {
-                        if (!e.latLng) return;
-                        setForm((prev) => ({ ...prev, lat: e.latLng!.lat().toFixed(6), lng: e.latLng!.lng().toFixed(6) }));
-                      }}
-                    />
-                  )}
-                </GoogleMap>
-              </div>
+              <MemoizedLoteMap
+                lat={form.lat}
+                lng={form.lng}
+                onMapClick={handleMapClick}
+                onMarkerDragEnd={handleMarkerDragEnd}
+              />
             </GoogleMapsGate>
           </CardContent>
         </Card>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,8 +86,10 @@ const DashboardLotes = () => {
     },
   });
 
+  const deferredSearch = useDeferredValue(search);
+
   const filtered = lotes.filter((l) => {
-    const q = search.toLowerCase();
+    const q = deferredSearch.toLowerCase();
     return (
       l.nombre_lote.toLowerCase().includes(q) ||
       (l.barrio ?? "").toLowerCase().includes(q)
