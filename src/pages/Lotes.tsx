@@ -97,7 +97,7 @@ const Lotes = () => {
   }, [allLotes, filters]);
 
   const mapOptions = useMemo(() => ({
-    mapTypeId: "hybrid" as google.maps.MapTypeId,
+    mapTypeId: "hybrid",
     disableDefaultUI: false,
     zoomControl: true,
     mapTypeControl: false,
@@ -140,7 +140,7 @@ const Lotes = () => {
                     key={lote.id}
                     position={{ lat: lote.lat!, lng: lote.lng! }}
                     icon={{
-                      path: google.maps.SymbolPath.CIRCLE,
+                      path: 0, // google.maps.SymbolPath.CIRCLE
                       fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
                       fillOpacity: 1,
                       strokeColor: "#FFFFFF",

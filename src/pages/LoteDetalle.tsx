@@ -403,11 +403,11 @@ const LoteDetalle = () => {
                     mapContainerStyle={{ width: "100%", height: "100%" }}
                     center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
                     zoom={15}
-                    options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                    options={{ mapTypeId: "hybrid", disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
                   >
                     <MarkerF
                       position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                      icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
+                      icon={{ path: 0, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
                     />
                   </GoogleMap>
                 </div>
