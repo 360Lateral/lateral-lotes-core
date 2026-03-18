@@ -86,8 +86,10 @@ const DashboardLotes = () => {
     },
   });
 
+  const deferredSearch = useDeferredValue(search);
+
   const filtered = lotes.filter((l) => {
-    const q = search.toLowerCase();
+    const q = deferredSearch.toLowerCase();
     return (
       l.nombre_lote.toLowerCase().includes(q) ||
       (l.barrio ?? "").toLowerCase().includes(q)

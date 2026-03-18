@@ -257,6 +257,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     }));
   }, []);
 
+  const handleMarkerDragEnd = useCallback((e: any) => {
+    if (!e.latLng) return;
+    setForm((prev) => ({
+      ...prev,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
+  }, []);
+
   // Auto-calc price
   const handlePrecioChange = (field: "precio_cop" | "precio_m2_cop", value: string) => {
     const area = parseFloat(form.area_total_m2) || 0;

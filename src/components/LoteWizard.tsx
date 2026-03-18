@@ -138,6 +138,15 @@ const LoteWizard = () => {
     }));
   }, []);
 
+  const handleMarkerDragEnd = useCallback((e: any) => {
+    if (!e.latLng) return;
+    setForm((p) => ({
+      ...p,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
+  }, []);
+
   // ---- Photo handlers ----
   const handlePhotos = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
