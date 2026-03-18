@@ -181,6 +181,7 @@ const Bienvenida = () => {
         ← Volver al inicio
       </a>
     </div>
+    </HeroImage>
   );
 };
 

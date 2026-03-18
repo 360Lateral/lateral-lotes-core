@@ -161,22 +161,24 @@ const Index = () => {
 
     // Not logged in
     return (
-      <section className="flex min-h-[500px] flex-col items-center justify-center bg-secondary px-4 text-center">
-        <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-secondary-foreground md:text-5xl">
-          Tu lote tiene más valor del que crees
-        </h1>
-        <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
-          Conectamos tierra con su mejor destino: venta, desarrollo o viabilización. Con información técnica, normativa y financiera completa.
-        </p>
-        <div className="mt-8">
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/bienvenida">Comenzar ahora</Link>
-          </Button>
+      <HeroImage imageUrl={HERO_IMG} height="520px" overlay="split">
+        <div className="flex flex-col items-center px-4 text-center">
+          <h1 className="max-w-3xl font-body text-4xl font-bold leading-tight text-white md:text-5xl">
+            Tu lote tiene más valor del que crees
+          </h1>
+          <p className="mt-4 max-w-xl font-body text-base text-white/70 md:text-lg">
+            Conectamos tierra con su mejor destino: venta, desarrollo o viabilización. Con información técnica, normativa y financiera completa.
+          </p>
+          <div className="mt-8">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/bienvenida">Comenzar ahora</Link>
+            </Button>
+          </div>
+          <Link to="/login" className="mt-4 font-body text-sm text-white/60 hover:text-white transition-colors">
+            ¿Ya tienes cuenta? Iniciar sesión →
+          </Link>
         </div>
-        <Link to="/login" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
-          ¿Ya tienes cuenta? Iniciar sesión →
-        </Link>
-      </section>
+      </HeroImage>
     );
   };
 
