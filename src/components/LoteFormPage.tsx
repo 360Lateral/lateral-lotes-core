@@ -511,7 +511,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                   mapContainerStyle={{ width: "100%", height: "100%" }}
                   center={{ lat: parseFloat(form.lat) || 6.253, lng: parseFloat(form.lng) || -75.5736 }}
                   zoom={13}
-                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                  options={{ mapTypeId: "hybrid", mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
                   onClick={handleMapClick}
                 >
                   {form.lat && form.lng && (

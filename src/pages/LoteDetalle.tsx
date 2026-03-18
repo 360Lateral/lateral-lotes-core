@@ -407,7 +407,7 @@ const LoteDetalle = () => {
                   >
                     <MarkerF
                       position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                      icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
+                      icon={{ path: 0, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
                     />
                   </GoogleMap>
                 </div>
