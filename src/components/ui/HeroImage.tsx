@@ -50,7 +50,7 @@ const HeroImage = ({ imageUrl, height = "500px", overlay, children }: HeroImageP
       />
 
       {/* Content */}
-      <div className="relative z-[2] flex h-full w-full items-center justify-center">
+      <div className="relative z-[2] flex h-full w-full items-center justify-center animate-fade-in" style={{ animationDuration: "0.8s", animationFillMode: "both" }}>
         {children}
       </div>
     </div>
