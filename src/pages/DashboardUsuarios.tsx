@@ -289,6 +289,11 @@ const DashboardUsuarios = () => {
                                 </Badge>
                               </div>
                             )}
+                            {(u.user_type === "dueno" || u.user_type === "comisionista") && (
+                              <p className="text-[10px] text-muted-foreground mt-0.5">
+                                {u.owner_ids?.length ?? 0} lotes asociados
+                              </p>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
