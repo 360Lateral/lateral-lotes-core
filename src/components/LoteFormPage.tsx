@@ -248,7 +248,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     }));
   }, [existingPrecio]);
 
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+  const handleMapClick = useCallback((e: any) => {
     if (!e.latLng) return;
     setForm((prev) => ({
       ...prev,
