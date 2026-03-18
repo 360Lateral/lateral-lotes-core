@@ -12,9 +12,7 @@ import { Button } from "@/components/ui/button";
 import { List, Map as MapIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
-
-const MEDELLIN_CENTER: [number, number] = [-75.5736, 6.2530];
+const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
 const PIN_COLORS: Record<string, string> = {
   Disponible: "#22C55E",
