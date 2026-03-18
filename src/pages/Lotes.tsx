@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { supabase } from "@/integrations/supabase/client";
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import Navbar from "@/components/Navbar";
 
 import LotesFilterPanel from "@/components/LotesFilterPanel";
