@@ -60,11 +60,13 @@ const Lotes = () => {
   const [showList, setShowList] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
+  const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
 
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: mapsKey ?? "",
+    id: "google-map-script",
+  });
 
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
