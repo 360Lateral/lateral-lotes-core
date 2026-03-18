@@ -42,10 +42,24 @@ const DashboardLotes = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario")
+        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario, es_publico")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const togglePublicoMutation = useMutation({
+    mutationFn: async ({ id, es_publico }: { id: string; es_publico: boolean }) => {
+      const { error } = await supabase.from("lotes").update({ es_publico }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
+      toast({ title: "Visibilidad actualizada" });
+    },
+    onError: (err: any) => {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     },
   });
 
