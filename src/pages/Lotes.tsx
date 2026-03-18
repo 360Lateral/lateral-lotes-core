@@ -5,7 +5,7 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 import { supabase } from "@/integrations/supabase/client";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";

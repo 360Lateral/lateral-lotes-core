@@ -505,7 +505,30 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                 <Input value={form.lng} onChange={(e) => update("lng", e.target.value)} placeholder="-75.5736" />
               </div>
             </div>
-            <div ref={mapContainer} className="h-56 w-full rounded-lg" />
+            {isLoaded && mapsKey ? (
+              <div className="h-56 w-full rounded-lg overflow-hidden">
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={{ lat: parseFloat(form.lat) || 6.253, lng: parseFloat(form.lng) || -75.5736 }}
+                  zoom={13}
+                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                  onClick={handleMapClick}
+                >
+                  {form.lat && form.lng && (
+                    <MarkerF
+                      position={{ lat: parseFloat(form.lat), lng: parseFloat(form.lng) }}
+                      draggable
+                      onDragEnd={(e) => {
+                        if (!e.latLng) return;
+                        setForm((prev) => ({ ...prev, lat: e.latLng!.lat().toFixed(6), lng: e.latLng!.lng().toFixed(6) }));
+                      }}
+                    />
+                  )}
+                </GoogleMap>
+              </div>
+            ) : (
+              <div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>
+            )}
           </CardContent>
         </Card>
 

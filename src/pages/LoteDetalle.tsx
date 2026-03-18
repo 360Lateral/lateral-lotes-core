@@ -396,11 +396,20 @@ const LoteDetalle = () => {
             )}
 
             {/* Mini map */}
-            {lote.lat && lote.lng && (
-              <div
-                ref={mapContainer}
-                className="h-48 w-full overflow-hidden rounded-lg md:h-64"
-              />
+            {lote.lat && lote.lng && isLoaded && mapsKey && (
+              <div className="h-48 w-full overflow-hidden rounded-lg md:h-64">
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                  zoom={15}
+                  options={{ mapTypeId: "hybrid" as google.maps.MapTypeId, disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
+                >
+                  <MarkerF
+                    position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
+                    icon={{ path: google.maps.SymbolPath.CIRCLE, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
+                  />
+                </GoogleMap>
+              </div>
             )}
 
             {/* Notes */}
