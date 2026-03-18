@@ -94,7 +94,8 @@ const Bienvenida = () => {
   if (loading) return null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: "#1a2744" }}>
+    <HeroImage imageUrl={BIENVENIDA_IMG} height="100vh" overlay="dark">
+    <div className="flex flex-col items-center px-4 py-12">
       {/* Logo */}
       <div className="mb-8">
         <Logo variant="on-navy" />
