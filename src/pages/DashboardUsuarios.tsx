@@ -424,6 +424,39 @@ const DashboardUsuarios = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Lotes del propietario */}
+              {(currentEditUser?.user_type === "dueno" || currentEditUser?.user_type === "comisionista") && (
+                <div className="space-y-2">
+                  <Label>Lotes del propietario ({lotesDelUsuario.length})</Label>
+                  {lotesDelUsuario.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Este usuario no tiene lotes publicados.</p>
+                  ) : (
+                    <div className="max-h-48 overflow-y-auto space-y-2">
+                      {lotesDelUsuario.map((lote) => (
+                        <div key={lote.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-foreground">{lote.nombre_lote}</p>
+                            <p className="text-xs text-muted-foreground">{lote.ciudad} · {lote.estado_disponibilidad}</p>
+                          </div>
+                          <div className="flex items-center gap-2 ml-2">
+                            {lote.has_resolutoria && (
+                              <Badge variant="default" className="text-[10px]">360°</Badge>
+                            )}
+                            <Badge
+                              variant={lote.es_publico ? "default" : "secondary"}
+                              className="text-[10px] cursor-pointer"
+                              onClick={() => toggleLoteVisibility(lote.id, lote.es_publico)}
+                            >
+                              {lote.es_publico ? "Público" : "Privado"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
