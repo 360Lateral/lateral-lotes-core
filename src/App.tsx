@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import HomeButton from "@/components/ui/HomeButton";
 
 import Index from "./pages/Index";
 import Lotes from "./pages/Lotes";
