@@ -252,38 +252,7 @@ const LoteDetalle = () => {
     },
   });
 
-  // Mini map
-  useEffect(() => {
-    if (!mapContainer.current || !lote?.lat || !lote?.lng || mapRef.current) return;
-
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [Number(lote.lng), Number(lote.lat)],
-      zoom: 15,
-      interactive: false,
-    });
-
-    const el = document.createElement("div");
-    el.style.width = "16px";
-    el.style.height = "16px";
-    el.style.borderRadius = "50%";
-    el.style.backgroundColor = "#F49D15";
-    el.style.border = "2px solid white";
-    el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-
-    new mapboxgl.Marker({ element: el })
-      .setLngLat([Number(lote.lng), Number(lote.lat)])
-      .addTo(map);
-
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, [lote?.lat, lote?.lng]);
+  // Mini map is now rendered declaratively via GoogleMap component
 
   const handleDownload = async (storagePath: string | null, fileName: string) => {
     if (!storagePath) return;

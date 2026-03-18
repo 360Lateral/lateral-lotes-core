@@ -124,10 +124,57 @@ const Lotes = () => {
 
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
-        <div
-          ref={mapContainer}
-          className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}
-        />
+        <div className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
+          {isLoaded && mapsKey ? (
+            <GoogleMap
+              mapContainerStyle={{ width: "100%", height: "100%" }}
+              center={MEDELLIN_CENTER}
+              zoom={12}
+              options={mapOptions}
+            >
+              {filteredLotes
+                .filter((l) => l.lat != null && l.lng != null)
+                .map((lote) => (
+                  <Marker
+                    key={lote.id}
+                    position={{ lat: lote.lat!, lng: lote.lng! }}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE,
+                      fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
+                      fillOpacity: 1,
+                      strokeColor: "#FFFFFF",
+                      strokeWeight: 3,
+                      scale: hoveredLoteId === lote.id ? 12 : 8,
+                    }}
+                    onClick={() => setSelectedLote(lote)}
+                    zIndex={hoveredLoteId === lote.id ? 10 : 1}
+                  />
+                ))}
+              {selectedLote && selectedLote.lat && selectedLote.lng && (
+                <InfoWindow
+                  position={{ lat: selectedLote.lat, lng: selectedLote.lng }}
+                  onCloseClick={() => setSelectedLote(null)}
+                >
+                  <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
+                    <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
+                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {(selectedLote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
+                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>
+                    <a
+                      href={`/lotes/${selectedLote.id}`}
+                      style={{ display: "inline-block", background: "hsl(37,91%,52%)", color: "white", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                    >
+                      Ver ficha
+                    </a>
+                  </div>
+                </InfoWindow>
+              )}
+            </GoogleMap>
+          ) : (
+            <div className="flex h-full items-center justify-center bg-muted">
+              <p className="text-muted-foreground">Cargando mapa…</p>
+            </div>
+          )}
+        </div>
 
         {/* Desktop panel */}
         {!isMobile && (
