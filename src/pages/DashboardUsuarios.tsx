@@ -129,9 +129,37 @@ const DashboardUsuarios = () => {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const { data: lotesDelUsuario = [] } = useQuery({
+    queryKey: ["user-lotes", editUser?.id],
+    enabled: !!editUser && (editUser.user_type === "dueno" || editUser.user_type === "comisionista"),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("lotes")
+        .select("id, nombre_lote, ciudad, estado_disponibilidad, es_publico, has_resolutoria")
+        .eq("owner_id", editUser!.id)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const toggleLoteVisibility = async (loteId: string, esPublico: boolean) => {
+    const { error } = await supabase
+      .from("lotes")
+      .update({ es_publico: !esPublico })
+      .eq("id", loteId);
+    if (error) {
+      toast.error("Error al cambiar visibilidad");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["user-lotes", editUser?.id] });
+      toast.success(esPublico ? "Lote ocultado" : "Lote publicado");
+    }
+  };
+
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
-    return !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
+    const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
+    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "asesor"].includes(r)));
+    return matchSearch && matchType;
   });
 
   const openEditDialog = (user: UserRecord) => {
