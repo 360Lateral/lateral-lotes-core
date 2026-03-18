@@ -38,6 +38,14 @@ interface Props {
 
 const DashboardLayout = ({ children }: Props) => {
   const { user, roles, signOut, isDeveloper, userType } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({ title: "Sesión cerrada", description: "Has cerrado sesión correctamente." });
+    navigate("/", { replace: true });
+  };
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
