@@ -122,6 +122,7 @@ const DashboardLotes = () => {
                 <th className="px-4 py-3 font-semibold text-foreground">Ciudad</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Área m²</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
+                <th className="px-4 py-3 font-semibold text-foreground">Público</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Dest.</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Acciones</th>
               </tr>
