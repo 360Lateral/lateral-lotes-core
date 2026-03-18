@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import ScoreIndicator from "@/components/ScoreIndicator";
 import { Landmark } from "lucide-react";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 
 interface LoteCardProps {
   id: string;
