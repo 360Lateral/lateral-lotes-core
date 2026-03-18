@@ -170,7 +170,7 @@ const DashboardLayout = ({ children }: Props) => {
             onClick={() => setMobileOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 z-50 w-[220px] bg-secondary">
-            <SidebarContent />
+            {sidebarContent}
           </aside>
         </>
       )}
