@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ImagePlus, Trash2 } from "lucide-react";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiZmFjdHVyYWNpb250ZXJyYSIsImEiOiJjbW1wY3F3aGcwb2JiMnBweTJ1MnFrMWNxIn0.U5SBL1PDZLqAd4h9RDsx4w";
+
 
 const SERVICIOS_DEFAULT = [
   { tipo: "Agua", estado: "Disponible", operador: "" },
