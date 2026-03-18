@@ -151,7 +151,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isDeveloper = userType === "developer" || roles.some((r) => r === "developer");
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      // Force local cleanup even if server call fails
+    }
+    setSession(null);
+    setUser(null);
     setRoles([]);
     setUserType(null);
     lastUserIdRef.current = null;
