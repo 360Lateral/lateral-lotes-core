@@ -3,7 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import { Home, Building2, UserCheck, Check } from "lucide-react";
+
+const BIENVENIDA_IMG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85";
 
 type Perfil = "dueno" | "developer" | "comisionista";
 
