@@ -106,6 +106,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Safety timeout: force loading=false after 8s to prevent blank screen
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (mountedRef.current) setLoading(false);
+    }, 8000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
 
