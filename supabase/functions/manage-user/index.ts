@@ -12,7 +12,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Validate caller is admin/asesor
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "No autorizado" }), {
@@ -24,7 +23,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify caller with their JWT
+    // Verify caller
     const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -36,8 +35,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check caller is admin
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+    // Check caller is admin
     const { data: roleCheck } = await adminClient
       .from("user_roles")
       .select("role")
@@ -51,52 +51,57 @@ Deno.serve(async (req) => {
       });
     }
 
-    // List all users from auth
-    const { data: { users }, error } = await adminClient.auth.admin.listUsers({ perPage: 1000 });
-    if (error) throw error;
+    const body = await req.json();
+    const { action, user_id } = body;
 
-    // Get all profiles, roles, comisionista docs, and owner associations
-    const [perfilesRes, rolesRes, comDocsRes, ownerAssocRes] = await Promise.all([
-      adminClient.from("perfiles").select("*"),
-      adminClient.from("user_roles").select("*"),
-      adminClient.from("documentos_comisionista").select("user_id, estado"),
-      adminClient.from("usuario_owner").select("user_id, owner_id"),
-    ]);
-
-    const perfiles = perfilesRes.data ?? [];
-    const roles = rolesRes.data ?? [];
-    const comDocs = comDocsRes.data ?? [];
-
-    const perfilesMap = new Map(perfiles.map((p: any) => [p.id, p]));
-    const rolesMap = new Map<string, string[]>();
-    for (const r of roles) {
-      const existing = rolesMap.get(r.user_id) ?? [];
-      existing.push(r.role);
-      rolesMap.set(r.user_id, existing);
+    if (!user_id || !action) {
+      return new Response(JSON.stringify({ error: "Faltan parámetros" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Comisionista doc status per user
-    const comDocStatus = new Map<string, string>();
-    for (const d of comDocs) {
-      comDocStatus.set(d.user_id, d.estado);
+    // Action: update_user_type
+    if (action === "update_user_type") {
+      const { user_type } = body;
+      const { error } = await adminClient
+        .from("perfiles")
+        .update({ user_type })
+        .eq("id", user_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const result = users.map((u: any) => {
-      const perfil = perfilesMap.get(u.id);
-      return {
-        id: u.id,
-        email: u.email,
-        full_name: u.user_metadata?.full_name ?? perfil?.nombre ?? null,
-        user_type: perfil?.user_type ?? null,
-        activo: perfil?.activo ?? true,
-        roles: rolesMap.get(u.id) ?? [],
-        comisionista_doc_estado: comDocStatus.get(u.id) ?? null,
-        created_at: u.created_at,
-        last_sign_in_at: u.last_sign_in_at,
-      };
-    });
+    // Action: add_owner_association
+    if (action === "add_owner") {
+      const { owner_id } = body;
+      const { error } = await adminClient
+        .from("usuario_owner")
+        .insert({ user_id, owner_id });
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    return new Response(JSON.stringify(result), {
+    // Action: remove_owner_association
+    if (action === "remove_owner") {
+      const { owner_id } = body;
+      const { error } = await adminClient
+        .from("usuario_owner")
+        .delete()
+        .eq("user_id", user_id)
+        .eq("owner_id", owner_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Acción no válida" }), {
+      status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
