@@ -1,7 +1,8 @@
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,14 @@ interface Props {
 
 const DashboardLayout = ({ children }: Props) => {
   const { user, roles, signOut, isDeveloper, userType } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({ title: "Sesión cerrada", description: "Has cerrado sesión correctamente." });
+    navigate("/", { replace: true });
+  };
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -135,7 +144,7 @@ const DashboardLayout = ({ children }: Props) => {
           variant="ghost"
           size="sm"
           className="mt-2 w-full justify-start text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
-          onClick={signOut}
+          onClick={handleSignOut}
         >
           <LogOut className="mr-2 h-4 w-4" />
           Cerrar sesión
