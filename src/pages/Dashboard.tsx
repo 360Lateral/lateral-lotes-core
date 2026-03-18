@@ -20,8 +20,6 @@ import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake, Check, X } fr
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
 const leadEstadoVariant = (e: string) => {
   switch (e) {
