@@ -2,7 +2,10 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import { Check, X } from "lucide-react";
+
+const PLANES_IMG = "https://images.unsplash.com/photo-1448630360428-65456885c650?w=1600&q=85";
 
 const features = [
   "Valoración referencial por m²",
