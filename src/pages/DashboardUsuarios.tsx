@@ -220,9 +220,22 @@ const DashboardUsuarios = () => {
             <h1 className="font-heading text-xl font-bold text-foreground">Gestión de Usuarios</h1>
             <p className="text-sm text-muted-foreground">{users.length} usuarios registrados</p>
           </div>
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar por nombre, email o rol..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <div className="flex gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-72">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Buscar por nombre, email o rol..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+            </div>
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="dueno">Dueños de lote</SelectItem>
+                <SelectItem value="comisionista">Comisionistas</SelectItem>
+                <SelectItem value="developer">Desarrolladores</SelectItem>
+                <SelectItem value="inversor">Inversionistas</SelectItem>
+                <SelectItem value="admin">Administradores</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
