@@ -119,10 +119,8 @@ const LoteWizard = () => {
   const [docs, setDocs] = useState<DocFile[]>([]);
   const [published, setPublished] = useState(false);
 
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
-  const mapInitialized = useRef(false);
+  const { data: mapsKey } = useGoogleMapsKey();
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: mapsKey ?? "", id: "google-map-script" });
 
   const update = (key: keyof WizardForm, value: any) =>
     setForm((p) => ({ ...p, [key]: value }));
