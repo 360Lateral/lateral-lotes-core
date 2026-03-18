@@ -250,60 +250,14 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     }));
   }, [existingPrecio]);
 
-  // Mini map
-  useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const lat = parseFloat(form.lat) || 6.253;
-    const lng = parseFloat(form.lng) || -75.5736;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [lng, lat],
-      zoom: 13,
-    });
-
-    const marker = new mapboxgl.Marker({ draggable: true })
-      .setLngLat([lng, lat])
-      .addTo(map);
-
-    marker.on("dragend", () => {
-      const lngLat = marker.getLngLat();
-      setForm((prev) => ({
-        ...prev,
-        lat: lngLat.lat.toFixed(6),
-        lng: lngLat.lng.toFixed(6),
-      }));
-    });
-
-    map.on("click", (e) => {
-      marker.setLngLat(e.lngLat);
-      setForm((prev) => ({
-        ...prev,
-        lat: e.lngLat.lat.toFixed(6),
-        lng: e.lngLat.lng.toFixed(6),
-      }));
-    });
-
-    mapRef.current = map;
-    markerRef.current = marker;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      markerRef.current = null;
-    };
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+    setForm((prev) => ({
+      ...prev,
+      lat: e.latLng!.lat().toFixed(6),
+      lng: e.latLng!.lng().toFixed(6),
+    }));
   }, []);
-
-  // Update marker when lat/lng typed
-  useEffect(() => {
-    const lat = parseFloat(form.lat);
-    const lng = parseFloat(form.lng);
-    if (!isNaN(lat) && !isNaN(lng) && markerRef.current && mapRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-      mapRef.current.flyTo({ center: [lng, lat], zoom: 15 });
-    }
-  }, [form.lat, form.lng]);
 
   // Auto-calc price
   const handlePrecioChange = (field: "precio_cop" | "precio_m2_cop", value: string) => {
