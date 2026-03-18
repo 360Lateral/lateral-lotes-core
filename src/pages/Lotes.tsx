@@ -101,101 +101,14 @@ const Lotes = () => {
     });
   }, [allLotes, filters]);
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: MEDELLIN_CENTER,
-      zoom: 12,
-    });
-    map.addControl(new mapboxgl.NavigationControl(), "top-left");
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  // Sync markers
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    // Remove old markers
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current.clear();
-
-    const filteredIds = new Set(filteredLotes.map((l) => l.id));
-
-    filteredLotes.forEach((lote) => {
-      if (lote.lat == null || lote.lng == null) return;
-
-      const color = PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF";
-
-      const el = document.createElement("div");
-      el.style.width = "18px";
-      el.style.height = "18px";
-      el.style.borderRadius = "50%";
-      el.style.backgroundColor = color;
-      el.style.border = "3px solid white";
-      el.style.cursor = "pointer";
-      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-      el.style.transition = "transform 0.15s";
-      el.style.transformOrigin = "center center";
-      el.dataset.loteId = lote.id;
-
-      // Tooltip on hover
-      el.addEventListener("mouseenter", () => {
-        el.style.transform = "scale(1.4)";
-        el.title = lote.nombre_lote;
-      });
-      el.addEventListener("mouseleave", () => {
-        el.style.transform = "scale(1)";
-      });
-
-      // Popup on click
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        popupRef.current?.remove();
-        const popup = new mapboxgl.Popup({ offset: 15, closeButton: true, maxWidth: "240px" })
-          .setLngLat([lote.lng!, lote.lat!])
-          .setHTML(`
-            <div style="font-family:Montserrat,sans-serif;padding:4px 0;">
-              <p style="font-weight:700;font-size:14px;margin:0 0 4px;">${lote.nombre_lote}</p>
-              <p style="font-size:12px;color:#666;margin:0 0 2px;">Área: ${(lote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
-              <p style="font-size:12px;color:#666;margin:0 0 8px;">Precio/m²: ${formatCOP(lote.precio_m2)}</p>
-              <a href="/lotes/${lote.id}" style="display:inline-block;background:hsl(37,91%,52%);color:white;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">Ver ficha</a>
-            </div>
-          `)
-          .addTo(map);
-        popupRef.current = popup;
-      });
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([lote.lng!, lote.lat!])
-        .addTo(map);
-
-      markersRef.current.set(lote.id, marker);
-    });
-  }, [filteredLotes]);
-
-  // Highlight pin on card hover
-  useEffect(() => {
-    markersRef.current.forEach((marker, id) => {
-      const el = marker.getElement();
-      if (id === hoveredLoteId) {
-        el.style.transform = "scale(1.6)";
-        el.style.zIndex = "10";
-      } else {
-        el.style.transform = "scale(1)";
-        el.style.zIndex = "1";
-      }
-    });
-  }, [hoveredLoteId]);
+  const mapOptions = useMemo(() => ({
+    mapTypeId: "hybrid" as google.maps.MapTypeId,
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+  }), []);
 
   const handleApplyFilters = useCallback((newFilters: Filters) => {
     setFilters(newFilters);
