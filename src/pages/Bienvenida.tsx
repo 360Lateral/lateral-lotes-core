@@ -80,6 +80,8 @@ const Bienvenida = () => {
         navigate("/dashboard/owner", { replace: true });
       } else if (userType === "developer") {
         navigate("/dashboard/developer", { replace: true });
+      } else if (userType === "comisionista") {
+        navigate("/dashboard/owner", { replace: true });
       } else {
         navigate("/lotes", { replace: true });
       }
