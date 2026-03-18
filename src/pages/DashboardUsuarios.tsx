@@ -61,6 +61,7 @@ const DashboardUsuarios = () => {
   const { roles: myRoles } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("todos");
 
   // Unified edit dialog state
   const [editOpen, setEditOpen] = useState(false);
@@ -128,9 +129,37 @@ const DashboardUsuarios = () => {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const { data: lotesDelUsuario = [] } = useQuery({
+    queryKey: ["user-lotes", editUser?.id],
+    enabled: !!editUser && (editUser.user_type === "dueno" || editUser.user_type === "comisionista"),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("lotes")
+        .select("id, nombre_lote, ciudad, estado_disponibilidad, es_publico, has_resolutoria")
+        .eq("owner_id", editUser!.id)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const toggleLoteVisibility = async (loteId: string, esPublico: boolean) => {
+    const { error } = await supabase
+      .from("lotes")
+      .update({ es_publico: !esPublico })
+      .eq("id", loteId);
+    if (error) {
+      toast.error("Error al cambiar visibilidad");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["user-lotes", editUser?.id] });
+      toast.success(esPublico ? "Lote ocultado" : "Lote publicado");
+    }
+  };
+
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
-    return !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
+    const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
+    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "asesor"].includes(r)));
+    return matchSearch && matchType;
   });
 
   const openEditDialog = (user: UserRecord) => {
@@ -191,9 +220,22 @@ const DashboardUsuarios = () => {
             <h1 className="font-heading text-xl font-bold text-foreground">Gestión de Usuarios</h1>
             <p className="text-sm text-muted-foreground">{users.length} usuarios registrados</p>
           </div>
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar por nombre, email o rol..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <div className="flex gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-72">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Buscar por nombre, email o rol..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+            </div>
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="dueno">Dueños de lote</SelectItem>
+                <SelectItem value="comisionista">Comisionistas</SelectItem>
+                <SelectItem value="developer">Desarrolladores</SelectItem>
+                <SelectItem value="inversor">Inversionistas</SelectItem>
+                <SelectItem value="admin">Administradores</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -246,6 +288,11 @@ const DashboardUsuarios = () => {
                                     : "Sin documento"}
                                 </Badge>
                               </div>
+                            )}
+                            {(u.user_type === "dueno" || u.user_type === "comisionista") && (
+                              <p className="text-[10px] text-muted-foreground mt-0.5">
+                                {u.owner_ids?.length ?? 0} lotes asociados
+                              </p>
                             )}
                           </TableCell>
                           <TableCell>
@@ -377,6 +424,39 @@ const DashboardUsuarios = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Lotes del propietario */}
+              {(currentEditUser?.user_type === "dueno" || currentEditUser?.user_type === "comisionista") && (
+                <div className="space-y-2">
+                  <Label>Lotes del propietario ({lotesDelUsuario.length})</Label>
+                  {lotesDelUsuario.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Este usuario no tiene lotes publicados.</p>
+                  ) : (
+                    <div className="max-h-48 overflow-y-auto space-y-2">
+                      {lotesDelUsuario.map((lote) => (
+                        <div key={lote.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-foreground">{lote.nombre_lote}</p>
+                            <p className="text-xs text-muted-foreground">{lote.ciudad} · {lote.estado_disponibilidad}</p>
+                          </div>
+                          <div className="flex items-center gap-2 ml-2">
+                            {lote.has_resolutoria && (
+                              <Badge variant="default" className="text-[10px]">360°</Badge>
+                            )}
+                            <Badge
+                              variant={lote.es_publico ? "default" : "secondary"}
+                              className="text-[10px] cursor-pointer"
+                              onClick={() => toggleLoteVisibility(lote.id, lote.es_publico)}
+                            >
+                              {lote.es_publico ? "Público" : "Privado"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
