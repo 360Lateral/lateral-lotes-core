@@ -98,7 +98,7 @@ const DashboardLayout = ({ children }: Props) => {
     return location.pathname.startsWith(href);
   };
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex items-center px-5 py-5">
@@ -158,7 +158,7 @@ const DashboardLayout = ({ children }: Props) => {
       {/* Desktop sidebar */}
       {!isMobile && (
         <aside className="hidden w-[220px] shrink-0 bg-secondary md:flex md:flex-col">
-          <SidebarContent />
+          {sidebarContent}
         </aside>
       )}
 
@@ -170,7 +170,7 @@ const DashboardLayout = ({ children }: Props) => {
             onClick={() => setMobileOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 z-50 w-[220px] bg-secondary">
-            <SidebarContent />
+            {sidebarContent}
           </aside>
         </>
       )}
