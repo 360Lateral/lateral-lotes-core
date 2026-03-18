@@ -18,7 +18,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const estadoVariant = (e: string) => {
@@ -91,26 +98,26 @@ const DashboardLotes = () => {
     <DashboardLayout>
       <div className="mb-4 flex items-center justify-between gap-4">
         <h1 className="font-body text-xl font-bold text-foreground">Lotes</h1>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/dashboard/lotes/importar">
-              <Upload className="mr-1 h-4 w-4" /> Importar Excel
-            </Link>
-          </Button>
-          <Button variant="default" size="sm" asChild>
-            <Link to="/dashboard/lotes/nuevo">
-              <Plus className="mr-1 h-4 w-4" /> Nuevo lote
-            </Link>
-          </Button>
-        </div>
+        <Button variant="default" size="sm" asChild>
+          <Link to="/dashboard/lotes/nuevo">
+            <Plus className="mr-1 h-4 w-4" /> Nuevo lote
+          </Link>
+        </Button>
       </div>
 
-      <Input
-        placeholder="Buscar por nombre o barrio…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 max-w-sm"
-      />
+      <div className="mb-4 flex items-center gap-2">
+        <Input
+          placeholder="Buscar por nombre o barrio…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
+        <Button variant="ghost" size="sm" asChild title="Importar Excel">
+          <Link to="/dashboard/lotes/importar">
+            <Upload className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
 
       <Card>
         <CardContent className="overflow-x-auto p-0">
@@ -124,7 +131,7 @@ const DashboardLotes = () => {
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Público</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Dest.</th>
-                <th className="px-4 py-3 font-semibold text-foreground">Acciones</th>
+                <th className="px-4 py-3 font-semibold text-foreground w-10"></th>
               </tr>
             </thead>
             <tbody>
@@ -153,27 +160,42 @@ const DashboardLotes = () => {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Link to={`/dashboard/lotes/${l.id}/editar`} title="Editar">
-                        <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                      </Link>
-                      <Link to={`/dashboard/lotes/${l.id}/docs`} title="Documentos">
-                        <FolderOpen className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                      </Link>
-                      <Link to={`/dashboard/lotes/${l.id}/analisis`} title="Análisis 360°">
-                        <BarChart3 className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                      </Link>
-                      <Link to={`/lotes/${l.id}`} target="_blank" title="Ver ficha">
-                        <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                      </Link>
-                      <button
-                        type="button"
-                        title="Eliminar"
-                        onClick={() => { setDeleteId(l.id); setDeleteName(l.nombre_lote); }}
-                      >
-                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link to={`/dashboard/lotes/${l.id}/editar`} className="flex items-center gap-2">
+                            <Pencil className="h-4 w-4" /> Editar
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={`/dashboard/lotes/${l.id}/docs`} className="flex items-center gap-2">
+                            <FolderOpen className="h-4 w-4" /> Documentos
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={`/dashboard/lotes/${l.id}/analisis`} className="flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4" /> Análisis 360°
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={`/lotes/${l.id}`} target="_blank" className="flex items-center gap-2">
+                            <Eye className="h-4 w-4" /> Ver ficha
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => { setDeleteId(l.id); setDeleteName(l.nombre_lote); }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               ))}

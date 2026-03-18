@@ -17,7 +17,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ShieldPlus, ShieldMinus, Users, Pencil, X } from "lucide-react";
+import { Loader2, Search, ShieldPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 
 const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
@@ -61,16 +61,13 @@ const DashboardUsuarios = () => {
   const { roles: myRoles } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [dialogAction, setDialogAction] = useState<"grant" | "revoke">("grant");
 
-  // Edit user dialog state
+  // Unified edit dialog state
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState<UserRecord | null>(null);
   const [editUserType, setEditUserType] = useState("");
   const [selectedOwnerId, setSelectedOwnerId] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
 
   const isSuperAdmin = myRoles.includes("super_admin");
 
@@ -83,10 +80,9 @@ const DashboardUsuarios = () => {
     },
   });
 
-  // Get list of owners for association
   const owners = users.filter((u) => u.user_type === "dueno");
 
-  const mutation = useMutation({
+  const roleMutation = useMutation({
     mutationFn: async ({ user_id, role, action }: { user_id: string; role: string; action: "grant" | "revoke" }) => {
       const { data, error } = await supabase.functions.invoke("manage-user-role", {
         body: { user_id, role, action },
@@ -95,10 +91,9 @@ const DashboardUsuarios = () => {
       if (data?.error) throw new Error(data.error);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      toast.success(dialogAction === "grant" ? "Rol otorgado correctamente" : "Rol removido correctamente");
-      setDialogOpen(false);
+      toast.success(vars.action === "grant" ? "Rol otorgado" : "Rol removido");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -138,27 +133,28 @@ const DashboardUsuarios = () => {
     return !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
   });
 
-  const openGrantDialog = (user: UserRecord) => {
-    setSelectedUser(user); setDialogAction("grant"); setSelectedRole(""); setDialogOpen(true);
-  };
-  const openRevokeDialog = (user: UserRecord, role: string) => {
-    setSelectedUser(user); setDialogAction("revoke"); setSelectedRole(role); setDialogOpen(true);
-  };
-  const handleConfirm = () => {
-    if (!selectedUser || !selectedRole) return;
-    mutation.mutate({ user_id: selectedUser.id, role: selectedRole, action: dialogAction });
-  };
-
   const openEditDialog = (user: UserRecord) => {
     setEditUser(user);
     setEditUserType(user.user_type ?? "");
     setSelectedOwnerId("");
+    setSelectedRole("");
     setEditOpen(true);
   };
 
   const handleSaveUserType = () => {
     if (!editUser || !editUserType) return;
     updateTypeMutation.mutate({ user_id: editUser.id, user_type: editUserType });
+  };
+
+  const handleGrantRole = () => {
+    if (!editUser || !selectedRole) return;
+    roleMutation.mutate({ user_id: editUser.id, role: selectedRole, action: "grant" });
+    setSelectedRole("");
+  };
+
+  const handleRevokeRole = (role: string) => {
+    if (!editUser) return;
+    roleMutation.mutate({ user_id: editUser.id, role, action: "revoke" });
   };
 
   const handleAddOwner = () => {
@@ -185,7 +181,6 @@ const DashboardUsuarios = () => {
     return owner?.full_name || owner?.email || ownerId.slice(0, 8);
   };
 
-  // Refresh editUser data when users list changes
   const currentEditUser = editUser ? users.find((u) => u.id === editUser.id) ?? editUser : null;
 
   return (
@@ -214,21 +209,23 @@ const DashboardUsuarios = () => {
                       <TableHead>Usuario</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Roles</TableHead>
-                      <TableHead>Dueños asoc.</TableHead>
                       <TableHead>Registro</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
+                        <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
                           <Users className="mx-auto mb-2 h-8 w-8" />No se encontraron usuarios
                         </TableCell>
                       </TableRow>
                     ) : (
                       filtered.map((u) => (
-                        <TableRow key={u.id}>
+                        <TableRow
+                          key={u.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => openEditDialog(u)}
+                        >
                           <TableCell>
                             <p className="font-medium text-foreground">{u.full_name || "Sin nombre"}</p>
                             <p className="text-xs text-muted-foreground">{u.email}</p>
@@ -257,41 +254,14 @@ const DashboardUsuarios = () => {
                                 <span className="text-xs text-muted-foreground">Sin roles</span>
                               ) : u.roles.map((r) => (
                                 <Badge key={r} variant="outline"
-                                  className={`cursor-pointer text-[10px] ${ROLE_COLORS[r] ?? ""}`}
-                                  onClick={() => openRevokeDialog(u, r)}
-                                  title={`Clic para remover rol ${ROLE_LABELS[r]}`}>
-                                  {ROLE_LABELS[r] ?? r}<ShieldMinus className="ml-1 h-3 w-3" />
+                                  className={`text-[10px] ${ROLE_COLORS[r] ?? ""}`}>
+                                  {ROLE_LABELS[r] ?? r}
                                 </Badge>
                               ))}
                             </div>
                           </TableCell>
-                          <TableCell>
-                            {u.owner_ids.length === 0 ? (
-                              <span className="text-xs text-muted-foreground">—</span>
-                            ) : (
-                              <div className="flex flex-wrap gap-1">
-                                {u.owner_ids.map((oid) => (
-                                  <Badge key={oid} variant="outline" className="text-[10px]">
-                                    {getOwnerName(oid)}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                          </TableCell>
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(u.created_at).toLocaleDateString("es-CO")}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="sm" onClick={() => openEditDialog(u)} title="Editar usuario">
-                                <Pencil className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                              {availableRolesToGrant(u).length > 0 && (
-                                <Button variant="ghost" size="sm" onClick={() => openGrantDialog(u)} title="Otorgar rol">
-                                  <ShieldPlus className="h-4 w-4 text-primary" />
-                                </Button>
-                              )}
-                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -303,39 +273,7 @@ const DashboardUsuarios = () => {
           </Card>
         )}
 
-        {/* Grant/Revoke role dialog */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{dialogAction === "grant" ? "Otorgar rol" : "Remover rol"}</DialogTitle>
-              <DialogDescription>
-                {dialogAction === "grant"
-                  ? `Selecciona el rol que deseas otorgar a ${selectedUser?.full_name || selectedUser?.email}`
-                  : `¿Estás seguro de remover el rol "${ROLE_LABELS[selectedRole]}" de ${selectedUser?.full_name || selectedUser?.email}?`}
-              </DialogDescription>
-            </DialogHeader>
-            {dialogAction === "grant" && (
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger><SelectValue placeholder="Seleccionar rol" /></SelectTrigger>
-                <SelectContent>
-                  {selectedUser && availableRolesToGrant(selectedUser).map((r) => (
-                    <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleConfirm} disabled={!selectedRole || mutation.isPending}
-                variant={dialogAction === "revoke" ? "destructive" : "default"}>
-                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {dialogAction === "grant" ? "Otorgar" : "Remover"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit user dialog */}
+        {/* Unified edit dialog: user type + roles + owner associations */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -345,7 +283,8 @@ const DashboardUsuarios = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
+              {/* User type */}
               <div className="space-y-2">
                 <Label>Tipo de usuario</Label>
                 <div className="flex gap-2">
@@ -364,6 +303,41 @@ const DashboardUsuarios = () => {
                 </div>
               </div>
 
+              {/* Roles */}
+              <div className="space-y-2">
+                <Label>Roles</Label>
+                {currentEditUser && currentEditUser.roles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {currentEditUser.roles.map((r) => (
+                      <Badge key={r} variant="outline" className={`gap-1 ${ROLE_COLORS[r] ?? ""}`}>
+                        {ROLE_LABELS[r] ?? r}
+                        <button type="button" onClick={() => handleRevokeRole(r)}
+                          className="ml-1 rounded-full hover:bg-destructive/20">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {currentEditUser && availableRolesToGrant(currentEditUser).length > 0 && (
+                  <div className="flex gap-2">
+                    <Select value={selectedRole} onValueChange={setSelectedRole}>
+                      <SelectTrigger className="flex-1"><SelectValue placeholder="Agregar rol" /></SelectTrigger>
+                      <SelectContent>
+                        {availableRolesToGrant(currentEditUser).map((r) => (
+                          <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button size="sm" onClick={handleGrantRole}
+                      disabled={!selectedRole || roleMutation.isPending}>
+                      {roleMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldPlus className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Owner associations */}
               <div className="space-y-2">
                 <Label>Dueños asociados</Label>
                 <p className="text-xs text-muted-foreground">

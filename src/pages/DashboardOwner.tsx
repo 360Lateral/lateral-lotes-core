@@ -18,7 +18,6 @@ const DashboardOwner = () => {
   const [uploading, setUploading] = useState(false);
   const isComisionista = userType === "comisionista";
 
-  // Comisionista doc status
   const { data: comDoc } = useQuery({
     queryKey: ["comisionista-doc", user?.id],
     enabled: !!user && isComisionista,
@@ -118,40 +117,21 @@ const DashboardOwner = () => {
   const comDocPending = comDoc?.estado === "pendiente";
   const comDocRejected = comDoc?.estado === "rechazado";
   const comDocMissing = !comDoc;
-
-  // Comisionista cannot publish until doc is approved
   const canPublish = !isComisionista || comDocApproved;
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="font-heading text-xl font-bold text-foreground">Mi Panel</h1>
-            <p className="text-sm text-muted-foreground">
-              {isComisionista
-                ? "Gestiona los lotes que representas"
-                : "Gestiona tus lotes y diagnósticos"}
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => navigate("/dashboard/lotes/nuevo")}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={!canPublish}
-              title={!canPublish ? "Debes tener tu documento de autorización aprobado" : ""}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Publicar lote
-            </Button>
-            <Button variant="outline" onClick={() => navigate("/diagnostico")}>
-              <FileSearch className="mr-2 h-4 w-4" />
-              Solicitar diagnóstico
-            </Button>
-          </div>
+        <div>
+          <h1 className="font-heading text-xl font-bold text-foreground">Mi Panel</h1>
+          <p className="text-sm text-muted-foreground">
+            {isComisionista
+              ? "Gestiona los lotes que representas"
+              : "Gestiona tus lotes y diagnósticos"}
+          </p>
         </div>
 
-        {/* Comisionista doc alert */}
+        {/* Comisionista doc alerts */}
         {isComisionista && (comDocMissing || comDocRejected) && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
@@ -214,7 +194,17 @@ const DashboardOwner = () => {
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {/* Action card: Publicar lote */}
+            <Card
+              className={`cursor-pointer border-dashed border-primary/30 hover:shadow-md transition-shadow ${!canPublish ? "opacity-50 pointer-events-none" : ""}`}
+              onClick={() => canPublish && navigate("/dashboard/lotes/nuevo")}
+            >
+              <CardContent className="pt-6 text-center">
+                <Plus className="mx-auto mb-2 h-5 w-5 text-primary" />
+                <p className="text-sm font-semibold text-primary">Publicar lote</p>
+              </CardContent>
+            </Card>
             <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/dashboard/owner/lotes")}>
               <CardContent className="pt-6 text-center">
                 <MapPin className="mx-auto mb-2 h-5 w-5 text-primary" />

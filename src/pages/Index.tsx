@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
+import { LayoutDashboard, Search, MapPin, FileCheck, Handshake, User } from "lucide-react";
 
 const Index = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
@@ -56,7 +56,6 @@ const Index = () => {
   const renderHero = () => {
     if (authLoading) return null;
 
-    // Profile badge component for logged-in users
     const ProfileBadge = () => (
       <div className="mb-4 flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-4 py-1.5">
         <User className="h-4 w-4 text-primary" />
@@ -65,7 +64,7 @@ const Index = () => {
       </div>
     );
 
-    // Logged-in owner
+    // Logged-in owner — 1 primary CTA only
     if (user && isDueno) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
@@ -74,37 +73,21 @@ const Index = () => {
             Bienvenido a tu panel de lotes
           </h1>
           <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
-            Desde aquí puedes publicar nuevos terrenos, ver el estado de tus lotes actuales, solicitar diagnósticos y dar seguimiento a tus negociaciones.
+            Publica terrenos, consulta diagnósticos y da seguimiento a tus negociaciones desde tu panel.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
               <Link to="/dashboard/owner">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
                 Ir a Mi Panel
               </Link>
             </Button>
-            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-              <Link to="/dashboard/owner/lotes">
-                <MapPin className="mr-2 h-5 w-5" />
-                Ver mis lotes
-              </Link>
-            </Button>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-secondary-foreground/50">
-            <Link to="/dashboard/lotes/nuevo" className="flex items-center gap-1.5 font-body text-sm hover:text-secondary-foreground transition-colors">
-              <Plus className="h-4 w-4" />
-              Publicar nuevo lote
-            </Link>
-            <Link to="/diagnostico" className="flex items-center gap-1.5 font-body text-sm hover:text-secondary-foreground transition-colors">
-              <FileCheck className="h-4 w-4" />
-              Solicitar diagnóstico
-            </Link>
           </div>
         </section>
       );
     }
 
-    // Logged-in developer
+    // Logged-in developer — 1 primary CTA
     if (user && isDeveloper) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
@@ -113,19 +96,13 @@ const Index = () => {
             Encuentra tu próximo terreno
           </h1>
           <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
-            Explora lotes verificados con información técnica, normativa y financiera completa para tomar decisiones informadas.
+            Explora lotes verificados con información técnica, normativa y financiera completa.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
               <Link to="/lotes">
                 <Search className="mr-2 h-5 w-5" />
                 Explorar catálogo
-              </Link>
-            </Button>
-            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-              <Link to="/dashboard/developer">
-                <LayoutDashboard className="mr-2 h-5 w-5" />
-                Mi dashboard
               </Link>
             </Button>
           </div>
@@ -156,7 +133,7 @@ const Index = () => {
       );
     }
 
-    // Logged-in but no specific type matched — generic fallback
+    // Logged-in generic fallback — 1 CTA
     if (user) {
       return (
         <section className="flex min-h-[400px] flex-col items-center justify-center bg-secondary px-4 text-center">
@@ -167,17 +144,11 @@ const Index = () => {
           <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
             Gestiona tus lotes o explora oportunidades de inversión en terrenos.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
               <Link to="/lotes">
                 <Search className="mr-2 h-5 w-5" />
                 Explorar lotes
-              </Link>
-            </Button>
-            <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-              <Link to="/diagnostico">
-                <FileCheck className="mr-2 h-5 w-5" />
-                Solicitar diagnóstico
               </Link>
             </Button>
           </div>
@@ -194,16 +165,13 @@ const Index = () => {
         <p className="mt-4 max-w-xl font-body text-base text-secondary-foreground/70 md:text-lg">
           Conectamos tierra con su mejor destino: venta, desarrollo o viabilización. Con información técnica, normativa y financiera completa.
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8">
           <Button variant="hero" size="xl" asChild>
             <Link to="/bienvenida">Comenzar ahora</Link>
           </Button>
-          <Button variant="outline" size="xl" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10" asChild>
-            <Link to="/login">Iniciar sesión</Link>
-          </Button>
         </div>
-        <Link to="/diagnostico" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
-          ¿Tienes un lote? Descubre su valor gratis →
+        <Link to="/login" className="mt-4 font-body text-sm text-secondary-foreground/60 hover:text-secondary-foreground transition-colors">
+          ¿Ya tienes cuenta? Iniciar sesión →
         </Link>
       </section>
     );

@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -13,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Handshake } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const estadoLabel = (e: string) => {
@@ -26,19 +24,10 @@ const estadoLabel = (e: string) => {
   }
 };
 
-const estadoBadge = (e: string) => {
-  switch (e) {
-    case "activa": return "disponible" as const;
-    case "en_revision": return "reservado" as const;
-    case "cerrada": return "vendido" as const;
-    case "concretada": return "disponible" as const;
-    default: return "default" as const;
-  }
-};
-
 const DashboardNegociaciones = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: negociaciones = [], isLoading } = useQuery({
     queryKey: ["admin-negociaciones"],
@@ -52,7 +41,6 @@ const DashboardNegociaciones = () => {
     },
   });
 
-  // Fetch all relevant perfiles
   const allUserIds = [...new Set(negociaciones.flatMap((n: any) => [n.developer_id, n.owner_id].filter(Boolean)))];
   const { data: perfiles = [] } = useQuery({
     queryKey: ["neg-perfiles", allUserIds.join(",")],
@@ -104,17 +92,20 @@ const DashboardNegociaciones = () => {
                 <th className="pb-2">Fecha</th>
                 <th className="pb-2">Estado</th>
                 <th className="pb-2">Contacto</th>
-                <th className="pb-2"></th>
               </tr>
             </thead>
             <tbody>
               {negociaciones.map((n: any) => (
-                <tr key={n.id} className="border-b border-border last:border-0">
+                <tr
+                  key={n.id}
+                  className="border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => navigate(`/negociacion/${n.id}`)}
+                >
                   <td className="py-3 text-foreground font-medium">{(n.lotes as any)?.nombre_lote ?? "—"}</td>
                   <td className="py-3 text-muted-foreground">{getName(n.developer_id)}</td>
                   <td className="py-3 text-muted-foreground">{getName(n.owner_id)}</td>
                   <td className="py-3 text-xs text-muted-foreground">{new Date(n.created_at).toLocaleDateString("es-CO")}</td>
-                  <td className="py-3">
+                  <td className="py-3" onClick={(e) => e.stopPropagation()}>
                     <Select
                       value={n.estado}
                       onValueChange={(val) => updateNeg.mutate({ negId: n.id, updates: { estado: val } })}
@@ -130,16 +121,11 @@ const DashboardNegociaciones = () => {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="py-3">
+                  <td className="py-3" onClick={(e) => e.stopPropagation()}>
                     <Switch
                       checked={n.contacto_visible}
                       onCheckedChange={(val) => updateNeg.mutate({ negId: n.id, updates: { contacto_visible: val } })}
                     />
-                  </td>
-                  <td className="py-3">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to={`/negociacion/${n.id}`}>Ver sala</Link>
-                    </Button>
                   </td>
                 </tr>
               ))}
