@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import HeroImage from "@/components/ui/HeroImage";
 import {
   FileText,
   Scale,
@@ -13,6 +14,8 @@ import {
   Calculator,
   CheckCircle2,
 } from "lucide-react";
+
+const RESOLUTORIA_IMG = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1600&q=85";
 
 const areas = [
   { icon: FileText, nombre: "Normativo", entregable: "FCN + Ficha Resumen" },
