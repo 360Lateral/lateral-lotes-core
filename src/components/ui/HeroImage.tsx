@@ -35,6 +35,8 @@ const HeroImage = ({ imageUrl, height = "500px", overlay, children }: HeroImageP
         src={imageUrl}
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover animate-ken-burns"
       />
 
