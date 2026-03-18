@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import HeroImage from "@/components/ui/HeroImage";
 import {
   Select,
   SelectContent,
@@ -16,6 +17,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const DIAGNOSTICO_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85";
 
 type TipoLote = "Urbano" | "Rural" | "Expansión urbana";
 
