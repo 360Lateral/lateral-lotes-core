@@ -5,14 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
     await signOut();
+    toast({ title: "Sesión cerrada", description: "Has cerrado sesión correctamente." });
     navigate("/", { replace: true });
   };
 
