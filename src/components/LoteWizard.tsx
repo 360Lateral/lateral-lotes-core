@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, useCallback } from "react";
+import { useState, useMemo, ChangeEvent, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
@@ -32,6 +32,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { calculateLoteScore } from "@/lib/loteScore";
+import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import LoteScoreResult from "@/components/LoteScoreResult";
 
 
@@ -573,22 +575,33 @@ const LoteWizard = () => {
                 <Label className="text-xs">
                   Departamento <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  className={errClass("departamento")}
+                <SearchableSelect
+                  options={DEPARTAMENTO_NOMBRES}
                   value={form.departamento}
-                  onChange={(e) => update("departamento", e.target.value)}
-                  placeholder="Ej: Antioquia"
+                  onValueChange={(v) => {
+                    update("departamento", v);
+                    // Reset ciudad when departamento changes
+                    if (v !== form.departamento) update("ciudad", "");
+                  }}
+                  placeholder="Seleccionar departamento"
+                  searchPlaceholder="Buscar departamento..."
+                  emptyText="Departamento no encontrado."
+                  className={errClass("departamento")}
                 />
               </div>
               <div>
                 <Label className="text-xs">
                   Municipio <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  className={errClass("ciudad")}
+                <SearchableSelect
+                  options={getMunicipios(form.departamento)}
                   value={form.ciudad}
-                  onChange={(e) => update("ciudad", e.target.value)}
-                  placeholder="Ej: Medellín"
+                  onValueChange={(v) => update("ciudad", v)}
+                  placeholder="Seleccionar municipio"
+                  searchPlaceholder="Buscar municipio..."
+                  emptyText="Municipio no encontrado."
+                  className={errClass("ciudad")}
+                  disabled={!form.departamento}
                 />
               </div>
             </div>
