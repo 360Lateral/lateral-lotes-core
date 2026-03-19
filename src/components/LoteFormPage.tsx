@@ -25,13 +25,6 @@ import { Link } from "react-router-dom";
 
 
 
-const SERVICIOS_DEFAULT = [
-  { tipo: "Agua", estado: "Disponible", operador: "" },
-  { tipo: "Energía", estado: "Disponible", operador: "" },
-  { tipo: "Gas", estado: "Disponible", operador: "" },
-  { tipo: "Alcantarillado", estado: "Disponible", operador: "" },
-  { tipo: "Internet", estado: "Disponible", operador: "" },
-];
 
 interface LoteForm {
   nombre_lote: string;
