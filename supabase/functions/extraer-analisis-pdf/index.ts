@@ -156,12 +156,12 @@ serve(async (req) => {
 
     // Step 1: Download PDF from Google Drive
     const fileId =
-      pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] ||
+      pdf_url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] ||
       pdf_url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] ||
-      (/^[a-zA-Z0-9_-]{20,}$/.test(pdf_url.trim()) ? pdf_url.trim() : null);
+      pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
     if (!fileId) {
       return new Response(
-        JSON.stringify({ success: false, error: `No se pudo extraer el ID del archivo de Google Drive. URL recibida: ${pdf_url}` }),
+        JSON.stringify({ success: false, error: "No se pudo extraer el ID del archivo. Verifica que el link sea de Google Drive." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

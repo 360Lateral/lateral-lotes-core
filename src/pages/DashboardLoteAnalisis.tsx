@@ -109,13 +109,13 @@ const PdfExtractPanel = ({ pdfProps }: { pdfProps: PdfProps }) => {
       <p className="text-[10px] text-orange-600">
         El PDF debe estar compartido como "Cualquiera con el enlace puede ver"
       </p>
+      <Input
+        value={pdfProps.pdfUrl}
+        onChange={(e) => pdfProps.setPdfUrl(e.target.value)}
+        placeholder="https://drive.google.com/file/d/..."
+        className="text-xs w-full"
+      />
       <div className="flex gap-2">
-        <Input
-          value={pdfProps.pdfUrl}
-          onChange={(e) => pdfProps.setPdfUrl(e.target.value)}
-          placeholder="https://drive.google.com/file/d/..."
-          className="text-xs flex-1"
-        />
         <Button
           size="sm"
           onClick={() => pdfProps.extraerDesdePdf(pdfProps.areaKey)}
@@ -123,8 +123,16 @@ const PdfExtractPanel = ({ pdfProps }: { pdfProps: PdfProps }) => {
           className="bg-orange-500 hover:bg-orange-600 text-white"
         >
           {pdfProps.extrayendo === pdfProps.areaKey ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : "Extraer"}
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Extrayendo...
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Extraer con IA
+            </>
+          )}
         </Button>
         <Button
           size="sm"
@@ -134,7 +142,7 @@ const PdfExtractPanel = ({ pdfProps }: { pdfProps: PdfProps }) => {
             pdfProps.setPdfUrl("");
           }}
         >
-          <X className="h-4 w-4" />
+          Cancelar
         </Button>
       </div>
     </div>
