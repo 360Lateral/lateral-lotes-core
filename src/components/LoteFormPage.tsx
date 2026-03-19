@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+
 import {
   Select,
   SelectContent,
@@ -45,8 +45,6 @@ interface LoteForm {
   lat: string;
   lng: string;
   area_total_m2: string;
-  frente_ml: string;
-  fondo_ml: string;
   matricula_inmobiliaria: string;
   notas: string;
   // Normativa
@@ -85,8 +83,6 @@ const emptyForm: LoteForm = {
   lat: "",
   lng: "",
   area_total_m2: "",
-  frente_ml: "",
-  fondo_ml: "",
   matricula_inmobiliaria: "",
   notas: "",
   uso_principal: "",
@@ -210,8 +206,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       lat: existingLote.lat != null ? String(existingLote.lat) : "",
       lng: existingLote.lng != null ? String(existingLote.lng) : "",
       area_total_m2: existingLote.area_total_m2 != null ? String(existingLote.area_total_m2) : "",
-      frente_ml: existingLote.frente_ml != null ? String(existingLote.frente_ml) : "",
-      fondo_ml: existingLote.fondo_ml != null ? String(existingLote.fondo_ml) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
       score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
@@ -328,8 +322,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         lat: form.lat ? parseFloat(form.lat) : null,
         lng: form.lng ? parseFloat(form.lng) : null,
         area_total_m2: form.area_total_m2 ? parseFloat(form.area_total_m2) : null,
-        frente_ml: form.frente_ml ? parseFloat(form.frente_ml) : null,
-        fondo_ml: form.fondo_ml ? parseFloat(form.fondo_ml) : null,
         matricula_inmobiliaria: form.matricula_inmobiliaria || null,
         notas: form.notas || null,
         score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
@@ -555,18 +547,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         {/* Dimensiones */}
         <Card>
           <CardHeader><CardTitle className="text-base">Dimensiones</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Área m²</Label>
               <Input type="number" value={form.area_total_m2} onChange={(e) => update("area_total_m2", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Frente ml</Label>
-              <Input type="number" value={form.frente_ml} onChange={(e) => update("frente_ml", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Fondo ml</Label>
-              <Input type="number" value={form.fondo_ml} onChange={(e) => update("fondo_ml", e.target.value)} />
             </div>
             <div>
               <Label className="text-xs">Matrícula</Label>
@@ -677,7 +661,12 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
         {/* Precio */}
         <Card>
-          <CardHeader><CardTitle className="text-base">Precio</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Precio del propietario</CardTitle></CardHeader>
+          <CardContent className="!pt-0">
+            <p className="text-xs text-muted-foreground -mt-2 mb-2">
+              Precio solicitado por el propietario. El valor real del lote se determina en el Análisis Financiero 360°.
+            </p>
+          </CardContent>
           <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Precio total COP</Label>
