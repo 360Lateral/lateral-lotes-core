@@ -146,17 +146,15 @@ serve(async (req) => {
       );
     }
 
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ success: false, error: "ANTHROPIC_API_KEY no está configurada" }),
+        JSON.stringify({ success: false, error: "LOVABLE_API_KEY no está configurada" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     // Step 1: Download PDF from Google Drive
-    // Support multiple Google Drive URL formats:
-    // /file/d/FILE_ID/..., open?id=FILE_ID, uc?id=FILE_ID, or raw FILE_ID
     const fileId =
       pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] ||
       pdf_url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] ||
@@ -198,28 +196,33 @@ serve(async (req) => {
       );
     }
 
-    // Step 3: Call Claude API with PDF
-    const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
+    // Step 3: Call Lovable AI Gateway with PDF content as base64 text
+    // Lovable AI Gateway uses OpenAI-compatible API format
+    const userContent = `Aquí está el contenido del PDF en base64 (decodifícalo mentalmente para analizar el documento):
+
+[PDF_BASE64_START]
+${pdfBase64}
+[PDF_BASE64_END]
+
+Extrae los datos de este informe ${area} para el lote: ${JSON.stringify(lote_context)}. Responde SOLO con el JSON, sin texto adicional, sin bloques de código.`;
+
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1500,
-        system: systemPrompt,
+        model: "google/gemini-2.5-flash",
         messages: [
+          { role: "system", content: systemPrompt },
           {
             role: "user",
             content: [
               {
-                type: "document",
-                source: {
-                  type: "base64",
-                  media_type: "application/pdf",
-                  data: pdfBase64,
+                type: "image_url",
+                image_url: {
+                  url: `data:application/pdf;base64,${pdfBase64}`,
                 },
               },
               {
@@ -229,24 +232,36 @@ serve(async (req) => {
             ],
           },
         ],
+        max_tokens: 1500,
       }),
     });
 
-    if (!claudeResponse.ok) {
-      const errorText = await claudeResponse.text();
-      console.error("Claude API error:", claudeResponse.status, errorText);
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error("Lovable AI Gateway error:", aiResponse.status, errorText);
+      
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Límite de solicitudes excedido. Por favor intenta de nuevo en unos segundos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Créditos de IA agotados. Recarga créditos en la configuración del workspace." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ success: false, error: `Error de Claude API [${claudeResponse.status}]: ${errorText}` }),
+        JSON.stringify({ success: false, error: `Error de IA [${aiResponse.status}]: ${errorText}` }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const result = await claudeResponse.json();
+    const result = await aiResponse.json();
 
-    const rawText = result.content
-      .filter((b: any) => b.type === "text")
-      .map((b: any) => b.text)
-      .join("");
+    const rawText = result.choices?.[0]?.message?.content ?? "";
 
     const clean = rawText
       .replace(/```json/g, "")
@@ -257,9 +272,9 @@ serve(async (req) => {
     try {
       datos = JSON.parse(clean);
     } catch {
-      console.error("Failed to parse Claude response:", clean);
+      console.error("Failed to parse AI response:", clean);
       return new Response(
-        JSON.stringify({ success: false, error: "No se pudo parsear la respuesta de Claude", raw: clean }),
+        JSON.stringify({ success: false, error: "No se pudo parsear la respuesta de IA", raw: clean }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

@@ -12,39 +12,53 @@ serve(async (req) => {
   }
 
   try {
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
     }
 
     const { messages, loteContext } = await req.json();
 
     const systemPrompt = `Eres el Asistente 360°, especialista en análisis de lotes en Colombia. Responde siempre en español, de forma clara y concisa. Tienes acceso a esta información del lote: ${JSON.stringify(loteContext)}. Responde solo sobre este lote. Si te preguntan algo que no está en los datos, sugiere solicitar la Resolutoría 360° completa. No inventes información. Máximo 3 párrafos cortos por respuesta.`;
 
-    // Convert messages to Anthropic format
-    const anthropicMessages = messages.map((m: { role: string; content: string }) => ({
+    const aiMessages = messages.map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "assistant" : "user",
       content: m.content,
     }));
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...aiMessages,
+        ],
         max_tokens: 1024,
-        system: systemPrompt,
-        messages: anthropicMessages,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Anthropic API error:", response.status, errorText);
+      console.error("Lovable AI Gateway error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Límite de solicitudes excedido. Intenta de nuevo en unos segundos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Créditos de IA agotados." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ error: "Error al consultar el asistente IA" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -52,7 +66,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const respuesta = data.content?.[0]?.text ?? "No pude generar una respuesta.";
+    const respuesta = data.choices?.[0]?.message?.content ?? "No pude generar una respuesta.";
 
     return new Response(
       JSON.stringify({ respuesta }),
