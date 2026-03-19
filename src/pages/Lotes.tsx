@@ -67,7 +67,7 @@ const Lotes = () => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
-  useEffect(() => {
+  const initAutocomplete = useCallback(() => {
     const input = document.getElementById("google-places-search") as HTMLInputElement;
     if (!input || !window.google?.maps?.places) return;
     if (autocompleteRef.current) return;
@@ -92,10 +92,6 @@ const Lotes = () => {
     });
 
     autocompleteRef.current = autocomplete;
-    return () => {
-      google.maps.event.clearInstanceListeners(autocomplete);
-      autocompleteRef.current = null;
-    };
   }, []);
 
 
