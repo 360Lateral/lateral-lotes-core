@@ -644,6 +644,7 @@ const SSPPSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps 
   const upsert = useAnalisisUpsert("analisis_sspp", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("sspp", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
