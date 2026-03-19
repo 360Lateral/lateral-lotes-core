@@ -458,6 +458,7 @@ const JuridicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPr
   const upsert = useAnalisisUpsert("analisis_juridico", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("juridico", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
