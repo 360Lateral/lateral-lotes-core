@@ -16,7 +16,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   Scale, Leaf, Zap, Mountain, TrendingUp, Building2, DollarSign, FileText,
-  FileUp, Loader2, X,
+  FileUp, Loader2, Sparkles,
 } from "lucide-react";
 import ExcelAnalisisImporter from "@/components/ExcelAnalisisImporter";
 import ExcelAnalisisExporter from "@/components/ExcelAnalisisExporter";
