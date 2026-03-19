@@ -202,6 +202,9 @@ export type Database = {
           lote_id: string
           margen_bruto_pct: number | null
           observaciones: string | null
+          precio_estimado_max: number | null
+          precio_estimado_min: number | null
+          precio_estimado_promedio: number | null
           punto_equilibrio_pct: number | null
           tir_pct: number | null
           updated_at: string | null
@@ -215,6 +218,9 @@ export type Database = {
           lote_id: string
           margen_bruto_pct?: number | null
           observaciones?: string | null
+          precio_estimado_max?: number | null
+          precio_estimado_min?: number | null
+          precio_estimado_promedio?: number | null
           punto_equilibrio_pct?: number | null
           tir_pct?: number | null
           updated_at?: string | null
@@ -228,6 +234,9 @@ export type Database = {
           lote_id?: string
           margen_bruto_pct?: number | null
           observaciones?: string | null
+          precio_estimado_max?: number | null
+          precio_estimado_min?: number | null
+          precio_estimado_promedio?: number | null
           punto_equilibrio_pct?: number | null
           tir_pct?: number | null
           updated_at?: string | null
