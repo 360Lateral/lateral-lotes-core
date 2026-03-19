@@ -306,6 +306,7 @@ const NormativaSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
   const upsert = useAnalisisUpsert("normativa_urbana", loteId, qk);
   const completed = !!n;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  const { isFromPdf } = useAutoMergePdfData("normativo", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
