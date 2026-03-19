@@ -146,9 +146,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       area_total_m2: existingLote.area_total_m2 != null ? String(existingLote.area_total_m2) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
-      score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
-      score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
-      score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
       es_publico: existingLote.es_publico ?? true,
     }));
     if ((existingLote as any).foto_url) {
