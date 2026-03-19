@@ -174,7 +174,20 @@ const LoteDetalle = () => {
     },
   });
 
-  // Fetch normativa
+  // Fetch precio análisis 360°
+  const { data: precioAnalisis } = useQuery({
+    queryKey: ["precio-analisis", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("analisis_financiero")
+        .select("precio_estimado_min,precio_estimado_promedio,precio_estimado_max")
+        .eq("lote_id", id!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const { data: normativa } = useQuery({
     queryKey: ["lote-normativa", id],
     queryFn: async () => {
