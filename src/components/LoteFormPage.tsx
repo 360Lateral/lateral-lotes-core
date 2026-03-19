@@ -733,6 +733,78 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
+        {/* Análisis 360° — Estado por área */}
+        {isEdit && isAdminOrAsesor && (
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Análisis 360° — Estado por área</CardTitle>
+                <Link
+                  to={`/dashboard/lotes/${id}/analisis`}
+                  className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                  Ir al análisis completo
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { key: "normativo", label: "Normativo", icon: FileText },
+                  { key: "juridico", label: "Jurídico", icon: Scale },
+                  { key: "ambiental", label: "Ambiental", icon: Leaf },
+                  { key: "sspp", label: "SSPP", icon: Zap },
+                  { key: "geotecnico", label: "Suelos", icon: Mountain },
+                  { key: "mercado", label: "Mercado", icon: TrendingUp },
+                  { key: "arquitectonico", label: "Arquitectónico", icon: Building2 },
+                  { key: "financiero", label: "Financiero", icon: Calculator },
+                ].map(({ key, label, icon: Icon }) => {
+                  const completado = estadoAnalisis?.[key as keyof typeof estadoAnalisis] ?? false;
+                  return (
+                    <Link
+                      key={key}
+                      to={`/dashboard/lotes/${id}/analisis`}
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 transition-colors hover:bg-muted/50"
+                    >
+                      <Icon className={`h-4 w-4 shrink-0 ${completado ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium text-foreground">{label}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          {completado ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                          )}
+                          <span className={`text-[10px] ${completado ? "text-green-600" : "text-muted-foreground"}`}>
+                            {completado ? "Completado" : "Pendiente"}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              {estadoAnalisis && (
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/50 px-4 py-2.5">
+                  <span className="text-xs text-muted-foreground">Progreso del análisis</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-24 rounded-full bg-border">
+                      <div
+                        className="h-1.5 rounded-full bg-primary transition-all"
+                        style={{ width: `${(Object.values(estadoAnalisis).filter(Boolean).length / 8) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-foreground">
+                      {Object.values(estadoAnalisis).filter(Boolean).length}/8
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Actions */}
         <div className="flex gap-3">
           <Button type="submit" variant="default" size="lg" disabled={saveMutation.isPending}>
