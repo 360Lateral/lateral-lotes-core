@@ -114,8 +114,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         supabase.from("analisis_arquitectonico").select("id").eq("lote_id", id!).maybeSingle(),
         supabase.from("analisis_financiero").select("id").eq("lote_id", id!).maybeSingle(),
       ]);
+      const normativa = await supabase.from("normativa_urbana").select("id").eq("lote_id", id!).maybeSingle();
       return {
-        normativo: !!existingNormativa,
+        normativo: !!normativa.data,
         juridico: !!juridico.data,
         ambiental: !!ambiental.data,
         sspp: !!sspp.data,
