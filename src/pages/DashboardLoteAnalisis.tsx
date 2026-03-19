@@ -108,8 +108,8 @@ const PdfExtractPanel = ({ pdfProps }: { pdfProps: PdfProps }) => {
   );
 };
 
-const Sugerencia = ({ areaKey, campo, label, pdfProps, onApply }: {
-  areaKey: string; campo: string; label?: string;
+const Sugerencia = ({ areaKey, campo, pdfProps, onApply }: {
+  areaKey: string; campo: string;
   pdfProps: PdfProps; onApply: (value: any) => void;
 }) => {
   const value = pdfProps.datosExtraidos[areaKey]?.[campo];
