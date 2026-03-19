@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   Scale, Leaf, Zap, Mountain, TrendingUp, Building2, DollarSign, FileText,
@@ -33,6 +33,39 @@ interface PdfProps {
   extraerDesdePdf: (area: string) => void;
   datosExtraidos: Record<string, any>;
   setDatosExtraidos: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+}
+
+/* Auto-merge extracted PDF data into form state + track which fields came from PDF */
+function useAutoMergePdfData(
+  areaKey: string,
+  pdfProps: PdfProps,
+  setForm: React.Dispatch<React.SetStateAction<any>>,
+) {
+  const pdfFieldsRef = useRef<Set<string>>(new Set());
+  const lastMergedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const datos = pdfProps.datosExtraidos[areaKey];
+    if (!datos) return;
+    const key = JSON.stringify(datos);
+    if (key === lastMergedRef.current) return;
+    lastMergedRef.current = key;
+
+    const nonNullEntries = Object.entries(datos).filter(([, v]) => v !== null && v !== undefined);
+    if (nonNullEntries.length === 0) return;
+
+    const merged: Record<string, any> = {};
+    for (const [k, v] of nonNullEntries) {
+      merged[k] = v;
+      pdfFieldsRef.current.add(k);
+    }
+    setForm((prev: any) => ({ ...prev, ...merged }));
+  }, [areaKey, pdfProps.datosExtraidos, setForm]);
+
+  const isFromPdf = (campo: string) => pdfFieldsRef.current.has(campo);
+  const clearPdfField = (campo: string) => pdfFieldsRef.current.delete(campo);
+
+  return { isFromPdf, clearPdfField };
 }
 
 const SectionHeader = ({ icon: Icon, label, completed, open, areaKey, pdfProps }: {
@@ -245,11 +278,13 @@ const DashboardLoteAnalisis = () => {
         <div className="fixed bottom-6 right-6 z-50">
           <Button
             onClick={() => {
-              toast({ title: "Datos disponibles", description: "Aplica las sugerencias en cada sección y guarda" });
+              // Data is auto-merged by useAutoMergePdfData, just clear suggestions
+              setDatosExtraidos({});
+              toast({ title: "Datos aplicados", description: "Los datos fueron cargados en cada sección. Revisa y guarda." });
             }}
             className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg"
           >
-            {extractedCount} área(s) con datos sugeridos
+            Aplicar {extractedCount} área(s) y limpiar sugerencias
           </Button>
         </div>
       )}
@@ -273,6 +308,7 @@ const NormativaSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
   const upsert = useAnalisisUpsert("normativa_urbana", loteId, qk);
   const completed = !!n;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("normativo", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -424,6 +460,7 @@ const JuridicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPr
   const upsert = useAnalisisUpsert("analisis_juridico", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("juridico", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -509,6 +546,7 @@ const AmbientalSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
   const upsert = useAnalisisUpsert("analisis_ambiental", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("ambiental", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -608,6 +646,7 @@ const SSPPSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps 
   const upsert = useAnalisisUpsert("analisis_sspp", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("sspp", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -694,6 +733,7 @@ const SuelosSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProp
   const upsert = useAnalisisUpsert("analisis_geotecnico", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("geotecnico", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -793,6 +833,7 @@ const MercadoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPro
   const upsert = useAnalisisUpsert("analisis_mercado", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("mercado", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -881,6 +922,7 @@ const ArquitectonicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps:
   const upsert = useAnalisisUpsert("analisis_arquitectonico", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("arquitectonico", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -983,6 +1025,7 @@ const FinancieroSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: Pdf
   const upsert = useAnalisisUpsert("analisis_financiero", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("financiero", pdfProps, setForm);
 
   const area = loteData?.area_total_m2 ? Number(loteData.area_total_m2) : 0;
   const precioPromedio = form.precio_estimado_promedio ? Number(form.precio_estimado_promedio) : 0;
