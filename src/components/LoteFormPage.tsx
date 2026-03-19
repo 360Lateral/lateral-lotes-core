@@ -206,8 +206,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       lat: existingLote.lat != null ? String(existingLote.lat) : "",
       lng: existingLote.lng != null ? String(existingLote.lng) : "",
       area_total_m2: existingLote.area_total_m2 != null ? String(existingLote.area_total_m2) : "",
-      frente_ml: existingLote.frente_ml != null ? String(existingLote.frente_ml) : "",
-      fondo_ml: existingLote.fondo_ml != null ? String(existingLote.fondo_ml) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
       score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
