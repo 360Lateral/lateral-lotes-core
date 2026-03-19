@@ -91,23 +91,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     enabled: isEdit && !!id,
   });
 
-  const { data: existingNormativa } = useQuery({
-    queryKey: ["edit-normativa", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("normativa_urbana").select("*").eq("lote_id", id!).maybeSingle();
-      return data;
-    },
-    enabled: isEdit && !!id,
-  });
-
-  const { data: existingServicios } = useQuery({
-    queryKey: ["edit-servicios", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("servicios_publicos").select("*").eq("lote_id", id!);
-      return data ?? [];
-    },
-    enabled: isEdit && !!id,
-  });
 
   const { data: existingPrecio } = useQuery({
     queryKey: ["edit-precio", id],
