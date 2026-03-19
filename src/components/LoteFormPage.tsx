@@ -45,8 +45,6 @@ interface LoteForm {
   lat: string;
   lng: string;
   area_total_m2: string;
-  frente_ml: string;
-  fondo_ml: string;
   matricula_inmobiliaria: string;
   notas: string;
   // Normativa
