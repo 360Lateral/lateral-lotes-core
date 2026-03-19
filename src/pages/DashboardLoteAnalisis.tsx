@@ -831,6 +831,7 @@ const MercadoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPro
   const upsert = useAnalisisUpsert("analisis_mercado", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("mercado", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
