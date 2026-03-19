@@ -278,11 +278,13 @@ const DashboardLoteAnalisis = () => {
         <div className="fixed bottom-6 right-6 z-50">
           <Button
             onClick={() => {
-              toast({ title: "Datos disponibles", description: "Aplica las sugerencias en cada sección y guarda" });
+              // Data is auto-merged by useAutoMergePdfData, just clear suggestions
+              setDatosExtraidos({});
+              toast({ title: "Datos aplicados", description: "Los datos fueron cargados en cada sección. Revisa y guarda." });
             }}
             className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg"
           >
-            {extractedCount} área(s) con datos sugeridos
+            Aplicar {extractedCount} área(s) y limpiar sugerencias
           </Button>
         </div>
       )}
