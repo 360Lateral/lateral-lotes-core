@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
-import { List, Map as MapIcon } from "lucide-react";
+import { List, Map as MapIcon, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
