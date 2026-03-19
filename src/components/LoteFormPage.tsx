@@ -166,34 +166,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     setExistingPhotoUrl(null);
   };
 
-  useEffect(() => {
-    if (!existingNormativa) return;
-    setForm((prev) => ({
-      ...prev,
-      uso_principal: existingNormativa.uso_principal ?? "",
-      usos_compatibles: (existingNormativa.usos_compatibles ?? []).join(", "),
-      indice_construccion: existingNormativa.indice_construccion != null ? String(existingNormativa.indice_construccion) : "",
-      indice_ocupacion: existingNormativa.indice_ocupacion != null ? String(existingNormativa.indice_ocupacion) : "",
-      altura_max_pisos: existingNormativa.altura_max_pisos != null ? String(existingNormativa.altura_max_pisos) : "",
-      altura_max_metros: existingNormativa.altura_max_metros != null ? String(existingNormativa.altura_max_metros) : "",
-      aislamiento_frontal_m: existingNormativa.aislamiento_frontal_m != null ? String(existingNormativa.aislamiento_frontal_m) : "",
-      aislamiento_posterior_m: existingNormativa.aislamiento_posterior_m != null ? String(existingNormativa.aislamiento_posterior_m) : "",
-      aislamiento_lateral_m: existingNormativa.aislamiento_lateral_m != null ? String(existingNormativa.aislamiento_lateral_m) : "",
-      zona_pot: existingNormativa.zona_pot ?? "",
-      tratamiento: existingNormativa.tratamiento ?? "",
-      norma_vigente: existingNormativa.norma_vigente ?? "",
-      cesion_tipo_a_pct: existingNormativa.cesion_tipo_a_pct != null ? String(existingNormativa.cesion_tipo_a_pct) : "",
-    }));
-  }, [existingNormativa]);
-
-  useEffect(() => {
-    if (!existingServicios || existingServicios.length === 0) return;
-    const mapped = SERVICIOS_DEFAULT.map((def) => {
-      const found = existingServicios.find((s) => s.tipo === def.tipo);
-      return found ? { tipo: found.tipo, estado: found.estado, operador: found.operador ?? "" } : def;
-    });
-    setServicios(mapped);
-  }, [existingServicios]);
 
   useEffect(() => {
     if (!existingPrecio) return;
