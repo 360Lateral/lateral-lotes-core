@@ -383,11 +383,18 @@ function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
   return useMutation({
     mutationFn: async (values: Record<string, any>) => {
       const { data: existing } = await supabase.from(table as any).select("id").eq("lote_id", loteId).maybeSingle();
+      // normativa_urbana doesn't have updated_at column
+      const tablesWithUpdatedAt = ["analisis_juridico","analisis_ambiental","analisis_sspp","analisis_geotecnico","analisis_mercado","analisis_arquitectonico","analisis_financiero"];
+      const payload = tablesWithUpdatedAt.includes(table)
+        ? { ...values, updated_at: new Date().toISOString() }
+        : { ...values };
+      // Remove updated_at if it leaked into the form values for normativa_urbana
+      if (!tablesWithUpdatedAt.includes(table)) delete payload.updated_at;
       if (existing) {
-        const { error } = await supabase.from(table as any).update({ ...values, updated_at: new Date().toISOString() }).eq("id", (existing as any).id);
+        const { error } = await supabase.from(table as any).update(payload).eq("id", (existing as any).id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from(table as any).insert({ ...values, lote_id: loteId });
+        const { error } = await supabase.from(table as any).insert({ ...payload, lote_id: loteId });
         if (error) throw error;
       }
     },
