@@ -546,48 +546,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Score de viabilidad */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Score de viabilidad</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <Label className="text-xs">Score Jurídico</Label>
-              <Select value={form.score_juridico || "none"} onValueChange={(v) => update("score_juridico", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-xs">Score Normativo</Label>
-              <Select value={form.score_normativo || "none"} onValueChange={(v) => update("score_normativo", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-xs">Score Servicios</Label>
-              <Select value={form.score_servicios || "none"} onValueChange={(v) => update("score_servicios", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Análisis 360° — Estado por área */}
         {isEdit && isAdminOrAsesor && (
