@@ -35,6 +35,39 @@ interface PdfProps {
   setDatosExtraidos: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
+/* Auto-merge extracted PDF data into form state + track which fields came from PDF */
+function useAutoMergePdfData(
+  areaKey: string,
+  pdfProps: PdfProps,
+  setForm: React.Dispatch<React.SetStateAction<any>>,
+) {
+  const pdfFieldsRef = useRef<Set<string>>(new Set());
+  const lastMergedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const datos = pdfProps.datosExtraidos[areaKey];
+    if (!datos) return;
+    const key = JSON.stringify(datos);
+    if (key === lastMergedRef.current) return;
+    lastMergedRef.current = key;
+
+    const nonNullEntries = Object.entries(datos).filter(([, v]) => v !== null && v !== undefined);
+    if (nonNullEntries.length === 0) return;
+
+    const merged: Record<string, any> = {};
+    for (const [k, v] of nonNullEntries) {
+      merged[k] = v;
+      pdfFieldsRef.current.add(k);
+    }
+    setForm((prev: any) => ({ ...prev, ...merged }));
+  }, [areaKey, pdfProps.datosExtraidos, setForm]);
+
+  const isFromPdf = (campo: string) => pdfFieldsRef.current.has(campo);
+  const clearPdfField = (campo: string) => pdfFieldsRef.current.delete(campo);
+
+  return { isFromPdf, clearPdfField };
+}
+
 const SectionHeader = ({ icon: Icon, label, completed, open, areaKey, pdfProps }: {
   icon: any; label: string; completed: boolean; open: boolean;
   areaKey?: string; pdfProps?: PdfProps;
