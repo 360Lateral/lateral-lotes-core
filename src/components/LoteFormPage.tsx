@@ -83,8 +83,6 @@ const emptyForm: LoteForm = {
   lat: "",
   lng: "",
   area_total_m2: "",
-  frente_ml: "",
-  fondo_ml: "",
   matricula_inmobiliaria: "",
   notas: "",
   uso_principal: "",
