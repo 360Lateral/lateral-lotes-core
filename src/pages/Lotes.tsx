@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
-import { List, Map as MapIcon } from "lucide-react";
+import { List, Map as MapIcon, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
@@ -61,6 +61,38 @@ const Lotes = () => {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
+  const [searchText, setSearchText] = useState("");
+  const [mapCenter, setMapCenter] = useState(MEDELLIN_CENTER);
+  const [mapZoom, setMapZoom] = useState(12);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
+  const initAutocomplete = useCallback(() => {
+    const input = document.getElementById("google-places-search") as HTMLInputElement;
+    if (!input || !window.google?.maps?.places) return;
+    if (autocompleteRef.current) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: "co" },
+      fields: ["geometry", "name", "formatted_address"],
+    });
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location) return;
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setMapCenter({ lat, lng });
+      setMapZoom(15);
+      if (mapRef.current) {
+        mapRef.current.panTo({ lat, lng });
+        mapRef.current.setZoom(15);
+      }
+      setSearchText(place.formatted_address || place.name || "");
+    });
+
+    autocompleteRef.current = autocomplete;
+  }, []);
 
 
   const { data: allLotes = [], isLoading } = useQuery({
@@ -119,7 +151,34 @@ const Lotes = () => {
 
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
-        <div className={`${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
+        <div className={`relative ${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <input
+                id="google-places-search"
+                type="text"
+                placeholder="Buscar por dirección, barrio o municipio..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-full rounded-full border border-border bg-background pl-9 pr-9 py-2.5 text-sm shadow-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              {searchText && (
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setSearchText("");
+                    setMapCenter(MEDELLIN_CENTER);
+                    setMapZoom(12);
+                    const input = document.getElementById("google-places-search") as HTMLInputElement;
+                    if (input) input.value = "";
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
           <GoogleMapsGate
             fallback={
               <div className="flex h-full items-center justify-center bg-muted">
@@ -129,9 +188,10 @@ const Lotes = () => {
           >
             <GoogleMap
               mapContainerStyle={{ width: "100%", height: "100%" }}
-              center={MEDELLIN_CENTER}
-              zoom={12}
+              center={mapCenter}
+              zoom={mapZoom}
               options={mapOptions}
+              onLoad={(map) => { mapRef.current = map; initAutocomplete(); }}
             >
               {filteredLotes
                 .filter((l) => l.lat != null && l.lng != null)
