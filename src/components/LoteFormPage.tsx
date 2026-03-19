@@ -74,7 +74,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { isAdminOrAsesor } = useAuth();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
-  const [servicios, setServicios] = useState<ServicioRow[]>(SERVICIOS_DEFAULT);
+  
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
