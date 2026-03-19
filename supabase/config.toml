@@ -2,3 +2,6 @@ project_id = "xtcicjrpznawnwvjdqhe"
 
 [functions.chat-lote]
 verify_jwt = false
+
+[functions.extraer-analisis-pdf]
+verify_jwt = false
