@@ -1023,6 +1023,7 @@ const FinancieroSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: Pdf
   const upsert = useAnalisisUpsert("analisis_financiero", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("financiero", pdfProps, setForm);
 
   const area = loteData?.area_total_m2 ? Number(loteData.area_total_m2) : 0;
   const precioPromedio = form.precio_estimado_promedio ? Number(form.precio_estimado_promedio) : 0;
