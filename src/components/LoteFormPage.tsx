@@ -661,7 +661,12 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
         {/* Precio */}
         <Card>
-          <CardHeader><CardTitle className="text-base">Precio</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Precio del propietario</CardTitle></CardHeader>
+          <CardContent className="!pt-0">
+            <p className="text-xs text-muted-foreground -mt-2 mb-2">
+              Precio solicitado por el propietario. El valor real del lote se determina en el Análisis Financiero 360°.
+            </p>
+          </CardContent>
           <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Precio total COP</Label>
