@@ -25,13 +25,6 @@ import { Link } from "react-router-dom";
 
 
 
-const SERVICIOS_DEFAULT = [
-  { tipo: "Agua", estado: "Disponible", operador: "" },
-  { tipo: "Energía", estado: "Disponible", operador: "" },
-  { tipo: "Gas", estado: "Disponible", operador: "" },
-  { tipo: "Alcantarillado", estado: "Disponible", operador: "" },
-  { tipo: "Internet", estado: "Disponible", operador: "" },
-];
 
 interface LoteForm {
   nombre_lote: string;
@@ -47,27 +40,9 @@ interface LoteForm {
   area_total_m2: string;
   matricula_inmobiliaria: string;
   notas: string;
-  // Normativa
-  uso_principal: string;
-  usos_compatibles: string;
-  indice_construccion: string;
-  indice_ocupacion: string;
-  altura_max_pisos: string;
-  altura_max_metros: string;
-  aislamiento_frontal_m: string;
-  aislamiento_posterior_m: string;
-  aislamiento_lateral_m: string;
-  zona_pot: string;
-  tratamiento: string;
-  norma_vigente: string;
-  cesion_tipo_a_pct: string;
   // Precio
   precio_cop: string;
   precio_m2_cop: string;
-  // Scores
-  score_juridico: string;
-  score_normativo: string;
-  score_servicios: string;
   es_publico: boolean;
 }
 
@@ -85,32 +60,11 @@ const emptyForm: LoteForm = {
   area_total_m2: "",
   matricula_inmobiliaria: "",
   notas: "",
-  uso_principal: "",
-  usos_compatibles: "",
-  indice_construccion: "",
-  indice_ocupacion: "",
-  altura_max_pisos: "",
-  altura_max_metros: "",
-  aislamiento_frontal_m: "",
-  aislamiento_posterior_m: "",
-  aislamiento_lateral_m: "",
-  zona_pot: "",
-  tratamiento: "",
-  norma_vigente: "",
-  cesion_tipo_a_pct: "",
   precio_cop: "",
   precio_m2_cop: "",
-  score_juridico: "",
-  score_normativo: "",
-  score_servicios: "",
   es_publico: true,
 };
 
-interface ServicioRow {
-  tipo: string;
-  estado: string;
-  operador: string;
-}
 
 const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { id } = useParams<{ id: string }>();
@@ -120,7 +74,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { isAdminOrAsesor } = useAuth();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
-  const [servicios, setServicios] = useState<ServicioRow[]>(SERVICIOS_DEFAULT);
+  
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
@@ -137,23 +91,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     enabled: isEdit && !!id,
   });
 
-  const { data: existingNormativa } = useQuery({
-    queryKey: ["edit-normativa", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("normativa_urbana").select("*").eq("lote_id", id!).maybeSingle();
-      return data;
-    },
-    enabled: isEdit && !!id,
-  });
-
-  const { data: existingServicios } = useQuery({
-    queryKey: ["edit-servicios", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("servicios_publicos").select("*").eq("lote_id", id!);
-      return data ?? [];
-    },
-    enabled: isEdit && !!id,
-  });
 
   const { data: existingPrecio } = useQuery({
     queryKey: ["edit-precio", id],
@@ -177,8 +114,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         supabase.from("analisis_arquitectonico").select("id").eq("lote_id", id!).maybeSingle(),
         supabase.from("analisis_financiero").select("id").eq("lote_id", id!).maybeSingle(),
       ]);
+      const normativa = await supabase.from("normativa_urbana").select("id").eq("lote_id", id!).maybeSingle();
       return {
-        normativo: !!existingNormativa,
+        normativo: !!normativa.data,
         juridico: !!juridico.data,
         ambiental: !!ambiental.data,
         sspp: !!sspp.data,
@@ -208,9 +146,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       area_total_m2: existingLote.area_total_m2 != null ? String(existingLote.area_total_m2) : "",
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
-      score_juridico: existingLote.score_juridico != null ? String(existingLote.score_juridico) : "",
-      score_normativo: existingLote.score_normativo != null ? String(existingLote.score_normativo) : "",
-      score_servicios: existingLote.score_servicios != null ? String(existingLote.score_servicios) : "",
       es_publico: existingLote.es_publico ?? true,
     }));
     if ((existingLote as any).foto_url) {
@@ -231,34 +166,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     setExistingPhotoUrl(null);
   };
 
-  useEffect(() => {
-    if (!existingNormativa) return;
-    setForm((prev) => ({
-      ...prev,
-      uso_principal: existingNormativa.uso_principal ?? "",
-      usos_compatibles: (existingNormativa.usos_compatibles ?? []).join(", "),
-      indice_construccion: existingNormativa.indice_construccion != null ? String(existingNormativa.indice_construccion) : "",
-      indice_ocupacion: existingNormativa.indice_ocupacion != null ? String(existingNormativa.indice_ocupacion) : "",
-      altura_max_pisos: existingNormativa.altura_max_pisos != null ? String(existingNormativa.altura_max_pisos) : "",
-      altura_max_metros: existingNormativa.altura_max_metros != null ? String(existingNormativa.altura_max_metros) : "",
-      aislamiento_frontal_m: existingNormativa.aislamiento_frontal_m != null ? String(existingNormativa.aislamiento_frontal_m) : "",
-      aislamiento_posterior_m: existingNormativa.aislamiento_posterior_m != null ? String(existingNormativa.aislamiento_posterior_m) : "",
-      aislamiento_lateral_m: existingNormativa.aislamiento_lateral_m != null ? String(existingNormativa.aislamiento_lateral_m) : "",
-      zona_pot: existingNormativa.zona_pot ?? "",
-      tratamiento: existingNormativa.tratamiento ?? "",
-      norma_vigente: existingNormativa.norma_vigente ?? "",
-      cesion_tipo_a_pct: existingNormativa.cesion_tipo_a_pct != null ? String(existingNormativa.cesion_tipo_a_pct) : "",
-    }));
-  }, [existingNormativa]);
-
-  useEffect(() => {
-    if (!existingServicios || existingServicios.length === 0) return;
-    const mapped = SERVICIOS_DEFAULT.map((def) => {
-      const found = existingServicios.find((s) => s.tipo === def.tipo);
-      return found ? { tipo: found.tipo, estado: found.estado, operador: found.operador ?? "" } : def;
-    });
-    setServicios(mapped);
-  }, [existingServicios]);
 
   useEffect(() => {
     if (!existingPrecio) return;
@@ -304,8 +211,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const update = (key: keyof LoteForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const updateServicio = (idx: number, key: keyof ServicioRow, value: string) =>
-    setServicios((prev) => prev.map((s, i) => (i === idx ? { ...s, [key]: value } : s)));
 
   // Save mutation
   const saveMutation = useMutation({
@@ -324,9 +229,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         area_total_m2: form.area_total_m2 ? parseFloat(form.area_total_m2) : null,
         matricula_inmobiliaria: form.matricula_inmobiliaria || null,
         notas: form.notas || null,
-        score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
-        score_normativo: form.score_normativo ? parseInt(form.score_normativo) : null,
-        score_servicios: form.score_servicios ? parseInt(form.score_servicios) : null,
         es_publico: form.es_publico,
       };
 
@@ -354,41 +256,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         await supabase.from("lotes").update({ foto_url: null } as any).eq("id", id);
       }
 
-      // Normativa
-      const normPayload = {
-        lote_id: loteId!,
-        uso_principal: form.uso_principal || null,
-        usos_compatibles: form.usos_compatibles ? form.usos_compatibles.split(",").map((s) => s.trim()).filter(Boolean) : null,
-        indice_construccion: form.indice_construccion ? parseFloat(form.indice_construccion) : null,
-        indice_ocupacion: form.indice_ocupacion ? parseFloat(form.indice_ocupacion) : null,
-        altura_max_pisos: form.altura_max_pisos ? parseInt(form.altura_max_pisos) : null,
-        altura_max_metros: form.altura_max_metros ? parseFloat(form.altura_max_metros) : null,
-        aislamiento_frontal_m: form.aislamiento_frontal_m ? parseFloat(form.aislamiento_frontal_m) : null,
-        aislamiento_posterior_m: form.aislamiento_posterior_m ? parseFloat(form.aislamiento_posterior_m) : null,
-        aislamiento_lateral_m: form.aislamiento_lateral_m ? parseFloat(form.aislamiento_lateral_m) : null,
-        zona_pot: form.zona_pot || null,
-        tratamiento: form.tratamiento || null,
-        norma_vigente: form.norma_vigente || null,
-        cesion_tipo_a_pct: form.cesion_tipo_a_pct ? parseFloat(form.cesion_tipo_a_pct) : null,
-      };
-
-      if (isEdit && existingNormativa) {
-        await supabase.from("normativa_urbana").update(normPayload).eq("id", existingNormativa.id);
-      } else {
-        await supabase.from("normativa_urbana").insert(normPayload);
-      }
-
-      // Servicios: delete existing, re-insert
-      if (isEdit) {
-        await supabase.from("servicios_publicos").delete().eq("lote_id", loteId!);
-      }
-      const serviciosPayload = servicios.map((s) => ({
-        lote_id: loteId!,
-        tipo: s.tipo,
-        estado: s.estado as any,
-        operador: s.operador || null,
-      }));
-      await supabase.from("servicios_publicos").insert(serviciosPayload);
 
       // Precio
       if (form.precio_cop || form.precio_m2_cop) {
@@ -559,105 +426,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Normativa */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Normativa urbana</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            <div>
-              <Label className="text-xs">Uso principal</Label>
-              <Input value={form.uso_principal} onChange={(e) => update("uso_principal", e.target.value)} />
-            </div>
-            <div className="col-span-2">
-              <Label className="text-xs">Usos compatibles (separados por coma)</Label>
-              <Input value={form.usos_compatibles} onChange={(e) => update("usos_compatibles", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Índice construcción</Label>
-              <Input type="number" step="0.01" value={form.indice_construccion} onChange={(e) => update("indice_construccion", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Índice ocupación</Label>
-              <Input type="number" step="0.01" value={form.indice_ocupacion} onChange={(e) => update("indice_ocupacion", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Altura máx. pisos</Label>
-              <Input type="number" value={form.altura_max_pisos} onChange={(e) => update("altura_max_pisos", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Altura máx. metros</Label>
-              <Input type="number" value={form.altura_max_metros} onChange={(e) => update("altura_max_metros", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Aisl. frontal m</Label>
-              <Input type="number" step="0.1" value={form.aislamiento_frontal_m} onChange={(e) => update("aislamiento_frontal_m", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Aisl. posterior m</Label>
-              <Input type="number" step="0.1" value={form.aislamiento_posterior_m} onChange={(e) => update("aislamiento_posterior_m", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Aisl. lateral m</Label>
-              <Input type="number" step="0.1" value={form.aislamiento_lateral_m} onChange={(e) => update("aislamiento_lateral_m", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Zona POT</Label>
-              <Input value={form.zona_pot} onChange={(e) => update("zona_pot", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Tratamiento</Label>
-              <Input value={form.tratamiento} onChange={(e) => update("tratamiento", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Norma vigente</Label>
-              <Input value={form.norma_vigente} onChange={(e) => update("norma_vigente", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Cesión tipo A %</Label>
-              <Input type="number" step="0.1" value={form.cesion_tipo_a_pct} onChange={(e) => update("cesion_tipo_a_pct", e.target.value)} />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Servicios */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Servicios públicos</CardTitle></CardHeader>
-          <CardContent className="overflow-x-auto">
-            <table className="w-full text-left font-body text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="pb-2 font-semibold">Servicio</th>
-                  <th className="pb-2 font-semibold">Estado</th>
-                  <th className="pb-2 font-semibold">Operador</th>
-                </tr>
-              </thead>
-              <tbody>
-                {servicios.map((s, i) => (
-                  <tr key={s.tipo} className="border-b border-border last:border-0">
-                    <td className="py-2 text-foreground">{s.tipo}</td>
-                    <td className="py-2">
-                      <Select value={s.estado || "Disponible"} onValueChange={(v) => updateServicio(i, "estado", v)}>
-                        <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Disponible">Disponible</SelectItem>
-                          <SelectItem value="En trámite">En trámite</SelectItem>
-                          <SelectItem value="No disponible">No disponible</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="py-2">
-                      <Input
-                        className="h-8"
-                        value={s.operador}
-                        onChange={(e) => updateServicio(i, "operador", e.target.value)}
-                        placeholder="Ej: EPM"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
 
         {/* Precio */}
         <Card>
@@ -679,48 +447,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Score de viabilidad */}
-        <Card>
-          <CardHeader><CardTitle className="text-base">Score de viabilidad</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <Label className="text-xs">Score Jurídico</Label>
-              <Select value={form.score_juridico || "none"} onValueChange={(v) => update("score_juridico", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-xs">Score Normativo</Label>
-              <Select value={form.score_normativo || "none"} onValueChange={(v) => update("score_normativo", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-xs">Score Servicios</Label>
-              <Select value={form.score_servicios || "none"} onValueChange={(v) => update("score_servicios", v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  <SelectItem value="1">🟢 Verde — Favorable</SelectItem>
-                  <SelectItem value="2">🟡 Amarillo — Requiere revisión</SelectItem>
-                  <SelectItem value="3">🔴 Rojo — Tiene observaciones</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Análisis 360° — Estado por área */}
         {isEdit && isAdminOrAsesor && (
