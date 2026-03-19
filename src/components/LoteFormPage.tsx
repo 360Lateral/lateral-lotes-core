@@ -168,6 +168,32 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     enabled: isEdit && !!id,
   });
 
+  const { data: estadoAnalisis } = useQuery({
+    queryKey: ["estado-analisis", id],
+    enabled: isEdit && !!id && isAdminOrAsesor,
+    queryFn: async () => {
+      const [juridico, ambiental, sspp, geotecnico, mercado, arquitectonico, financiero] = await Promise.all([
+        supabase.from("analisis_juridico").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_ambiental").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_sspp").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_geotecnico").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_mercado").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_arquitectonico").select("id").eq("lote_id", id!).maybeSingle(),
+        supabase.from("analisis_financiero").select("id").eq("lote_id", id!).maybeSingle(),
+      ]);
+      return {
+        normativo: !!existingNormativa,
+        juridico: !!juridico.data,
+        ambiental: !!ambiental.data,
+        sspp: !!sspp.data,
+        geotecnico: !!geotecnico.data,
+        mercado: !!mercado.data,
+        arquitectonico: !!arquitectonico.data,
+        financiero: !!financiero.data,
+      };
+    },
+  });
+
   // Populate form on edit
   useEffect(() => {
     if (!existingLote) return;
