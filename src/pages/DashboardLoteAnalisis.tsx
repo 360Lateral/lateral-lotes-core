@@ -731,6 +731,7 @@ const SuelosSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProp
   const upsert = useAnalisisUpsert("analisis_geotecnico", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("geotecnico", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
