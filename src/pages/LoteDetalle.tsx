@@ -174,7 +174,20 @@ const LoteDetalle = () => {
     },
   });
 
-  // Fetch normativa
+  // Fetch precio análisis 360°
+  const { data: precioAnalisis } = useQuery({
+    queryKey: ["precio-analisis", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("analisis_financiero")
+        .select("precio_estimado_min,precio_estimado_promedio,precio_estimado_max")
+        .eq("lote_id", id!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const { data: normativa } = useQuery({
     queryKey: ["lote-normativa", id],
     queryFn: async () => {
@@ -505,8 +518,33 @@ const LoteDetalle = () => {
                     Promedio zona: {formatCOP(precioRef)}/m²
                   </p>
                 )}
+
+              {precioAnalisis?.precio_estimado_promedio && (
+                <div className="rounded-lg p-3 mt-2" style={{ backgroundColor: "#FDF3E3" }}>
+                  <p className="text-xs font-medium mb-1" style={{ color: "#854F0B" }}>
+                    Valor estimado 360°
+                  </p>
+                  <p className="font-body text-xl font-bold" style={{ color: "#E8951A" }}>
+                    {formatCOP(precioAnalisis.precio_estimado_promedio)}
+                  </p>
+                  {precioAnalisis.precio_estimado_min && precioAnalisis.precio_estimado_max && (
+                    <p className="text-xs mt-0.5" style={{ color: "#BA7517" }}>
+                      Rango: {formatCOP(precioAnalisis.precio_estimado_min)} — {formatCOP(precioAnalisis.precio_estimado_max)}
+                    </p>
+                  )}
+                  {lote.area_total_m2 && (
+                    <p className="text-xs mt-0.5" style={{ color: "#BA7517" }}>
+                      {formatCOP(precioAnalisis.precio_estimado_promedio / Number(lote.area_total_m2))} / m² estimado
+                    </p>
+                  )}
+                  <p className="text-[10px] mt-1.5" style={{ color: "#BA7517", opacity: 0.7 }}>
+                    Según Resolutoría 360° completa
+                  </p>
+                </div>
+              )}
               </div>
             )}
+
 
             {/* Contact button */}
             {!isVendido && (

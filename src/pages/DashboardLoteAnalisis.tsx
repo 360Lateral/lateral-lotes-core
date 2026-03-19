@@ -557,6 +557,9 @@ const ArquitectonicoSection = ({ loteId }: { loteId: string }) => {
 };
 
 /* ─── Section 8: Financiero ───────────────────── */
+const formatCOP = (v: number) =>
+  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
+
 const FinancieroSection = ({ loteId }: { loteId: string }) => {
   const [open, setOpen] = useState(false);
   const qk = ["analisis-financiero", loteId];
@@ -567,11 +570,21 @@ const FinancieroSection = ({ loteId }: { loteId: string }) => {
       return data;
     },
   });
+  const { data: loteData } = useQuery({
+    queryKey: ["analisis-lote-area", loteId],
+    queryFn: async () => {
+      const { data } = await supabase.from("lotes").select("area_total_m2").eq("id", loteId).single();
+      return data;
+    },
+  });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
   const upsert = useAnalisisUpsert("analisis_financiero", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+
+  const area = loteData?.area_total_m2 ? Number(loteData.area_total_m2) : 0;
+  const precioPromedio = form.precio_estimado_promedio ? Number(form.precio_estimado_promedio) : 0;
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -579,6 +592,27 @@ const FinancieroSection = ({ loteId }: { loteId: string }) => {
         <button className="w-full"><SectionHeader icon={DollarSign} label="Financiero" completed={completed} open={open} /></button>
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-background p-4 space-y-4">
+        {/* Valoración estimada 360° */}
+        <div className="rounded-lg border-l-4 border-primary bg-primary/5 p-4 space-y-3">
+          <p className="font-body text-sm font-semibold text-foreground">Valoración estimada del lote (360°)</p>
+          <div className="grid grid-cols-3 gap-3">
+            <Field label="Precio mínimo estimado (COP)">
+              <Input type="number" value={form.precio_estimado_min ?? ""} onChange={(e) => set("precio_estimado_min", e.target.value ? Number(e.target.value) : null)} />
+            </Field>
+            <Field label="Precio promedio estimado (COP)">
+              <Input type="number" value={form.precio_estimado_promedio ?? ""} onChange={(e) => set("precio_estimado_promedio", e.target.value ? Number(e.target.value) : null)} />
+            </Field>
+            <Field label="Precio máximo estimado (COP)">
+              <Input type="number" value={form.precio_estimado_max ?? ""} onChange={(e) => set("precio_estimado_max", e.target.value ? Number(e.target.value) : null)} />
+            </Field>
+          </div>
+          {precioPromedio > 0 && area > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Precio estimado por m²: {formatCOP(precioPromedio / area)} / m²
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <Field label="Valor compra lote (COP)">
             <Input type="number" value={form.valor_compra_lote ?? ""} onChange={(e) => set("valor_compra_lote", e.target.value ? Number(e.target.value) : null)} />
@@ -606,6 +640,8 @@ const FinancieroSection = ({ loteId }: { loteId: string }) => {
           <Textarea value={form.observaciones ?? ""} onChange={(e) => set("observaciones", e.target.value)} rows={3} />
         </Field>
         <Button onClick={() => upsert.mutate({
+          precio_estimado_min: form.precio_estimado_min, precio_estimado_promedio: form.precio_estimado_promedio,
+          precio_estimado_max: form.precio_estimado_max,
           valor_compra_lote: form.valor_compra_lote, costo_construccion_m2: form.costo_construccion_m2,
           ingresos_proyectados: form.ingresos_proyectados, margen_bruto_pct: form.margen_bruto_pct,
           tir_pct: form.tir_pct, vpn: form.vpn, punto_equilibrio_pct: form.punto_equilibrio_pct,
