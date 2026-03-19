@@ -191,7 +191,7 @@ const Lotes = () => {
               center={mapCenter}
               zoom={mapZoom}
               options={mapOptions}
-              onLoad={(map) => { mapRef.current = map; }}
+              onLoad={(map) => { mapRef.current = map; initAutocomplete(); }}
             >
               {filteredLotes
                 .filter((l) => l.lat != null && l.lng != null)
