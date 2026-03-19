@@ -65,11 +65,6 @@ const emptyForm: LoteForm = {
   es_publico: true,
 };
 
-interface ServicioRow {
-  tipo: string;
-  estado: string;
-  operador: string;
-}
 
 const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { id } = useParams<{ id: string }>();
