@@ -547,18 +547,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         {/* Dimensiones */}
         <Card>
           <CardHeader><CardTitle className="text-base">Dimensiones</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">Área m²</Label>
               <Input type="number" value={form.area_total_m2} onChange={(e) => update("area_total_m2", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Frente ml</Label>
-              <Input type="number" value={form.frente_ml} onChange={(e) => update("frente_ml", e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Fondo ml</Label>
-              <Input type="number" value={form.fondo_ml} onChange={(e) => update("fondo_ml", e.target.value)} />
             </div>
             <div>
               <Label className="text-xs">Matrícula</Label>
