@@ -211,8 +211,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const update = (key: keyof LoteForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const updateServicio = (idx: number, key: keyof ServicioRow, value: string) =>
-    setServicios((prev) => prev.map((s, i) => (i === idx ? { ...s, [key]: value } : s)));
 
   // Save mutation
   const saveMutation = useMutation({
