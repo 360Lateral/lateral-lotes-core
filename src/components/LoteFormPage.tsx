@@ -40,27 +40,9 @@ interface LoteForm {
   area_total_m2: string;
   matricula_inmobiliaria: string;
   notas: string;
-  // Normativa
-  uso_principal: string;
-  usos_compatibles: string;
-  indice_construccion: string;
-  indice_ocupacion: string;
-  altura_max_pisos: string;
-  altura_max_metros: string;
-  aislamiento_frontal_m: string;
-  aislamiento_posterior_m: string;
-  aislamiento_lateral_m: string;
-  zona_pot: string;
-  tratamiento: string;
-  norma_vigente: string;
-  cesion_tipo_a_pct: string;
   // Precio
   precio_cop: string;
   precio_m2_cop: string;
-  // Scores
-  score_juridico: string;
-  score_normativo: string;
-  score_servicios: string;
   es_publico: boolean;
 }
 
