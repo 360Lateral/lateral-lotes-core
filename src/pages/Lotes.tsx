@@ -61,6 +61,42 @@ const Lotes = () => {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
+  const [searchText, setSearchText] = useState("");
+  const [mapCenter, setMapCenter] = useState(MEDELLIN_CENTER);
+  const [mapZoom, setMapZoom] = useState(12);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
+  useEffect(() => {
+    const input = document.getElementById("google-places-search") as HTMLInputElement;
+    if (!input || !window.google?.maps?.places) return;
+    if (autocompleteRef.current) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: "co" },
+      fields: ["geometry", "name", "formatted_address"],
+    });
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location) return;
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setMapCenter({ lat, lng });
+      setMapZoom(15);
+      if (mapRef.current) {
+        mapRef.current.panTo({ lat, lng });
+        mapRef.current.setZoom(15);
+      }
+      setSearchText(place.formatted_address || place.name || "");
+    });
+
+    autocompleteRef.current = autocomplete;
+    return () => {
+      google.maps.event.clearInstanceListeners(autocomplete);
+      autocompleteRef.current = null;
+    };
+  }, []);
 
 
   const { data: allLotes = [], isLoading } = useQuery({
