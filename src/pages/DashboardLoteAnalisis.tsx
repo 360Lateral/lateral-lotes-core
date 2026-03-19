@@ -544,6 +544,7 @@ const AmbientalSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
   const upsert = useAnalisisUpsert("analisis_ambiental", loteId, qk);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
+  useAutoMergePdfData("ambiental", pdfProps, setForm);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
