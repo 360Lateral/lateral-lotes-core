@@ -229,9 +229,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         area_total_m2: form.area_total_m2 ? parseFloat(form.area_total_m2) : null,
         matricula_inmobiliaria: form.matricula_inmobiliaria || null,
         notas: form.notas || null,
-        score_juridico: form.score_juridico ? parseInt(form.score_juridico) : null,
-        score_normativo: form.score_normativo ? parseInt(form.score_normativo) : null,
-        score_servicios: form.score_servicios ? parseInt(form.score_servicios) : null,
         es_publico: form.es_publico,
       };
 
