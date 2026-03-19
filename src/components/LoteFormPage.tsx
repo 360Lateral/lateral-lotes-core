@@ -256,41 +256,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         await supabase.from("lotes").update({ foto_url: null } as any).eq("id", id);
       }
 
-      // Normativa
-      const normPayload = {
-        lote_id: loteId!,
-        uso_principal: form.uso_principal || null,
-        usos_compatibles: form.usos_compatibles ? form.usos_compatibles.split(",").map((s) => s.trim()).filter(Boolean) : null,
-        indice_construccion: form.indice_construccion ? parseFloat(form.indice_construccion) : null,
-        indice_ocupacion: form.indice_ocupacion ? parseFloat(form.indice_ocupacion) : null,
-        altura_max_pisos: form.altura_max_pisos ? parseInt(form.altura_max_pisos) : null,
-        altura_max_metros: form.altura_max_metros ? parseFloat(form.altura_max_metros) : null,
-        aislamiento_frontal_m: form.aislamiento_frontal_m ? parseFloat(form.aislamiento_frontal_m) : null,
-        aislamiento_posterior_m: form.aislamiento_posterior_m ? parseFloat(form.aislamiento_posterior_m) : null,
-        aislamiento_lateral_m: form.aislamiento_lateral_m ? parseFloat(form.aislamiento_lateral_m) : null,
-        zona_pot: form.zona_pot || null,
-        tratamiento: form.tratamiento || null,
-        norma_vigente: form.norma_vigente || null,
-        cesion_tipo_a_pct: form.cesion_tipo_a_pct ? parseFloat(form.cesion_tipo_a_pct) : null,
-      };
-
-      if (isEdit && existingNormativa) {
-        await supabase.from("normativa_urbana").update(normPayload).eq("id", existingNormativa.id);
-      } else {
-        await supabase.from("normativa_urbana").insert(normPayload);
-      }
-
-      // Servicios: delete existing, re-insert
-      if (isEdit) {
-        await supabase.from("servicios_publicos").delete().eq("lote_id", loteId!);
-      }
-      const serviciosPayload = servicios.map((s) => ({
-        lote_id: loteId!,
-        tipo: s.tipo,
-        estado: s.estado as any,
-        operador: s.operador || null,
-      }));
-      await supabase.from("servicios_publicos").insert(serviciosPayload);
 
       // Precio
       if (form.precio_cop || form.precio_m2_cop) {
