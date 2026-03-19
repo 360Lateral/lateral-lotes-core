@@ -3,7 +3,7 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 
 const GOOGLE_MAPS_LOADER_ID = "google-map-script";
-const GOOGLE_MAPS_LIBRARIES: ("maps")[] = ["maps"];
+const GOOGLE_MAPS_LIBRARIES: ("places" | "geometry")[] = ["places", "geometry"];
 
 interface GoogleMapsGateProps {
   children: ReactNode;
