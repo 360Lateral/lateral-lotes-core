@@ -79,6 +79,35 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
+  const [potResult, setPotResult] = useState<any>(null);
+  const [potLoading, setPotLoading] = useState(false);
+  const [potError, setPotError] = useState<string | null>(null);
+
+  const consultarNormaPot = async () => {
+    const lat = parseFloat(form.lat);
+    const lng = parseFloat(form.lng);
+    if (!lat || !lng) {
+      toast({ title: "Coordenadas requeridas", description: "Ingresa latitud y longitud antes de consultar.", variant: "destructive" });
+      return;
+    }
+    setPotLoading(true);
+    setPotError(null);
+    setPotResult(null);
+    try {
+      const { data, error } = await supabase.rpc("consultar_norma_por_punto", { p_lat: lat, p_lng: lng });
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        setPotError("No hay datos POT disponibles para las coordenadas de este lote");
+      } else {
+        setPotResult(data[0]);
+      }
+    } catch (err: any) {
+      setPotError(err.message || "Error al consultar norma POT");
+    } finally {
+      setPotLoading(false);
+    }
+  };
+
 
   // Fetch existing data for edit mode
   const { data: existingLote } = useQuery({
