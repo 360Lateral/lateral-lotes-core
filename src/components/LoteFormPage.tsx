@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, MapPin, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
@@ -78,6 +78,35 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
+
+  const [potResult, setPotResult] = useState<any>(null);
+  const [potLoading, setPotLoading] = useState(false);
+  const [potError, setPotError] = useState<string | null>(null);
+
+  const consultarNormaPot = async () => {
+    const lat = parseFloat(form.lat);
+    const lng = parseFloat(form.lng);
+    if (!lat || !lng) {
+      toast({ title: "Coordenadas requeridas", description: "Ingresa latitud y longitud antes de consultar.", variant: "destructive" });
+      return;
+    }
+    setPotLoading(true);
+    setPotError(null);
+    setPotResult(null);
+    try {
+      const { data, error } = await supabase.rpc("consultar_norma_por_punto", { p_lat: lat, p_lng: lng });
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        setPotError("No hay datos POT disponibles para las coordenadas de este lote");
+      } else {
+        setPotResult(data[0]);
+      }
+    } catch (err: any) {
+      setPotError(err.message || "Error al consultar norma POT");
+    } finally {
+      setPotLoading(false);
+    }
+  };
 
 
   // Fetch existing data for edit mode
@@ -411,7 +440,53 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Dimensiones */}
+        {/* Consultar norma POT */}
+        {isEdit && form.lat && form.lng && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Norma POT</CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={potLoading}
+                  onClick={consultarNormaPot}
+                >
+                  {potLoading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin mr-2" />Consultando…</>
+                  ) : (
+                    <><MapPin className="h-4 w-4 mr-2" />Consultar norma POT</>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            {(potResult || potError) && (
+              <CardContent>
+                {potError ? (
+                  <p className="text-sm text-muted-foreground">{potError}</p>
+                ) : potResult ? (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {[
+                      { label: "Uso principal", value: potResult.uso_principal },
+                      { label: "Zona homogénea", value: potResult.zona_homogenea },
+                      { label: "Polígono de norma", value: potResult.poligono_norma },
+                      { label: "Norma vigente", value: potResult.norma_vigente },
+                      { label: "Fuente", value: potResult.fuente },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="text-sm font-medium text-foreground">{value || "—"}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </CardContent>
+            )}
+          </Card>
+        )}
+
+
         <Card>
           <CardHeader><CardTitle className="text-base">Dimensiones</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
