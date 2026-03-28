@@ -991,6 +991,75 @@ export type Database = {
         }
         Relationships: []
       }
+      pot_poligonos: {
+        Row: {
+          altura_max_m: number | null
+          altura_max_pisos: number | null
+          cesion_tipo_a: number | null
+          cesion_tipo_b: number | null
+          densidad_max: number | null
+          departamento: string
+          fecha_carga: string | null
+          fuente: string | null
+          geom: unknown
+          ic_base: number | null
+          ic_maximo: number | null
+          id: string
+          io: number | null
+          municipio: string
+          norma_vigente: string | null
+          poligono_norma: string | null
+          tratamiento: string | null
+          uso_principal: string | null
+          usos_compatibles: string[] | null
+          zona_homogenea: string | null
+        }
+        Insert: {
+          altura_max_m?: number | null
+          altura_max_pisos?: number | null
+          cesion_tipo_a?: number | null
+          cesion_tipo_b?: number | null
+          densidad_max?: number | null
+          departamento: string
+          fecha_carga?: string | null
+          fuente?: string | null
+          geom?: unknown
+          ic_base?: number | null
+          ic_maximo?: number | null
+          id?: string
+          io?: number | null
+          municipio: string
+          norma_vigente?: string | null
+          poligono_norma?: string | null
+          tratamiento?: string | null
+          uso_principal?: string | null
+          usos_compatibles?: string[] | null
+          zona_homogenea?: string | null
+        }
+        Update: {
+          altura_max_m?: number | null
+          altura_max_pisos?: number | null
+          cesion_tipo_a?: number | null
+          cesion_tipo_b?: number | null
+          densidad_max?: number | null
+          departamento?: string
+          fecha_carga?: string | null
+          fuente?: string | null
+          geom?: unknown
+          ic_base?: number | null
+          ic_maximo?: number | null
+          id?: string
+          io?: number | null
+          municipio?: string
+          norma_vigente?: string | null
+          poligono_norma?: string | null
+          tratamiento?: string | null
+          uso_principal?: string | null
+          usos_compatibles?: string[] | null
+          zona_homogenea?: string | null
+        }
+        Relationships: []
+      }
       precios: {
         Row: {
           id: string
@@ -1102,6 +1171,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consultar_norma_por_punto: {
+        Args: { p_lat: number; p_lng: number }
+        Returns: {
+          altura_max_m: number
+          altura_max_pisos: number
+          cesion_tipo_a: number
+          cesion_tipo_b: number
+          densidad_max: number
+          fuente: string
+          ic_base: number
+          ic_maximo: number
+          io: number
+          municipio: string
+          norma_vigente: string
+          poligono_norma: string
+          tratamiento: string
+          uso_principal: string
+          usos_compatibles: string[]
+          zona_homogenea: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
