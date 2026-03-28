@@ -440,7 +440,53 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Dimensiones */}
+        {/* Consultar norma POT */}
+        {isEdit && form.lat && form.lng && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Norma POT</CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={potLoading}
+                  onClick={consultarNormaPot}
+                >
+                  {potLoading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin mr-2" />Consultando…</>
+                  ) : (
+                    <><MapPin className="h-4 w-4 mr-2" />Consultar norma POT</>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            {(potResult || potError) && (
+              <CardContent>
+                {potError ? (
+                  <p className="text-sm text-muted-foreground">{potError}</p>
+                ) : potResult ? (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {[
+                      { label: "Uso principal", value: potResult.uso_principal },
+                      { label: "Zona homogénea", value: potResult.zona_homogenea },
+                      { label: "Polígono de norma", value: potResult.poligono_norma },
+                      { label: "Norma vigente", value: potResult.norma_vigente },
+                      { label: "Fuente", value: potResult.fuente },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="text-sm font-medium text-foreground">{value || "—"}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </CardContent>
+            )}
+          </Card>
+        )}
+
+
         <Card>
           <CardHeader><CardTitle className="text-base">Dimensiones</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
