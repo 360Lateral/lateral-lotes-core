@@ -326,7 +326,8 @@ const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean
   { key: "altura_texto", label: "Altura normativa", potKey: "altura_texto" },
   { key: "cesion_tipo_a_pct", label: "Cesión tipo A", potKey: "cesion_tipo_a" },
   { key: "cesion_tipo_b", label: "Cesión tipo B", potKey: "cesion_tipo_b" },
-  { key: "indice_ocupacion", label: "IO (Índice de ocupación)", potKey: "io" },
+  { key: "io_plataforma", label: "IO plataforma", potKey: "io" },
+  { key: "io_torre", label: "IO torre", potKey: "io_torre" },
   { key: "aislamiento_frontal_m", label: "Aislamiento frontal (m)", potKey: "aislamiento_frontal_m" },
   { key: "aislamiento_posterior_m", label: "Aislamiento posterior (m)", potKey: "aislamiento_posterior_m" },
   { key: "aislamiento_lateral_m", label: "Aislamiento lateral (m)", potKey: "aislamiento_lateral_m" },
@@ -441,6 +442,8 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
         ? Number(String(ic).replace(",", "."))
         : null,
       indice_ocupacion: mergedForm.indice_ocupacion ?? null,
+      io_plataforma: mergedForm.io_plataforma ?? null,
+      io_torre: mergedForm.io_torre ?? null,
       altura_max_pisos: mergedForm.altura_max_pisos ?? null,
       altura_max_metros: mergedForm.altura_max_metros ?? null,
       aislamiento_frontal_m: mergedForm.aislamiento_frontal_m ?? null,
@@ -522,10 +525,14 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               <Sugerencia areaKey="normativo" campo="indice_construccion" pdfProps={pdfProps} onApply={(v) => set("indice_construccion", v)} />
             </div>
             <div>
-              <Field label="Índice ocupación">
-                <Input type="number" step="0.01" value={form.indice_ocupacion ?? ""} onChange={(e) => set("indice_ocupacion", e.target.value ? Number(e.target.value) : null)} />
+              <Field label="IO plataforma" tooltip={"Índice de Ocupación máximo para el primer nivel o plataforma de la edificación. Define qué porcentaje del lote puede ser cubierto en planta baja.\nEj: 0.80 = máximo 80% del área del lote ocupada en primer piso"}>
+                <Input type="number" step="0.01" value={form.io_plataforma ?? ""} onChange={(e) => set("io_plataforma", e.target.value ? Number(e.target.value) : null)} />
               </Field>
-              <Sugerencia areaKey="normativo" campo="indice_ocupacion" pdfProps={pdfProps} onApply={(v) => set("indice_ocupacion", v)} />
+            </div>
+            <div>
+              <Field label="IO torre" tooltip={"Índice de Ocupación máximo para los pisos superiores o torre de la edificación. Generalmente menor que el IO de plataforma para garantizar retiros en altura.\nEj: 0.60 = máximo 60% del área del lote ocupada en pisos superiores"}>
+                <Input type="number" step="0.01" value={form.io_torre ?? ""} onChange={(e) => set("io_torre", e.target.value ? Number(e.target.value) : null)} />
+              </Field>
             </div>
             <div>
               <Field label="Altura máx. pisos">
@@ -611,6 +618,8 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
             usos_compatibles: form.usos_compatibles ? (Array.isArray(form.usos_compatibles) ? form.usos_compatibles : form.usos_compatibles.split(",").map((s: string) => s.trim()).filter(Boolean)) : null,
             indice_construccion: form.indice_construccion ? Number(String(form.indice_construccion).replace(",", ".")) : null,
             indice_ocupacion: form.indice_ocupacion,
+            io_plataforma: form.io_plataforma ?? null,
+            io_torre: form.io_torre ?? null,
             altura_max_pisos: form.altura_max_pisos, altura_max_metros: form.altura_max_metros,
             aislamiento_frontal_m: form.aislamiento_frontal_m, aislamiento_posterior_m: form.aislamiento_posterior_m,
             aislamiento_lateral_m: form.aislamiento_lateral_m, zona_pot: form.zona_pot || null,

@@ -979,6 +979,8 @@ export type Database = {
           id: string
           indice_construccion: number | null
           indice_ocupacion: number | null
+          io_plataforma: number | null
+          io_torre: number | null
           lote_id: string
           norma_vigente: string | null
           tratamiento: string | null
@@ -1000,6 +1002,8 @@ export type Database = {
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null
+          io_plataforma?: number | null
+          io_torre?: number | null
           lote_id: string
           norma_vigente?: string | null
           tratamiento?: string | null
@@ -1021,6 +1025,8 @@ export type Database = {
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null
+          io_plataforma?: number | null
+          io_torre?: number | null
           lote_id?: string
           norma_vigente?: string | null
           tratamiento?: string | null
