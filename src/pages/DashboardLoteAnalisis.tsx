@@ -442,9 +442,13 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
       aislamiento_posterior_m: mergedForm.aislamiento_posterior_m ?? null,
       aislamiento_lateral_m: mergedForm.aislamiento_lateral_m ?? null,
       zona_pot: mergedForm.zona_pot || null,
+      zona_homogenea: mergedForm.zona_homogenea || null,
       tratamiento: updatedFields.tratamiento || mergedForm.tratamiento || null,
       norma_vigente: mergedForm.norma_vigente || null,
       cesion_tipo_a_pct: mergedForm.cesion_tipo_a_pct ?? null,
+      cesion_tipo_b: mergedForm.cesion_tipo_b ?? null,
+      densidad_max: mergedForm.densidad_max || null,
+      altura_texto: mergedForm.altura_texto || null,
     };
 
     try {
@@ -600,13 +604,17 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
           <Button onClick={() => upsert.mutate({
             uso_principal: form.uso_principal || null,
             usos_compatibles: form.usos_compatibles ? (Array.isArray(form.usos_compatibles) ? form.usos_compatibles : form.usos_compatibles.split(",").map((s: string) => s.trim()).filter(Boolean)) : null,
-            indice_construccion: form.indice_construccion ? Number(form.indice_construccion) : null,
+            indice_construccion: form.indice_construccion ? Number(String(form.indice_construccion).replace(",", ".")) : null,
             indice_ocupacion: form.indice_ocupacion,
             altura_max_pisos: form.altura_max_pisos, altura_max_metros: form.altura_max_metros,
             aislamiento_frontal_m: form.aislamiento_frontal_m, aislamiento_posterior_m: form.aislamiento_posterior_m,
             aislamiento_lateral_m: form.aislamiento_lateral_m, zona_pot: form.zona_pot || null,
+            zona_homogenea: form.zona_homogenea || null,
             tratamiento: form.tratamiento || null, norma_vigente: form.norma_vigente || null,
             cesion_tipo_a_pct: form.cesion_tipo_a_pct,
+            cesion_tipo_b: form.cesion_tipo_b ?? null,
+            densidad_max: form.densidad_max || null,
+            altura_texto: form.altura_texto || null,
           })} disabled={upsert.isPending}>
             {upsert.isPending ? "Guardando…" : "Guardar Normativo"}
           </Button>
