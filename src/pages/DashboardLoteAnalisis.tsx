@@ -323,7 +323,7 @@ const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean
   { key: "tratamiento", label: "Tratamiento", potKey: "tratamiento" },
   { key: "indice_construccion", label: "IC", potKey: "ic_texto", isText: true },
   { key: "densidad_max", label: "Densidad máx", potKey: "densidad_max" },
-  { key: "altura_normativa", label: "Altura", potKey: "altura_texto", isText: true },
+  { key: "altura_texto", label: "Altura normativa", potKey: "altura_texto" },
   { key: "cesion_tipo_a_pct", label: "Cesión tipo A", potKey: "cesion_tipo_a" },
   { key: "cesion_tipo_b", label: "Cesión tipo B", potKey: "cesion_tipo_b" },
   { key: "indice_ocupacion", label: "IO (Índice de ocupación)", potKey: "io" },
@@ -546,7 +546,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
             </div>
             <div>
               <Field label="Altura normativa" tooltip={"Altura máxima de la edificación en pisos o metros. N/A = regulada por IC, sin tope de pisos"}>
-                <Input value={form.altura_normativa ?? ""} onChange={(e) => set("altura_normativa", e.target.value || null)} />
+                <Input value={form.altura_texto ?? ""} onChange={(e) => set("altura_texto", e.target.value || null)} />
               </Field>
             </div>
             <div>
