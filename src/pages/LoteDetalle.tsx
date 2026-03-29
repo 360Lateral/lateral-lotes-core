@@ -118,7 +118,7 @@ const LoteDetalle = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("*")
+        .select("id, nombre_lote, ciudad, barrio, departamento, direccion, area_total_m2, lat, lng, estado_disponibilidad, tipo_lote, estrato, frente_ml, fondo_ml, destacado, foto_url, video_url, score_juridico, score_normativo, score_servicios, has_resolutoria, es_publico, owner_id, created_at, updated_at, tiene_escritura")
         .eq("id", id!)
         .single();
       if (error) throw error;
