@@ -11,12 +11,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   Scale, Leaf, Zap, Mountain, TrendingUp, Building2, DollarSign, FileText,
-  FileUp, Loader2, Sparkles,
+  FileUp, Loader2, Sparkles, MapPin,
 } from "lucide-react";
 import ExcelAnalisisImporter from "@/components/ExcelAnalisisImporter";
 import ExcelAnalisisExporter from "@/components/ExcelAnalisisExporter";
