@@ -78,12 +78,13 @@ const Diagnostico = () => {
 
     try {
       // Get lotes matching ciudad
-      const { data: lotes } = await supabase
+      const { data: lotesRaw } = await supabase
         .from("lotes_publicos" as any)
         .select("id, ciudad")
         .ilike("ciudad", municipio.trim());
 
-      if (!lotes || lotes.length === 0) {
+      const lotes = (lotesRaw ?? []) as { id: string; ciudad: string }[];
+      if (lotes.length === 0) {
         setEstimacion(null);
         setLoading(false);
         return;
