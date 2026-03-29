@@ -975,7 +975,7 @@ export type Database = {
           altura_texto: string | null
           cesion_tipo_a_pct: number | null
           cesion_tipo_b: number | null
-          densidad_max: string | null
+          densidad_max: number | null
           id: string
           indice_construccion: number | null
           indice_ocupacion: number | null
@@ -996,7 +996,7 @@ export type Database = {
           altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
           cesion_tipo_b?: number | null
-          densidad_max?: string | null
+          densidad_max?: number | null
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null
@@ -1017,7 +1017,7 @@ export type Database = {
           altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
           cesion_tipo_b?: number | null
-          densidad_max?: string | null
+          densidad_max?: number | null
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null

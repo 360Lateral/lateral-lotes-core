@@ -1,0 +1,1 @@
+ALTER TABLE public.normativa_urbana ALTER COLUMN densidad_max TYPE integer USING (CASE WHEN densidad_max ~ '^\d+$' THEN densidad_max::integer ELSE NULL END);
