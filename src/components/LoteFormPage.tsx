@@ -1,6 +1,4 @@
 import { useState, useEffect, ChangeEvent, useCallback } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, MapPin, Loader2 } from "lucide-react";
+import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
@@ -81,34 +79,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
 
-  const [potResult, setPotResult] = useState<any>(null);
-  const [potLoading, setPotLoading] = useState(false);
-  const [potError, setPotError] = useState<string | null>(null);
-
-  const consultarNormaPot = async () => {
-    const lat = parseFloat(form.lat);
-    const lng = parseFloat(form.lng);
-    if (!lat || !lng) {
-      toast({ title: "Coordenadas requeridas", description: "Ingresa latitud y longitud antes de consultar.", variant: "destructive" });
-      return;
-    }
-    setPotLoading(true);
-    setPotError(null);
-    setPotResult(null);
-    try {
-      const { data, error } = await supabase.rpc("consultar_norma_por_punto", { p_lat: lat, p_lng: lng });
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        setPotError("No hay datos POT disponibles para las coordenadas de este lote");
-      } else {
-        setPotResult(data[0]);
-      }
-    } catch (err: any) {
-      setPotError(err.message || "Error al consultar norma POT");
-    } finally {
-      setPotLoading(false);
-    }
-  };
 
 
   // Fetch existing data for edit mode
@@ -441,74 +411,6 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </GoogleMapsGate>
           </CardContent>
         </Card>
-
-        {/* Consultar norma POT */}
-        {isEdit && form.lat && form.lng && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Norma POT</CardTitle>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={potLoading}
-                  onClick={consultarNormaPot}
-                >
-                  {potLoading ? (
-                    <><Loader2 className="h-4 w-4 animate-spin mr-2" />Consultando…</>
-                  ) : (
-                    <><MapPin className="h-4 w-4 mr-2" />Consultar norma POT</>
-                  )}
-                </Button>
-              </div>
-            </CardHeader>
-            {(potResult || potError) && (
-              <CardContent>
-                {potError ? (
-                  <p className="text-sm text-muted-foreground">{potError}</p>
-                ) : potResult ? (
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {[
-                      { label: "Uso principal", value: potResult.uso_principal },
-                      { label: "Zona homogénea", value: potResult.zona_homogenea, tooltip: "División territorial con características urbanas similares" },
-                      { label: "Polígono de norma", value: potResult.poligono_norma, tooltip: "Código único del polígono normativo según el mapa del POT Acuerdo 48/2014" },
-                      { label: "Norma vigente", value: potResult.norma_vigente },
-                      { label: "Fuente", value: potResult.fuente },
-                      { label: "Tratamiento urbanístico", value: potResult.tratamiento, tooltip: "Directriz que define qué tipo de intervención se permite en el sector.\nTipos: Consolidación / Renovación / Desarrollo / Mejoramiento / Conservación" },
-                      { label: "IC", value: potResult.ic_texto, tooltip: "Multiplicador sobre el área del lote que determina los m² construibles totales.\nEj: IC 1,4 en lote 200m² = 280m² máx" },
-                      { label: "IC máximo", value: potResult.ic_maximo != null ? String(potResult.ic_maximo) : null },
-                      { label: "Densidad máxima", value: potResult.densidad_texto, tooltip: "Número máximo de viviendas permitidas por hectárea de suelo urbanizable" },
-                      { label: "Altura normativa", value: potResult.altura_texto, tooltip: "Altura máxima de la edificación en pisos o metros. N/A = regulada por IC" },
-                      { label: "Cesión tipo A (%)", value: potResult.cesion_tipo_a != null ? String(potResult.cesion_tipo_a) : null, tooltip: "Suelo a ceder gratuitamente para parques y espacio público. Unidad: m²/habitante" },
-                      { label: "Cesión tipo B (%)", value: potResult.cesion_tipo_b != null ? String(potResult.cesion_tipo_b) : null, tooltip: "Área para equipamientos colectivos.\nUnidad: m² por cada 100m² construidos" },
-                    ].map(({ label, value, tooltip }) => (
-                      <div key={label}>
-                        <div className="flex items-center gap-1">
-                          <p className="text-xs text-muted-foreground">{label}</p>
-                          {tooltip && (
-                            <TooltipProvider delayDuration={200}>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Info className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help shrink-0" />
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-xs whitespace-pre-line text-xs">
-                                  {tooltip}
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </div>
-                        <p className="text-sm font-medium text-foreground">{value || "—"}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </CardContent>
-            )}
-          </Card>
-        )}
-
 
         <Card>
           <CardHeader><CardTitle className="text-base">Dimensiones</CardTitle></CardHeader>
