@@ -972,7 +972,10 @@ export type Database = {
           aislamiento_posterior_m: number | null
           altura_max_metros: number | null
           altura_max_pisos: number | null
+          altura_texto: string | null
           cesion_tipo_a_pct: number | null
+          cesion_tipo_b: number | null
+          densidad_max: string | null
           id: string
           indice_construccion: number | null
           indice_ocupacion: number | null
@@ -981,6 +984,7 @@ export type Database = {
           tratamiento: string | null
           uso_principal: string | null
           usos_compatibles: string[] | null
+          zona_homogenea: string | null
           zona_pot: string | null
         }
         Insert: {
@@ -989,7 +993,10 @@ export type Database = {
           aislamiento_posterior_m?: number | null
           altura_max_metros?: number | null
           altura_max_pisos?: number | null
+          altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
+          cesion_tipo_b?: number | null
+          densidad_max?: string | null
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null
@@ -998,6 +1005,7 @@ export type Database = {
           tratamiento?: string | null
           uso_principal?: string | null
           usos_compatibles?: string[] | null
+          zona_homogenea?: string | null
           zona_pot?: string | null
         }
         Update: {
@@ -1006,7 +1014,10 @@ export type Database = {
           aislamiento_posterior_m?: number | null
           altura_max_metros?: number | null
           altura_max_pisos?: number | null
+          altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
+          cesion_tipo_b?: number | null
+          densidad_max?: string | null
           id?: string
           indice_construccion?: number | null
           indice_ocupacion?: number | null
@@ -1015,6 +1026,7 @@ export type Database = {
           tratamiento?: string | null
           uso_principal?: string | null
           usos_compatibles?: string[] | null
+          zona_homogenea?: string | null
           zona_pot?: string | null
         }
         Relationships: [
