@@ -322,7 +322,7 @@ const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean
   { key: "uso_principal", label: "Uso principal", potKey: "uso_principal" },
   { key: "tratamiento", label: "Tratamiento", potKey: "tratamiento" },
   { key: "indice_construccion", label: "IC", potKey: "ic_texto", isText: true },
-  { key: "densidad_maxima", label: "Densidad máx", potKey: "densidad_texto", isText: true },
+  { key: "densidad_max", label: "Densidad máx", potKey: "densidad_max" },
   { key: "altura_normativa", label: "Altura", potKey: "altura_texto", isText: true },
   { key: "cesion_tipo_a_pct", label: "Cesión tipo A", potKey: "cesion_tipo_a" },
   { key: "cesion_tipo_b", label: "Cesión tipo B", potKey: "cesion_tipo_b" },
@@ -452,7 +452,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
       norma_vigente: mergedForm.norma_vigente || null,
       cesion_tipo_a_pct: mergedForm.cesion_tipo_a_pct ?? null,
       cesion_tipo_b: mergedForm.cesion_tipo_b ?? null,
-      densidad_max: mergedForm.densidad_max || null,
+      densidad_max: mergedForm.densidad_max ? parseInt(String(mergedForm.densidad_max).replace(',', '.')) : null,
       altura_texto: mergedForm.altura_texto || null,
     };
 
@@ -541,7 +541,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
             </div>
             <div>
               <Field label="Densidad máxima" tooltip={"Número máximo de viviendas permitidas por hectárea de suelo urbanizable.\nUnidad: viv/ha"}>
-                <Input value={form.densidad_maxima ?? ""} onChange={(e) => set("densidad_maxima", e.target.value || null)} />
+                <Input value={form.densidad_max ?? ""} onChange={(e) => set("densidad_max", e.target.value || null)} />
               </Field>
             </div>
             <div>
@@ -618,7 +618,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
             tratamiento: form.tratamiento || null, norma_vigente: form.norma_vigente || null,
             cesion_tipo_a_pct: form.cesion_tipo_a_pct,
             cesion_tipo_b: form.cesion_tipo_b ?? null,
-            densidad_max: form.densidad_max || null,
+            densidad_max: form.densidad_max ? parseInt(String(form.densidad_max).replace(',', '.')) : null,
             altura_texto: form.altura_texto || null,
           })} disabled={upsert.isPending}>
             {upsert.isPending ? "Guardando…" : "Guardar Normativo"}
