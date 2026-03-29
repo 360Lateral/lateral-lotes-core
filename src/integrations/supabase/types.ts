@@ -1192,6 +1192,7 @@ export type Database = {
           zona_homogenea: string
         }[]
       }
+      count_diagnosticos: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
