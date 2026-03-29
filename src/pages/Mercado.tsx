@@ -44,7 +44,7 @@ const Mercado = () => {
         .select("id, ciudad")
         .not("ciudad", "is", null);
 
-      const lotes = (lotesRaw ?? []) as { id: string; ciudad: string }[];
+      const lotes = (lotesRaw ?? []) as unknown as { id: string; ciudad: string }[];
       if (lotes.length === 0) return [];
 
       const loteIds = lotes.map((l) => l.id);

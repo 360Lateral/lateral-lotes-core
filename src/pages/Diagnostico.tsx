@@ -83,7 +83,7 @@ const Diagnostico = () => {
         .select("id, ciudad")
         .ilike("ciudad", municipio.trim());
 
-      const lotes = (lotesRaw ?? []) as { id: string; ciudad: string }[];
+      const lotes = (lotesRaw ?? []) as unknown as { id: string; ciudad: string }[];
       if (lotes.length === 0) {
         setEstimacion(null);
         setLoading(false);
