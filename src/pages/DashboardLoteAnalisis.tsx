@@ -303,14 +303,14 @@ const DashboardLoteAnalisis = () => {
 };
 
 /* ─── POT field mapping config ─────────────────── */
-const POT_FIELDS = [
+const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean }[] = [
   { key: "tratamiento", label: "Tratamiento", potKey: "tratamiento" },
   { key: "indice_construccion", label: "IC", potKey: "ic_texto", isText: true },
   { key: "densidad_maxima", label: "Densidad máx", potKey: "densidad_texto", isText: true },
   { key: "altura_normativa", label: "Altura", potKey: "altura_texto", isText: true },
   { key: "cesion_tipo_a_pct", label: "Cesión tipo A", potKey: "cesion_tipo_a" },
   { key: "cesion_tipo_b", label: "Cesión tipo B", potKey: "cesion_tipo_b" },
-] as const;
+];
 
 /* ─── Section 1: Normativa (read-only summary + PDF) ── */
 const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?: number | null; lng?: number | null; pdfProps: PdfProps }) => {
