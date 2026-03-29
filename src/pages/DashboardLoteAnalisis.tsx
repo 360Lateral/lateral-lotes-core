@@ -451,7 +451,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               <Sugerencia areaKey="normativo" campo="uso_principal" pdfProps={pdfProps} onApply={(v) => set("uso_principal", v)} />
             </div>
             <div>
-              <Field label="Índice construcción">
+              <Field label="Índice construcción" tooltip={"Multiplicador sobre el área del lote que determina los m² construibles totales.\nEj: IC 1,4 en lote de 200m² = 280m² máx"}>
                 <Input value={form.indice_construccion ?? ""} onChange={(e) => set("indice_construccion", e.target.value || null)} />
               </Field>
               <Sugerencia areaKey="normativo" campo="indice_construccion" pdfProps={pdfProps} onApply={(v) => set("indice_construccion", v)} />
@@ -475,12 +475,12 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               <Sugerencia areaKey="normativo" campo="altura_max_metros" pdfProps={pdfProps} onApply={(v) => set("altura_max_metros", v)} />
             </div>
             <div>
-              <Field label="Densidad máxima">
+              <Field label="Densidad máxima" tooltip={"Número máximo de viviendas permitidas por hectárea de suelo urbanizable.\nUnidad: viv/ha"}>
                 <Input value={form.densidad_maxima ?? ""} onChange={(e) => set("densidad_maxima", e.target.value || null)} />
               </Field>
             </div>
             <div>
-              <Field label="Altura normativa">
+              <Field label="Altura normativa" tooltip={"Altura máxima de la edificación en pisos o metros. N/A = regulada por IC, sin tope de pisos"}>
                 <Input value={form.altura_normativa ?? ""} onChange={(e) => set("altura_normativa", e.target.value || null)} />
               </Field>
             </div>
@@ -503,36 +503,36 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               <Sugerencia areaKey="normativo" campo="aislamiento_lateral_m" pdfProps={pdfProps} onApply={(v) => set("aislamiento_lateral_m", v)} />
             </div>
             <div>
-              <Field label="Zona POT">
+              <Field label="Polígono de norma" tooltip={"Código único del polígono normativo según el mapa protocolizado del POT Acuerdo 48 de 2014"}>
                 <Input value={form.zona_pot ?? ""} onChange={(e) => set("zona_pot", e.target.value)} />
               </Field>
               <Sugerencia areaKey="normativo" campo="zona_pot" pdfProps={pdfProps} onApply={(v) => set("zona_pot", v)} />
             </div>
             <div>
-              <Field label="Zona homogénea">
+              <Field label="Zona homogénea" tooltip={"División territorial con características urbanas similares. Ej: Z4 = Zona 4"}>
                 <Input value={form.zona_homogenea ?? ""} onChange={(e) => set("zona_homogenea", e.target.value)} />
               </Field>
             </div>
             <div>
-              <Field label="Tratamiento">
+              <Field label="Tratamiento" tooltip={"Directriz que define qué intervención se permite. Tipos: Consolidación / Renovación / Desarrollo / Mejoramiento / Conservación"}>
                 <Input value={form.tratamiento ?? ""} onChange={(e) => set("tratamiento", e.target.value)} />
               </Field>
               <Sugerencia areaKey="normativo" campo="tratamiento" pdfProps={pdfProps} onApply={(v) => set("tratamiento", v)} />
             </div>
             <div>
-              <Field label="Norma vigente">
+              <Field label="Fuente norma" tooltip={"Acuerdo municipal o decreto que establece la norma urbanística vigente para el predio"}>
                 <Input value={form.norma_vigente ?? ""} onChange={(e) => set("norma_vigente", e.target.value)} />
               </Field>
               <Sugerencia areaKey="normativo" campo="norma_vigente" pdfProps={pdfProps} onApply={(v) => set("norma_vigente", v)} />
             </div>
             <div>
-              <Field label="Cesión tipo A (%)">
+              <Field label="Cesión tipo A (%)" tooltip={"Suelo a ceder gratuitamente al municipio para parques y espacio público.\nUnidad: m² por habitante"}>
                 <Input type="number" step="0.1" value={form.cesion_tipo_a_pct ?? ""} onChange={(e) => set("cesion_tipo_a_pct", e.target.value ? Number(e.target.value) : null)} />
               </Field>
               <Sugerencia areaKey="normativo" campo="cesion_tipo_a_pct" pdfProps={pdfProps} onApply={(v) => set("cesion_tipo_a_pct", v)} />
             </div>
             <div>
-              <Field label="Cesión tipo B (%)">
+              <Field label="Cesión tipo B (%)" tooltip={"Área para equipamientos colectivos como colegios y centros de salud.\nUnidad: m² por cada 100m² construidos"}>
                 <Input type="number" step="0.1" value={form.cesion_tipo_b ?? ""} onChange={(e) => set("cesion_tipo_b", e.target.value ? Number(e.target.value) : null)} />
               </Field>
             </div>
