@@ -40,9 +40,8 @@ const Mercado = () => {
     queryFn: async () => {
       // Fetch lotes with their precios
       const { data: lotes } = await supabase
-        .from("lotes")
+        .from("lotes_publicos" as any)
         .select("id, ciudad")
-        .eq("es_publico", true)
         .not("ciudad", "is", null);
 
       if (!lotes || lotes.length === 0) return [];
