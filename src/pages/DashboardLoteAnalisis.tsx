@@ -202,7 +202,7 @@ const DashboardLoteAnalisis = () => {
   const { data: lote, isLoading: loadingLote } = useQuery({
     queryKey: ["analisis-lote", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("lotes").select("nombre_lote, ciudad, area_total_m2").eq("id", id!).single();
+      const { data, error } = await supabase.from("lotes").select("nombre_lote, ciudad, area_total_m2, lat, lng").eq("id", id!).single();
       if (error) throw error;
       return data;
     },
