@@ -100,7 +100,7 @@ const Lotes = () => {
     queryFn: async () => {
       const { data: lotesData, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios");
+        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios, es_publico");
       if (error) throw error;
 
       const ids = lotesData.map((l) => l.id);

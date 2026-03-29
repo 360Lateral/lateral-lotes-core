@@ -118,7 +118,7 @@ const LoteDetalle = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("*")
+        .select("id, nombre_lote, ciudad, barrio, departamento, direccion, area_total_m2, lat, lng, estado_disponibilidad, tipo_lote, estrato, frente_ml, fondo_ml, destacado, foto_url, video_url, score_juridico, score_normativo, score_servicios, has_resolutoria, es_publico, owner_id, created_at, updated_at, tiene_escritura")
         .eq("id", id!)
         .single();
       if (error) throw error;
@@ -449,14 +449,14 @@ const LoteDetalle = () => {
               </GoogleMapsGate>
             )}
 
-            {/* Notes */}
-            {lote.notas && (
+            {/* Notes - only visible for admin/asesor */}
+            {isAdminOrAsesor && (lote as any).notas && (
               <div className="rounded-lg border border-border p-4">
                 <h3 className="mb-2 font-body text-sm font-semibold text-foreground">
                   Descripción
                 </h3>
                 <p className="font-body text-sm leading-relaxed text-muted-foreground">
-                  {lote.notas}
+                  {(lote as any).notas}
                 </p>
               </div>
             )}
@@ -610,10 +610,12 @@ const LoteDetalle = () => {
                       : "—"
                   }
                 />
-                <DataItem
-                  label="Matrícula"
-                  value={lote.matricula_inmobiliaria ?? "—"}
-                />
+                {isAdminOrAsesor && (
+                  <DataItem
+                    label="Matrícula"
+                    value={(lote as any).matricula_inmobiliaria ?? "—"}
+                  />
+                )}
                 <DataItem
                   label="Estrato"
                   value={lote.estrato != null ? String(lote.estrato) : "—"}
@@ -655,7 +657,7 @@ const LoteDetalle = () => {
                 score_juridico: lote.score_juridico,
                 score_normativo: lote.score_normativo,
                 score_servicios: lote.score_servicios,
-                notas: lote.notas,
+                notas: isAdminOrAsesor ? (lote as any).notas ?? null : null,
               }}
             />
 
