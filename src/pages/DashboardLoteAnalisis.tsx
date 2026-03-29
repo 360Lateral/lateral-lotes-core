@@ -274,7 +274,7 @@ const DashboardLoteAnalisis = () => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <NormativaSection loteId={id!} pdfProps={makePdfProps("normativo")} />
+        <NormativaSection loteId={id!} lat={lote?.lat} lng={lote?.lng} pdfProps={makePdfProps("normativo")} />
         <JuridicoSection loteId={id!} pdfProps={makePdfProps("juridico")} />
         <AmbientalSection loteId={id!} pdfProps={makePdfProps("ambiental")} />
         <SSPPSection loteId={id!} pdfProps={makePdfProps("sspp")} />
