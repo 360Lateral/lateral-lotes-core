@@ -326,6 +326,10 @@ const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean
   { key: "altura_normativa", label: "Altura", potKey: "altura_texto", isText: true },
   { key: "cesion_tipo_a_pct", label: "Cesión tipo A", potKey: "cesion_tipo_a" },
   { key: "cesion_tipo_b", label: "Cesión tipo B", potKey: "cesion_tipo_b" },
+  { key: "indice_ocupacion", label: "IO (Índice de ocupación)", potKey: "io" },
+  { key: "aislamiento_frontal_m", label: "Aislamiento frontal (m)", potKey: "aislamiento_frontal_m" },
+  { key: "aislamiento_posterior_m", label: "Aislamiento posterior (m)", potKey: "aislamiento_posterior_m" },
+  { key: "aislamiento_lateral_m", label: "Aislamiento lateral (m)", potKey: "aislamiento_lateral_m" },
 ];
 
 /* ─── Section 1: Normativa (read-only summary + PDF) ── */
