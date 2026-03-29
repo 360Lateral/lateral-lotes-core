@@ -587,8 +587,6 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
     </>
   );
 };
-  );
-};
 
 /* ─── Generic upsert hook ─────────────────────── */
 function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
