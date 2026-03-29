@@ -319,6 +319,7 @@ const DashboardLoteAnalisis = () => {
 
 /* ─── POT field mapping config ─────────────────── */
 const POT_FIELDS: { key: string; label: string; potKey: string; isText?: boolean }[] = [
+  { key: "uso_principal", label: "Uso principal", potKey: "uso_principal" },
   { key: "tratamiento", label: "Tratamiento", potKey: "tratamiento" },
   { key: "indice_construccion", label: "IC", potKey: "ic_texto", isText: true },
   { key: "densidad_maxima", label: "Densidad máx", potKey: "densidad_texto", isText: true },
