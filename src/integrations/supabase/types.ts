@@ -1115,6 +1115,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pot_norma_referencia: {
+        Row: {
+          aislamiento_frontal_m: number | null
+          aislamiento_lateral_m: number | null
+          aislamiento_posterior_m: number | null
+          franja: string | null
+          id: string
+          io_plataforma: number | null
+          io_torre: number | null
+          observaciones: string | null
+          tipo: string
+          tratamiento: string | null
+        }
+        Insert: {
+          aislamiento_frontal_m?: number | null
+          aislamiento_lateral_m?: number | null
+          aislamiento_posterior_m?: number | null
+          franja?: string | null
+          id?: string
+          io_plataforma?: number | null
+          io_torre?: number | null
+          observaciones?: string | null
+          tipo: string
+          tratamiento?: string | null
+        }
+        Update: {
+          aislamiento_frontal_m?: number | null
+          aislamiento_lateral_m?: number | null
+          aislamiento_posterior_m?: number | null
+          franja?: string | null
+          id?: string
+          io_plataforma?: number | null
+          io_torre?: number | null
+          observaciones?: string | null
+          tipo?: string
+          tratamiento?: string | null
+        }
+        Relationships: []
+      }
       pot_poligonos: {
         Row: {
           altura_max_m: number | null
@@ -1410,6 +1449,9 @@ export type Database = {
       consultar_norma_por_punto: {
         Args: { p_lat: number; p_lng: number }
         Returns: {
+          aislamiento_frontal_m: number
+          aislamiento_lateral_m: number
+          aislamiento_posterior_m: number
           altura_max_m: number
           altura_max_pisos: number
           altura_texto: string
@@ -1417,13 +1459,16 @@ export type Database = {
           cesion_tipo_b: number
           densidad_max: number
           densidad_texto: string
+          franja: string
           fuente: string
           ic_base: number
           ic_maximo: number
           ic_texto: string
           io: number
+          io_torre: number
           municipio: string
           norma_vigente: string
+          observaciones_norma: string
           poligono_norma: string
           tratamiento: string
           uso_principal: string
