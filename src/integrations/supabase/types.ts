@@ -98,6 +98,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_ambiental_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       analisis_arquitectonico: {
@@ -148,6 +155,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_arquitectonico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       analisis_documentos: {
@@ -190,6 +204,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_documentos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -251,6 +272,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_financiero_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       analisis_geotecnico: {
@@ -296,6 +324,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_geotecnico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -351,6 +386,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_juridico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       analisis_mercado: {
@@ -396,6 +438,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_mercado_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -451,6 +500,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_sspp_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       consultas_ia: {
@@ -484,6 +540,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultas_ia_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -581,6 +644,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "documentos_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       favoritos: {
@@ -608,6 +678,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favoritos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -640,6 +717,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fotos_lotes_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -691,6 +775,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -865,6 +956,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "negociaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       normativa_urbana: {
@@ -927,6 +1025,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "normativa_urbana_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notificaciones: {
@@ -960,6 +1065,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notificaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -1093,6 +1205,13 @@ export type Database = {
             referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "precios_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       servicios_publicos: {
@@ -1123,6 +1242,13 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "servicios_publicos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -1168,7 +1294,96 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lotes_publicos: {
+        Row: {
+          area_total_m2: number | null
+          barrio: string | null
+          ciudad: string | null
+          created_at: string | null
+          departamento: string | null
+          destacado: boolean | null
+          direccion: string | null
+          es_publico: boolean | null
+          estado_disponibilidad:
+            | Database["public"]["Enums"]["estado_disponibilidad"]
+            | null
+          estrato: number | null
+          fondo_ml: number | null
+          foto_url: string | null
+          frente_ml: number | null
+          has_resolutoria: boolean | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          nombre_lote: string | null
+          owner_id: string | null
+          score_juridico: number | null
+          score_normativo: number | null
+          score_servicios: number | null
+          tipo_lote: string | null
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          area_total_m2?: number | null
+          barrio?: string | null
+          ciudad?: string | null
+          created_at?: string | null
+          departamento?: string | null
+          destacado?: boolean | null
+          direccion?: string | null
+          es_publico?: boolean | null
+          estado_disponibilidad?:
+            | Database["public"]["Enums"]["estado_disponibilidad"]
+            | null
+          estrato?: number | null
+          fondo_ml?: number | null
+          foto_url?: string | null
+          frente_ml?: number | null
+          has_resolutoria?: boolean | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          nombre_lote?: string | null
+          owner_id?: string | null
+          score_juridico?: number | null
+          score_normativo?: number | null
+          score_servicios?: number | null
+          tipo_lote?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          area_total_m2?: number | null
+          barrio?: string | null
+          ciudad?: string | null
+          created_at?: string | null
+          departamento?: string | null
+          destacado?: boolean | null
+          direccion?: string | null
+          es_publico?: boolean | null
+          estado_disponibilidad?:
+            | Database["public"]["Enums"]["estado_disponibilidad"]
+            | null
+          estrato?: number | null
+          fondo_ml?: number | null
+          foto_url?: string | null
+          frente_ml?: number | null
+          has_resolutoria?: boolean | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          nombre_lote?: string | null
+          owner_id?: string | null
+          score_juridico?: number | null
+          score_normativo?: number | null
+          score_servicios?: number | null
+          tipo_lote?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       consultar_norma_por_punto: {
