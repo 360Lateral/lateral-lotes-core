@@ -232,6 +232,7 @@ const Login = () => {
             <Button type="submit" className="w-full" disabled={loading || loginSuccess}>
               {loading ? "Ingresando..." : loginSuccess ? "Redirigiendo..." : "Iniciar sesión"}
             </Button>
+            {googleButton}
           </form>
         ) : (
           <form onSubmit={handleRegister} className="space-y-4">
@@ -283,6 +284,7 @@ const Login = () => {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Registrando..." : "Crear cuenta"}
             </Button>
+            {googleButton}
           </form>
         )}
 
