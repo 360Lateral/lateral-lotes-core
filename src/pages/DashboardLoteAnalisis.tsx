@@ -18,8 +18,9 @@ import { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   Scale, Leaf, Zap, Mountain, TrendingUp, Building2, DollarSign, FileText,
-  FileUp, Loader2, Sparkles, MapPin,
+  FileUp, Loader2, Sparkles, MapPin, Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ExcelAnalisisImporter from "@/components/ExcelAnalisisImporter";
 import ExcelAnalisisExporter from "@/components/ExcelAnalisisExporter";
 
@@ -180,9 +181,23 @@ const Sugerencia = ({ areaKey, campo, pdfProps, onApply }: {
   );
 };
 
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+const Field = ({ label, children, tooltip }: { label: string; children: React.ReactNode; tooltip?: string }) => (
   <div className="flex flex-col gap-1.5">
-    <Label className="font-body text-xs text-muted-foreground">{label}</Label>
+    <div className="flex items-center gap-1">
+      <Label className="font-body text-xs text-muted-foreground">{label}</Label>
+      {tooltip && (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[200px] whitespace-pre-line text-xs bg-foreground text-background">
+              {tooltip}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </div>
     {children}
   </div>
 );
