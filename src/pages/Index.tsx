@@ -41,10 +41,10 @@ const Index = () => {
     queryKey: ["trust-stats"],
     queryFn: async () => {
       const [lotesRes, ciudadesRes, diagRes, resoRes] = await Promise.all([
-        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("estado_disponibilidad", "Disponible"),
-        supabase.from("lotes").select("ciudad"),
+        supabase.from("lotes_publicos" as any).select("id", { count: "exact", head: true }).eq("estado_disponibilidad", "Disponible"),
+        supabase.from("lotes_publicos" as any).select("ciudad"),
         supabase.rpc("count_diagnosticos"),
-        supabase.from("lotes").select("id", { count: "exact", head: true }).eq("has_resolutoria", true),
+        supabase.from("lotes_publicos" as any).select("id", { count: "exact", head: true }).eq("has_resolutoria", true),
       ]);
       const uniqueCiudades = new Set((ciudadesRes.data ?? []).map((l: any) => l.ciudad).filter(Boolean));
       return [

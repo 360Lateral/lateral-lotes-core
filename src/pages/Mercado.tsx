@@ -39,13 +39,13 @@ const Mercado = () => {
     queryKey: ["mercado-index"],
     queryFn: async () => {
       // Fetch lotes with their precios
-      const { data: lotes } = await supabase
-        .from("lotes")
+      const { data: lotesRaw } = await supabase
+        .from("lotes_publicos" as any)
         .select("id, ciudad")
-        .eq("es_publico", true)
         .not("ciudad", "is", null);
 
-      if (!lotes || lotes.length === 0) return [];
+      const lotes = (lotesRaw ?? []) as unknown as { id: string; ciudad: string }[];
+      if (lotes.length === 0) return [];
 
       const loteIds = lotes.map((l) => l.id);
 
