@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, useCallback, ReactNode } from "react";
+import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
