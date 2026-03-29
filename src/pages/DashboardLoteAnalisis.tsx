@@ -395,33 +395,65 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
     return pot[field.potKey] != null ? String(pot[field.potKey]) : null;
   };
 
-  const applyPotData = (pot: any, selected: Record<string, boolean> | null) => {
+  const applyPotData = async (pot: any, selected: Record<string, boolean> | null) => {
     let count = 0;
-    setForm((prev: any) => {
-      const updated = { ...prev };
-      POT_FIELDS.forEach(f => {
-        if (selected === null || selected[f.key]) {
-          const val = getPotValue(pot, f);
-          if (val !== null) {
-            if (f.isText) {
-              updated[f.key] = val;
-            } else if (f.key === "cesion_tipo_a_pct" || f.key === "cesion_tipo_b") {
-              updated[f.key] = pot[f.potKey];
-            } else {
-              updated[f.key] = val;
-            }
-            count++;
+    const updatedFields: Record<string, any> = {};
+
+    POT_FIELDS.forEach(f => {
+      if (selected === null || selected[f.key]) {
+        const val = getPotValue(pot, f);
+        if (val !== null) {
+          if (f.key === "cesion_tipo_a_pct" || f.key === "cesion_tipo_b") {
+            updatedFields[f.key] = pot[f.potKey];
+          } else {
+            updatedFields[f.key] = val;
           }
+          count++;
         }
-      });
-      // Always apply these non-compared fields
-      if (pot.poligono_norma) updated.zona_pot = pot.poligono_norma;
-      if (pot.zona_homogenea) updated.zona_homogenea = pot.zona_homogenea;
-      updated.norma_vigente = "GeoMedellín - Acuerdo 48 de 2014";
-      return updated;
+      }
     });
-    toast({ title: `Norma POT aplicada — ${count} campos actualizados desde GeoMedellín · Acuerdo 48 de 2014` });
+
+    // Always apply these non-compared fields
+    if (pot.poligono_norma) updatedFields.zona_pot = pot.poligono_norma;
+    if (pot.zona_homogenea) updatedFields.zona_homogenea = pot.zona_homogenea;
+    updatedFields.norma_vigente = "GeoMedellín - Acuerdo 48 de 2014";
+
+    // Update form state
+    setForm((prev: any) => ({ ...prev, ...updatedFields }));
     setShowPotModal(false);
+
+    // Build the full payload for upsert using current form + new fields
+    const mergedForm = { ...form, ...updatedFields };
+    const payload = {
+      uso_principal: mergedForm.uso_principal || null,
+      usos_compatibles: mergedForm.usos_compatibles ? (Array.isArray(mergedForm.usos_compatibles) ? mergedForm.usos_compatibles : mergedForm.usos_compatibles.split(",").map((s: string) => s.trim()).filter(Boolean)) : null,
+      indice_construccion: mergedForm.indice_construccion ? Number(mergedForm.indice_construccion) : null,
+      indice_ocupacion: mergedForm.indice_ocupacion ?? null,
+      altura_max_pisos: mergedForm.altura_max_pisos ?? null,
+      altura_max_metros: mergedForm.altura_max_metros ?? null,
+      aislamiento_frontal_m: mergedForm.aislamiento_frontal_m ?? null,
+      aislamiento_posterior_m: mergedForm.aislamiento_posterior_m ?? null,
+      aislamiento_lateral_m: mergedForm.aislamiento_lateral_m ?? null,
+      zona_pot: mergedForm.zona_pot || null,
+      tratamiento: mergedForm.tratamiento || null,
+      norma_vigente: mergedForm.norma_vigente || null,
+      cesion_tipo_a_pct: mergedForm.cesion_tipo_a_pct ?? null,
+    };
+
+    // Auto-save to Supabase
+    try {
+      const { data: existing } = await supabase.from("normativa_urbana").select("id").eq("lote_id", loteId).maybeSingle();
+      if (existing) {
+        const { error } = await supabase.from("normativa_urbana").update(payload).eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("normativa_urbana").insert({ ...payload, lote_id: loteId });
+        if (error) throw error;
+      }
+      toast({ title: `Norma POT aplicada — ${count} campos actualizados desde GeoMedellín · Acuerdo 48 de 2014` });
+    } catch (err: any) {
+      toast({ title: "Error al guardar — intenta de nuevo", description: err.message, variant: "destructive" });
+    }
   };
 
   return (
