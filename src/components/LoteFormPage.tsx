@@ -473,6 +473,12 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
                       { label: "Polígono de norma", value: potResult.poligono_norma },
                       { label: "Norma vigente", value: potResult.norma_vigente },
                       { label: "Fuente", value: potResult.fuente },
+                      { label: "Tratamiento urbanístico", value: potResult.tratamiento },
+                      { label: "IC base", value: potResult.ic_base != null ? String(potResult.ic_base) : null },
+                      { label: "IC máximo", value: potResult.ic_maximo != null ? String(potResult.ic_maximo) : null },
+                      { label: "Densidad máxima (viv/ha)", value: potResult.densidad_max != null ? String(potResult.densidad_max) : null },
+                      { label: "Cesión tipo A (%)", value: potResult.cesion_tipo_a != null ? String(potResult.cesion_tipo_a) : null },
+                      { label: "Cesión tipo B (%)", value: potResult.cesion_tipo_b != null ? String(potResult.cesion_tipo_b) : null },
                     ].map(({ label, value }) => (
                       <div key={label}>
                         <p className="text-xs text-muted-foreground">{label}</p>
