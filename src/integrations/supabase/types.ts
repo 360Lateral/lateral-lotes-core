@@ -1107,15 +1107,18 @@ export type Database = {
         Row: {
           altura_max_m: number | null
           altura_max_pisos: number | null
+          altura_texto: string | null
           cesion_tipo_a: number | null
           cesion_tipo_b: number | null
           densidad_max: number | null
+          densidad_texto: string | null
           departamento: string
           fecha_carga: string | null
           fuente: string | null
           geom: unknown
           ic_base: number | null
           ic_maximo: number | null
+          ic_texto: string | null
           id: string
           io: number | null
           municipio: string
@@ -1129,15 +1132,18 @@ export type Database = {
         Insert: {
           altura_max_m?: number | null
           altura_max_pisos?: number | null
+          altura_texto?: string | null
           cesion_tipo_a?: number | null
           cesion_tipo_b?: number | null
           densidad_max?: number | null
+          densidad_texto?: string | null
           departamento: string
           fecha_carga?: string | null
           fuente?: string | null
           geom?: unknown
           ic_base?: number | null
           ic_maximo?: number | null
+          ic_texto?: string | null
           id?: string
           io?: number | null
           municipio: string
@@ -1151,15 +1157,18 @@ export type Database = {
         Update: {
           altura_max_m?: number | null
           altura_max_pisos?: number | null
+          altura_texto?: string | null
           cesion_tipo_a?: number | null
           cesion_tipo_b?: number | null
           densidad_max?: number | null
+          densidad_texto?: string | null
           departamento?: string
           fecha_carga?: string | null
           fuente?: string | null
           geom?: unknown
           ic_base?: number | null
           ic_maximo?: number | null
+          ic_texto?: string | null
           id?: string
           io?: number | null
           municipio?: string
@@ -1391,12 +1400,15 @@ export type Database = {
         Returns: {
           altura_max_m: number
           altura_max_pisos: number
+          altura_texto: string
           cesion_tipo_a: number
           cesion_tipo_b: number
           densidad_max: number
+          densidad_texto: string
           fuente: string
           ic_base: number
           ic_maximo: number
+          ic_texto: string
           io: number
           municipio: string
           norma_vigente: string
