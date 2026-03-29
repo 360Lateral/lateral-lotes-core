@@ -413,21 +413,28 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
       }
     });
 
-    // Always apply these non-compared fields
     if (pot.poligono_norma) updatedFields.zona_pot = pot.poligono_norma;
     if (pot.zona_homogenea) updatedFields.zona_homogenea = pot.zona_homogenea;
     updatedFields.norma_vigente = "GeoMedellín - Acuerdo 48 de 2014";
+    updatedFields.tratamiento = pot.tratamiento || null;
 
-    // Update form state
-    setForm((prev: any) => ({ ...prev, ...updatedFields }));
     setShowPotModal(false);
 
-    // Build the full payload for upsert using current form + new fields
+    // CORRECCIÓN: usar updatedFields directamente, no form
+    // porque setForm es asíncrono y form aún no se actualizó
     const mergedForm = { ...form, ...updatedFields };
+    const ic = mergedForm.indice_construccion;
+
     const payload = {
       uso_principal: mergedForm.uso_principal || null,
-      usos_compatibles: mergedForm.usos_compatibles ? (Array.isArray(mergedForm.usos_compatibles) ? mergedForm.usos_compatibles : mergedForm.usos_compatibles.split(",").map((s: string) => s.trim()).filter(Boolean)) : null,
-      indice_construccion: mergedForm.indice_construccion ? Number(mergedForm.indice_construccion) : null,
+      usos_compatibles: mergedForm.usos_compatibles
+        ? (Array.isArray(mergedForm.usos_compatibles)
+            ? mergedForm.usos_compatibles
+            : mergedForm.usos_compatibles.split(",").map((s: string) => s.trim()).filter(Boolean))
+        : null,
+      indice_construccion: ic !== undefined && ic !== null && ic !== ""
+        ? Number(String(ic).replace(",", "."))
+        : null,
       indice_ocupacion: mergedForm.indice_ocupacion ?? null,
       altura_max_pisos: mergedForm.altura_max_pisos ?? null,
       altura_max_metros: mergedForm.altura_max_metros ?? null,
@@ -435,24 +442,41 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
       aislamiento_posterior_m: mergedForm.aislamiento_posterior_m ?? null,
       aislamiento_lateral_m: mergedForm.aislamiento_lateral_m ?? null,
       zona_pot: mergedForm.zona_pot || null,
-      tratamiento: mergedForm.tratamiento || null,
+      tratamiento: updatedFields.tratamiento || mergedForm.tratamiento || null,
       norma_vigente: mergedForm.norma_vigente || null,
       cesion_tipo_a_pct: mergedForm.cesion_tipo_a_pct ?? null,
     };
 
-    // Auto-save to Supabase
     try {
-      const { data: existing } = await supabase.from("normativa_urbana").select("id").eq("lote_id", loteId).maybeSingle();
+      const { data: existing } = await supabase
+        .from("normativa_urbana")
+        .select("id")
+        .eq("lote_id", loteId)
+        .maybeSingle();
+
       if (existing) {
-        const { error } = await supabase.from("normativa_urbana").update(payload).eq("id", existing.id);
+        const { error } = await supabase
+          .from("normativa_urbana")
+          .update(payload)
+          .eq("id", existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("normativa_urbana").insert({ ...payload, lote_id: loteId });
+        const { error } = await supabase
+          .from("normativa_urbana")
+          .insert({ ...payload, lote_id: loteId });
         if (error) throw error;
       }
-      toast({ title: `Norma POT aplicada — ${count} campos actualizados desde GeoMedellín · Acuerdo 48 de 2014` });
+
+      setForm((prev: any) => ({ ...prev, ...updatedFields }));
+      toast({
+        title: `Norma POT aplicada — ${count} campos actualizados desde GeoMedellín · Acuerdo 48 de 2014`
+      });
     } catch (err: any) {
-      toast({ title: "Error al guardar — intenta de nuevo", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error al guardar — intenta de nuevo",
+        description: err.message,
+        variant: "destructive"
+      });
     }
   };
 
