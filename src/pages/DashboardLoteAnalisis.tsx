@@ -533,6 +533,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               <Field label="IO torre" tooltip={"Índice de Ocupación máximo para los pisos superiores o torre de la edificación. Generalmente menor que el IO de plataforma para garantizar retiros en altura.\nEj: 0.60 = máximo 60% del área del lote ocupada en pisos superiores"}>
                 <Input type="number" step="0.01" value={form.io_torre ?? ""} onChange={(e) => set("io_torre", e.target.value ? Number(e.target.value) : null)} />
               </Field>
+            </div>
             <div>
               <Field label="Altura máx. pisos">
                 <Input type="number" value={form.altura_max_pisos ?? ""} onChange={(e) => set("altura_max_pisos", e.target.value ? Number(e.target.value) : null)} />
