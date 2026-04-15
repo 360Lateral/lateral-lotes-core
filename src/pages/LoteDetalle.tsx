@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import AsistenteChat from "@/components/AsistenteChat";
 import { useToast } from "@/hooks/use-toast";
+import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
 
 
 
@@ -100,6 +101,7 @@ const categoriasDoc = [
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const { user, isDeveloper, isAdminOrAsesor } = useAuth();
+  const { limits: planLimits } = usePlan();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [contactOpen, setContactOpen] = useState(false);
@@ -639,6 +641,22 @@ const LoteDetalle = () => {
             </div>
 
             {/* Asistente IA 360° */}
+            {planLimits && planLimits.max_consultas_ia_mes === 0 ? (
+              <Card className="border-dashed">
+                <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                  <Lock className="h-8 w-8 text-muted-foreground" />
+                  <p className="font-body text-sm font-semibold text-foreground">
+                    Asistente IA no disponible en tu plan
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground max-w-xs">
+                    Actualiza tu plan para acceder al asistente IA 360°.
+                  </p>
+                  <Button variant="default" size="sm" asChild>
+                    <Link to="/planes">Ver planes</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
             <AsistenteChat
               loteId={id!}
               loteContext={{
@@ -660,6 +678,7 @@ const LoteDetalle = () => {
                 notas: isAdminOrAsesor ? (lote as any).notas ?? null : null,
               }}
             />
+            )}
 
             {/* Tabs */}
             <Tabs defaultValue="normativa" className="w-full">
@@ -944,7 +963,23 @@ const LoteDetalle = () => {
 
               {/* Tab: Resolutoría */}
               <TabsContent value="resolutoria">
-                {(lote as any).has_resolutoria === true ? (
+                {planLimits && !planLimits.acceso_analisis_completo ? (
+                  <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                      <Lock className="h-8 w-8 text-muted-foreground" />
+                      <p className="font-body text-sm font-semibold text-foreground">
+                        Análisis completo no incluido en tu plan{" "}
+                        {PLAN_LABELS[planLimits.plan_slug] ?? planLimits.plan_slug}
+                      </p>
+                      <p className="font-body text-xs text-muted-foreground max-w-xs">
+                        Accede a los 8 análisis de la Resolutoría 360° (normativo, jurídico, SSPP, suelos, mercado, ambiental, arquitectónico y financiero) actualizando tu plan.
+                      </p>
+                      <Button variant="default" size="sm" asChild>
+                        <Link to="/planes">Ver planes</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (lote as any).has_resolutoria === true ? (
                   <div className="flex flex-col gap-4">
                     <Badge variant="disponible" className="w-fit gap-1 text-sm px-3 py-1">
                       <Check className="h-4 w-4" /> Resolutoría 360° Completada

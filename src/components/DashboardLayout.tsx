@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, end: true },
@@ -38,6 +39,7 @@ interface Props {
 
 const DashboardLayout = ({ children }: Props) => {
   const { user, roles, signOut, isDeveloper, userType } = useAuth();
+  const { planSlug } = usePlan();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -140,6 +142,14 @@ const DashboardLayout = ({ children }: Props) => {
         <p className="truncate font-body text-xs text-secondary-foreground/70">
           {displayName}
         </p>
+        {planSlug && (
+          <Link
+            to="/planes"
+            className="mt-1 inline-block rounded-full bg-primary/20 px-2 py-0.5 font-body text-[10px] font-semibold text-primary hover:bg-primary/30 transition-colors"
+          >
+            Plan {PLAN_LABELS[planSlug] ?? planSlug}
+          </Link>
+        )}
         <Button
           variant="ghost"
           size="sm"
