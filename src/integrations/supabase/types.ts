@@ -23,11 +23,17 @@ export type Database = {
           barrio: string | null
           ciudad: string | null
           created_at: string
+          descripcion: string | null
+          estratos: number[] | null
           id: string
           io_minimo: number | null
           nombre: string | null
           precio_max_m2: number | null
+          presupuesto_max: number | null
+          presupuesto_min: number | null
+          status: string | null
           tratamiento: string | null
+          tratamientos: string[] | null
           updated_at: string | null
           user_id: string
           uso_suelo: string | null
@@ -40,11 +46,17 @@ export type Database = {
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          descripcion?: string | null
+          estratos?: number[] | null
           id?: string
           io_minimo?: number | null
           nombre?: string | null
           precio_max_m2?: number | null
+          presupuesto_max?: number | null
+          presupuesto_min?: number | null
+          status?: string | null
           tratamiento?: string | null
+          tratamientos?: string[] | null
           updated_at?: string | null
           user_id: string
           uso_suelo?: string | null
@@ -57,11 +69,17 @@ export type Database = {
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          descripcion?: string | null
+          estratos?: number[] | null
           id?: string
           io_minimo?: number | null
           nombre?: string | null
           precio_max_m2?: number | null
+          presupuesto_max?: number | null
+          presupuesto_min?: number | null
+          status?: string | null
           tratamiento?: string | null
+          tratamientos?: string[] | null
           updated_at?: string | null
           user_id?: string
           uso_suelo?: string | null
@@ -625,6 +643,55 @@ export type Database = {
           },
           {
             foreignKeyName: "consultas_ia_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criteria_matches: {
+        Row: {
+          alerta_id: string
+          calculated_at: string
+          detalles: Json | null
+          id: string
+          lote_id: string
+          score: number
+        }
+        Insert: {
+          alerta_id: string
+          calculated_at?: string
+          detalles?: Json | null
+          id?: string
+          lote_id: string
+          score?: number
+        }
+        Update: {
+          alerta_id?: string
+          calculated_at?: string
+          detalles?: Json | null
+          id?: string
+          lote_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteria_matches_alerta_id_fkey"
+            columns: ["alerta_id"]
+            isOneToOne: false
+            referencedRelation: "alertas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_matches_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_matches_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes_publicos"
@@ -1701,6 +1768,13 @@ export type Database = {
       }
     }
     Functions: {
+      calcular_match_score: {
+        Args: { p_alerta_id: string; p_lote_id: string }
+        Returns: {
+          detalles: Json
+          score: number
+        }[]
+      }
       consultar_norma_por_punto: {
         Args: { p_lat: number; p_lng: number }
         Returns: {
@@ -1762,6 +1836,10 @@ export type Database = {
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
         Returns: boolean
+      }
+      refresh_matches_alerta: {
+        Args: { p_alerta_id: string }
+        Returns: undefined
       }
       shares_negociacion: {
         Args: { _user_a: string; _user_b: string }
