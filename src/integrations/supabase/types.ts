@@ -23,11 +23,17 @@ export type Database = {
           barrio: string | null
           ciudad: string | null
           created_at: string
+          descripcion: string | null
+          estratos: number[] | null
           id: string
           io_minimo: number | null
           nombre: string | null
           precio_max_m2: number | null
+          presupuesto_max: number | null
+          presupuesto_min: number | null
+          status: string | null
           tratamiento: string | null
+          tratamientos: string[] | null
           updated_at: string | null
           user_id: string
           uso_suelo: string | null
@@ -40,11 +46,17 @@ export type Database = {
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          descripcion?: string | null
+          estratos?: number[] | null
           id?: string
           io_minimo?: number | null
           nombre?: string | null
           precio_max_m2?: number | null
+          presupuesto_max?: number | null
+          presupuesto_min?: number | null
+          status?: string | null
           tratamiento?: string | null
+          tratamientos?: string[] | null
           updated_at?: string | null
           user_id: string
           uso_suelo?: string | null
@@ -57,11 +69,17 @@ export type Database = {
           barrio?: string | null
           ciudad?: string | null
           created_at?: string
+          descripcion?: string | null
+          estratos?: number[] | null
           id?: string
           io_minimo?: number | null
           nombre?: string | null
           precio_max_m2?: number | null
+          presupuesto_max?: number | null
+          presupuesto_min?: number | null
+          status?: string | null
           tratamiento?: string | null
+          tratamientos?: string[] | null
           updated_at?: string | null
           user_id?: string
           uso_suelo?: string | null
@@ -632,6 +650,55 @@ export type Database = {
           },
         ]
       }
+      criteria_matches: {
+        Row: {
+          alerta_id: string
+          calculated_at: string
+          detalles: Json | null
+          id: string
+          lote_id: string
+          score: number
+        }
+        Insert: {
+          alerta_id: string
+          calculated_at?: string
+          detalles?: Json | null
+          id?: string
+          lote_id: string
+          score?: number
+        }
+        Update: {
+          alerta_id?: string
+          calculated_at?: string
+          detalles?: Json | null
+          id?: string
+          lote_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteria_matches_alerta_id_fkey"
+            columns: ["alerta_id"]
+            isOneToOne: false
+            referencedRelation: "alertas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_matches_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_matches_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnosticos: {
         Row: {
           area_m2: number | null
@@ -895,6 +962,7 @@ export type Database = {
         Row: {
           area_total_m2: number | null
           barrio: string | null
+          cbml: string | null
           ciudad: string | null
           created_at: string
           departamento: string | null
@@ -933,6 +1001,7 @@ export type Database = {
         Insert: {
           area_total_m2?: number | null
           barrio?: string | null
+          cbml?: string | null
           ciudad?: string | null
           created_at?: string
           departamento?: string | null
@@ -971,6 +1040,7 @@ export type Database = {
         Update: {
           area_total_m2?: number | null
           barrio?: string | null
+          cbml?: string | null
           ciudad?: string | null
           created_at?: string
           departamento?: string | null
@@ -1005,6 +1075,42 @@ export type Database = {
           tipo_lote?: string | null
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      mapgis_cache: {
+        Row: {
+          cbml: string
+          consultado_at: string
+          datos: Json
+          es_valido: boolean
+          expira_at: string
+          id: string
+          tipo_entrada: string
+          user_id: string | null
+          valor_entrada: string
+        }
+        Insert: {
+          cbml: string
+          consultado_at?: string
+          datos?: Json
+          es_valido?: boolean
+          expira_at?: string
+          id?: string
+          tipo_entrada?: string
+          user_id?: string | null
+          valor_entrada: string
+        }
+        Update: {
+          cbml?: string
+          consultado_at?: string
+          datos?: Json
+          es_valido?: boolean
+          expira_at?: string
+          id?: string
+          tipo_entrada?: string
+          user_id?: string | null
+          valor_entrada?: string
         }
         Relationships: []
       }
@@ -1195,36 +1301,49 @@ export type Database = {
       }
       notificaciones: {
         Row: {
+          alerta_id: string | null
           created_at: string
           id: string
           leida: boolean
           lote_id: string
           mensaje: string
           negociacion_id: string | null
+          score: number | null
           tipo: string | null
           user_id: string
         }
         Insert: {
+          alerta_id?: string | null
           created_at?: string
           id?: string
           leida?: boolean
           lote_id: string
           mensaje: string
           negociacion_id?: string | null
+          score?: number | null
           tipo?: string | null
           user_id: string
         }
         Update: {
+          alerta_id?: string | null
           created_at?: string
           id?: string
           leida?: boolean
           lote_id?: string
           mensaje?: string
           negociacion_id?: string | null
+          score?: number | null
           tipo?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "notificaciones_alerta_id_fkey"
+            columns: ["alerta_id"]
+            isOneToOne: false
+            referencedRelation: "alertas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notificaciones_lote_id_fkey"
             columns: ["lote_id"]
@@ -1701,6 +1820,13 @@ export type Database = {
       }
     }
     Functions: {
+      calcular_match_score: {
+        Args: { p_alerta_id: string; p_lote_id: string }
+        Returns: {
+          detalles: Json
+          score: number
+        }[]
+      }
       consultar_norma_por_punto: {
         Args: { p_lat: number; p_lng: number }
         Returns: {
@@ -1762,6 +1888,11 @@ export type Database = {
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
         Returns: boolean
+      }
+      recalcular_todas_notificaciones: { Args: never; Returns: number }
+      refresh_matches_alerta: {
+        Args: { p_alerta_id: string }
+        Returns: undefined
       }
       shares_negociacion: {
         Args: { _user_a: string; _user_b: string }
