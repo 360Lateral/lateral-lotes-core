@@ -254,7 +254,7 @@ const DashboardDeveloper = () => {
   // Crear alerta
   const createAlerta = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("alertas")
         .insert({
           user_id: user!.id,
