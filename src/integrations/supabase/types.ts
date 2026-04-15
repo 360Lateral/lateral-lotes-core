@@ -962,6 +962,7 @@ export type Database = {
         Row: {
           area_total_m2: number | null
           barrio: string | null
+          cbml: string | null
           ciudad: string | null
           created_at: string
           departamento: string | null
@@ -1000,6 +1001,7 @@ export type Database = {
         Insert: {
           area_total_m2?: number | null
           barrio?: string | null
+          cbml?: string | null
           ciudad?: string | null
           created_at?: string
           departamento?: string | null
@@ -1038,6 +1040,7 @@ export type Database = {
         Update: {
           area_total_m2?: number | null
           barrio?: string | null
+          cbml?: string | null
           ciudad?: string | null
           created_at?: string
           departamento?: string | null
@@ -1072,6 +1075,42 @@ export type Database = {
           tipo_lote?: string | null
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      mapgis_cache: {
+        Row: {
+          cbml: string
+          consultado_at: string
+          datos: Json
+          es_valido: boolean
+          expira_at: string
+          id: string
+          tipo_entrada: string
+          user_id: string | null
+          valor_entrada: string
+        }
+        Insert: {
+          cbml: string
+          consultado_at?: string
+          datos?: Json
+          es_valido?: boolean
+          expira_at?: string
+          id?: string
+          tipo_entrada?: string
+          user_id?: string | null
+          valor_entrada: string
+        }
+        Update: {
+          cbml?: string
+          consultado_at?: string
+          datos?: Json
+          es_valido?: boolean
+          expira_at?: string
+          id?: string
+          tipo_entrada?: string
+          user_id?: string | null
+          valor_entrada?: string
         }
         Relationships: []
       }
