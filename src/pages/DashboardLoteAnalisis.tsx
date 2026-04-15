@@ -23,6 +23,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ExcelAnalisisImporter from "@/components/ExcelAnalisisImporter";
 import ExcelAnalisisExporter from "@/components/ExcelAnalisisExporter";
+import MapGISConsulta from "@/components/MapGISConsulta";
 
 /* ─── helpers ──────────────────────────────────── */
 
@@ -509,6 +510,19 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
               </Button>
             </div>
           )}
+
+          {/* MapGIS — consulta automática de datos urbanísticos */}
+          <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <MapGISConsulta
+              loteId={loteId}
+              onApply={(datos) => {
+                if (datos.uso_principal)        set("uso_principal", datos.uso_principal);
+                if (datos.tratamiento)           set("tratamiento", datos.tratamiento);
+                if (datos.indice_construccion != null) set("indice_construccion", String(datos.indice_construccion));
+                if (datos.altura_normativa)      set("altura_texto", datos.altura_normativa);
+              }}
+            />
+          </div>
 
           <PdfExtractPanel pdfProps={pdfProps} />
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
