@@ -17,34 +17,52 @@ export type Database = {
       alertas: {
         Row: {
           activa: boolean
+          altura_min_pisos: number | null
           area_max: number | null
           area_min: number | null
+          barrio: string | null
           ciudad: string | null
           created_at: string
           id: string
+          io_minimo: number | null
+          nombre: string | null
           precio_max_m2: number | null
+          tratamiento: string | null
+          updated_at: string | null
           user_id: string
           uso_suelo: string | null
         }
         Insert: {
           activa?: boolean
+          altura_min_pisos?: number | null
           area_max?: number | null
           area_min?: number | null
+          barrio?: string | null
           ciudad?: string | null
           created_at?: string
           id?: string
+          io_minimo?: number | null
+          nombre?: string | null
           precio_max_m2?: number | null
+          tratamiento?: string | null
+          updated_at?: string | null
           user_id: string
           uso_suelo?: string | null
         }
         Update: {
           activa?: boolean
+          altura_min_pisos?: number | null
           area_max?: number | null
           area_min?: number | null
+          barrio?: string | null
           ciudad?: string | null
           created_at?: string
           id?: string
+          io_minimo?: number | null
+          nombre?: string | null
           precio_max_m2?: number | null
+          tratamiento?: string | null
+          updated_at?: string | null
           user_id?: string
           uso_suelo?: string | null
         }
@@ -54,6 +72,9 @@ export type Database = {
         Row: {
           amenaza_inundacion: string | null
           amenaza_remocion: string | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           distancia_ronda_m: number | null
           id: string
           lote_id: string
@@ -67,6 +88,9 @@ export type Database = {
         Insert: {
           amenaza_inundacion?: string | null
           amenaza_remocion?: string | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           distancia_ronda_m?: number | null
           id?: string
           lote_id: string
@@ -80,6 +104,9 @@ export type Database = {
         Update: {
           amenaza_inundacion?: string | null
           amenaza_remocion?: string | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           distancia_ronda_m?: number | null
           id?: string
           lote_id?: string
@@ -110,6 +137,9 @@ export type Database = {
       analisis_arquitectonico: {
         Row: {
           area_vendible_pct: number | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           eficiencia_lote_pct: number | null
           forma_lote: string | null
           id: string
@@ -123,6 +153,9 @@ export type Database = {
         }
         Insert: {
           area_vendible_pct?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           eficiencia_lote_pct?: number | null
           forma_lote?: string | null
           id?: string
@@ -136,6 +169,9 @@ export type Database = {
         }
         Update: {
           area_vendible_pct?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           eficiencia_lote_pct?: number | null
           forma_lote?: string | null
           id?: string
@@ -217,6 +253,9 @@ export type Database = {
       }
       analisis_financiero: {
         Row: {
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           costo_construccion_m2: number | null
           id: string
           ingresos_proyectados: number | null
@@ -233,6 +272,9 @@ export type Database = {
           vpn: number | null
         }
         Insert: {
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           costo_construccion_m2?: number | null
           id?: string
           ingresos_proyectados?: number | null
@@ -249,6 +291,9 @@ export type Database = {
           vpn?: number | null
         }
         Update: {
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           costo_construccion_m2?: number | null
           id?: string
           ingresos_proyectados?: number | null
@@ -284,6 +329,9 @@ export type Database = {
       analisis_geotecnico: {
         Row: {
           capacidad_portante_ton_m2: number | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           id: string
           lote_id: string
           nivel_freatico_m: number | null
@@ -296,6 +344,9 @@ export type Database = {
         }
         Insert: {
           capacidad_portante_ton_m2?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           id?: string
           lote_id: string
           nivel_freatico_m?: number | null
@@ -308,6 +359,9 @@ export type Database = {
         }
         Update: {
           capacidad_portante_ton_m2?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           id?: string
           lote_id?: string
           nivel_freatico_m?: number | null
@@ -338,6 +392,9 @@ export type Database = {
       analisis_juridico: {
         Row: {
           cadena_tradicion: string | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           deuda_predial: boolean | null
           discrepancia_areas: boolean | null
           gravamenes: boolean | null
@@ -352,6 +409,9 @@ export type Database = {
         }
         Insert: {
           cadena_tradicion?: string | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           deuda_predial?: boolean | null
           discrepancia_areas?: boolean | null
           gravamenes?: boolean | null
@@ -366,6 +426,9 @@ export type Database = {
         }
         Update: {
           cadena_tradicion?: string | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           deuda_predial?: boolean | null
           discrepancia_areas?: boolean | null
           gravamenes?: boolean | null
@@ -397,6 +460,9 @@ export type Database = {
       }
       analisis_mercado: {
         Row: {
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           id: string
           lote_id: string
           observaciones: string | null
@@ -409,6 +475,9 @@ export type Database = {
           velocidad_absorcion_unidades_mes: number | null
         }
         Insert: {
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           id?: string
           lote_id: string
           observaciones?: string | null
@@ -421,6 +490,9 @@ export type Database = {
           velocidad_absorcion_unidades_mes?: number | null
         }
         Update: {
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           id?: string
           lote_id?: string
           observaciones?: string | null
@@ -454,6 +526,9 @@ export type Database = {
           acueducto_disponible: boolean | null
           alcantarillado_disponible: boolean | null
           capacidad_red_kva: number | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           costo_extension_estimado: number | null
           distancia_red_matriz_m: number | null
           energia_disponible: boolean | null
@@ -468,6 +543,9 @@ export type Database = {
           acueducto_disponible?: boolean | null
           alcantarillado_disponible?: boolean | null
           capacidad_red_kva?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           costo_extension_estimado?: number | null
           distancia_red_matriz_m?: number | null
           energia_disponible?: boolean | null
@@ -482,6 +560,9 @@ export type Database = {
           acueducto_disponible?: boolean | null
           alcantarillado_disponible?: boolean | null
           capacidad_red_kva?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           costo_extension_estimado?: number | null
           distancia_red_matriz_m?: number | null
           energia_disponible?: boolean | null
@@ -555,11 +636,13 @@ export type Database = {
         Row: {
           area_m2: number | null
           ciudad: string | null
+          convertido_a_lote: boolean | null
           created_at: string
           departamento: string | null
           email: string | null
           estado: string | null
           id: string
+          lote_id: string | null
           nombre: string | null
           notas: string | null
           objetivo: string | null
@@ -568,15 +651,18 @@ export type Database = {
           telefono: string | null
           tiene_escritura: boolean | null
           tipo_lote: string | null
+          user_id: string | null
         }
         Insert: {
           area_m2?: number | null
           ciudad?: string | null
+          convertido_a_lote?: boolean | null
           created_at?: string
           departamento?: string | null
           email?: string | null
           estado?: string | null
           id?: string
+          lote_id?: string | null
           nombre?: string | null
           notas?: string | null
           objetivo?: string | null
@@ -585,15 +671,18 @@ export type Database = {
           telefono?: string | null
           tiene_escritura?: boolean | null
           tipo_lote?: string | null
+          user_id?: string | null
         }
         Update: {
           area_m2?: number | null
           ciudad?: string | null
+          convertido_a_lote?: boolean | null
           created_at?: string
           departamento?: string | null
           email?: string | null
           estado?: string | null
           id?: string
+          lote_id?: string | null
           nombre?: string | null
           notas?: string | null
           objetivo?: string | null
@@ -602,8 +691,24 @@ export type Database = {
           telefono?: string | null
           tiene_escritura?: boolean | null
           tipo_lote?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "diagnosticos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documentos_comisionista: {
         Row: {
@@ -811,7 +916,12 @@ export type Database = {
           notas: string | null
           owner_id: string | null
           problema_juridico: string | null
+          score_ambiental: number | null
+          score_arquitectonico: number | null
+          score_financiero: number | null
+          score_geotecnico: number | null
           score_juridico: number | null
+          score_mercado: number | null
           score_normativo: number | null
           score_servicios: number | null
           tiene_deudas: string | null
@@ -844,7 +954,12 @@ export type Database = {
           notas?: string | null
           owner_id?: string | null
           problema_juridico?: string | null
+          score_ambiental?: number | null
+          score_arquitectonico?: number | null
+          score_financiero?: number | null
+          score_geotecnico?: number | null
           score_juridico?: number | null
+          score_mercado?: number | null
           score_normativo?: number | null
           score_servicios?: number | null
           tiene_deudas?: string | null
@@ -877,7 +992,12 @@ export type Database = {
           notas?: string | null
           owner_id?: string | null
           problema_juridico?: string | null
+          score_ambiental?: number | null
+          score_arquitectonico?: number | null
+          score_financiero?: number | null
+          score_geotecnico?: number | null
           score_juridico?: number | null
+          score_mercado?: number | null
           score_normativo?: number | null
           score_servicios?: number | null
           tiene_deudas?: string | null
@@ -893,22 +1013,31 @@ export type Database = {
           contenido: string
           created_at: string
           id: string
+          leido: boolean
+          metadata: Json | null
           negociacion_id: string
           sender_id: string
+          tipo: string | null
         }
         Insert: {
           contenido: string
           created_at?: string
           id?: string
+          leido?: boolean
+          metadata?: Json | null
           negociacion_id: string
           sender_id: string
+          tipo?: string | null
         }
         Update: {
           contenido?: string
           created_at?: string
           id?: string
+          leido?: boolean
+          metadata?: Json | null
           negociacion_id?: string
           sender_id?: string
+          tipo?: string | null
         }
         Relationships: [
           {
@@ -929,6 +1058,7 @@ export type Database = {
           id: string
           lote_id: string
           owner_id: string | null
+          updated_at: string | null
         }
         Insert: {
           contacto_visible?: boolean
@@ -938,6 +1068,7 @@ export type Database = {
           id?: string
           lote_id: string
           owner_id?: string | null
+          updated_at?: string | null
         }
         Update: {
           contacto_visible?: boolean
@@ -947,6 +1078,7 @@ export type Database = {
           id?: string
           lote_id?: string
           owner_id?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -975,6 +1107,9 @@ export type Database = {
           altura_texto: string | null
           cesion_tipo_a_pct: number | null
           cesion_tipo_b: number | null
+          completado: boolean | null
+          completado_at: string | null
+          completado_por: string | null
           densidad_max: number | null
           id: string
           indice_construccion: number | null
@@ -998,6 +1133,9 @@ export type Database = {
           altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
           cesion_tipo_b?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           densidad_max?: number | null
           id?: string
           indice_construccion?: number | null
@@ -1021,6 +1159,9 @@ export type Database = {
           altura_texto?: string | null
           cesion_tipo_a_pct?: number | null
           cesion_tipo_b?: number | null
+          completado?: boolean | null
+          completado_at?: string | null
+          completado_por?: string | null
           densidad_max?: number | null
           id?: string
           indice_construccion?: number | null
@@ -1059,6 +1200,8 @@ export type Database = {
           leida: boolean
           lote_id: string
           mensaje: string
+          negociacion_id: string | null
+          tipo: string | null
           user_id: string
         }
         Insert: {
@@ -1067,6 +1210,8 @@ export type Database = {
           leida?: boolean
           lote_id: string
           mensaje: string
+          negociacion_id?: string | null
+          tipo?: string | null
           user_id: string
         }
         Update: {
@@ -1075,6 +1220,8 @@ export type Database = {
           leida?: boolean
           lote_id?: string
           mensaje?: string
+          negociacion_id?: string | null
+          tipo?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1092,32 +1239,111 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notificaciones_negociacion_id_fkey"
+            columns: ["negociacion_id"]
+            isOneToOne: false
+            referencedRelation: "negociaciones"
+            referencedColumns: ["id"]
+          },
         ]
       }
       perfiles: {
         Row: {
           activo: boolean | null
           created_at: string
+          email: string | null
           id: string
           nombre: string | null
+          onboarding_completado: boolean | null
+          onboarding_paso: number | null
+          plan: string | null
           telefono: string | null
+          updated_at: string | null
           user_type: string | null
         }
         Insert: {
           activo?: boolean | null
           created_at?: string
+          email?: string | null
           id: string
           nombre?: string | null
+          onboarding_completado?: boolean | null
+          onboarding_paso?: number | null
+          plan?: string | null
           telefono?: string | null
+          updated_at?: string | null
           user_type?: string | null
         }
         Update: {
           activo?: boolean | null
           created_at?: string
+          email?: string | null
           id?: string
           nombre?: string | null
+          onboarding_completado?: boolean | null
+          onboarding_paso?: number | null
+          plan?: string | null
           telefono?: string | null
+          updated_at?: string | null
           user_type?: string | null
+        }
+        Relationships: []
+      }
+      planes: {
+        Row: {
+          acceso_analisis_completo: boolean
+          acceso_documentos: boolean
+          acceso_negociaciones: boolean
+          activo: boolean
+          created_at: string
+          descripcion: string | null
+          destacar_lotes: boolean
+          id: string
+          max_alertas: number | null
+          max_consultas_ia_mes: number | null
+          max_documentos: number | null
+          max_lotes: number | null
+          nombre: string
+          precio_anual_cop: number | null
+          precio_cop: number
+          slug: string
+        }
+        Insert: {
+          acceso_analisis_completo?: boolean
+          acceso_documentos?: boolean
+          acceso_negociaciones?: boolean
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          destacar_lotes?: boolean
+          id?: string
+          max_alertas?: number | null
+          max_consultas_ia_mes?: number | null
+          max_documentos?: number | null
+          max_lotes?: number | null
+          nombre: string
+          precio_anual_cop?: number | null
+          precio_cop?: number
+          slug: string
+        }
+        Update: {
+          acceso_analisis_completo?: boolean
+          acceso_documentos?: boolean
+          acceso_negociaciones?: boolean
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          destacar_lotes?: boolean
+          id?: string
+          max_alertas?: number | null
+          max_consultas_ia_mes?: number | null
+          max_documentos?: number | null
+          max_lotes?: number | null
+          nombre?: string
+          precio_anual_cop?: number | null
+          precio_cop?: number
+          slug?: string
         }
         Relationships: []
       }
@@ -1319,6 +1545,80 @@ export type Database = {
           },
         ]
       }
+      suscripciones: {
+        Row: {
+          ciclo: string | null
+          created_at: string | null
+          estado: string
+          external_customer_id: string | null
+          external_subscription_id: string | null
+          fecha_fin: string | null
+          fecha_inicio: string
+          fecha_vencimiento: string | null
+          id: string
+          monto_cop: number | null
+          plan: string
+          plan_id: string | null
+          proveedor_pago: string | null
+          prueba_hasta: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+          wompi_subscription_id: string | null
+        }
+        Insert: {
+          ciclo?: string | null
+          created_at?: string | null
+          estado?: string
+          external_customer_id?: string | null
+          external_subscription_id?: string | null
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          monto_cop?: number | null
+          plan?: string
+          plan_id?: string | null
+          proveedor_pago?: string | null
+          prueba_hasta?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          wompi_subscription_id?: string | null
+        }
+        Update: {
+          ciclo?: string | null
+          created_at?: string | null
+          estado?: string
+          external_customer_id?: string | null
+          external_subscription_id?: string | null
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          monto_cop?: number | null
+          plan?: string
+          plan_id?: string | null
+          proveedor_pago?: string | null
+          prueba_hasta?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          wompi_subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suscripciones_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "planes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -1383,70 +1683,19 @@ export type Database = {
           lng: number | null
           nombre_lote: string | null
           owner_id: string | null
+          precio_cop: number | null
+          precio_m2_cop: number | null
+          score_ambiental: number | null
+          score_arquitectonico: number | null
+          score_financiero: number | null
+          score_geotecnico: number | null
           score_juridico: number | null
+          score_mercado: number | null
           score_normativo: number | null
           score_servicios: number | null
           tipo_lote: string | null
           updated_at: string | null
           video_url: string | null
-        }
-        Insert: {
-          area_total_m2?: number | null
-          barrio?: string | null
-          ciudad?: string | null
-          created_at?: string | null
-          departamento?: string | null
-          destacado?: boolean | null
-          direccion?: string | null
-          es_publico?: boolean | null
-          estado_disponibilidad?:
-            | Database["public"]["Enums"]["estado_disponibilidad"]
-            | null
-          estrato?: number | null
-          fondo_ml?: number | null
-          foto_url?: string | null
-          frente_ml?: number | null
-          has_resolutoria?: boolean | null
-          id?: string | null
-          lat?: number | null
-          lng?: number | null
-          nombre_lote?: string | null
-          owner_id?: string | null
-          score_juridico?: number | null
-          score_normativo?: number | null
-          score_servicios?: number | null
-          tipo_lote?: string | null
-          updated_at?: string | null
-          video_url?: string | null
-        }
-        Update: {
-          area_total_m2?: number | null
-          barrio?: string | null
-          ciudad?: string | null
-          created_at?: string | null
-          departamento?: string | null
-          destacado?: boolean | null
-          direccion?: string | null
-          es_publico?: boolean | null
-          estado_disponibilidad?:
-            | Database["public"]["Enums"]["estado_disponibilidad"]
-            | null
-          estrato?: number | null
-          fondo_ml?: number | null
-          foto_url?: string | null
-          frente_ml?: number | null
-          has_resolutoria?: boolean | null
-          id?: string | null
-          lat?: number | null
-          lng?: number | null
-          nombre_lote?: string | null
-          owner_id?: string | null
-          score_juridico?: number | null
-          score_normativo?: number | null
-          score_servicios?: number | null
-          tipo_lote?: string | null
-          updated_at?: string | null
-          video_url?: string | null
         }
         Relationships: []
       }
@@ -1483,6 +1732,21 @@ export type Database = {
         }[]
       }
       count_diagnosticos: { Args: never; Returns: number }
+      get_plan_limits: {
+        Args: { _user_id: string }
+        Returns: {
+          acceso_analisis_completo: boolean
+          acceso_documentos: boolean
+          acceso_negociaciones: boolean
+          destacar_lotes: boolean
+          max_alertas: number
+          max_consultas_ia_mes: number
+          max_documentos: number
+          max_lotes: number
+          plan_slug: string
+        }[]
+      }
+      get_user_plan: { Args: { _user_id: string }; Returns: string }
       has_lot_access: {
         Args: { _lote_id: string; _user_id: string }
         Returns: boolean
@@ -1497,6 +1761,10 @@ export type Database = {
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
+        Returns: boolean
+      }
+      shares_negociacion: {
+        Args: { _user_a: string; _user_b: string }
         Returns: boolean
       }
     }
