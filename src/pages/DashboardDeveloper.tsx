@@ -99,7 +99,7 @@ const MatchingLotes = ({ alertaId }: { alertaId: string }) => {
     queryKey: ["matches", alertaId],
     enabled: open,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("criteria_matches")
         .select("score, detalles, lotes(id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad)")
         .eq("alerta_id", alertaId)
@@ -237,7 +237,7 @@ const DashboardDeveloper = () => {
     enabled: !!user && alertas.length > 0,
     queryFn: async () => {
       const ids = alertas.map((a: any) => a.id);
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("criteria_matches")
         .select("alerta_id, score")
         .in("alerta_id", ids)
@@ -276,7 +276,7 @@ const DashboardDeveloper = () => {
       if (error) throw error;
       // Calcular matches en background
       if (data?.id) {
-        await supabase.rpc("refresh_matches_alerta", { p_alerta_id: data.id });
+        await (supabase as any).rpc("refresh_matches_alerta", { p_alerta_id: data.id });
       }
     },
     onSuccess: () => {
