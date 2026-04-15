@@ -1301,36 +1301,49 @@ export type Database = {
       }
       notificaciones: {
         Row: {
+          alerta_id: string | null
           created_at: string
           id: string
           leida: boolean
           lote_id: string
           mensaje: string
           negociacion_id: string | null
+          score: number | null
           tipo: string | null
           user_id: string
         }
         Insert: {
+          alerta_id?: string | null
           created_at?: string
           id?: string
           leida?: boolean
           lote_id: string
           mensaje: string
           negociacion_id?: string | null
+          score?: number | null
           tipo?: string | null
           user_id: string
         }
         Update: {
+          alerta_id?: string | null
           created_at?: string
           id?: string
           leida?: boolean
           lote_id?: string
           mensaje?: string
           negociacion_id?: string | null
+          score?: number | null
           tipo?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "notificaciones_alerta_id_fkey"
+            columns: ["alerta_id"]
+            isOneToOne: false
+            referencedRelation: "alertas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notificaciones_lote_id_fkey"
             columns: ["lote_id"]
@@ -1876,6 +1889,7 @@ export type Database = {
         Args: { _negociacion_id: string; _user_id: string }
         Returns: boolean
       }
+      recalcular_todas_notificaciones: { Args: never; Returns: number }
       refresh_matches_alerta: {
         Args: { p_alerta_id: string }
         Returns: undefined
