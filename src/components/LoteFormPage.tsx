@@ -223,7 +223,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         barrio: form.barrio || null,
         direccion: form.direccion || null,
         estrato: form.estrato ? parseInt(form.estrato) : null,
-        estado_disponibilidad: form.estado_disponibilidad as any,
+        estado_disponibilidad: (form.estado_disponibilidad || "Disponible") as any,
         destacado: form.destacado,
         lat: form.lat ? parseFloat(form.lat) : null,
         lng: form.lng ? parseFloat(form.lng) : null,
