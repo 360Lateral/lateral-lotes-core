@@ -145,11 +145,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [applySession]);
 
-  const isAdminOrAsesor = roles.some((r) =>
+  // Simulación de rol para super_admin
+  const { devRole, isSimulating } = useDevRole();
+  const isRealSuperAdmin = roles.includes("super_admin");
+  const canSimulate = isRealSuperAdmin && isSimulating;
+
+  const effectiveRoles: AppRole[] = canSimulate
+    ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
+    : roles;
+
+  const effectiveUserType: string | null = canSimulate
+    ? (["developer", "dueno", "comisionista", "inversor"].includes(devRole) ? devRole : userType)
+    : userType;
+
+  const isAdminOrAsesor = effectiveRoles.some((r) =>
     ["super_admin", "admin", "asesor"].includes(r)
   );
 
-  const isDeveloper = userType === "developer" || roles.some((r) => r === "developer");
+  const isDeveloper = effectiveUserType === "developer" || effectiveRoles.some((r) => r === "developer");
 
   const signOut = async () => {
     try {
