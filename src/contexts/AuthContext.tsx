@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useDevRole } from "@/contexts/DevRoleContext";
 
 type AppRole = "super_admin" | "admin" | "asesor" | "inversor" | "developer" | "dueno" | "comisionista";
 
