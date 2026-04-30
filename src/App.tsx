@@ -4,9 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DevRoleProvider } from "@/contexts/DevRoleContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HomeButton from "@/components/ui/HomeButton";
+import DevRoleBanner from "@/components/DevRoleBanner";
 
 import Index from "./pages/Index";
 import Lotes from "./pages/Lotes";
@@ -41,14 +43,16 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <ErrorBoundary>
-        <BrowserRouter>
-          <HomeButton />
-          <Routes>
+    <DevRoleProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <ErrorBoundary>
+          <BrowserRouter>
+            <DevRoleBanner />
+            <HomeButton />
+            <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Index />} />
             <Route path="/lotes" element={<Lotes />} />
