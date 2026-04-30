@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useDevRole } from "@/contexts/DevRoleContext";
 
 type AppRole = "super_admin" | "admin" | "asesor" | "inversor" | "developer" | "dueno" | "comisionista";
 
@@ -144,11 +145,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [applySession]);
 
-  const isAdminOrAsesor = roles.some((r) =>
+  // Simulación de rol para super_admin
+  const { devRole, isSimulating } = useDevRole();
+  const isRealSuperAdmin = roles.includes("super_admin");
+  const canSimulate = isRealSuperAdmin && isSimulating;
+
+  const effectiveRoles: AppRole[] = canSimulate
+    ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
+    : roles;
+
+  const effectiveUserType: string | null = canSimulate
+    ? (["developer", "dueno", "comisionista", "inversor"].includes(devRole) ? devRole : userType)
+    : userType;
+
+  const isAdminOrAsesor = effectiveRoles.some((r) =>
     ["super_admin", "admin", "asesor"].includes(r)
   );
 
-  const isDeveloper = userType === "developer" || roles.some((r) => r === "developer");
+  const isDeveloper = effectiveUserType === "developer" || effectiveRoles.some((r) => r === "developer");
 
   const signOut = async () => {
     try {
@@ -164,7 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, roles, userType, loading, isAdminOrAsesor, isDeveloper, signOut }}>
+    <AuthContext.Provider value={{ session, user, roles: effectiveRoles, userType: effectiveUserType, loading, isAdminOrAsesor, isDeveloper, signOut }}>
       {children}
     </AuthContext.Provider>
   );
