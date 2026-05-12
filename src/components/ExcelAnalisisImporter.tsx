@@ -165,50 +165,50 @@ function readSSPP(ws: XLSX.WorkSheet) {
 
 function readSuelos(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    tipo_suelo: toStr(cell(ws, "C7")),
-    capacidad_portante_ton_m2: toNum(cell(ws, "C9")),
-    nivel_freatico_m: toNum(cell(ws, "C10")),
-    pendiente_pct: toNum(cell(ws, "C12")),
-    sistema_cimentacion: toStr(cell(ws, "C17")),
-    sobrecosto_cimentacion_estimado: toNum(cell(ws, "C19")),
+    tipo_suelo: toStr(readByLabel(ws, [/tipo de suelo/], ["B3", "C7"])),
+    capacidad_portante_ton_m2: toNum(readByLabel(ws, [/capacidad portante/], ["B5", "C9"])),
+    nivel_freatico_m: toNum(readByLabel(ws, [/nivel freatico/], ["B6", "C10"])),
+    pendiente_pct: toNum(readByLabel(ws, [/pendiente promedio|pendiente/], ["B8", "C12"])),
+    sistema_cimentacion: toStr(readByLabel(ws, [/sistema de cimentacion/], ["B13", "C17"])),
+    sobrecosto_cimentacion_estimado: toNum(readByLabel(ws, [/sobrecosto cimentacion/], ["B15", "C19"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readMercado(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    precio_venta_m2_zona: toNum(cell(ws, "C7")),
-    precio_unidad_promedio: toNum(cell(ws, "C21")) ?? toNum(cell(ws, "C8")),
-    proyectos_competidores: toInt(cell(ws, "C13")),
-    velocidad_absorcion_unidades_mes: toNum(cell(ws, "C18")),
-    perfil_comprador: toStr(cell(ws, "C20")),
-    valorizacion_anual_pct: toNum(cell(ws, "C23")),
+    precio_venta_m2_zona: toNum(readByLabel(ws, [/precio promedio venta.*m2/], ["B3", "C7"])),
+    precio_unidad_promedio: toNum(readByLabel(ws, [/rango precio por unidad|precio unidad/], ["B17", "C21", "C8"])),
+    proyectos_competidores: toInt(readByLabel(ws, [/proyectos competidores/], ["B9", "C13"])),
+    velocidad_absorcion_unidades_mes: toNum(readByLabel(ws, [/velocidad absorcion/], ["B14", "C18"])),
+    perfil_comprador: toStr(readByLabel(ws, [/perfil del comprador/], ["B16", "C20"])),
+    valorizacion_anual_pct: toNum(readByLabel(ws, [/valorizacion anual/], ["B19", "C23"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readArquitectonico(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    m2_construibles_total: toNum(cell(ws, "C9")),
-    unidades_estimadas: toInt(cell(ws, "C15")),
-    area_vendible_pct: toNum(cell(ws, "C11")),
-    tipologias: toStr(cell(ws, "C13")),
-    eficiencia_lote_pct: toNum(cell(ws, "C11")),
-    forma_lote: toStr(cell(ws, "C19")),
-    permite_sotano: toBool(cell(ws, "C23")),
+    m2_construibles_total: toNum(readByLabel(ws, [/m2 construibles|m² construibles/], ["B5", "C9"])),
+    unidades_estimadas: toInt(readByLabel(ws, [/unidades habitacionales|unidades estimadas/], ["B11", "C15"])),
+    area_vendible_pct: toNum(readByLabel(ws, [/m2 vendibles|m² vendibles|area vendible/], ["B7", "C11"])),
+    tipologias: toStr(readByLabel(ws, [/tipologia predominante|tipologias/], ["B9", "C13"])),
+    eficiencia_lote_pct: toNum(readByLabel(ws, [/eficiencia del lote/], ["B7", "C11"])),
+    forma_lote: toStr(readByLabel(ws, [/forma del lote/], ["B15", "C19"])),
+    permite_sotano: toBool(readByLabel(ws, [/permite sotano/], ["B19", "C23"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readFinanciero(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    valor_compra_lote: toNum(cell(ws, "C7")),
-    costo_construccion_m2: toNum(cell(ws, "C12")),
-    ingresos_proyectados: toNum(cell(ws, "C22")),
-    margen_bruto_pct: toNum(cell(ws, "C25")),
-    tir_pct: toNum(cell(ws, "C26")),
-    vpn: toNum(cell(ws, "C27")),
-    punto_equilibrio_pct: toNum(cell(ws, "C28")),
+    valor_compra_lote: toNum(readByLabel(ws, [/precio de compra del lote|valor compra/], ["B3", "C7"])),
+    costo_construccion_m2: toNum(readByLabel(ws, [/costo construccion.*m2|cop\/m2/], ["B8", "C12"])),
+    ingresos_proyectados: toNum(readByLabel(ws, [/ingresos totales|ingresos proyectados/], ["B18", "C22"])),
+    margen_bruto_pct: toNum(readByLabel(ws, [/margen bruto/], ["B21", "C25"])),
+    tir_pct: toNum(readByLabel(ws, [/tir del proyecto|tir/], ["B22", "C26"])),
+    vpn: toNum(readByLabel(ws, [/vpn del proyecto|vpn/], ["B23", "C27"])),
+    punto_equilibrio_pct: toNum(readByLabel(ws, [/punto de equilibrio/], ["B24", "C28"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
