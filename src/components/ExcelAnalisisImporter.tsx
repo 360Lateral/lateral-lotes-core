@@ -276,7 +276,7 @@ const ExcelAnalisisImporter = ({ loteId: currentLoteId, loteName: currentLoteNam
       const errores: string[] = [];
 
       for (const { sheetName, table, label, reader } of sheetMap) {
-        const ws = wb.Sheets[sheetName];
+        const ws = findSheet(wb, sheetName);
         if (!ws) continue;
 
         const payload = reader(ws);
