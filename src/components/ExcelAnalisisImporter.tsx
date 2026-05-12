@@ -56,6 +56,42 @@ const lastCellColC = (ws: XLSX.WorkSheet): any => {
   return null;
 };
 
+const normalizeText = (value: any): string =>
+  String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+const findSheet = (wb: XLSX.WorkBook, expected: string): XLSX.WorkSheet | null => {
+  const expectedNorm = normalizeText(expected).replace(/^\d+\.\s*/, "");
+  const name = wb.SheetNames.find((sheetName) => {
+    const sheetNorm = normalizeText(sheetName).replace(/^\d+\.\s*/, "");
+    return sheetNorm === expectedNorm || sheetNorm.includes(expectedNorm) || expectedNorm.includes(sheetNorm);
+  });
+  return name ? wb.Sheets[name] : null;
+};
+
+const readByLabel = (ws: XLSX.WorkSheet, patterns: RegExp[], fallbackAddrs: string[] = []): any => {
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1");
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    for (let c = range.s.c; c <= Math.min(range.e.c, 8); c++) {
+      const label = normalizeText(ws[XLSX.utils.encode_cell({ r, c })]?.v);
+      if (!label || !patterns.some((pattern) => pattern.test(label))) continue;
+      for (let cc = c + 1; cc <= Math.min(range.e.c, c + 4); cc++) {
+        const v = ws[XLSX.utils.encode_cell({ r, c: cc })]?.v;
+        if (v != null && String(v).trim() !== "") return v;
+      }
+    }
+  }
+
+  for (const addr of fallbackAddrs) {
+    const v = cell(ws, addr);
+    if (v != null && String(v).trim() !== "") return v;
+  }
+  return null;
+};
+
 /** Filter out null/undefined/"" values from an object */
 const cleanPayload = (obj: Record<string, any>): Record<string, any> => {
   const result: Record<string, any> = {};
@@ -68,21 +104,21 @@ const cleanPayload = (obj: Record<string, any>): Record<string, any> => {
 /* ─── Sheet readers ────────────────────────────── */
 
 function readNormativo(ws: XLSX.WorkSheet) {
-  const usosRaw = toStr(cell(ws, "C8"));
+  const usosRaw = toStr(readByLabel(ws, [/usos compatibles/], ["B4", "C8"]));
   return cleanPayload({
-    uso_principal: toStr(cell(ws, "C7")),
+    uso_principal: toStr(readByLabel(ws, [/uso principal/], ["B3", "C7"])),
     usos_compatibles: usosRaw ? usosRaw.split(",").map((s: string) => s.trim()) : null,
-    indice_construccion: toNum(cell(ws, "C9")),
-    indice_ocupacion: toNum(cell(ws, "C10")),
-    altura_max_pisos: toInt(cell(ws, "C11")),
-    altura_max_metros: toNum(cell(ws, "C12")),
-    aislamiento_frontal_m: toNum(cell(ws, "C13")),
-    aislamiento_posterior_m: toNum(cell(ws, "C14")),
-    aislamiento_lateral_m: toNum(cell(ws, "C15")),
-    zona_pot: toStr(cell(ws, "C16")),
-    tratamiento: toStr(cell(ws, "C17")),
-    norma_vigente: toStr(cell(ws, "C18")),
-    cesion_tipo_a_pct: toNum(cell(ws, "C19")),
+    indice_construccion: toNum(readByLabel(ws, [/indice de construccion|\bic\b/], ["B5", "C9"])),
+    indice_ocupacion: toNum(readByLabel(ws, [/indice de ocupacion|\bio\b/], ["B6", "C10"])),
+    altura_max_pisos: toInt(readByLabel(ws, [/altura maxima.*pisos/], ["B7", "C11"])),
+    altura_max_metros: toNum(readByLabel(ws, [/altura maxima.*metros/], ["B8", "C12"])),
+    aislamiento_frontal_m: toNum(readByLabel(ws, [/aislamiento frontal/], ["B9", "C13"])),
+    aislamiento_posterior_m: toNum(readByLabel(ws, [/aislamiento posterior/], ["B10", "C14"])),
+    aislamiento_lateral_m: toNum(readByLabel(ws, [/aislamiento lateral/], ["B11", "C15"])),
+    zona_pot: toStr(readByLabel(ws, [/zona pot/], ["B12", "C16"])),
+    tratamiento: toStr(readByLabel(ws, [/tratamiento/], ["B13", "C17"])),
+    norma_vigente: toStr(readByLabel(ws, [/norma vigente/], ["B14", "C18"])),
+    cesion_tipo_a_pct: toNum(readByLabel(ws, [/cesion tipo a/], ["B15", "C19"])),
   });
 }
 
