@@ -124,41 +124,41 @@ function readNormativo(ws: XLSX.WorkSheet) {
 
 function readJuridico(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    cadena_tradicion: toStr(cell(ws, "C9")),
-    hipoteca_activa: toBool(cell(ws, "C12")),
-    servidumbres: toBool(cell(ws, "C14")),
-    deuda_predial: toBool(cell(ws, "C18")) != null ? !toBool(cell(ws, "C18")) : null, // predial_al_dia inverted
-    discrepancia_areas: toBool(cell(ws, "C22")) != null ? !toBool(cell(ws, "C22")) : null, // areas_coinciden inverted
-    proceso_sucesion: toBool(cell(ws, "C24")),
-    litigio_activo: toBool(cell(ws, "C23")),
-    gravamenes: toBool(cell(ws, "C13")), // embargo_activo maps to gravamenes
+    cadena_tradicion: toStr(readByLabel(ws, [/cadena de tradicion|estado cadena/], ["B5", "C9"])),
+    hipoteca_activa: toBool(readByLabel(ws, [/hipoteca activa/], ["B8", "C12"])),
+    servidumbres: toBool(readByLabel(ws, [/servidumbres/], ["B10", "C14"])),
+    deuda_predial: toBool(readByLabel(ws, [/predial al dia/], ["B14", "C18"])) != null ? !toBool(readByLabel(ws, [/predial al dia/], ["B14", "C18"])) : null,
+    discrepancia_areas: toBool(readByLabel(ws, [/areas.*coinciden|escritura.*catastral/], ["B18", "C22"])) != null ? !toBool(readByLabel(ws, [/areas.*coinciden|escritura.*catastral/], ["B18", "C22"])) : null,
+    proceso_sucesion: toBool(readByLabel(ws, [/sucesion/], ["B20", "C24"])),
+    litigio_activo: toBool(readByLabel(ws, [/litigio activo/], ["B19", "C23"])),
+    gravamenes: toBool(readByLabel(ws, [/embargo|medida cautelar|gravamen/], ["B9", "C13"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readAmbiental(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    ronda_hidrica: toBool(cell(ws, "C7")),
-    distancia_ronda_m: toNum(cell(ws, "C8")),
-    reserva_forestal: toBool(cell(ws, "C9")),
-    amenaza_inundacion: toStr(cell(ws, "C12")),
-    amenaza_remocion: toStr(cell(ws, "C13")),
-    pasivo_ambiental: toBool(cell(ws, "C17")),
-    requiere_licencia_ambiental: toBool(cell(ws, "C20")),
+    ronda_hidrica: toBool(readByLabel(ws, [/ronda hidrica/], ["B3", "C7"])),
+    distancia_ronda_m: toNum(readByLabel(ws, [/distancia.*ronda/], ["B4", "C8"])),
+    reserva_forestal: toBool(readByLabel(ws, [/reserva forestal/], ["B5", "C9"])),
+    amenaza_inundacion: toStr(readByLabel(ws, [/amenaza.*inundacion/], ["B8", "C12"])),
+    amenaza_remocion: toStr(readByLabel(ws, [/remocion/], ["B9", "C13"])),
+    pasivo_ambiental: toBool(readByLabel(ws, [/pasivo ambiental/], ["B13", "C17"])),
+    requiere_licencia_ambiental: toBool(readByLabel(ws, [/licencia ambiental/], ["B16", "C20"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readSSPP(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    acueducto_disponible: toBool(cell(ws, "C7")),
-    alcantarillado_disponible: toBool(cell(ws, "C8")),
-    energia_disponible: toBool(cell(ws, "C9")),
-    gas_disponible: toBool(cell(ws, "C10")),
-    capacidad_red_kva: toNum(cell(ws, "C14")),
-    distancia_red_matriz_m: toNum(cell(ws, "C17")),
-    costo_extension_estimado: toNum(cell(ws, "C19")),
-    via_pavimentada: toBool(cell(ws, "C22")),
+    acueducto_disponible: toBool(readByLabel(ws, [/acueducto disponible/], ["B3", "C7"])),
+    alcantarillado_disponible: toBool(readByLabel(ws, [/alcantarillado disponible/], ["B4", "C8"])),
+    energia_disponible: toBool(readByLabel(ws, [/energia electrica|energia disponible/], ["B5", "C9"])),
+    gas_disponible: toBool(readByLabel(ws, [/gas natural|gas disponible/], ["B6", "C10"])),
+    capacidad_red_kva: toNum(readByLabel(ws, [/capacidad.*kva|red electrica/], ["B10", "C14"])),
+    distancia_red_matriz_m: toNum(readByLabel(ws, [/distancia.*red energia|distancia.*matriz/], ["B13", "C17"])),
+    costo_extension_estimado: toNum(readByLabel(ws, [/costo extension energia|costo extension/], ["B15", "C19"])),
+    via_pavimentada: toBool(readByLabel(ws, [/via pavimentada/], ["B18", "C22"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
