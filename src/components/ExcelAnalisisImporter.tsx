@@ -213,11 +213,39 @@ const ExcelAnalisisImporter = () => {
       return;
     }
 
-    const nombre_excel = toStr(cell(importSheet, "C12"));
+    // Buscar el nombre del lote de forma robusta:
+    // 1) Intentar celdas comunes (C12, C11, C13, B12, D12)
+    // 2) Si no, buscar una fila cuya columna A/B contenga "nombre" y leer la siguiente columna
+    // 3) Como último recurso, primer valor no vacío en columna C
+    let nombre_excel = toStr(cell(importSheet, "C12"))
+      || toStr(cell(importSheet, "C11"))
+      || toStr(cell(importSheet, "C13"))
+      || toStr(cell(importSheet, "B12"))
+      || toStr(cell(importSheet, "D12"));
+
+    if (!nombre_excel) {
+      const range = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
+      for (let r = range.s.r; r <= Math.min(range.e.r, 50) && !nombre_excel; r++) {
+        for (let c = 0; c <= Math.min(range.e.c, 3); c++) {
+          const label = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
+          if (label && /nombre.*lote|lote.*nombre|^nombre$/i.test(label)) {
+            for (let cc = c + 1; cc <= Math.min(range.e.c, c + 4); cc++) {
+              const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c: cc })]?.v);
+              if (v) { nombre_excel = v; break; }
+            }
+            if (!nombre_excel) {
+              const below = toStr(importSheet[XLSX.utils.encode_cell({ r: r + 1, c })]?.v);
+              if (below) nombre_excel = below;
+            }
+          }
+        }
+      }
+    }
+
     if (!nombre_excel) {
       toast({
-        title: "Nombre no encontrado",
-        description: 'La celda C12 de "Importar a 360 Lateral" está vacía.',
+        title: "Nombre del lote no encontrado",
+        description: 'No se pudo encontrar el nombre del lote en la hoja "Importar a 360 Lateral". Verifica que la celda C12 (o una celda con etiqueta "Nombre del lote") contenga el nombre exacto del lote.',
         variant: "destructive",
       });
       return;
