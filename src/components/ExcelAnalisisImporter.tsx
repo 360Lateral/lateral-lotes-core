@@ -323,6 +323,7 @@ const ExcelAnalisisImporter = () => {
       ];
 
       const areas: { name: string; fields: number }[] = [];
+      const errores: string[] = [];
 
       for (const { sheetName, table, label, reader } of sheetMap) {
         const ws = wb.Sheets[sheetName];
@@ -332,25 +333,52 @@ const ExcelAnalisisImporter = () => {
         const fieldCount = Object.keys(payload).length;
         if (fieldCount === 0) continue;
 
-        // Upsert: check if exists first
-        const { data: existing } = await supabase
+        // normativa_urbana NO tiene columna updated_at
+        const includeUpdatedAt = table !== "normativa_urbana";
+
+        const { data: existing, error: selErr } = await supabase
           .from(table as any)
           .select("id")
           .eq("lote_id", loteId)
           .maybeSingle();
 
+        if (selErr) {
+          errores.push(`${label}: ${selErr.message}`);
+          continue;
+        }
+
+        let opError: any = null;
         if (existing) {
-          await supabase
+          const updatePayload = includeUpdatedAt
+            ? { ...payload, updated_at: new Date().toISOString() }
+            : payload;
+          const { error } = await supabase
             .from(table as any)
-            .update({ ...payload, updated_at: new Date().toISOString() })
+            .update(updatePayload)
             .eq("id", (existing as any).id);
+          opError = error;
         } else {
-          await supabase
+          const { error } = await supabase
             .from(table as any)
             .insert({ ...payload, lote_id: loteId });
+          opError = error;
+        }
+
+        if (opError) {
+          console.error(`[ExcelImporter] Error ${label}:`, opError, "payload:", payload);
+          errores.push(`${label}: ${opError.message}`);
+          continue;
         }
 
         areas.push({ name: label, fields: fieldCount });
+      }
+
+      if (errores.length > 0) {
+        toast({
+          title: areas.length > 0 ? "Importación parcial" : "No se pudo importar",
+          description: errores.join(" · "),
+          variant: "destructive",
+        });
       }
 
       // Invalidate all analysis queries
