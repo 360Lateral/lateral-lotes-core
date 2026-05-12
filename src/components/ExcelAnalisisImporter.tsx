@@ -202,12 +202,46 @@ const ExcelAnalisisImporter = () => {
     const data = new Uint8Array(await file.arrayBuffer());
     const wb = XLSX.read(data, { type: "array" });
 
-    // Find the import sheet
-    const importSheet = wb.Sheets["Importar a 360 Lateral"];
-    if (!importSheet) {
+    // ── Validación estructural de la plantilla ────────────────
+    const REQUIRED_SHEETS = [
+      "Importar a 360 Lateral",
+      "1. Normativo",
+      "2. Jurídico",
+      "3. Ambiental",
+      "4. SSPP",
+      "5. Suelos",
+      "6. Mercado",
+      "7. Arquitectónico",
+      "8. Financiero",
+    ];
+    const missingSheets = REQUIRED_SHEETS.filter((s) => !wb.SheetNames.includes(s));
+    if (missingSheets.length > 0) {
       toast({
-        title: "Hoja no encontrada",
-        description: 'No se encontró la hoja "Importar a 360 Lateral" en el archivo.',
+        title: "Plantilla inválida",
+        description: `Faltan las siguientes hojas: ${missingSheets.join(", ")}. Asegúrate de usar la plantilla oficial de 360 Lateral.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const importSheet = wb.Sheets["Importar a 360 Lateral"];
+
+    // Validar que exista una etiqueta "Nombre del lote" (o similar) en la hoja de importación
+    const validationRange = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
+    let labelFound = false;
+    for (let r = validationRange.s.r; r <= Math.min(validationRange.e.r, 50) && !labelFound; r++) {
+      for (let c = 0; c <= Math.min(validationRange.e.c, 5); c++) {
+        const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
+        if (v && /nombre.*lote|lote.*nombre|^nombre$/i.test(v)) {
+          labelFound = true;
+          break;
+        }
+      }
+    }
+    if (!labelFound) {
+      toast({
+        title: "Etiqueta no encontrada",
+        description: 'La hoja "Importar a 360 Lateral" no contiene la etiqueta "Nombre del lote". Verifica que la plantilla esté completa.',
         variant: "destructive",
       });
       return;
