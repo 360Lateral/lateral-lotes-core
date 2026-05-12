@@ -220,7 +220,12 @@ interface ImportResult {
   areas: { name: string; fields: number }[];
 }
 
-const ExcelAnalisisImporter = () => {
+interface Props {
+  loteId: string;
+  loteName?: string | null;
+}
+
+const ExcelAnalisisImporter = ({ loteId: currentLoteId, loteName: currentLoteName }: Props) => {
   const { toast } = useToast();
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -237,108 +242,17 @@ const ExcelAnalisisImporter = () => {
   const handleFile = useCallback(async (file: File) => {
     const data = new Uint8Array(await file.arrayBuffer());
     const wb = XLSX.read(data, { type: "array" });
-
-    // ── Validación estructural de la plantilla ────────────────
-    const REQUIRED_SHEETS = [
-      "Importar a 360 Lateral",
-      "1. Normativo",
-      "2. Jurídico",
-      "3. Ambiental",
-      "4. SSPP",
-      "5. Suelos",
-      "6. Mercado",
-      "7. Arquitectónico",
-      "8. Financiero",
-    ];
-    const missingSheets = REQUIRED_SHEETS.filter((s) => !wb.SheetNames.includes(s));
-    if (missingSheets.length > 0) {
+    if (!currentLoteId) {
       toast({
-        title: "Plantilla inválida",
-        description: `Faltan las siguientes hojas: ${missingSheets.join(", ")}. Asegúrate de usar la plantilla oficial de 360 Lateral.`,
+        title: "Lote no identificado",
+        description: "Abre primero la ficha de análisis del lote al que quieres importar los datos.",
         variant: "destructive",
       });
       return;
     }
 
-    const importSheet = wb.Sheets["Importar a 360 Lateral"];
-
-    // Validar que exista una etiqueta "Nombre del lote" (o similar) en la hoja de importación
-    const validationRange = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
-    let labelFound = false;
-    for (let r = validationRange.s.r; r <= Math.min(validationRange.e.r, 50) && !labelFound; r++) {
-      for (let c = 0; c <= Math.min(validationRange.e.c, 5); c++) {
-        const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
-        if (v && /nombre.*lote|lote.*nombre|^nombre$/i.test(v)) {
-          labelFound = true;
-          break;
-        }
-      }
-    }
-    if (!labelFound) {
-      toast({
-        title: "Etiqueta no encontrada",
-        description: 'La hoja "Importar a 360 Lateral" no contiene la etiqueta "Nombre del lote". Verifica que la plantilla esté completa.',
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Buscar el nombre del lote de forma robusta:
-    // 1) Intentar celdas comunes (C12, C11, C13, B12, D12)
-    // 2) Si no, buscar una fila cuya columna A/B contenga "nombre" y leer la siguiente columna
-    // 3) Como último recurso, primer valor no vacío en columna C
-    let nombre_excel = toStr(cell(importSheet, "C12"))
-      || toStr(cell(importSheet, "C11"))
-      || toStr(cell(importSheet, "C13"))
-      || toStr(cell(importSheet, "B12"))
-      || toStr(cell(importSheet, "D12"));
-
-    if (!nombre_excel) {
-      const range = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
-      for (let r = range.s.r; r <= Math.min(range.e.r, 50) && !nombre_excel; r++) {
-        for (let c = 0; c <= Math.min(range.e.c, 3); c++) {
-          const label = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
-          if (label && /nombre.*lote|lote.*nombre|^nombre$/i.test(label)) {
-            for (let cc = c + 1; cc <= Math.min(range.e.c, c + 4); cc++) {
-              const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c: cc })]?.v);
-              if (v) { nombre_excel = v; break; }
-            }
-            if (!nombre_excel) {
-              const below = toStr(importSheet[XLSX.utils.encode_cell({ r: r + 1, c })]?.v);
-              if (below) nombre_excel = below;
-            }
-          }
-        }
-      }
-    }
-
-    if (!nombre_excel) {
-      toast({
-        title: "Nombre del lote no encontrado",
-        description: 'No se pudo encontrar el nombre del lote en la hoja "Importar a 360 Lateral". Verifica que la celda C12 (o una celda con etiqueta "Nombre del lote") contenga el nombre exacto del lote.',
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Find lote
-    const { data: loteEncontrado } = await supabase
-      .from("lotes")
-      .select("id, nombre_lote")
-      .ilike("nombre_lote", nombre_excel.trim())
-      .maybeSingle();
-
-    if (!loteEncontrado) {
-      toast({
-        title: "Lote no encontrado",
-        description: `No existe ningún lote con el nombre "${nombre_excel}" en la plataforma. Verifica el nombre en la hoja "Importar a 360 Lateral" celda C12.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setConfirmDialog({ loteId: loteEncontrado.id, loteName: loteEncontrado.nombre_lote, wb });
-  }, [toast]);
+    setConfirmDialog({ loteId: currentLoteId, loteName: currentLoteName || "lote actual", wb });
+  }, [currentLoteId, currentLoteName, toast]);
 
   const handleConfirm = useCallback(async () => {
     if (!confirmDialog) return;
