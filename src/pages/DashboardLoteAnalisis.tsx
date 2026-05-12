@@ -285,7 +285,7 @@ const DashboardLoteAnalisis = () => {
         </h1>
         <div className="flex items-center gap-2">
           <ExcelAnalisisExporter loteId={id!} />
-          <ExcelAnalisisImporter />
+          <ExcelAnalisisImporter loteId={id!} loteName={lote?.nombre_lote} />
         </div>
       </div>
 

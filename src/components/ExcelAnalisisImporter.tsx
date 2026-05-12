@@ -56,6 +56,42 @@ const lastCellColC = (ws: XLSX.WorkSheet): any => {
   return null;
 };
 
+const normalizeText = (value: any): string =>
+  String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+const findSheet = (wb: XLSX.WorkBook, expected: string): XLSX.WorkSheet | null => {
+  const expectedNorm = normalizeText(expected).replace(/^\d+\.\s*/, "");
+  const name = wb.SheetNames.find((sheetName) => {
+    const sheetNorm = normalizeText(sheetName).replace(/^\d+\.\s*/, "");
+    return sheetNorm === expectedNorm || sheetNorm.includes(expectedNorm) || expectedNorm.includes(sheetNorm);
+  });
+  return name ? wb.Sheets[name] : null;
+};
+
+const readByLabel = (ws: XLSX.WorkSheet, patterns: RegExp[], fallbackAddrs: string[] = []): any => {
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1");
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    for (let c = range.s.c; c <= Math.min(range.e.c, 8); c++) {
+      const label = normalizeText(ws[XLSX.utils.encode_cell({ r, c })]?.v);
+      if (!label || !patterns.some((pattern) => pattern.test(label))) continue;
+      for (let cc = c + 1; cc <= Math.min(range.e.c, c + 4); cc++) {
+        const v = ws[XLSX.utils.encode_cell({ r, c: cc })]?.v;
+        if (v != null && String(v).trim() !== "") return v;
+      }
+    }
+  }
+
+  for (const addr of fallbackAddrs) {
+    const v = cell(ws, addr);
+    if (v != null && String(v).trim() !== "") return v;
+  }
+  return null;
+};
+
 /** Filter out null/undefined/"" values from an object */
 const cleanPayload = (obj: Record<string, any>): Record<string, any> => {
   const result: Record<string, any> = {};
@@ -68,111 +104,111 @@ const cleanPayload = (obj: Record<string, any>): Record<string, any> => {
 /* ─── Sheet readers ────────────────────────────── */
 
 function readNormativo(ws: XLSX.WorkSheet) {
-  const usosRaw = toStr(cell(ws, "C8"));
+  const usosRaw = toStr(readByLabel(ws, [/usos compatibles/], ["B4", "C8"]));
   return cleanPayload({
-    uso_principal: toStr(cell(ws, "C7")),
+    uso_principal: toStr(readByLabel(ws, [/uso principal/], ["B3", "C7"])),
     usos_compatibles: usosRaw ? usosRaw.split(",").map((s: string) => s.trim()) : null,
-    indice_construccion: toNum(cell(ws, "C9")),
-    indice_ocupacion: toNum(cell(ws, "C10")),
-    altura_max_pisos: toInt(cell(ws, "C11")),
-    altura_max_metros: toNum(cell(ws, "C12")),
-    aislamiento_frontal_m: toNum(cell(ws, "C13")),
-    aislamiento_posterior_m: toNum(cell(ws, "C14")),
-    aislamiento_lateral_m: toNum(cell(ws, "C15")),
-    zona_pot: toStr(cell(ws, "C16")),
-    tratamiento: toStr(cell(ws, "C17")),
-    norma_vigente: toStr(cell(ws, "C18")),
-    cesion_tipo_a_pct: toNum(cell(ws, "C19")),
+    indice_construccion: toNum(readByLabel(ws, [/indice de construccion|\bic\b/], ["B5", "C9"])),
+    indice_ocupacion: toNum(readByLabel(ws, [/indice de ocupacion|\bio\b/], ["B6", "C10"])),
+    altura_max_pisos: toInt(readByLabel(ws, [/altura maxima.*pisos/], ["B7", "C11"])),
+    altura_max_metros: toNum(readByLabel(ws, [/altura maxima.*metros/], ["B8", "C12"])),
+    aislamiento_frontal_m: toNum(readByLabel(ws, [/aislamiento frontal/], ["B9", "C13"])),
+    aislamiento_posterior_m: toNum(readByLabel(ws, [/aislamiento posterior/], ["B10", "C14"])),
+    aislamiento_lateral_m: toNum(readByLabel(ws, [/aislamiento lateral/], ["B11", "C15"])),
+    zona_pot: toStr(readByLabel(ws, [/zona pot/], ["B12", "C16"])),
+    tratamiento: toStr(readByLabel(ws, [/tratamiento/], ["B13", "C17"])),
+    norma_vigente: toStr(readByLabel(ws, [/norma vigente/], ["B14", "C18"])),
+    cesion_tipo_a_pct: toNum(readByLabel(ws, [/cesion tipo a/], ["B15", "C19"])),
   });
 }
 
 function readJuridico(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    cadena_tradicion: toStr(cell(ws, "C9")),
-    hipoteca_activa: toBool(cell(ws, "C12")),
-    servidumbres: toBool(cell(ws, "C14")),
-    deuda_predial: toBool(cell(ws, "C18")) != null ? !toBool(cell(ws, "C18")) : null, // predial_al_dia inverted
-    discrepancia_areas: toBool(cell(ws, "C22")) != null ? !toBool(cell(ws, "C22")) : null, // areas_coinciden inverted
-    proceso_sucesion: toBool(cell(ws, "C24")),
-    litigio_activo: toBool(cell(ws, "C23")),
-    gravamenes: toBool(cell(ws, "C13")), // embargo_activo maps to gravamenes
+    cadena_tradicion: toStr(readByLabel(ws, [/cadena de tradicion|estado cadena/], ["B5", "C9"])),
+    hipoteca_activa: toBool(readByLabel(ws, [/hipoteca activa/], ["B8", "C12"])),
+    servidumbres: toBool(readByLabel(ws, [/servidumbres/], ["B10", "C14"])),
+    deuda_predial: toBool(readByLabel(ws, [/predial al dia/], ["B14", "C18"])) != null ? !toBool(readByLabel(ws, [/predial al dia/], ["B14", "C18"])) : null,
+    discrepancia_areas: toBool(readByLabel(ws, [/areas.*coinciden|escritura.*catastral/], ["B18", "C22"])) != null ? !toBool(readByLabel(ws, [/areas.*coinciden|escritura.*catastral/], ["B18", "C22"])) : null,
+    proceso_sucesion: toBool(readByLabel(ws, [/sucesion/], ["B20", "C24"])),
+    litigio_activo: toBool(readByLabel(ws, [/litigio activo/], ["B19", "C23"])),
+    gravamenes: toBool(readByLabel(ws, [/embargo|medida cautelar|gravamen/], ["B9", "C13"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readAmbiental(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    ronda_hidrica: toBool(cell(ws, "C7")),
-    distancia_ronda_m: toNum(cell(ws, "C8")),
-    reserva_forestal: toBool(cell(ws, "C9")),
-    amenaza_inundacion: toStr(cell(ws, "C12")),
-    amenaza_remocion: toStr(cell(ws, "C13")),
-    pasivo_ambiental: toBool(cell(ws, "C17")),
-    requiere_licencia_ambiental: toBool(cell(ws, "C20")),
+    ronda_hidrica: toBool(readByLabel(ws, [/ronda hidrica/], ["B3", "C7"])),
+    distancia_ronda_m: toNum(readByLabel(ws, [/distancia.*ronda/], ["B4", "C8"])),
+    reserva_forestal: toBool(readByLabel(ws, [/reserva forestal/], ["B5", "C9"])),
+    amenaza_inundacion: toStr(readByLabel(ws, [/amenaza.*inundacion/], ["B8", "C12"])),
+    amenaza_remocion: toStr(readByLabel(ws, [/remocion/], ["B9", "C13"])),
+    pasivo_ambiental: toBool(readByLabel(ws, [/pasivo ambiental/], ["B13", "C17"])),
+    requiere_licencia_ambiental: toBool(readByLabel(ws, [/licencia ambiental/], ["B16", "C20"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readSSPP(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    acueducto_disponible: toBool(cell(ws, "C7")),
-    alcantarillado_disponible: toBool(cell(ws, "C8")),
-    energia_disponible: toBool(cell(ws, "C9")),
-    gas_disponible: toBool(cell(ws, "C10")),
-    capacidad_red_kva: toNum(cell(ws, "C14")),
-    distancia_red_matriz_m: toNum(cell(ws, "C17")),
-    costo_extension_estimado: toNum(cell(ws, "C19")),
-    via_pavimentada: toBool(cell(ws, "C22")),
+    acueducto_disponible: toBool(readByLabel(ws, [/acueducto disponible/], ["B3", "C7"])),
+    alcantarillado_disponible: toBool(readByLabel(ws, [/alcantarillado disponible/], ["B4", "C8"])),
+    energia_disponible: toBool(readByLabel(ws, [/energia electrica|energia disponible/], ["B5", "C9"])),
+    gas_disponible: toBool(readByLabel(ws, [/gas natural|gas disponible/], ["B6", "C10"])),
+    capacidad_red_kva: toNum(readByLabel(ws, [/capacidad.*kva|red electrica/], ["B10", "C14"])),
+    distancia_red_matriz_m: toNum(readByLabel(ws, [/distancia.*red energia|distancia.*matriz/], ["B13", "C17"])),
+    costo_extension_estimado: toNum(readByLabel(ws, [/costo extension energia|costo extension/], ["B15", "C19"])),
+    via_pavimentada: toBool(readByLabel(ws, [/via pavimentada/], ["B18", "C22"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readSuelos(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    tipo_suelo: toStr(cell(ws, "C7")),
-    capacidad_portante_ton_m2: toNum(cell(ws, "C9")),
-    nivel_freatico_m: toNum(cell(ws, "C10")),
-    pendiente_pct: toNum(cell(ws, "C12")),
-    sistema_cimentacion: toStr(cell(ws, "C17")),
-    sobrecosto_cimentacion_estimado: toNum(cell(ws, "C19")),
+    tipo_suelo: toStr(readByLabel(ws, [/tipo de suelo/], ["B3", "C7"])),
+    capacidad_portante_ton_m2: toNum(readByLabel(ws, [/capacidad portante/], ["B5", "C9"])),
+    nivel_freatico_m: toNum(readByLabel(ws, [/nivel freatico/], ["B6", "C10"])),
+    pendiente_pct: toNum(readByLabel(ws, [/pendiente promedio|pendiente/], ["B8", "C12"])),
+    sistema_cimentacion: toStr(readByLabel(ws, [/sistema de cimentacion/], ["B13", "C17"])),
+    sobrecosto_cimentacion_estimado: toNum(readByLabel(ws, [/sobrecosto cimentacion/], ["B15", "C19"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readMercado(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    precio_venta_m2_zona: toNum(cell(ws, "C7")),
-    precio_unidad_promedio: toNum(cell(ws, "C21")) ?? toNum(cell(ws, "C8")),
-    proyectos_competidores: toInt(cell(ws, "C13")),
-    velocidad_absorcion_unidades_mes: toNum(cell(ws, "C18")),
-    perfil_comprador: toStr(cell(ws, "C20")),
-    valorizacion_anual_pct: toNum(cell(ws, "C23")),
+    precio_venta_m2_zona: toNum(readByLabel(ws, [/precio promedio venta.*m2/], ["B3", "C7"])),
+    precio_unidad_promedio: toNum(readByLabel(ws, [/rango precio por unidad|precio unidad/], ["B17", "C21", "C8"])),
+    proyectos_competidores: toInt(readByLabel(ws, [/proyectos competidores/], ["B9", "C13"])),
+    velocidad_absorcion_unidades_mes: toNum(readByLabel(ws, [/velocidad absorcion/], ["B14", "C18"])),
+    perfil_comprador: toStr(readByLabel(ws, [/perfil del comprador/], ["B16", "C20"])),
+    valorizacion_anual_pct: toNum(readByLabel(ws, [/valorizacion anual/], ["B19", "C23"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readArquitectonico(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    m2_construibles_total: toNum(cell(ws, "C9")),
-    unidades_estimadas: toInt(cell(ws, "C15")),
-    area_vendible_pct: toNum(cell(ws, "C11")),
-    tipologias: toStr(cell(ws, "C13")),
-    eficiencia_lote_pct: toNum(cell(ws, "C11")),
-    forma_lote: toStr(cell(ws, "C19")),
-    permite_sotano: toBool(cell(ws, "C23")),
+    m2_construibles_total: toNum(readByLabel(ws, [/m2 construibles|m² construibles/], ["B5", "C9"])),
+    unidades_estimadas: toInt(readByLabel(ws, [/unidades habitacionales|unidades estimadas/], ["B11", "C15"])),
+    area_vendible_pct: toNum(readByLabel(ws, [/m2 vendibles|m² vendibles|area vendible/], ["B7", "C11"])),
+    tipologias: toStr(readByLabel(ws, [/tipologia predominante|tipologias/], ["B9", "C13"])),
+    eficiencia_lote_pct: toNum(readByLabel(ws, [/eficiencia del lote/], ["B7", "C11"])),
+    forma_lote: toStr(readByLabel(ws, [/forma del lote/], ["B15", "C19"])),
+    permite_sotano: toBool(readByLabel(ws, [/permite sotano/], ["B19", "C23"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
 
 function readFinanciero(ws: XLSX.WorkSheet) {
   return cleanPayload({
-    valor_compra_lote: toNum(cell(ws, "C7")),
-    costo_construccion_m2: toNum(cell(ws, "C12")),
-    ingresos_proyectados: toNum(cell(ws, "C22")),
-    margen_bruto_pct: toNum(cell(ws, "C25")),
-    tir_pct: toNum(cell(ws, "C26")),
-    vpn: toNum(cell(ws, "C27")),
-    punto_equilibrio_pct: toNum(cell(ws, "C28")),
+    valor_compra_lote: toNum(readByLabel(ws, [/precio de compra del lote|valor compra/], ["B3", "C7"])),
+    costo_construccion_m2: toNum(readByLabel(ws, [/costo construccion.*m2|cop\/m2/], ["B8", "C12"])),
+    ingresos_proyectados: toNum(readByLabel(ws, [/ingresos totales|ingresos proyectados/], ["B18", "C22"])),
+    margen_bruto_pct: toNum(readByLabel(ws, [/margen bruto/], ["B21", "C25"])),
+    tir_pct: toNum(readByLabel(ws, [/tir del proyecto|tir/], ["B22", "C26"])),
+    vpn: toNum(readByLabel(ws, [/vpn del proyecto|vpn/], ["B23", "C27"])),
+    punto_equilibrio_pct: toNum(readByLabel(ws, [/punto de equilibrio/], ["B24", "C28"])),
     observaciones: toStr(lastCellColC(ws)),
   });
 }
@@ -184,7 +220,12 @@ interface ImportResult {
   areas: { name: string; fields: number }[];
 }
 
-const ExcelAnalisisImporter = () => {
+interface Props {
+  loteId: string;
+  loteName?: string | null;
+}
+
+const ExcelAnalisisImporter = ({ loteId: currentLoteId, loteName: currentLoteName }: Props) => {
   const { toast } = useToast();
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -201,108 +242,17 @@ const ExcelAnalisisImporter = () => {
   const handleFile = useCallback(async (file: File) => {
     const data = new Uint8Array(await file.arrayBuffer());
     const wb = XLSX.read(data, { type: "array" });
-
-    // ── Validación estructural de la plantilla ────────────────
-    const REQUIRED_SHEETS = [
-      "Importar a 360 Lateral",
-      "1. Normativo",
-      "2. Jurídico",
-      "3. Ambiental",
-      "4. SSPP",
-      "5. Suelos",
-      "6. Mercado",
-      "7. Arquitectónico",
-      "8. Financiero",
-    ];
-    const missingSheets = REQUIRED_SHEETS.filter((s) => !wb.SheetNames.includes(s));
-    if (missingSheets.length > 0) {
+    if (!currentLoteId) {
       toast({
-        title: "Plantilla inválida",
-        description: `Faltan las siguientes hojas: ${missingSheets.join(", ")}. Asegúrate de usar la plantilla oficial de 360 Lateral.`,
+        title: "Lote no identificado",
+        description: "Abre primero la ficha de análisis del lote al que quieres importar los datos.",
         variant: "destructive",
       });
       return;
     }
 
-    const importSheet = wb.Sheets["Importar a 360 Lateral"];
-
-    // Validar que exista una etiqueta "Nombre del lote" (o similar) en la hoja de importación
-    const validationRange = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
-    let labelFound = false;
-    for (let r = validationRange.s.r; r <= Math.min(validationRange.e.r, 50) && !labelFound; r++) {
-      for (let c = 0; c <= Math.min(validationRange.e.c, 5); c++) {
-        const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
-        if (v && /nombre.*lote|lote.*nombre|^nombre$/i.test(v)) {
-          labelFound = true;
-          break;
-        }
-      }
-    }
-    if (!labelFound) {
-      toast({
-        title: "Etiqueta no encontrada",
-        description: 'La hoja "Importar a 360 Lateral" no contiene la etiqueta "Nombre del lote". Verifica que la plantilla esté completa.',
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Buscar el nombre del lote de forma robusta:
-    // 1) Intentar celdas comunes (C12, C11, C13, B12, D12)
-    // 2) Si no, buscar una fila cuya columna A/B contenga "nombre" y leer la siguiente columna
-    // 3) Como último recurso, primer valor no vacío en columna C
-    let nombre_excel = toStr(cell(importSheet, "C12"))
-      || toStr(cell(importSheet, "C11"))
-      || toStr(cell(importSheet, "C13"))
-      || toStr(cell(importSheet, "B12"))
-      || toStr(cell(importSheet, "D12"));
-
-    if (!nombre_excel) {
-      const range = XLSX.utils.decode_range(importSheet["!ref"] || "A1");
-      for (let r = range.s.r; r <= Math.min(range.e.r, 50) && !nombre_excel; r++) {
-        for (let c = 0; c <= Math.min(range.e.c, 3); c++) {
-          const label = toStr(importSheet[XLSX.utils.encode_cell({ r, c })]?.v);
-          if (label && /nombre.*lote|lote.*nombre|^nombre$/i.test(label)) {
-            for (let cc = c + 1; cc <= Math.min(range.e.c, c + 4); cc++) {
-              const v = toStr(importSheet[XLSX.utils.encode_cell({ r, c: cc })]?.v);
-              if (v) { nombre_excel = v; break; }
-            }
-            if (!nombre_excel) {
-              const below = toStr(importSheet[XLSX.utils.encode_cell({ r: r + 1, c })]?.v);
-              if (below) nombre_excel = below;
-            }
-          }
-        }
-      }
-    }
-
-    if (!nombre_excel) {
-      toast({
-        title: "Nombre del lote no encontrado",
-        description: 'No se pudo encontrar el nombre del lote en la hoja "Importar a 360 Lateral". Verifica que la celda C12 (o una celda con etiqueta "Nombre del lote") contenga el nombre exacto del lote.',
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Find lote
-    const { data: loteEncontrado } = await supabase
-      .from("lotes")
-      .select("id, nombre_lote")
-      .ilike("nombre_lote", nombre_excel.trim())
-      .maybeSingle();
-
-    if (!loteEncontrado) {
-      toast({
-        title: "Lote no encontrado",
-        description: `No existe ningún lote con el nombre "${nombre_excel}" en la plataforma. Verifica el nombre en la hoja "Importar a 360 Lateral" celda C12.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setConfirmDialog({ loteId: loteEncontrado.id, loteName: loteEncontrado.nombre_lote, wb });
-  }, [toast]);
+    setConfirmDialog({ loteId: currentLoteId, loteName: currentLoteName || "lote actual", wb });
+  }, [currentLoteId, currentLoteName, toast]);
 
   const handleConfirm = useCallback(async () => {
     if (!confirmDialog) return;
@@ -326,7 +276,7 @@ const ExcelAnalisisImporter = () => {
       const errores: string[] = [];
 
       for (const { sheetName, table, label, reader } of sheetMap) {
-        const ws = wb.Sheets[sheetName];
+        const ws = findSheet(wb, sheetName);
         if (!ws) continue;
 
         const payload = reader(ws);
