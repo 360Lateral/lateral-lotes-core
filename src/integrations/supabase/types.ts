@@ -825,6 +825,122 @@ export type Database = {
           },
         ]
       }
+      engagements_lote: {
+        Row: {
+          asesor_asignado_id: string | null
+          avance_pct: number
+          cliente_id: string | null
+          created_at: string
+          estado: Database["public"]["Enums"]["estado_engagement"]
+          estado_pago: string
+          fecha_entrega: string | null
+          fecha_inicio: string | null
+          fecha_sla_objetivo: string | null
+          fecha_solicitud: string
+          gerente_id: string | null
+          id: string
+          lead_id: string | null
+          lote_id: string
+          moneda: string
+          notas: string | null
+          plan_id: string | null
+          precio_cobrado: number | null
+          updated_at: string
+        }
+        Insert: {
+          asesor_asignado_id?: string | null
+          avance_pct?: number
+          cliente_id?: string | null
+          created_at?: string
+          estado?: Database["public"]["Enums"]["estado_engagement"]
+          estado_pago?: string
+          fecha_entrega?: string | null
+          fecha_inicio?: string | null
+          fecha_sla_objetivo?: string | null
+          fecha_solicitud?: string
+          gerente_id?: string | null
+          id?: string
+          lead_id?: string | null
+          lote_id: string
+          moneda?: string
+          notas?: string | null
+          plan_id?: string | null
+          precio_cobrado?: number | null
+          updated_at?: string
+        }
+        Update: {
+          asesor_asignado_id?: string | null
+          avance_pct?: number
+          cliente_id?: string | null
+          created_at?: string
+          estado?: Database["public"]["Enums"]["estado_engagement"]
+          estado_pago?: string
+          fecha_entrega?: string | null
+          fecha_inicio?: string | null
+          fecha_sla_objetivo?: string | null
+          fecha_solicitud?: string
+          gerente_id?: string | null
+          id?: string
+          lead_id?: string | null
+          lote_id?: string
+          moneda?: string
+          notas?: string | null
+          plan_id?: string | null
+          precio_cobrado?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagements_lote_asesor_asignado_id_fkey"
+            columns: ["asesor_asignado_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_gerente_id_fkey"
+            columns: ["gerente_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "planes_diagnostico"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favoritos: {
         Row: {
           created_at: string
@@ -1466,6 +1582,84 @@ export type Database = {
         }
         Relationships: []
       }
+      planes_analisis: {
+        Row: {
+          id: string
+          incluido: boolean
+          peso_avance: number
+          plan_id: string
+          tipo_analisis_id: string
+        }
+        Insert: {
+          id?: string
+          incluido?: boolean
+          peso_avance?: number
+          plan_id: string
+          tipo_analisis_id: string
+        }
+        Update: {
+          id?: string
+          incluido?: boolean
+          peso_avance?: number
+          plan_id?: string
+          tipo_analisis_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planes_analisis_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "planes_diagnostico"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planes_analisis_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      planes_diagnostico: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          dias_sla: number | null
+          id: string
+          moneda: string
+          nombre: string
+          orden: number | null
+          precio_cop: number | null
+          precio_smlmv: number | null
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          dias_sla?: number | null
+          id?: string
+          moneda?: string
+          nombre: string
+          orden?: number | null
+          precio_cop?: number | null
+          precio_smlmv?: number | null
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          dias_sla?: number | null
+          id?: string
+          moneda?: string
+          nombre?: string
+          orden?: number | null
+          precio_cop?: number | null
+          precio_smlmv?: number | null
+        }
+        Relationships: []
+      }
       pot_norma_referencia: {
         Row: {
           aislamiento_frontal_m: number | null
@@ -1738,6 +1932,106 @@ export type Database = {
           },
         ]
       }
+      tareas_analisis: {
+        Row: {
+          avance_pct: number
+          bloqueado: boolean
+          created_at: string
+          engagement_id: string
+          estado: Database["public"]["Enums"]["estado_analisis"]
+          fecha_completado: string | null
+          fecha_inicio: string | null
+          fecha_objetivo: string | null
+          id: string
+          link_detalle_id: string | null
+          motivo_bloqueo: string | null
+          responsable_id: string | null
+          tipo_analisis_id: string
+          updated_at: string
+        }
+        Insert: {
+          avance_pct?: number
+          bloqueado?: boolean
+          created_at?: string
+          engagement_id: string
+          estado?: Database["public"]["Enums"]["estado_analisis"]
+          fecha_completado?: string | null
+          fecha_inicio?: string | null
+          fecha_objetivo?: string | null
+          id?: string
+          link_detalle_id?: string | null
+          motivo_bloqueo?: string | null
+          responsable_id?: string | null
+          tipo_analisis_id: string
+          updated_at?: string
+        }
+        Update: {
+          avance_pct?: number
+          bloqueado?: boolean
+          created_at?: string
+          engagement_id?: string
+          estado?: Database["public"]["Enums"]["estado_analisis"]
+          fecha_completado?: string | null
+          fecha_inicio?: string | null
+          fecha_objetivo?: string | null
+          id?: string
+          link_detalle_id?: string | null
+          motivo_bloqueo?: string | null
+          responsable_id?: string | null
+          tipo_analisis_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tareas_analisis_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_analisis_responsable_id_fkey"
+            columns: ["responsable_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_analisis_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tipos_analisis: {
+        Row: {
+          activo: boolean
+          codigo: string
+          id: string
+          nombre: string
+          orden: number | null
+          tabla_destino: string | null
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          id?: string
+          nombre: string
+          orden?: number | null
+          tabla_destino?: string | null
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          id?: string
+          nombre?: string
+          orden?: number | null
+          tabla_destino?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -1915,11 +2209,26 @@ export type Database = {
         | "normativo"
         | "juridico"
         | "otro"
+      estado_analisis:
+        | "no_aplica"
+        | "pendiente"
+        | "en_progreso"
+        | "en_revision"
+        | "aprobado"
+        | "rechazado"
+        | "entregado"
       estado_disponibilidad:
         | "Disponible"
         | "Reservado"
         | "Vendido"
         | "En revisión"
+      estado_engagement:
+        | "prospecto"
+        | "activo"
+        | "en_revision"
+        | "entregado"
+        | "cerrado"
+        | "cancelado"
       estado_lead:
         | "nuevo"
         | "contactado"
@@ -2072,11 +2381,28 @@ export const Constants = {
         "juridico",
         "otro",
       ],
+      estado_analisis: [
+        "no_aplica",
+        "pendiente",
+        "en_progreso",
+        "en_revision",
+        "aprobado",
+        "rechazado",
+        "entregado",
+      ],
       estado_disponibilidad: [
         "Disponible",
         "Reservado",
         "Vendido",
         "En revisión",
+      ],
+      estado_engagement: [
+        "prospecto",
+        "activo",
+        "en_revision",
+        "entregado",
+        "cerrado",
+        "cancelado",
       ],
       estado_lead: [
         "nuevo",
