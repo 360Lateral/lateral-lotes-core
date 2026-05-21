@@ -42,7 +42,9 @@ const estadoVariant = (e: string) => {
 const DashboardLotes = () => {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
+  const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
