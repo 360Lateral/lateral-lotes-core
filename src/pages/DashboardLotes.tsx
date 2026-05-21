@@ -99,6 +99,8 @@ const DashboardLotes = () => {
     );
   });
 
+  const { data: engagementsActivos = {} } = useEngagementsActivosPorLotes(filtered.map((l) => l.id));
+
   return (
     <DashboardLayout>
       <div className="mb-4 flex items-center justify-between gap-4">
