@@ -5,10 +5,11 @@ interface Props {
   children: React.ReactNode;
   requireDeveloper?: boolean;
   allowOwner?: boolean;
+  requireSuperAdmin?: boolean;
 }
 
-const ProtectedRoute = ({ children, requireDeveloper, allowOwner }: Props) => {
-  const { user, isAdminOrAsesor, isDeveloper, userType, loading } = useAuth();
+const ProtectedRoute = ({ children, requireDeveloper, allowOwner, requireSuperAdmin }: Props) => {
+  const { user, roles, isAdminOrAsesor, isDeveloper, userType, loading } = useAuth();
 
   if (loading) {
     return (
@@ -20,6 +21,15 @@ const ProtectedRoute = ({ children, requireDeveloper, allowOwner }: Props) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  const isSuperAdmin = roles.includes("super_admin");
+
+  if (requireSuperAdmin) {
+    if (!isSuperAdmin) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    return <>{children}</>;
   }
 
   const isOwner = userType === "dueno" || userType === "comisionista";
