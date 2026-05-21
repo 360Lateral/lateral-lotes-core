@@ -17,6 +17,7 @@ import {
   BellRing,
   Handshake,
   FileSearch,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -53,6 +54,7 @@ const DashboardLayout = ({ children }: Props) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
+  const isSuperAdmin = roles.includes("super_admin" as any);
   const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "asesor"].includes(r));
   const isOwner = userType === "dueno" || userType === "comisionista";
   const displayName =
@@ -70,11 +72,16 @@ const DashboardLayout = ({ children }: Props) => {
     { label: "Negociaciones", href: "/dashboard/owner/negociaciones", icon: Handshake },
   ] : [];
 
+  const superAdminItems = isSuperAdmin ? [
+    { label: "Configuración", href: "/dashboard/config", icon: Settings },
+  ] : [];
+
   const allItems = [
     ...(isAdminOrAsesor ? navItems : []),
     ...(isAdmin ? adminOnlyItems : []),
     ...developerItems,
     ...ownerItems,
+    ...superAdminItems,
   ];
 
   const finalItems = allItems.length > 0 ? allItems : [navItems[0]];
