@@ -25,8 +25,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 
 const estadoVariant = (e: string) => {
   switch (e) {
