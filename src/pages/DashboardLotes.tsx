@@ -144,7 +144,16 @@ const DashboardLotes = () => {
             <tbody>
               {filtered.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted/50">
-                  <td className="px-4 py-3 font-medium text-foreground">{l.nombre_lote}</td>
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    <div className="flex items-center gap-2">
+                      <span>{l.nombre_lote}</span>
+                      {(engagementsActivos as any)[l.id]?.planes_diagnostico?.nombre && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {(engagementsActivos as any)[l.id].planes_diagnostico.nombre}
+                        </Badge>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
