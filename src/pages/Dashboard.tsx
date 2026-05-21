@@ -19,6 +19,7 @@ import {
 import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake, Check, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { usePortafolioKpis } from "@/hooks/usePortafolioKpis";
 
 
 const leadEstadoVariant = (e: string) => {
