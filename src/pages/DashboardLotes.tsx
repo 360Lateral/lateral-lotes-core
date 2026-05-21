@@ -250,6 +250,15 @@ const DashboardLotes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </AlertDialog>
+
+      {engagementLoteId && (
+        <CrearEngagementDialog
+          loteId={engagementLoteId}
+          open={!!engagementLoteId}
+          onOpenChange={(o) => { if (!o) setEngagementLoteId(null); }}
+        />
+      )}
     </DashboardLayout>
   );
 };
