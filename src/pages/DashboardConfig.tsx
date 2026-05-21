@@ -115,7 +115,7 @@ const PlanesTab = () => {
       await update.mutateAsync({ id: editing.id, ...parsed.data });
     } else {
       if (!form.codigo) { toast.error("Código requerido"); return; }
-      await create.mutateAsync({ ...parsed.data, codigo: form.codigo });
+      await create.mutateAsync({ ...parsed.data, codigo: form.codigo } as any);
     }
     setOpen(false);
   };
