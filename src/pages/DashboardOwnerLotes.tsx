@@ -44,6 +44,10 @@ const DashboardOwnerLotes = () => {
     },
   });
 
+  const loteIds = (lotes ?? []).map((l) => l.id);
+  const { data: engagementsActivos = {} } = useEngagementsActivosPorLotes(loteIds);
+
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
