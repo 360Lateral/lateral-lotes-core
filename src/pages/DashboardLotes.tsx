@@ -250,7 +250,6 @@ const DashboardLotes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </AlertDialog>
 
       {engagementLoteId && (
         <CrearEngagementDialog
