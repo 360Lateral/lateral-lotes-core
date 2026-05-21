@@ -1990,6 +1990,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tareas_analisis_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
             foreignKeyName: "tareas_analisis_responsable_id_fkey"
             columns: ["responsable_id"]
             isOneToOne: false
@@ -2112,6 +2119,52 @@ export type Database = {
         }
         Relationships: []
       }
+      vw_portafolio_resumen: {
+        Row: {
+          asesor_id: string | null
+          asesor_nombre: string | null
+          avance_pct: number | null
+          cliente_nombre: string | null
+          dias_en_gestion: number | null
+          dias_para_sla: number | null
+          engagement_id: string | null
+          estado: Database["public"]["Enums"]["estado_engagement"] | null
+          estado_pago: string | null
+          lote_barrio: string | null
+          lote_ciudad: string | null
+          lote_id: string | null
+          lote_nombre: string | null
+          moneda: string | null
+          plan_codigo: string | null
+          plan_nombre: string | null
+          precio_cobrado: number | null
+          semaforo_sla: string | null
+          ultima_actualizacion: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagements_lote_asesor_asignado_id_fkey"
+            columns: ["asesor_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       calcular_match_score: {
@@ -2197,6 +2250,7 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      obtener_kpis_portafolio: { Args: never; Returns: Json }
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
