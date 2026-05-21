@@ -198,6 +198,9 @@ const DashboardLotes = () => {
                             <BarChart3 className="h-4 w-4" /> Análisis 360°
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
+                          <Briefcase className="mr-2 h-4 w-4" /> Crear engagement
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to={`/lotes/${l.id}`} target="_blank" className="flex items-center gap-2">
                             <Eye className="h-4 w-4" /> Ver ficha
