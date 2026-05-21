@@ -171,6 +171,9 @@ const Dashboard = () => {
     <DashboardLayout>
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">Dashboard</h1>
 
+      <PortafolioKpisPreview />
+
+
       {/* Metrics */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
         {metrics.map((m) => (
