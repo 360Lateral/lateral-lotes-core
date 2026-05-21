@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,7 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Loader2 } from "lucide-react";
+import { Plus, MapPin, Loader2, Briefcase } from "lucide-react";
+import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 
 const DashboardOwnerLotes = () => {
   const { user } = useAuth();
