@@ -25,8 +25,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal } from "lucide-react";
+import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -41,6 +43,7 @@ const DashboardLotes = () => {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
+  const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -96,6 +99,8 @@ const DashboardLotes = () => {
     );
   });
 
+  const { data: engagementsActivos = {} } = useEngagementsActivosPorLotes(filtered.map((l) => l.id));
+
   return (
     <DashboardLayout>
       <div className="mb-4 flex items-center justify-between gap-4">
@@ -139,7 +144,16 @@ const DashboardLotes = () => {
             <tbody>
               {filtered.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted/50">
-                  <td className="px-4 py-3 font-medium text-foreground">{l.nombre_lote}</td>
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    <div className="flex items-center gap-2">
+                      <span>{l.nombre_lote}</span>
+                      {(engagementsActivos as any)[l.id]?.planes_diagnostico?.nombre && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {(engagementsActivos as any)[l.id].planes_diagnostico.nombre}
+                        </Badge>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
@@ -183,6 +197,9 @@ const DashboardLotes = () => {
                           <Link to={`/dashboard/lotes/${l.id}/analisis`} className="flex items-center gap-2">
                             <BarChart3 className="h-4 w-4" /> Análisis 360°
                           </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
+                          <Briefcase className="mr-2 h-4 w-4" /> Crear engagement
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to={`/lotes/${l.id}`} target="_blank" className="flex items-center gap-2">
@@ -233,6 +250,14 @@ const DashboardLotes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {engagementLoteId && (
+        <CrearEngagementDialog
+          loteId={engagementLoteId}
+          open={!!engagementLoteId}
+          onOpenChange={(o) => { if (!o) setEngagementLoteId(null); }}
+        />
+      )}
     </DashboardLayout>
   );
 };

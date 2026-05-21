@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,11 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Loader2 } from "lucide-react";
+import { Plus, MapPin, Loader2, Briefcase } from "lucide-react";
+import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 
 const DashboardOwnerLotes = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
 
   // Get owner associations for this user
   const { data: ownerIds = [] } = useQuery({
@@ -40,6 +44,10 @@ const DashboardOwnerLotes = () => {
     },
   });
 
+  const loteIds = (lotes ?? []).map((l) => l.id);
+  const { data: engagementsActivos = {} } = useEngagementsActivosPorLotes(loteIds);
+
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -67,33 +75,63 @@ const DashboardOwnerLotes = () => {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {lotes.map((lote) => (
-              <Card key={lote.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/lotes/${lote.id}`)}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold truncate">{lote.nombre_lote}</CardTitle>
-                  {lote.owner_id !== user?.id && (
-                    <p className="text-xs text-muted-foreground">Propietario: {lote.nombre_propietario ?? "—"}</p>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    {lote.ciudad}{lote.departamento ? `, ${lote.departamento}` : ""}
-                  </p>
-                  {lote.area_total_m2 && (
-                    <p className="text-sm">{lote.area_total_m2.toLocaleString("es-CO")} m²</p>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Badge variant={lote.es_publico ? "default" : "secondary"}>
-                      {lote.es_publico ? "Público" : "Borrador"}
-                    </Badge>
-                    <Badge variant="outline">{lote.estado_disponibilidad}</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {lotes.map((lote) => {
+              const activo = (engagementsActivos as any)[lote.id];
+              const esPropio = lote.owner_id === user?.id;
+              const puedeCrear = esPropio && !activo;
+              return (
+                <Card key={lote.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-2 cursor-pointer" onClick={() => navigate(`/lotes/${lote.id}`)}>
+                    <CardTitle className="text-base font-semibold truncate">{lote.nombre_lote}</CardTitle>
+                    {lote.owner_id !== user?.id && (
+                      <p className="text-xs text-muted-foreground">Propietario: {lote.nombre_propietario ?? "—"}</p>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      {lote.ciudad}{lote.departamento ? `, ${lote.departamento}` : ""}
+                    </p>
+                    {lote.area_total_m2 && (
+                      <p className="text-sm">{lote.area_total_m2.toLocaleString("es-CO")} m²</p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant={lote.es_publico ? "default" : "secondary"}>
+                        {lote.es_publico ? "Público" : "Borrador"}
+                      </Badge>
+                      <Badge variant="outline">{lote.estado_disponibilidad}</Badge>
+                      {activo?.planes_diagnostico?.nombre && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Plan: {activo.planes_diagnostico.nombre}
+                        </Badge>
+                      )}
+                    </div>
+                    {esPropio && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-2"
+                        disabled={!puedeCrear}
+                        onClick={() => setEngagementLoteId(lote.id)}
+                      >
+                        <Briefcase className="mr-2 h-4 w-4" />
+                        {activo ? "Engagement activo" : "Crear engagement"}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {engagementLoteId && (
+        <CrearEngagementDialog
+          loteId={engagementLoteId}
+          open={!!engagementLoteId}
+          onOpenChange={(o) => { if (!o) setEngagementLoteId(null); }}
+        />
+      )}
     </DashboardLayout>
   );
 };
