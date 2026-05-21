@@ -2152,6 +2152,14 @@ export type Database = {
         }[]
       }
       count_diagnosticos: { Args: never; Returns: number }
+      crear_engagement: {
+        Args: { p_cliente_id?: string; p_lote_id: string; p_plan_id: string }
+        Returns: string
+      }
+      factor_avance_por_estado: {
+        Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
+        Returns: number
+      }
       get_plan_limits: {
         Args: { _user_id: string }
         Returns: {
