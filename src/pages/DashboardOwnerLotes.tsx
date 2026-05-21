@@ -14,6 +14,7 @@ import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 const DashboardOwnerLotes = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
 
   // Get owner associations for this user
   const { data: ownerIds = [] } = useQuery({
