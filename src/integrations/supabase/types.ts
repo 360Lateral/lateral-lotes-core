@@ -2156,6 +2156,10 @@ export type Database = {
         Args: { p_cliente_id?: string; p_lote_id: string; p_plan_id: string }
         Returns: string
       }
+      es_asesor_de_engagement: {
+        Args: { _engagement_id: string; _user_id: string }
+        Returns: boolean
+      }
       factor_avance_por_estado: {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
         Returns: number
@@ -2189,6 +2193,12 @@ export type Database = {
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      puede_ver_engagement: {
+        Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
       }
       recalcular_todas_notificaciones: { Args: never; Returns: number }
