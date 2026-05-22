@@ -188,6 +188,8 @@ Deno.serve(async (req) => {
             "Cliente creado pero no se pudo generar link de invitación. Pídele que use 'Olvidé mi contraseña' en /login.",
           user_id: newUserId,
           engagement_asignado: engagementAsignado,
+        reinvitado,
+          reinvitado,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -233,6 +235,8 @@ Deno.serve(async (req) => {
           user_id: newUserId,
           invite_link: inviteLink,
           engagement_asignado: engagementAsignado,
+        reinvitado,
+          reinvitado,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -264,6 +268,8 @@ Deno.serve(async (req) => {
         user_id: newUserId,
         email_enviado: emailEnviado,
         engagement_asignado: engagementAsignado,
+        reinvitado,
+          reinvitado,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
