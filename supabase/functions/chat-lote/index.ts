@@ -31,6 +31,23 @@ serve(async (req) => {
       });
     }
 
+    // Server-side AI quota enforcement (prevents bypassing client-side limit)
+    const supabaseService = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const { data: quotaOk, error: quotaErr } = await supabaseService
+      .rpc("check_ai_quota", { _user_id: user.id });
+    if (quotaErr) {
+      console.error("check_ai_quota error:", quotaErr);
+    }
+    if (quotaOk === false) {
+      return new Response(
+        JSON.stringify({ error: "Has alcanzado el límite mensual de consultas a la IA de tu plan." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
