@@ -43,6 +43,8 @@ import MetricasEjecutivas from "./pages/MetricasEjecutivas";
 import Bienvenida from "./pages/Bienvenida";
 import PreferenciasUsuario from "./pages/PreferenciasUsuario";
 import NotFound from "./pages/NotFound";
+import MisEngagements from "./pages/portal/MisEngagements";
+import EngagementClienteDetalle from "./pages/portal/EngagementClienteDetalle";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +99,10 @@ const App = () => (
             <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowOwner><DashboardOwnerLotes /></ProtectedRoute>} />
             <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowOwner><DashboardOwnerDiagnosticos /></ProtectedRoute>} />
             <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowOwner><DashboardOwnerNegociaciones /></ProtectedRoute>} />
+
+            {/* Portal del cliente (rol inversor) */}
+            <Route path="/portal" element={<MisEngagements />} />
+            <Route path="/portal/engagement/:id" element={<EngagementClienteDetalle />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
