@@ -8,6 +8,7 @@ import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
+import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 
 const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +56,11 @@ const EngagementDetalle = () => {
             <p className="mt-6 font-body text-xs text-muted-foreground">
               Cambiar el estado de una tarea actualiza automáticamente el avance del engagement.
             </p>
+            <Separator className="my-6" />
+            <SeccionEntregables
+              engagementId={id!}
+              mostrarAvanceAlCliente={engagement.mostrar_avance_al_cliente}
+            />
           </>
         )}
       </div>
