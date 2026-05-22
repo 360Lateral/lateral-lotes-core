@@ -8,6 +8,7 @@ import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
+import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 
 const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
