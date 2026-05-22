@@ -41,6 +41,7 @@ import PortafolioDashboard from "./pages/PortafolioDashboard";
 import EngagementDetalle from "./pages/EngagementDetalle";
 import MetricasEjecutivas from "./pages/MetricasEjecutivas";
 import Bienvenida from "./pages/Bienvenida";
+import PreferenciasUsuario from "./pages/PreferenciasUsuario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
+            <Route path="/dashboard/preferencias" element={<ProtectedRoute allowOwner><PreferenciasUsuario /></ProtectedRoute>} />
 
             {/* Rutas developer */}
             <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />

@@ -1875,6 +1875,27 @@ export type Database = {
           },
         ]
       }
+      preferencias_usuario: {
+        Row: {
+          created_at: string
+          email_sla_digest: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sla_digest?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sla_digest?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       servicios_publicos: {
         Row: {
           estado: Database["public"]["Enums"]["estado_servicio"]
@@ -2337,6 +2358,7 @@ export type Database = {
         Returns: undefined
       }
       marcar_todas_leidas: { Args: never; Returns: number }
+      obtener_digest_sla: { Args: { p_user_id: string }; Returns: Json }
       obtener_embudo_conversion: {
         Args: { p_desde?: string; p_hasta?: string }
         Returns: {
