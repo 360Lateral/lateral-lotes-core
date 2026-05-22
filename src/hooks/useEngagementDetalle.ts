@@ -44,7 +44,7 @@ export const useEngagementDetalle = (engagementId: string | undefined) => {
           `
           id, lote_id, plan_id, cliente_id, asesor_asignado_id, estado,
           avance_pct, fecha_inicio, fecha_sla_objetivo, fecha_solicitud,
-          created_at, updated_at, notas,
+          created_at, updated_at, notas, mostrar_avance_al_cliente,
           lote:lotes!engagements_lote_lote_id_fkey ( id, nombre_lote, direccion, ciudad, area_total_m2 ),
           plan:planes_diagnostico!engagements_lote_plan_id_fkey ( id, codigo, nombre, precio_cop ),
           cliente:perfiles!engagements_lote_cliente_id_fkey ( id, nombre, email ),
