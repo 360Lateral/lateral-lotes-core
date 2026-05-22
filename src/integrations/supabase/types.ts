@@ -1483,6 +1483,62 @@ export type Database = {
           },
         ]
       }
+      notificaciones_sla: {
+        Row: {
+          created_at: string
+          data: Json
+          destinatario_id: string
+          entidad_id: string
+          entidad_tipo: string
+          estado: Database["public"]["Enums"]["estado_notificacion"]
+          id: string
+          leida_at: string | null
+          mensaje: string
+          nivel: Database["public"]["Enums"]["nivel_notificacion"]
+          resuelta_at: string | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          destinatario_id: string
+          entidad_id: string
+          entidad_tipo: string
+          estado?: Database["public"]["Enums"]["estado_notificacion"]
+          id?: string
+          leida_at?: string | null
+          mensaje: string
+          nivel: Database["public"]["Enums"]["nivel_notificacion"]
+          resuelta_at?: string | null
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          destinatario_id?: string
+          entidad_id?: string
+          entidad_tipo?: string
+          estado?: Database["public"]["Enums"]["estado_notificacion"]
+          id?: string
+          leida_at?: string | null
+          mensaje?: string
+          nivel?: Database["public"]["Enums"]["nivel_notificacion"]
+          resuelta_at?: string | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificaciones_sla_destinatario_id_fkey"
+            columns: ["destinatario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           activo: boolean | null
@@ -2204,11 +2260,13 @@ export type Database = {
           zona_homogenea: string
         }[]
       }
+      contar_notificaciones_pendientes: { Args: never; Returns: number }
       count_diagnosticos: { Args: never; Returns: number }
       crear_engagement: {
         Args: { p_cliente_id?: string; p_lote_id: string; p_plan_id: string }
         Returns: string
       }
+      detectar_sla_en_riesgo: { Args: never; Returns: number }
       es_asesor_de_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
@@ -2250,6 +2308,35 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      listar_notificaciones: {
+        Args: { p_limit?: number; p_solo_pendientes?: boolean }
+        Returns: {
+          created_at: string
+          data: Json
+          destinatario_id: string
+          entidad_id: string
+          entidad_tipo: string
+          estado: Database["public"]["Enums"]["estado_notificacion"]
+          id: string
+          leida_at: string | null
+          mensaje: string
+          nivel: Database["public"]["Enums"]["nivel_notificacion"]
+          resuelta_at: string | null
+          tipo: string
+          titulo: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notificaciones_sla"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      marcar_notificacion_leida: {
+        Args: { p_notif_id: string }
+        Returns: undefined
+      }
+      marcar_todas_leidas: { Args: never; Returns: number }
       obtener_embudo_conversion: {
         Args: { p_desde?: string; p_hasta?: string }
         Returns: {
@@ -2341,7 +2428,9 @@ export type Database = {
         | "cerrado"
         | "descartado"
       estado_negociacion: "activa" | "en_revision" | "cerrada" | "concretada"
+      estado_notificacion: "pendiente" | "leida" | "resuelta"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
+      nivel_notificacion: "amarillo" | "rojo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2517,7 +2606,9 @@ export const Constants = {
         "descartado",
       ],
       estado_negociacion: ["activa", "en_revision", "cerrada", "concretada"],
+      estado_notificacion: ["pendiente", "leida", "resuelta"],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
+      nivel_notificacion: ["amarillo", "rojo"],
     },
   },
 } as const
