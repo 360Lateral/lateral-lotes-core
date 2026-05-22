@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
+import CampanaNotificaciones from "@/components/notificaciones/CampanaNotificaciones";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, end: true },
@@ -199,14 +200,21 @@ const DashboardLayout = ({ children }: Props) => {
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden bg-muted">
         {/* Mobile header */}
-        {isMobile && (
-          <header className="flex h-12 items-center border-b border-border bg-background px-4">
-            <button onClick={() => setMobileOpen(true)}>
-              <Menu className="h-5 w-5 text-foreground" />
-            </button>
-            <span className="ml-3 font-body text-sm font-semibold text-foreground">
-              360Lateral
-            </span>
+        {isMobile ? (
+          <header className="flex h-12 items-center justify-between border-b border-border bg-background px-4">
+            <div className="flex items-center">
+              <button onClick={() => setMobileOpen(true)}>
+                <Menu className="h-5 w-5 text-foreground" />
+              </button>
+              <span className="ml-3 font-body text-sm font-semibold text-foreground">
+                360Lateral
+              </span>
+            </div>
+            <CampanaNotificaciones />
+          </header>
+        ) : (
+          <header className="flex h-12 items-center justify-end border-b border-border bg-background px-4">
+            <CampanaNotificaciones />
           </header>
         )}
 
