@@ -13,6 +13,8 @@ interface AuthContextType {
   loading: boolean;
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
+  isSuperAdmin: boolean;
+  isInversor: boolean;
   signOut: () => Promise<void>;
 }
 
