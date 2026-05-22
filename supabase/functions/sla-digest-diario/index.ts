@@ -94,9 +94,12 @@ serve(async (req) => {
       .eq("email_sla_digest", true);
     if (usrErr) throw usrErr;
 
-    const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
     const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "notificaciones@360lateral.com";
-    const MODO_SECO = !RESEND_KEY;
+    const FROM_NAME = Deno.env.get("FROM_NAME") ?? "360Lateral";
+    const MODO_SECO = !LOVABLE_API_KEY || !BREVO_API_KEY;
+    const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
 
     const resultados: Array<Record<string, unknown>> = [];
 
@@ -120,17 +123,18 @@ serve(async (req) => {
           continue;
         }
 
-        const resp = await fetch("https://api.resend.com/emails", {
+        const resp = await fetch(`${GATEWAY_URL}/smtp/email`, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${RESEND_KEY}`,
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "X-Connection-Api-Key": BREVO_API_KEY!,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: FROM_EMAIL,
-            to: d.usuario_email,
+            sender: { name: FROM_NAME, email: FROM_EMAIL },
+            to: [{ email: d.usuario_email, name: d.usuario_nombre }],
             subject: `[360Lateral] ${d.total_rojos} vencidos / ${d.total_amarillos} próximos a vencer`,
-            html,
+            htmlContent: html,
           }),
         });
         const body = await resp.text();
@@ -138,7 +142,7 @@ serve(async (req) => {
           user_id: u.user_id,
           status: resp.ok ? "sent" : "error",
           http: resp.status,
-          ...(resp.ok ? {} : { error: body.slice(0, 200) }),
+          ...(resp.ok ? {} : { error: body.slice(0, 300) }),
         });
       } catch (e) {
         resultados.push({ user_id: u.user_id, status: "error", error: String(e) });
