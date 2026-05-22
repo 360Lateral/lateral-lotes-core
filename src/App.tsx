@@ -37,6 +37,7 @@ import DashboardOwnerNegociaciones from "./pages/DashboardOwnerNegociaciones";
 import DashboardUsuarios from "./pages/DashboardUsuarios";
 import DashboardLoteAnalisis from "./pages/DashboardLoteAnalisis";
 import DashboardConfig from "./pages/DashboardConfig";
+import PortafolioDashboard from "./pages/PortafolioDashboard";
 import Bienvenida from "./pages/Bienvenida";
 import NotFound from "./pages/NotFound";
 
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/dashboard/leads" element={<ProtectedRoute><DashboardLeads /></ProtectedRoute>} />
             <Route path="/dashboard/usuarios" element={<ProtectedRoute><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
+            <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
 
             {/* Rutas developer */}
             <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />
