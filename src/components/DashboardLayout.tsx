@@ -18,6 +18,7 @@ import {
   Handshake,
   FileSearch,
   Settings,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -26,6 +27,7 @@ import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, end: true },
   { label: "Lotes", href: "/dashboard/lotes", icon: MapPin },
+  { label: "Portafolio", href: "/dashboard/portafolio", icon: BarChart3 },
   { label: "Leads", href: "/dashboard/leads", icon: Users },
 ];
 
