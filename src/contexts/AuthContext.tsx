@@ -166,6 +166,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const isDeveloper = effectiveUserType === "developer" || effectiveRoles.some((r) => r === "developer");
+  const isSuperAdmin = effectiveRoles.includes("super_admin");
+  const isInversor = effectiveRoles.includes("inversor") || effectiveUserType === "inversor";
 
   const signOut = async () => {
     try {
