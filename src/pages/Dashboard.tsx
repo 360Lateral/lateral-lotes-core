@@ -19,7 +19,7 @@ import {
 import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake, Check, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { usePortafolioKpis } from "@/hooks/usePortafolioKpis";
+
 
 
 const leadEstadoVariant = (e: string) => {
@@ -33,59 +33,6 @@ const leadEstadoVariant = (e: string) => {
   }
 };
 
-const PortafolioKpisPreview = () => {
-  const { data, isLoading, error } = usePortafolioKpis();
-
-  if (isLoading) {
-    return (
-      <div className="mb-8 rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">
-        Cargando KPIs…
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="mb-8 rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
-        Error: {(error as Error).message}
-      </div>
-    );
-  }
-  if (!data) return null;
-
-  const formatCop = (n: number) =>
-    new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(n ?? 0);
-
-  const tiles = [
-    { label: "Lotes activos", value: data.lotes_activos },
-    { label: "Avance promedio", value: `${data.avance_promedio_pct}%` },
-    { label: "SLA vencidos", value: data.sla_vencidos },
-    { label: "Ingresos del mes (COP)", value: `$${formatCop(data.ingresos_mes_cop)}` },
-  ];
-
-  return (
-    <div className="mb-8">
-      <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-        KPIs del portafolio (preview)
-      </h2>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {tiles.map((t) => (
-          <div key={t.label} className="rounded-md border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{t.label}</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{t.value}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {data.engagements_por_plan?.map((p) => (
-          <div key={p.plan_codigo} className="rounded-md border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Plan {p.plan_nombre}</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{p.cantidad}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const Dashboard = () => {
   const queryClient = useQueryClient();
@@ -225,7 +172,7 @@ const Dashboard = () => {
     <DashboardLayout>
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">Dashboard</h1>
 
-      <PortafolioKpisPreview />
+
 
 
       {/* Metrics */}
