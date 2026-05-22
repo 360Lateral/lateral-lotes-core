@@ -16,6 +16,7 @@ interface InvitarClienteResponse {
   email_enviado?: boolean;
   invite_link?: string;
   engagement_asignado?: string | null;
+  reinvitado?: boolean;
   warning?: string;
   error?: string;
 }
