@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
+import CampanaNotificaciones from "@/components/notificaciones/CampanaNotificaciones";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, end: true },
