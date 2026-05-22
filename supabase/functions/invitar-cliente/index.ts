@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
 
     let newUserId: string;
     let reinvitado = false;
+    let createdNewUser = false;
 
     if (ya) {
       const { data: roles } = await adminClient
@@ -91,10 +92,13 @@ Deno.serve(async (req) => {
       if (!soloInversor) {
         return new Response(
           JSON.stringify({
-            error:
-              "Ya existe un usuario con ese email y tiene otro rol asignado. No se puede re-invitar.",
+            ok: false,
+            conflicto_usuario_existente: true,
+            roles: rolesList,
+            warning:
+              "Ese email ya pertenece a un usuario interno. Usa otro email para crear el cliente o ajusta sus roles desde gestión de usuarios.",
           }),
-          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
       newUserId = ya.id;
@@ -118,6 +122,7 @@ Deno.serve(async (req) => {
         );
       }
       newUserId = created.user.id;
+      createdNewUser = true;
     }
 
 
@@ -136,7 +141,7 @@ Deno.serve(async (req) => {
         { onConflict: "id" },
       );
     if (perfilErr) {
-      await adminClient.auth.admin.deleteUser(newUserId);
+      if (createdNewUser) await adminClient.auth.admin.deleteUser(newUserId);
       return new Response(
         JSON.stringify({ error: "No se pudo crear el perfil: " + perfilErr.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -151,7 +156,7 @@ Deno.serve(async (req) => {
         { onConflict: "user_id,role" },
       );
     if (rolErr) {
-      await adminClient.auth.admin.deleteUser(newUserId);
+      if (createdNewUser) await adminClient.auth.admin.deleteUser(newUserId);
       return new Response(
         JSON.stringify({ error: "No se pudo asignar el rol: " + rolErr.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
