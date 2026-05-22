@@ -76,8 +76,10 @@ export default function InvitarClienteDialog({
           engagementId !== NO_ENGAGEMENT ? engagementId : undefined,
       },
       {
-        onSuccess: () => {
-          onOpenChange(false);
+        onSuccess: (data) => {
+          if (!data?.conflicto_usuario_existente) {
+            onOpenChange(false);
+          }
         },
       },
     );

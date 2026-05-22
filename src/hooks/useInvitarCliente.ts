@@ -19,6 +19,8 @@ interface InvitarClienteResponse {
   reinvitado?: boolean;
   warning?: string;
   error?: string;
+  conflicto_usuario_existente?: boolean;
+  roles?: string[];
 }
 
 export function useInvitarCliente() {
@@ -39,7 +41,13 @@ export function useInvitarCliente() {
         qc.invalidateQueries({ queryKey: ["engagements"] });
         qc.invalidateQueries({ queryKey: ["engagements-sin-cliente"] });
       }
-      if (data.modo_seco && data.invite_link) {
+      if (data.conflicto_usuario_existente) {
+        toast.warning("No se creó el cliente", {
+          description:
+            data.warning ??
+            "Ese email ya pertenece a un usuario interno y no puede re-invitarse como cliente.",
+        });
+      } else if (data.modo_seco && data.invite_link) {
         toast.warning("Email no enviado (modo seco)", {
           description: `Link de invitación: ${data.invite_link}`,
           duration: 30000,
