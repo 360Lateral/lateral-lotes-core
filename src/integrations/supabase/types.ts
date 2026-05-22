@@ -2327,6 +2327,7 @@ export type Database = {
           score: number
         }[]
       }
+      check_ai_quota: { Args: { _user_id: string }; Returns: boolean }
       consultar_norma_por_punto: {
         Args: { p_lat: number; p_lng: number }
         Returns: {
