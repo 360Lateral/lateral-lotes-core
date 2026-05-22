@@ -2250,7 +2250,40 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      obtener_embudo_conversion: {
+        Args: { p_desde?: string; p_hasta?: string }
+        Returns: {
+          cantidad: number
+          conversion_pct: number
+          etapa: string
+        }[]
+      }
       obtener_kpis_portafolio: { Args: never; Returns: Json }
+      obtener_ranking_asesores: {
+        Args: { p_desde?: string; p_hasta?: string }
+        Returns: {
+          asesor_id: string
+          asesor_nombre: string
+          avance_promedio: number
+          engagements_activos: number
+          engagements_entregados: number
+          engagements_totales: number
+          ingresos_generados_cop: number
+          sla_cumplidos_pct: number
+          tiempo_medio_cierre_dias: number
+        }[]
+      }
+      obtener_tendencia_mensual: {
+        Args: { p_meses_atras?: number }
+        Returns: {
+          engagements_completados: number
+          engagements_creados: number
+          ingresos_cop: number
+          leads_nuevos: number
+          mes: string
+          mes_label: string
+        }[]
+      }
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
