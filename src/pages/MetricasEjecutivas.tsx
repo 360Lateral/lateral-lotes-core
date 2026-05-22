@@ -80,6 +80,14 @@ const MetricasEjecutivas = () => {
           <div className="mt-6">
             <CardsComparativas data={data} />
           </div>
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <TablaRankingAsesores data={rankingData} isLoading={rankingLoading} />
+            </div>
+            <div>
+              <EmbudoConversion data={embudoData} isLoading={embudoLoading} />
+            </div>
+          </div>
         </>
       )}
     </DashboardLayout>
