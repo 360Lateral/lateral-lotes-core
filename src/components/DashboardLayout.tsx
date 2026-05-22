@@ -20,6 +20,7 @@ import {
   Settings,
   BarChart3,
   TrendingUp,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
