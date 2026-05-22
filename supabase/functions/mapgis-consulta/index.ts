@@ -372,9 +372,25 @@ serve(async (req) => {
       user_id: user?.id ?? null,
     }, { onConflict: "cbml" });
 
-    // ── Si viene con lote_id, actualizar cbml en el lote ─────────────────
-    if (lote_id && cbml) {
-      await supabase.from("lotes").update({ cbml }).eq("id", lote_id);
+    // ── Si viene con lote_id, actualizar cbml solo si el caller tiene acceso ─
+    if (lote_id && cbml && user) {
+      const { data: lot } = await supabase
+        .from("lotes")
+        .select("owner_id")
+        .eq("id", lote_id)
+        .maybeSingle();
+
+      const { data: roleRows } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      const isAdmin = (roleRows ?? []).some((r: { role: string }) =>
+        ["super_admin", "admin", "asesor"].includes(r.role)
+      );
+
+      if (lot && (isAdmin || lot.owner_id === user.id)) {
+        await supabase.from("lotes").update({ cbml }).eq("id", lote_id);
+      }
     }
 
     return new Response(
