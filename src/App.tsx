@@ -45,6 +45,7 @@ import PreferenciasUsuario from "./pages/PreferenciasUsuario";
 import NotFound from "./pages/NotFound";
 import MisEngagements from "./pages/portal/MisEngagements";
 import EngagementClienteDetalle from "./pages/portal/EngagementClienteDetalle";
+import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
 
 const queryClient = new QueryClient();
 
