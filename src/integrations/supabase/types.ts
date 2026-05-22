@@ -842,6 +842,7 @@ export type Database = {
           lead_id: string | null
           lote_id: string
           moneda: string
+          mostrar_avance_al_cliente: boolean
           notas: string | null
           plan_id: string | null
           precio_cobrado: number | null
@@ -863,6 +864,7 @@ export type Database = {
           lead_id?: string | null
           lote_id: string
           moneda?: string
+          mostrar_avance_al_cliente?: boolean
           notas?: string | null
           plan_id?: string | null
           precio_cobrado?: number | null
@@ -884,6 +886,7 @@ export type Database = {
           lead_id?: string | null
           lote_id?: string
           moneda?: string
+          mostrar_avance_al_cliente?: boolean
           notas?: string | null
           plan_id?: string | null
           precio_cobrado?: number | null
@@ -937,6 +940,79 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "planes_diagnostico"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entregables_engagement: {
+        Row: {
+          created_at: string
+          engagement_id: string
+          estado: Database["public"]["Enums"]["estado_entregable"]
+          id: string
+          mime_type: string | null
+          nombre: string
+          notas: string | null
+          storage_path: string | null
+          subido_por: string | null
+          tamano_bytes: number | null
+          tipo: Database["public"]["Enums"]["tipo_entregable"]
+          updated_at: string
+          url_externa: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          engagement_id: string
+          estado?: Database["public"]["Enums"]["estado_entregable"]
+          id?: string
+          mime_type?: string | null
+          nombre: string
+          notas?: string | null
+          storage_path?: string | null
+          subido_por?: string | null
+          tamano_bytes?: number | null
+          tipo: Database["public"]["Enums"]["tipo_entregable"]
+          updated_at?: string
+          url_externa?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          engagement_id?: string
+          estado?: Database["public"]["Enums"]["estado_entregable"]
+          id?: string
+          mime_type?: string | null
+          nombre?: string
+          notas?: string | null
+          storage_path?: string | null
+          subido_por?: string | null
+          tamano_bytes?: number | null
+          tipo?: Database["public"]["Enums"]["tipo_entregable"]
+          updated_at?: string
+          url_externa?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregables_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregables_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "entregables_engagement_subido_por_fkey"
+            columns: ["subido_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2296,6 +2372,10 @@ export type Database = {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
         Returns: number
       }
+      firmar_url_entregable: {
+        Args: { p_entregable_id: string; p_expira_segundos?: number }
+        Returns: string
+      }
       get_plan_limits: {
         Args: { _user_id: string }
         Returns: {
@@ -2329,6 +2409,25 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      listar_mis_engagements_cliente: {
+        Args: never
+        Returns: {
+          asesor_nombre: string
+          avance_pct: number
+          dias_para_sla: number
+          engagement_id: string
+          estado: Database["public"]["Enums"]["estado_engagement"]
+          fecha_inicio: string
+          fecha_sla: string
+          lote_ciudad: string
+          lote_direccion: string
+          lote_nombre: string
+          mostrar_avance_al_cliente: boolean
+          plan_codigo: string
+          plan_nombre: string
+          total_entregables_publicados: number
+        }[]
+      }
       listar_notificaciones: {
         Args: { p_limit?: number; p_solo_pendientes?: boolean }
         Returns: {
@@ -2366,6 +2465,10 @@ export type Database = {
           conversion_pct: number
           etapa: string
         }[]
+      }
+      obtener_engagement_para_cliente: {
+        Args: { p_engagement_id: string }
+        Returns: Json
       }
       obtener_kpis_portafolio: { Args: never; Returns: Json }
       obtener_ranking_asesores: {
@@ -2443,6 +2546,7 @@ export type Database = {
         | "entregado"
         | "cerrado"
         | "cancelado"
+      estado_entregable: "borrador" | "publicado" | "archivado"
       estado_lead:
         | "nuevo"
         | "contactado"
@@ -2453,6 +2557,12 @@ export type Database = {
       estado_notificacion: "pendiente" | "leida" | "resuelta"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
       nivel_notificacion: "amarillo" | "rojo"
+      tipo_entregable:
+        | "informe_final_pdf"
+        | "presentacion_gamma"
+        | "informe_area"
+        | "documento_soporte"
+        | "otro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2620,6 +2730,7 @@ export const Constants = {
         "cerrado",
         "cancelado",
       ],
+      estado_entregable: ["borrador", "publicado", "archivado"],
       estado_lead: [
         "nuevo",
         "contactado",
@@ -2631,6 +2742,13 @@ export const Constants = {
       estado_notificacion: ["pendiente", "leida", "resuelta"],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
       nivel_notificacion: ["amarillo", "rojo"],
+      tipo_entregable: [
+        "informe_final_pdf",
+        "presentacion_gamma",
+        "informe_area",
+        "documento_soporte",
+        "otro",
+      ],
     },
   },
 } as const
