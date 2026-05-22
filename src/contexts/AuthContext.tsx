@@ -13,6 +13,8 @@ interface AuthContextType {
   loading: boolean;
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
+  isSuperAdmin: boolean;
+  isInversor: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -24,6 +26,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAdminOrAsesor: false,
   isDeveloper: false,
+  isSuperAdmin: false,
+  isInversor: false,
   signOut: async () => {},
 });
 
@@ -162,6 +166,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const isDeveloper = effectiveUserType === "developer" || effectiveRoles.some((r) => r === "developer");
+  const isSuperAdmin = effectiveRoles.includes("super_admin");
+  const isInversor = effectiveRoles.includes("inversor") || effectiveUserType === "inversor";
 
   const signOut = async () => {
     try {
@@ -177,7 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, roles: effectiveRoles, userType: effectiveUserType, loading, isAdminOrAsesor, isDeveloper, signOut }}>
+    <AuthContext.Provider value={{ session, user, roles: effectiveRoles, userType: effectiveUserType, loading, isAdminOrAsesor, isDeveloper, isSuperAdmin, isInversor, signOut }}>
       {children}
     </AuthContext.Provider>
   );
