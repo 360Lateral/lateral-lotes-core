@@ -17,8 +17,9 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ShieldPlus, Users, X } from "lucide-react";
+import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
+import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 
 const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
 
@@ -69,6 +70,7 @@ const DashboardUsuarios = () => {
   const [editUserType, setEditUserType] = useState("");
   const [selectedOwnerId, setSelectedOwnerId] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
+  const [invitarOpen, setInvitarOpen] = useState(false);
 
   const isSuperAdmin = myRoles.includes("super_admin");
 
@@ -220,7 +222,11 @@ const DashboardUsuarios = () => {
             <h1 className="font-heading text-xl font-bold text-foreground">Gestión de Usuarios</h1>
             <p className="text-sm text-muted-foreground">{users.length} usuarios registrados</p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <Button onClick={() => setInvitarOpen(true)} className="gap-2">
+              <UserPlus className="h-4 w-4" />
+              Agregar cliente
+            </Button>
             <div className="relative flex-1 sm:w-72">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Buscar por nombre, email o rol..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
@@ -238,6 +244,8 @@ const DashboardUsuarios = () => {
             </Select>
           </div>
         </div>
+
+        <InvitarClienteDialog open={invitarOpen} onOpenChange={setInvitarOpen} />
 
         {isLoading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
