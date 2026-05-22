@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -137,6 +138,34 @@ serve(async (req) => {
   }
 
   try {
+    // Require authenticated admin/asesor caller
+    const token = (req.headers.get("Authorization") ?? "").replace("Bearer ", "").trim();
+    if (!token) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+    );
+    const { data: { user } } = await supabaseAuth.auth.getUser(token);
+    if (!user) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: roleRows } = await supabaseAuth
+      .from("user_roles").select("role").eq("user_id", user.id);
+    const allowed = (roleRows ?? []).some((r: { role: string }) =>
+      ["super_admin", "admin", "asesor"].includes(r.role)
+    );
+    if (!allowed) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { area, pdf_url, lote_context } = await req.json();
 
     if (!area || !pdf_url) {
@@ -154,7 +183,16 @@ serve(async (req) => {
       );
     }
 
-    // Step 1: Download PDF from Google Drive
+    // Step 1: Validate URL host is strictly Google Drive
+    let pdfUrlHost = "";
+    try { pdfUrlHost = new URL(pdf_url).hostname.toLowerCase(); } catch { /* ignore */ }
+    if (pdfUrlHost !== "drive.google.com" && pdfUrlHost !== "docs.google.com") {
+      return new Response(
+        JSON.stringify({ success: false, error: "El link debe ser de Google Drive (drive.google.com)" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const fileId =
       pdf_url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] ||
       pdf_url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] ||
