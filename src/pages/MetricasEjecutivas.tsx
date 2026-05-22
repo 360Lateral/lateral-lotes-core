@@ -6,15 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTendenciaMensual } from "@/hooks/useTendenciaMensual";
+import { useRankingAsesores } from "@/hooks/useRankingAsesores";
+import { useEmbudoConversion } from "@/hooks/useEmbudoConversion";
 import SelectorPeriodo from "@/components/metricas/SelectorPeriodo";
 import GraficoTendencia from "@/components/metricas/GraficoTendencia";
 import CardsComparativas from "@/components/metricas/CardsComparativas";
 import ResumenPeriodo from "@/components/metricas/ResumenPeriodo";
+import TablaRankingAsesores from "@/components/metricas/TablaRankingAsesores";
+import EmbudoConversion from "@/components/metricas/EmbudoConversion";
 
 const MetricasEjecutivas = () => {
   const { roles, loading } = useAuth();
   const [mesesAtras, setMesesAtras] = useState(12);
   const { data = [], isLoading, error, refetch } = useTendenciaMensual(mesesAtras);
+  const { data: rankingData = [], isLoading: rankingLoading } = useRankingAsesores(mesesAtras);
+  const { data: embudoData = [], isLoading: embudoLoading } = useEmbudoConversion(mesesAtras);
 
   const isAdmin = roles.some((r) => r === "admin" || r === "super_admin");
 
