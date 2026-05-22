@@ -70,6 +70,7 @@ const DashboardUsuarios = () => {
   const [editUserType, setEditUserType] = useState("");
   const [selectedOwnerId, setSelectedOwnerId] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
+  const [invitarOpen, setInvitarOpen] = useState(false);
 
   const isSuperAdmin = myRoles.includes("super_admin");
 
