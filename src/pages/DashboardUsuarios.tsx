@@ -17,8 +17,9 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ShieldPlus, Users, X } from "lucide-react";
+import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
+import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 
 const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
 
