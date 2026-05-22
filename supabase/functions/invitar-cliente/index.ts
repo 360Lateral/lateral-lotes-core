@@ -76,32 +76,50 @@ Deno.serve(async (req) => {
     const ya = existing?.users?.find(
       (u: { email?: string | null }) => u.email?.toLowerCase() === emailNorm,
     );
+
+    let newUserId: string;
+    let reinvitado = false;
+
     if (ya) {
-      return new Response(
-        JSON.stringify({ error: "Ya existe un usuario con ese email" }),
-        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      const { data: roles } = await adminClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", ya.id);
+      const rolesList = (roles ?? []).map((r) => r.role);
+      const soloInversor =
+        rolesList.length === 0 || rolesList.every((r) => r === "inversor");
+      if (!soloInversor) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Ya existe un usuario con ese email y tiene otro rol asignado. No se puede re-invitar.",
+          }),
+          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      newUserId = ya.id;
+      reinvitado = true;
+    } else {
+      const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+      const { data: created, error: createErr } = await adminClient.auth.admin.createUser({
+        email: emailNorm,
+        password: randomPassword,
+        email_confirm: true,
+        user_metadata: {
+          nombre_completo,
+          invitado_por: caller.id,
+          user_type: "inversor",
+        },
+      });
+      if (createErr || !created.user) {
+        return new Response(
+          JSON.stringify({ error: createErr?.message ?? "No se pudo crear el usuario" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      newUserId = created.user.id;
     }
 
-    // Crear auth user
-    const randomPassword = crypto.randomUUID() + crypto.randomUUID();
-    const { data: created, error: createErr } = await adminClient.auth.admin.createUser({
-      email: emailNorm,
-      password: randomPassword,
-      email_confirm: true,
-      user_metadata: {
-        nombre_completo,
-        invitado_por: caller.id,
-        user_type: "inversor",
-      },
-    });
-    if (createErr || !created.user) {
-      return new Response(
-        JSON.stringify({ error: createErr?.message ?? "No se pudo crear el usuario" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-    const newUserId = created.user.id;
 
     // Upsert perfil (handle_new_user trigger puede haber creado fila)
     const { error: perfilErr } = await adminClient
@@ -170,6 +188,7 @@ Deno.serve(async (req) => {
             "Cliente creado pero no se pudo generar link de invitación. Pídele que use 'Olvidé mi contraseña' en /login.",
           user_id: newUserId,
           engagement_asignado: engagementAsignado,
+          reinvitado,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -215,6 +234,7 @@ Deno.serve(async (req) => {
           user_id: newUserId,
           invite_link: inviteLink,
           engagement_asignado: engagementAsignado,
+          reinvitado,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -246,6 +266,7 @@ Deno.serve(async (req) => {
         user_id: newUserId,
         email_enviado: emailEnviado,
         engagement_asignado: engagementAsignado,
+          reinvitado,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
