@@ -26,7 +26,8 @@ const Login = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, userType, loading: authLoading, isAdminOrAsesor } = useAuth();
+  const { user, userType, roles, loading: authLoading, isAdminOrAsesor } = useAuth();
+  const isInversor = roles.includes("inversor") || userType === "inversor";
 
   // Redirect based on AuthContext state after login
   useEffect(() => {
@@ -35,6 +36,8 @@ const Login = () => {
 
     if (isAdminOrAsesor) {
       navigate("/dashboard", { replace: true });
+    } else if (isInversor) {
+      navigate("/portal", { replace: true });
     } else if (userType === "dueno" || userType === "comisionista") {
       navigate("/dashboard/owner", { replace: true });
     } else if (userType === "developer") {
@@ -42,17 +45,19 @@ const Login = () => {
     } else {
       navigate("/lotes", { replace: true });
     }
-  }, [loginSuccess, authLoading, user, isAdminOrAsesor, userType, navigate]);
+  }, [loginSuccess, authLoading, user, isAdminOrAsesor, isInversor, userType, navigate]);
 
   // Also redirect if user arrives at /login already authenticated
   useEffect(() => {
     if (authLoading || !user || loginSuccess) return;
     if (isAdminOrAsesor) {
       navigate("/dashboard", { replace: true });
+    } else if (isInversor) {
+      navigate("/portal", { replace: true });
     } else {
       navigate("/lotes", { replace: true });
     }
-  }, [authLoading, user, isAdminOrAsesor, navigate, loginSuccess]);
+  }, [authLoading, user, isAdminOrAsesor, isInversor, navigate, loginSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
