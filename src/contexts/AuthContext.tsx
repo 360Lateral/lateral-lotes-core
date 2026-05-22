@@ -66,6 +66,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Do NOT fall back to user_metadata for role/userType decisions —
     // user_metadata is client-controlled and could be spoofed.
     // The trigger handle_new_user() populates perfiles.user_type at signup.
+  };
+
+
 
   const applySession = useCallback(async (newSession: Session | null) => {
     const newUserId = newSession?.user?.id ?? null;
