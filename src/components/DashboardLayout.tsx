@@ -166,7 +166,18 @@ const DashboardLayout = ({ children }: Props) => {
         <Button
           variant="ghost"
           size="sm"
+          asChild
           className="mt-2 w-full justify-start text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
+        >
+          <Link to="/dashboard/preferencias" onClick={() => setMobileOpen(false)}>
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Preferencias
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-1 w-full justify-start text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
           onClick={handleSignOut}
         >
           <LogOut className="mr-2 h-4 w-4" />
