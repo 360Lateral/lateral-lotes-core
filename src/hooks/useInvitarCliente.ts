@@ -49,7 +49,8 @@ export function useInvitarCliente() {
       } else if (data.email_enviado === false) {
         toast.warning(`Cliente creado, pero falló el envío del email a ${vars.email}.`);
       } else {
-        toast.success(`Invitación enviada a ${vars.email}`);
+        const prefix = data.reinvitado ? "Invitación reenviada a " : "Invitación enviada a ";
+        toast.success(prefix + vars.email);
       }
     },
     onError: (err: Error) => {
