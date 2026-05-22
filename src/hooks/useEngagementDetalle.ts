@@ -15,6 +15,7 @@ export interface EngagementDetalle {
   created_at: string;
   updated_at: string;
   notas: string | null;
+  mostrar_avance_al_cliente: boolean;
   lote: {
     id: string;
     nombre_lote: string | null;
