@@ -90,7 +90,6 @@ Deno.serve(async (req) => {
 
     let newUserId: string;
     let emailEnviado = false;
-    let actionLink: string | undefined;
     let warning: string | undefined;
 
     if (ya) {
