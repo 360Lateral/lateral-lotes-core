@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: '360Lateral — Confirma tu correo',
+  invite: '360Lateral — Te invitaron a unirte',
+  magiclink: '360Lateral — Tu enlace de acceso',
+  recovery: '360Lateral — Restablece tu contraseña',
+  email_change: '360Lateral — Confirma tu nuevo correo',
+  reauthentication: '360Lateral — Tu código de verificación',
 }
 
 // Template mapping
@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "lateral-lotes-core"
+const SITE_NAME = "360Lateral"
 const SENDER_DOMAIN = "notify.notify.360lateral.com"
 const ROOT_DOMAIN = "notify.360lateral.com"
 const FROM_DOMAIN = "notify.360lateral.com" // Domain shown in From address (may be root or sender subdomain)
