@@ -33,8 +33,8 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 
 const schema = z.object({
   plan_id: z.string().uuid({ message: "Selecciona un plan" }),
-  tipo_cliente: z.enum(["lead", "perfil"]),
-  cliente_id: z.string().uuid({ message: "Selecciona un cliente" }),
+  tipo_cliente: z.enum(["lead", "perfil", "sin_cliente"]),
+  cliente_id: z.string().uuid().optional().or(z.literal("")),
   asesor_asignado_id: z.string().uuid({ message: "Selecciona un asesor" }),
   gerente_id: z.string().uuid().optional().or(z.literal("")),
   fecha_inicio: z.string().optional().or(z.literal("")),
@@ -201,8 +201,11 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
       const result = await crear.mutateAsync({
         lote_id: loteId,
         plan_id: values.plan_id,
-        tipo_cliente: values.tipo_cliente,
-        cliente_id: values.cliente_id,
+        tipo_cliente: values.tipo_cliente === "sin_cliente" ? "perfil" : values.tipo_cliente,
+        cliente_id:
+          values.tipo_cliente === "sin_cliente" || !values.cliente_id
+            ? null
+            : values.cliente_id,
         asesor_asignado_id: values.asesor_asignado_id,
         gerente_id: values.gerente_id || null,
         fecha_inicio: values.fecha_inicio || null,
@@ -318,28 +321,42 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
               <label className="flex items-center gap-2 text-sm">
                 <RadioGroupItem value="perfil" /> Cliente registrado
               </label>
+              <label className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="sin_cliente" /> Sin cliente todavía
+              </label>
             </RadioGroup>
           </div>
 
+          {tipoCliente === "sin_cliente" && (
+            <div className="rounded-md border border-blue-300 bg-blue-50 p-3 text-sm dark:bg-blue-950/30">
+              <p className="text-blue-900 dark:text-blue-200">
+                💡 El engagement se creará sin cliente. Después podrás asignar un cliente desde
+                "/dashboard/usuarios → Agregar cliente" o editando el engagement.
+              </p>
+            </div>
+          )}
+
           {/* Cliente */}
-          <div className="space-y-1">
-            <Label>{tipoCliente === "lead" ? "Lead" : "Cliente"} *</Label>
-            <Select
-              value={form.watch("cliente_id")}
-              onValueChange={(v) => form.setValue("cliente_id", v, { shouldValidate: true })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={tipoCliente === "lead" ? "Selecciona un lead" : "Selecciona un cliente"} />
-              </SelectTrigger>
-              <SelectContent>
-                {(tipoCliente === "lead" ? leads : perfiles).map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.nombre ?? "Sin nombre"}{c.email ? ` · ${c.email}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {tipoCliente !== "sin_cliente" && (
+            <div className="space-y-1">
+              <Label>{tipoCliente === "lead" ? "Lead" : "Cliente"} *</Label>
+              <Select
+                value={form.watch("cliente_id")}
+                onValueChange={(v) => form.setValue("cliente_id", v, { shouldValidate: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={tipoCliente === "lead" ? "Selecciona un lead" : "Selecciona un cliente"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {(tipoCliente === "lead" ? leads : perfiles).map((c: any) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.nombre ?? "Sin nombre"}{c.email ? ` · ${c.email}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Asesor */}
           <div className="grid gap-4 sm:grid-cols-2">
