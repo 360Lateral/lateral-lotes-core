@@ -201,8 +201,11 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
       const result = await crear.mutateAsync({
         lote_id: loteId,
         plan_id: values.plan_id,
-        tipo_cliente: values.tipo_cliente,
-        cliente_id: values.cliente_id,
+        tipo_cliente: values.tipo_cliente === "sin_cliente" ? "perfil" : values.tipo_cliente,
+        cliente_id:
+          values.tipo_cliente === "sin_cliente" || !values.cliente_id
+            ? null
+            : values.cliente_id,
         asesor_asignado_id: values.asesor_asignado_id,
         gerente_id: values.gerente_id || null,
         fecha_inicio: values.fecha_inicio || null,
