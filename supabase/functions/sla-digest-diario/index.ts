@@ -20,6 +20,15 @@ interface Digest {
   total_amarillos: number;
 }
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function generarHtmlDigest(d: Digest): string {
   const dashboard = "https://urbanix360.com/dashboard";
   const preferencias = "https://urbanix360.com/dashboard/preferencias";
