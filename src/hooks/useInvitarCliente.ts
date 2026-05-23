@@ -11,10 +11,9 @@ interface InvitarClienteInput {
 
 interface InvitarClienteResponse {
   ok?: boolean;
-  modo_seco?: boolean;
   user_id?: string;
   email_enviado?: boolean;
-  invite_link?: string;
+  action_link?: string;
   engagement_asignado?: string | null;
   reinvitado?: boolean;
   warning?: string;
@@ -41,25 +40,46 @@ export function useInvitarCliente() {
         qc.invalidateQueries({ queryKey: ["engagements"] });
         qc.invalidateQueries({ queryKey: ["engagements-sin-cliente"] });
       }
+
       if (data.conflicto_usuario_existente) {
         toast.warning("No se creó el cliente", {
           description:
             data.warning ??
             "Ese email ya pertenece a un usuario interno y no puede re-invitarse como cliente.",
         });
-      } else if (data.modo_seco && data.invite_link) {
-        toast.warning("Email no enviado (modo seco)", {
-          description: `Link de invitación: ${data.invite_link}`,
-          duration: 30000,
-        });
-      } else if (data.warning) {
-        toast.warning(data.warning);
-      } else if (data.email_enviado === false) {
-        toast.warning(`Cliente creado, pero falló el envío del email a ${vars.email}.`);
-      } else {
-        const prefix = data.reinvitado ? "Invitación reenviada a " : "Invitación enviada a ";
-        toast.success(prefix + vars.email);
+        return;
       }
+
+      // Warning con link de respaldo: ofrecer copiar el action_link
+      if (data.warning && data.action_link) {
+        const link = data.action_link;
+        toast.warning(data.warning, {
+          duration: 30000,
+          action: {
+            label: "Copiar link",
+            onClick: () => {
+              navigator.clipboard.writeText(link);
+              toast.success("Link de invitación copiado");
+            },
+          },
+        });
+        return;
+      }
+
+      if (data.warning) {
+        toast.warning(data.warning);
+        return;
+      }
+
+      if (data.email_enviado) {
+        const prefix = data.reinvitado
+          ? `Invitación reenviada a ${vars.email}. Le llegará el email en minutos.`
+          : `Cliente invitado: ${vars.email}. Le llegará un email en minutos.`;
+        toast.success(prefix);
+        return;
+      }
+
+      toast.warning(`Cliente creado, pero falló el envío del email a ${vars.email}.`);
     },
     onError: (err: Error) => {
       toast.error(err.message ?? "No se pudo invitar al cliente");
