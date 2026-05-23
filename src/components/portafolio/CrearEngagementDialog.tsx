@@ -321,28 +321,42 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
               <label className="flex items-center gap-2 text-sm">
                 <RadioGroupItem value="perfil" /> Cliente registrado
               </label>
+              <label className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="sin_cliente" /> Sin cliente todavía
+              </label>
             </RadioGroup>
           </div>
 
+          {tipoCliente === "sin_cliente" && (
+            <div className="rounded-md border border-blue-300 bg-blue-50 p-3 text-sm dark:bg-blue-950/30">
+              <p className="text-blue-900 dark:text-blue-200">
+                💡 El engagement se creará sin cliente. Después podrás asignar un cliente desde
+                "/dashboard/usuarios → Agregar cliente" o editando el engagement.
+              </p>
+            </div>
+          )}
+
           {/* Cliente */}
-          <div className="space-y-1">
-            <Label>{tipoCliente === "lead" ? "Lead" : "Cliente"} *</Label>
-            <Select
-              value={form.watch("cliente_id")}
-              onValueChange={(v) => form.setValue("cliente_id", v, { shouldValidate: true })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={tipoCliente === "lead" ? "Selecciona un lead" : "Selecciona un cliente"} />
-              </SelectTrigger>
-              <SelectContent>
-                {(tipoCliente === "lead" ? leads : perfiles).map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.nombre ?? "Sin nombre"}{c.email ? ` · ${c.email}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {tipoCliente !== "sin_cliente" && (
+            <div className="space-y-1">
+              <Label>{tipoCliente === "lead" ? "Lead" : "Cliente"} *</Label>
+              <Select
+                value={form.watch("cliente_id")}
+                onValueChange={(v) => form.setValue("cliente_id", v, { shouldValidate: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={tipoCliente === "lead" ? "Selecciona un lead" : "Selecciona un cliente"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {(tipoCliente === "lead" ? leads : perfiles).map((c: any) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.nombre ?? "Sin nombre"}{c.email ? ` · ${c.email}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Asesor */}
           <div className="grid gap-4 sm:grid-cols-2">
