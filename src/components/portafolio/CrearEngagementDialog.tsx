@@ -33,8 +33,8 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 
 const schema = z.object({
   plan_id: z.string().uuid({ message: "Selecciona un plan" }),
-  tipo_cliente: z.enum(["lead", "perfil"]),
-  cliente_id: z.string().uuid({ message: "Selecciona un cliente" }),
+  tipo_cliente: z.enum(["lead", "perfil", "sin_cliente"]),
+  cliente_id: z.string().uuid().optional().or(z.literal("")),
   asesor_asignado_id: z.string().uuid({ message: "Selecciona un asesor" }),
   gerente_id: z.string().uuid().optional().or(z.literal("")),
   fecha_inicio: z.string().optional().or(z.literal("")),
