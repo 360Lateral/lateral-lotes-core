@@ -35,17 +35,17 @@ function generarHtmlDigest(d: Digest): string {
   const itemRow = (color: string, label: string, it: DigestItem) => `
     <tr>
       <td style="padding:10px;border-bottom:1px solid #E5E7EB;">
-        <div style="font-weight:600;color:#111827;font-size:14px;">${it.lote_nombre}</div>
-        <div style="font-size:12px;color:#6B7280;">Plan: ${it.plan_nombre}</div>
+        <div style="font-weight:600;color:#111827;font-size:14px;">${escapeHtml(it.lote_nombre)}</div>
+        <div style="font-size:12px;color:#6B7280;">Plan: ${escapeHtml(it.plan_nombre)}</div>
       </td>
       <td style="padding:10px;border-bottom:1px solid #E5E7EB;text-align:right;">
-        <span style="background:${color};color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">${label}</span>
+        <span style="background:${color};color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">${escapeHtml(label)}</span>
       </td>
     </tr>`;
 
   const seccion = (titulo: string, color: string, items: DigestItem[], labelFn: (i: DigestItem) => string) =>
     items.length === 0 ? "" : `
-      <h2 style="font-size:16px;color:${color};margin:24px 0 8px;">${titulo} (${items.length})</h2>
+      <h2 style="font-size:16px;color:${color};margin:24px 0 8px;">${escapeHtml(titulo)} (${items.length})</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">
         ${items.map(i => itemRow(color, labelFn(i), i)).join("")}
       </table>`;
