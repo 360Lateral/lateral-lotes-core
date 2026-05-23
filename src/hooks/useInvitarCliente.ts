@@ -49,22 +49,6 @@ export function useInvitarCliente() {
         return;
       }
 
-      // Warning con link de respaldo: ofrecer copiar el action_link
-      if (data.warning && data.action_link) {
-        const link = data.action_link;
-        toast.warning(data.warning, {
-          duration: 30000,
-          action: {
-            label: "Copiar link",
-            onClick: () => {
-              navigator.clipboard.writeText(link);
-              toast.success("Link de invitación copiado");
-            },
-          },
-        });
-        return;
-      }
-
       if (data.warning) {
         toast.warning(data.warning);
         return;
