@@ -78,7 +78,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get("origin") || "https://360lateral.com";
+    const PUBLIC_APP_URL = Deno.env.get("PUBLIC_APP_URL");
+    const origin = PUBLIC_APP_URL || req.headers.get("origin") || "https://urbanix360.com";
     const redirectTo = `${origin}/login?cuenta_nueva=1`;
 
     // Verificar si el email ya existe
