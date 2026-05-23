@@ -58,10 +58,10 @@ function generarHtmlDigest(d: Digest): string {
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #E5E7EB;">
         <tr><td style="background:#1a2744;padding:20px 24px;">
           <div style="color:#fff;font-size:18px;font-weight:700;">360Lateral · Resumen diario de SLA</div>
-          <div style="color:#cbd5e1;font-size:12px;margin-top:4px;">${d.fecha}</div>
+          <div style="color:#cbd5e1;font-size:12px;margin-top:4px;">${escapeHtml(d.fecha)}</div>
         </td></tr>
         <tr><td style="padding:24px;">
-          <p style="margin:0 0 16px;font-size:14px;">Hola ${d.usuario_nombre},</p>
+          <p style="margin:0 0 16px;font-size:14px;">Hola ${escapeHtml(d.usuario_nombre)},</p>
           <p style="margin:0 0 16px;font-size:14px;">Tienes <strong style="color:#DC2626;">${d.total_rojos}</strong> engagements vencidos y <strong style="color:#F59E0B;">${d.total_amarillos}</strong> próximos a vencer.</p>
           ${seccion("Vencidos", "#DC2626", d.rojos, i => `${i.dias_vencido}d vencido`)}
           ${seccion("Próximos a vencer", "#F59E0B", d.amarillos, i => `${i.dias_restantes}d restantes`)}
