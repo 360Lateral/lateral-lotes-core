@@ -20,23 +20,32 @@ interface Digest {
   total_amarillos: number;
 }
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function generarHtmlDigest(d: Digest): string {
   const dashboard = "https://urbanix360.com/dashboard";
   const preferencias = "https://urbanix360.com/dashboard/preferencias";
   const itemRow = (color: string, label: string, it: DigestItem) => `
     <tr>
       <td style="padding:10px;border-bottom:1px solid #E5E7EB;">
-        <div style="font-weight:600;color:#111827;font-size:14px;">${it.lote_nombre}</div>
-        <div style="font-size:12px;color:#6B7280;">Plan: ${it.plan_nombre}</div>
+        <div style="font-weight:600;color:#111827;font-size:14px;">${escapeHtml(it.lote_nombre)}</div>
+        <div style="font-size:12px;color:#6B7280;">Plan: ${escapeHtml(it.plan_nombre)}</div>
       </td>
       <td style="padding:10px;border-bottom:1px solid #E5E7EB;text-align:right;">
-        <span style="background:${color};color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">${label}</span>
+        <span style="background:${color};color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">${escapeHtml(label)}</span>
       </td>
     </tr>`;
 
   const seccion = (titulo: string, color: string, items: DigestItem[], labelFn: (i: DigestItem) => string) =>
     items.length === 0 ? "" : `
-      <h2 style="font-size:16px;color:${color};margin:24px 0 8px;">${titulo} (${items.length})</h2>
+      <h2 style="font-size:16px;color:${color};margin:24px 0 8px;">${escapeHtml(titulo)} (${items.length})</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">
         ${items.map(i => itemRow(color, labelFn(i), i)).join("")}
       </table>`;
@@ -49,10 +58,10 @@ function generarHtmlDigest(d: Digest): string {
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #E5E7EB;">
         <tr><td style="background:#1a2744;padding:20px 24px;">
           <div style="color:#fff;font-size:18px;font-weight:700;">360Lateral · Resumen diario de SLA</div>
-          <div style="color:#cbd5e1;font-size:12px;margin-top:4px;">${d.fecha}</div>
+          <div style="color:#cbd5e1;font-size:12px;margin-top:4px;">${escapeHtml(d.fecha)}</div>
         </td></tr>
         <tr><td style="padding:24px;">
-          <p style="margin:0 0 16px;font-size:14px;">Hola ${d.usuario_nombre},</p>
+          <p style="margin:0 0 16px;font-size:14px;">Hola ${escapeHtml(d.usuario_nombre)},</p>
           <p style="margin:0 0 16px;font-size:14px;">Tienes <strong style="color:#DC2626;">${d.total_rojos}</strong> engagements vencidos y <strong style="color:#F59E0B;">${d.total_amarillos}</strong> próximos a vencer.</p>
           ${seccion("Vencidos", "#DC2626", d.rojos, i => `${i.dias_vencido}d vencido`)}
           ${seccion("Próximos a vencer", "#F59E0B", d.amarillos, i => `${i.dias_restantes}d restantes`)}

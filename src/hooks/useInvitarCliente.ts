@@ -13,7 +13,6 @@ interface InvitarClienteResponse {
   ok?: boolean;
   user_id?: string;
   email_enviado?: boolean;
-  action_link?: string;
   engagement_asignado?: string | null;
   reinvitado?: boolean;
   warning?: string;
@@ -46,22 +45,6 @@ export function useInvitarCliente() {
           description:
             data.warning ??
             "Ese email ya pertenece a un usuario interno y no puede re-invitarse como cliente.",
-        });
-        return;
-      }
-
-      // Warning con link de respaldo: ofrecer copiar el action_link
-      if (data.warning && data.action_link) {
-        const link = data.action_link;
-        toast.warning(data.warning, {
-          duration: 30000,
-          action: {
-            label: "Copiar link",
-            onClick: () => {
-              navigator.clipboard.writeText(link);
-              toast.success("Link de invitación copiado");
-            },
-          },
         });
         return;
       }

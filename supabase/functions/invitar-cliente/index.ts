@@ -90,7 +90,6 @@ Deno.serve(async (req) => {
 
     let newUserId: string;
     let emailEnviado = false;
-    let actionLink: string | undefined;
     let warning: string | undefined;
 
     if (ya) {
@@ -117,7 +116,8 @@ Deno.serve(async (req) => {
 
       newUserId = ya.id;
 
-      // Re-invitación: generar recovery link. Cloud Emails enviará la plantilla "Password reset".
+      // Re-invitación: generar recovery link dispara el envío del email vía Cloud Emails.
+      // El link NO se devuelve al cliente: se entrega únicamente por email para evitar exposición de tokens.
       const { data: linkData, error: linkErr } = await adminClient.auth.admin.generateLink({
         type: "recovery",
         email: emailNorm,
@@ -127,7 +127,6 @@ Deno.serve(async (req) => {
         warning =
           "Cliente ya existía, pero no se pudo regenerar el link. Pídele que use 'Olvidé mi contraseña' en /login.";
       } else {
-        actionLink = linkData.properties.action_link;
         emailEnviado = true;
       }
     } else {
@@ -212,7 +211,6 @@ Deno.serve(async (req) => {
         email_enviado: emailEnviado,
         engagement_asignado: engagementAsignado,
         reinvitado: Boolean(ya),
-        ...(actionLink ? { action_link: actionLink } : {}),
         ...(warning ? { warning } : {}),
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
