@@ -211,7 +211,6 @@ Deno.serve(async (req) => {
         email_enviado: emailEnviado,
         engagement_asignado: engagementAsignado,
         reinvitado: Boolean(ya),
-        ...(actionLink ? { action_link: actionLink } : {}),
         ...(warning ? { warning } : {}),
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
