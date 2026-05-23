@@ -81,7 +81,7 @@ export interface CrearEngagementInput {
   lote_id: string;
   plan_id: string;
   tipo_cliente: "lead" | "perfil";
-  cliente_id: string; // perfil.id when tipo=perfil, lead.id when tipo=lead
+  cliente_id: string | null; // perfil.id when tipo=perfil, lead.id when tipo=lead, or null
   asesor_asignado_id: string;
   gerente_id?: string | null;
   fecha_inicio?: string | null;
