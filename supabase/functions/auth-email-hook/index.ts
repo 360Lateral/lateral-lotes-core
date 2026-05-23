@@ -18,7 +18,7 @@ const corsHeaders = {
 
 const EMAIL_SUBJECTS: Record<string, string> = {
   signup: '360Lateral — Confirma tu correo',
-  invite: '360Lateral — Te invitaron a unirte',
+  invite: '360Lateral — Tu acceso al portal de clientes está listo',
   magiclink: '360Lateral — Tu enlace de acceso',
   recovery: '360Lateral — Restablece tu contraseña',
   email_change: '360Lateral — Confirma tu nuevo correo',

@@ -31,27 +31,36 @@ export const InviteEmail = ({
 }: InviteEmailProps) => (
   <Html lang="es" dir="ltr">
     <Head />
-    <Preview>Te invitaron a unirte a {siteName}</Preview>
+    <Preview>Tu acceso al portal de clientes de {siteName} está listo</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
           <Img src={LOGO_URL} alt={siteName} height="40" style={logo} />
         </Section>
-        <Heading style={h1}>Te invitaron a {siteName}</Heading>
+        <Heading style={h1}>Tu acceso al portal está listo</Heading>
         <Text style={text}>
-          Te invitaron a unirte a{' '}
+          Hola,
+        </Text>
+        <Text style={text}>
+          Te invitamos a unirte a{' '}
           <Link href={siteUrl} style={link}>
             <strong>{siteName}</strong>
-          </Link>
-          . Acepta la invitación y crea tu cuenta para empezar.
+          </Link>{' '}
+          como cliente. Desde tu portal privado podrás hacer seguimiento en
+          tiempo real al diagnóstico de tu lote, revisar avances del análisis
+          urbanístico y comunicarte directamente con nuestro equipo.
+        </Text>
+        <Text style={text}>
+          Activa tu cuenta para comenzar:
         </Text>
         <Section style={{ textAlign: 'center' }}>
           <Button style={button} href={confirmationUrl}>
-            Aceptar invitación
+            Activar mi cuenta
           </Button>
         </Section>
         <Text style={footer}>
-          Si no esperabas esta invitación, puedes ignorar este mensaje.
+          Si no esperabas esta invitación, puedes ignorar este mensaje con
+          tranquilidad. — Equipo 360Lateral
         </Text>
       </Container>
     </Body>
