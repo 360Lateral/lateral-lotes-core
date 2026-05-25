@@ -45,14 +45,14 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
 
   // Archivo
   const [archivo, setArchivo] = useState<File | null>(null);
-  const [tipoArchivo, setTipoArchivo] = useState<TipoEntregable>("informe_final_pdf");
+  const [tipoArchivo, setTipoArchivo] = useState<TipoEntregable>("diagnostico_inmobiliario");
   const [nombreArchivo, setNombreArchivo] = useState("");
   const [notasArchivo, setNotasArchivo] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
   // URL
   const [url, setUrl] = useState("");
-  const [tipoUrl, setTipoUrl] = useState<TipoEntregable>("presentacion_gamma");
+  const [tipoUrl, setTipoUrl] = useState<TipoEntregable>("presentacion_diagnostico");
   const [nombreUrl, setNombreUrl] = useState("");
   const [notasUrl, setNotasUrl] = useState("");
 
@@ -61,11 +61,11 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
 
   const reset = () => {
     setArchivo(null);
-    setTipoArchivo("informe_final_pdf");
+    setTipoArchivo("diagnostico_inmobiliario");
     setNombreArchivo("");
     setNotasArchivo("");
     setUrl("");
-    setTipoUrl("presentacion_gamma");
+    setTipoUrl("presentacion_diagnostico");
     setNombreUrl("");
     setNotasUrl("");
     setDragOver(false);
