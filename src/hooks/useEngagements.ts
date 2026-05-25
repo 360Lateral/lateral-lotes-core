@@ -117,11 +117,6 @@ export const useCrearEngagement = () => {
       }
       if (input.fecha_inicio) {
         patch.fecha_inicio = input.fecha_inicio;
-        if (input.dias_sla != null) {
-          const base = new Date(input.fecha_inicio);
-          base.setDate(base.getDate() + input.dias_sla);
-          patch.fecha_sla_objetivo = base.toISOString();
-        }
       }
 
       const { error: upErr } = await supabase
@@ -130,13 +125,7 @@ export const useCrearEngagement = () => {
         .eq("id", engagementId);
       if (upErr) throw upErr;
 
-      // Count generated tasks
-      const { count } = await supabase
-        .from("tareas_analisis")
-        .select("id", { count: "exact", head: true })
-        .eq("engagement_id", engagementId);
-
-      return { id: engagementId, tareas: count ?? 0 };
+      return { id: engagementId, tareas: 0 };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["engagements-list"] });
@@ -163,6 +152,33 @@ export const useActualizarEngagement = () => {
     },
     onError: (err: any) => {
       toast.error("Error al actualizar engagement", { description: err.message });
+    },
+  });
+};
+
+export const useActivarEngagement = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (engagementId: string) => {
+      const { error } = await supabase.rpc("activar_engagement" as any, {
+        p_engagement_id: engagementId,
+      });
+      if (error) throw error;
+      return engagementId;
+    },
+    onSuccess: (engagementId) => {
+      qc.invalidateQueries({ queryKey: ["engagements-list"] });
+      qc.invalidateQueries({ queryKey: ["engagements-por-lote"] });
+      qc.invalidateQueries({ queryKey: ["engagements-activos-lotes"] });
+      qc.invalidateQueries({ queryKey: ["engagement-detalle", engagementId] });
+      qc.invalidateQueries({ queryKey: ["tareas-engagement", engagementId] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
+      toast.success("Engagement activado", {
+        description: "Las tareas fueron creadas y el SLA comenzó a contar.",
+      });
+    },
+    onError: (err: any) => {
+      toast.error("No se pudo activar el engagement", { description: err.message });
     },
   });
 };

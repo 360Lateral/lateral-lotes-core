@@ -217,13 +217,9 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
         notas: values.notas || null,
         dias_sla: planSel?.dias_sla ?? null,
       });
-      toast.success(`Engagement creado · ${result.tareas} tareas generadas automáticamente`, {
-        action: {
-          label: "Ver lotes",
-          onClick: () => {
-            window.location.href = "/dashboard/lotes";
-          },
-        },
+      toast.success("Engagement creado en borrador", {
+        description:
+          "Pendiente de activación por un Super Admin. Las tareas se generarán al activarlo.",
       });
       onOpenChange(false);
     } catch {

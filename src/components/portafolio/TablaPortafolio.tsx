@@ -114,7 +114,25 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <EstadoEngagementBadge estado={f.estado} />
+                    <div className="flex flex-col items-start gap-1">
+                      <EstadoEngagementBadge estado={f.estado} />
+                      {f.estado_activacion === "borrador" && (
+                        <Badge
+                          variant="outline"
+                          className="bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-950/40 dark:text-yellow-200"
+                        >
+                          Borrador
+                        </Badge>
+                      )}
+                      {f.estado_activacion === "pendiente_pago" && (
+                        <Badge
+                          variant="outline"
+                          className="bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/40 dark:text-blue-200"
+                        >
+                          Pendiente pago
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
