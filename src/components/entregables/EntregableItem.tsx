@@ -63,8 +63,8 @@ const formatFecha = (iso: string) =>
   });
 
 const TIPO_LABELS: Record<Entregable["tipo"], string> = {
-  informe_final_pdf: "Informe Final PDF",
-  presentacion_gamma: "Presentación",
+  diagnostico_inmobiliario: "Informe Final PDF",
+  presentacion_diagnostico: "Presentación",
   informe_area: "Informe por área",
   documento_soporte: "Documento soporte",
   otro: "Otro",

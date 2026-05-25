@@ -9,9 +9,9 @@ interface Props {
 
 const TipoEntregableIcon = ({ tipo, size = 18, className }: Props) => {
   const Icon =
-    tipo === "informe_final_pdf"
+    tipo === "diagnostico_inmobiliario"
       ? FileText
-      : tipo === "presentacion_gamma"
+      : tipo === "presentacion_diagnostico"
         ? Presentation
         : tipo === "informe_area"
           ? BookOpen

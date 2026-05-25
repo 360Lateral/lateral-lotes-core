@@ -94,6 +94,8 @@ export type Database = {
           completado_at: string | null
           completado_por: string | null
           distancia_ronda_m: number | null
+          engagement_id: string | null
+          experto_id: string | null
           id: string
           lote_id: string
           observaciones: string | null
@@ -110,6 +112,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           distancia_ronda_m?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id: string
           observaciones?: string | null
@@ -126,6 +130,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           distancia_ronda_m?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id?: string
           observaciones?: string | null
@@ -136,6 +142,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_ambiental_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_ambiental_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_ambiental_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_ambiental_lote_id_fkey"
             columns: ["lote_id"]
@@ -159,6 +186,8 @@ export type Database = {
           completado_at: string | null
           completado_por: string | null
           eficiencia_lote_pct: number | null
+          engagement_id: string | null
+          experto_id: string | null
           forma_lote: string | null
           id: string
           lote_id: string
@@ -175,6 +204,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           eficiencia_lote_pct?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           forma_lote?: string | null
           id?: string
           lote_id: string
@@ -191,6 +222,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           eficiencia_lote_pct?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           forma_lote?: string | null
           id?: string
           lote_id?: string
@@ -202,6 +235,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_arquitectonico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_arquitectonico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_arquitectonico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_arquitectonico_lote_id_fkey"
             columns: ["lote_id"]
@@ -275,6 +329,8 @@ export type Database = {
           completado_at: string | null
           completado_por: string | null
           costo_construccion_m2: number | null
+          engagement_id: string | null
+          experto_id: string | null
           id: string
           ingresos_proyectados: number | null
           lote_id: string
@@ -294,6 +350,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           costo_construccion_m2?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           ingresos_proyectados?: number | null
           lote_id: string
@@ -313,6 +371,8 @@ export type Database = {
           completado_at?: string | null
           completado_por?: string | null
           costo_construccion_m2?: number | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           ingresos_proyectados?: number | null
           lote_id?: string
@@ -328,6 +388,27 @@ export type Database = {
           vpn?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_financiero_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_financiero_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_financiero_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_financiero_lote_id_fkey"
             columns: ["lote_id"]
@@ -350,6 +431,8 @@ export type Database = {
           completado: boolean | null
           completado_at: string | null
           completado_por: string | null
+          engagement_id: string | null
+          experto_id: string | null
           id: string
           lote_id: string
           nivel_freatico_m: number | null
@@ -365,6 +448,8 @@ export type Database = {
           completado?: boolean | null
           completado_at?: string | null
           completado_por?: string | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id: string
           nivel_freatico_m?: number | null
@@ -380,6 +465,8 @@ export type Database = {
           completado?: boolean | null
           completado_at?: string | null
           completado_por?: string | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id?: string
           nivel_freatico_m?: number | null
@@ -391,6 +478,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_geotecnico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_geotecnico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_geotecnico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_geotecnico_lote_id_fkey"
             columns: ["lote_id"]
@@ -415,6 +523,8 @@ export type Database = {
           completado_por: string | null
           deuda_predial: boolean | null
           discrepancia_areas: boolean | null
+          engagement_id: string | null
+          experto_id: string | null
           gravamenes: boolean | null
           hipoteca_activa: boolean | null
           id: string
@@ -432,6 +542,8 @@ export type Database = {
           completado_por?: string | null
           deuda_predial?: boolean | null
           discrepancia_areas?: boolean | null
+          engagement_id?: string | null
+          experto_id?: string | null
           gravamenes?: boolean | null
           hipoteca_activa?: boolean | null
           id?: string
@@ -449,6 +561,8 @@ export type Database = {
           completado_por?: string | null
           deuda_predial?: boolean | null
           discrepancia_areas?: boolean | null
+          engagement_id?: string | null
+          experto_id?: string | null
           gravamenes?: boolean | null
           hipoteca_activa?: boolean | null
           id?: string
@@ -460,6 +574,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_juridico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_juridico_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_juridico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_juridico_lote_id_fkey"
             columns: ["lote_id"]
@@ -481,6 +616,8 @@ export type Database = {
           completado: boolean | null
           completado_at: string | null
           completado_por: string | null
+          engagement_id: string | null
+          experto_id: string | null
           id: string
           lote_id: string
           observaciones: string | null
@@ -496,6 +633,8 @@ export type Database = {
           completado?: boolean | null
           completado_at?: string | null
           completado_por?: string | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id: string
           observaciones?: string | null
@@ -511,6 +650,8 @@ export type Database = {
           completado?: boolean | null
           completado_at?: string | null
           completado_por?: string | null
+          engagement_id?: string | null
+          experto_id?: string | null
           id?: string
           lote_id?: string
           observaciones?: string | null
@@ -523,6 +664,27 @@ export type Database = {
           velocidad_absorcion_unidades_mes?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_mercado_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_mercado_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_mercado_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_mercado_lote_id_fkey"
             columns: ["lote_id"]
@@ -550,6 +712,8 @@ export type Database = {
           costo_extension_estimado: number | null
           distancia_red_matriz_m: number | null
           energia_disponible: boolean | null
+          engagement_id: string | null
+          experto_id: string | null
           gas_disponible: boolean | null
           id: string
           lote_id: string
@@ -567,6 +731,8 @@ export type Database = {
           costo_extension_estimado?: number | null
           distancia_red_matriz_m?: number | null
           energia_disponible?: boolean | null
+          engagement_id?: string | null
+          experto_id?: string | null
           gas_disponible?: boolean | null
           id?: string
           lote_id: string
@@ -584,6 +750,8 @@ export type Database = {
           costo_extension_estimado?: number | null
           distancia_red_matriz_m?: number | null
           energia_disponible?: boolean | null
+          engagement_id?: string | null
+          experto_id?: string | null
           gas_disponible?: boolean | null
           id?: string
           lote_id?: string
@@ -592,6 +760,27 @@ export type Database = {
           via_pavimentada?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analisis_sspp_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_sspp_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "analisis_sspp_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "analisis_sspp_lote_id_fkey"
             columns: ["lote_id"]
@@ -919,6 +1108,7 @@ export type Database = {
           cliente_id: string | null
           created_at: string
           estado: Database["public"]["Enums"]["estado_engagement"]
+          estado_activacion: Database["public"]["Enums"]["estado_activacion"]
           estado_pago: string
           fecha_entrega: string | null
           fecha_inicio: string | null
@@ -941,6 +1131,7 @@ export type Database = {
           cliente_id?: string | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_engagement"]
+          estado_activacion?: Database["public"]["Enums"]["estado_activacion"]
           estado_pago?: string
           fecha_entrega?: string | null
           fecha_inicio?: string | null
@@ -963,6 +1154,7 @@ export type Database = {
           cliente_id?: string | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_engagement"]
+          estado_activacion?: Database["public"]["Enums"]["estado_activacion"]
           estado_pago?: string
           fecha_entrega?: string | null
           fecha_inicio?: string | null
@@ -1044,6 +1236,7 @@ export type Database = {
           subido_por: string | null
           tamano_bytes: number | null
           tipo: Database["public"]["Enums"]["tipo_entregable"]
+          tipo_analisis_id: string | null
           updated_at: string
           url_externa: string | null
           version: number
@@ -1060,6 +1253,7 @@ export type Database = {
           subido_por?: string | null
           tamano_bytes?: number | null
           tipo: Database["public"]["Enums"]["tipo_entregable"]
+          tipo_analisis_id?: string | null
           updated_at?: string
           url_externa?: string | null
           version?: number
@@ -1076,6 +1270,7 @@ export type Database = {
           subido_por?: string | null
           tamano_bytes?: number | null
           tipo?: Database["public"]["Enums"]["tipo_entregable"]
+          tipo_analisis_id?: string | null
           updated_at?: string
           url_externa?: string | null
           version?: number
@@ -1100,6 +1295,13 @@ export type Database = {
             columns: ["subido_por"]
             isOneToOne: false
             referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregables_engagement_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
             referencedColumns: ["id"]
           },
         ]
@@ -2663,6 +2865,7 @@ export type Database = {
         | "normativo"
         | "juridico"
         | "otro"
+      estado_activacion: "borrador" | "pendiente_pago" | "activo"
       estado_analisis:
         | "no_aplica"
         | "pendiente"
@@ -2695,8 +2898,8 @@ export type Database = {
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
       nivel_notificacion: "amarillo" | "rojo"
       tipo_entregable:
-        | "informe_final_pdf"
-        | "presentacion_gamma"
+        | "diagnostico_inmobiliario"
+        | "presentacion_diagnostico"
         | "informe_area"
         | "documento_soporte"
         | "otro"
@@ -2844,6 +3047,7 @@ export const Constants = {
         "juridico",
         "otro",
       ],
+      estado_activacion: ["borrador", "pendiente_pago", "activo"],
       estado_analisis: [
         "no_aplica",
         "pendiente",
@@ -2880,8 +3084,8 @@ export const Constants = {
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
       nivel_notificacion: ["amarillo", "rojo"],
       tipo_entregable: [
-        "informe_final_pdf",
-        "presentacion_gamma",
+        "diagnostico_inmobiliario",
+        "presentacion_diagnostico",
         "informe_area",
         "documento_soporte",
         "otro",
