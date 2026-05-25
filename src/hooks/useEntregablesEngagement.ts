@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type TipoEntregable =
-  | "informe_final_pdf"
-  | "presentacion_gamma"
+  | "diagnostico_inmobiliario"
+  | "presentacion_diagnostico"
   | "informe_area"
   | "documento_soporte"
   | "otro";
