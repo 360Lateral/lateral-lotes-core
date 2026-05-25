@@ -126,6 +126,7 @@ const FiltrosPortafolio = ({ filtros, onChangeFiltros }: Props) => {
   const conteo =
     (filtros.plan?.length ?? 0) +
     (filtros.estado?.length ?? 0) +
+    (filtros.estado_activacion?.length ?? 0) +
     (filtros.semaforo?.length ?? 0) +
     (filtros.asesor_id ? 1 : 0) +
     (filtros.busqueda && filtros.busqueda.length >= 2 ? 1 : 0);
