@@ -2595,16 +2595,23 @@ export type Database = {
           dias_para_sla: number | null
           engagement_id: string | null
           estado: Database["public"]["Enums"]["estado_engagement"] | null
+          estado_activacion:
+            | Database["public"]["Enums"]["estado_activacion"]
+            | null
           estado_pago: string | null
           lote_barrio: string | null
           lote_ciudad: string | null
           lote_id: string | null
           lote_nombre: string | null
           moneda: string | null
+          n_analisis_completados: number | null
+          n_analisis_total: number | null
           plan_codigo: string | null
           plan_nombre: string | null
           precio_cobrado: number | null
           semaforo_sla: string | null
+          tiene_diagnostico: boolean | null
+          tiene_presentacion: boolean | null
           ultima_actualizacion: string | null
         }
         Relationships: [
