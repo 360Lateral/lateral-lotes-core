@@ -171,6 +171,17 @@ const FiltrosPortafolio = ({ filtros, onChangeFiltros }: Props) => {
           selected={filtros.estado ?? []}
           onChange={(v) => onChangeFiltros({ ...filtros, estado: v })}
         />
+        <MultiDropdown
+          label="Activación"
+          options={ACTIVACION}
+          selected={filtros.estado_activacion ?? []}
+          onChange={(v) =>
+            onChangeFiltros({
+              ...filtros,
+              estado_activacion: v as PortafolioFiltrosUI["estado_activacion"],
+            })
+          }
+        />
 
         <Select
           value={filtros.asesor_id ?? "__all__"}
