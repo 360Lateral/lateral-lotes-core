@@ -44,6 +44,12 @@ const ESTADOS = [
   { value: "cancelado", label: "Cancelado" },
 ];
 
+const ACTIVACION = [
+  { value: "borrador", label: "Borrador" },
+  { value: "pendiente_pago", label: "Pendiente pago" },
+  { value: "activo", label: "Activo" },
+];
+
 const SEMAFOROS = [
   { value: "verde", label: "Verde", dot: "bg-success" },
   { value: "amarillo", label: "Amarillo", dot: "bg-warning" },
