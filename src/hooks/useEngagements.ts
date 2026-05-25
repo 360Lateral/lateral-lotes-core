@@ -117,11 +117,6 @@ export const useCrearEngagement = () => {
       }
       if (input.fecha_inicio) {
         patch.fecha_inicio = input.fecha_inicio;
-        if (input.dias_sla != null) {
-          const base = new Date(input.fecha_inicio);
-          base.setDate(base.getDate() + input.dias_sla);
-          patch.fecha_sla_objetivo = base.toISOString();
-        }
       }
 
       const { error: upErr } = await supabase
@@ -130,13 +125,7 @@ export const useCrearEngagement = () => {
         .eq("id", engagementId);
       if (upErr) throw upErr;
 
-      // Count generated tasks
-      const { count } = await supabase
-        .from("tareas_analisis")
-        .select("id", { count: "exact", head: true })
-        .eq("engagement_id", engagementId);
-
-      return { id: engagementId, tareas: count ?? 0 };
+      return { id: engagementId, tareas: 0 };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["engagements-list"] });
