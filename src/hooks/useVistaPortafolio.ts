@@ -13,6 +13,7 @@ export interface PortafolioVistaFila {
   asesor_id: string | null;
   asesor_nombre: string | null;
   estado: string;
+  estado_activacion: string | null;
   avance_pct: number;
   dias_en_gestion: number;
   dias_para_sla: number | null;
