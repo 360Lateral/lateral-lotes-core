@@ -25,8 +25,8 @@ import { toast } from "sonner";
 import type { TipoEntregable } from "@/hooks/useEntregablesEngagement";
 
 const TIPOS: { value: TipoEntregable; label: string }[] = [
-  { value: "informe_final_pdf", label: "Informe Final (PDF)" },
-  { value: "presentacion_gamma", label: "Presentación (Gamma/Slides)" },
+  { value: "diagnostico_inmobiliario", label: "Diagnóstico Inmobiliario (Drive)" },
+  { value: "presentacion_diagnostico", label: "Presentación del Diagnóstico (Drive)" },
   { value: "informe_area", label: "Informe por Área" },
   { value: "documento_soporte", label: "Documento Soporte" },
   { value: "otro", label: "Otro" },
