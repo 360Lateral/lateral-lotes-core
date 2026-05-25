@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Eye, Inbox } from "lucide-react";
+import { Eye, Inbox, CheckCircle2, Circle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -35,6 +35,20 @@ const progressColor = (pct: number) => {
   return "[&>div]:bg-success";
 };
 
+const EntregablePill = ({ label, done }: { label: string; done: boolean }) => (
+  <span
+    className={cn(
+      "inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-body text-[10px]",
+      done
+        ? "border-success/40 bg-success/15 text-success"
+        : "border-muted bg-muted/40 text-muted-foreground",
+    )}
+  >
+    {done ? <CheckCircle2 className="h-3 w-3" /> : <Circle className="h-3 w-3" />}
+    {label}
+  </span>
+);
+
 const TablaPortafolio = ({ filas, isLoading }: Props) => {
   const navigate = useNavigate();
 
@@ -48,8 +62,9 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
             <TableHead>Cliente</TableHead>
             <TableHead>Asesor</TableHead>
             <TableHead>Estado</TableHead>
-            <TableHead className="min-w-[160px]">Avance</TableHead>
+            <TableHead className="min-w-[180px]">Avance</TableHead>
             <TableHead>SLA</TableHead>
+            <TableHead>Entregables</TableHead>
             <TableHead>Días en gestión</TableHead>
             <TableHead className="text-right">Acciones</TableHead>
           </TableRow>
@@ -58,7 +73,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
-                {Array.from({ length: 9 }).map((__, j) => (
+                {Array.from({ length: 10 }).map((__, j) => (
                   <TableCell key={j}>
                     <Skeleton className="h-4 w-full" />
                   </TableCell>
@@ -67,7 +82,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
             ))
           ) : filas.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="py-12 text-center">
+              <TableCell colSpan={10} className="py-12 text-center">
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <Inbox className="h-8 w-8" />
                   <p className="font-body text-sm">
@@ -80,6 +95,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
             filas.map((f) => {
               const pct = Number(f.avance_pct ?? 0);
               const go = () => navigate(`/dashboard/engagements/${f.engagement_id}`);
+              const ambosEntregados = f.tiene_diagnostico && f.tiene_presentacion;
               return (
                 <TableRow
                   key={f.engagement_id}
@@ -119,7 +135,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                       {f.estado_activacion === "borrador" && (
                         <Badge
                           variant="outline"
-                          className="bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-950/40 dark:text-yellow-200"
+                          className="bg-warning/15 text-warning border-warning/40 font-body"
                         >
                           Borrador
                         </Badge>
@@ -127,7 +143,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                       {f.estado_activacion === "pendiente_pago" && (
                         <Badge
                           variant="outline"
-                          className="bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/40 dark:text-blue-200"
+                          className="bg-primary/10 text-primary border-primary/30 font-body"
                         >
                           Pendiente pago
                         </Badge>
@@ -135,13 +151,18 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Progress
-                        value={pct}
-                        className={cn("h-2 w-24", progressColor(pct))}
-                      />
-                      <span className="font-body text-xs text-muted-foreground">
-                        {pct.toFixed(0)}%
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Progress
+                          value={pct}
+                          className={cn("h-2 w-24", progressColor(pct))}
+                        />
+                        <span className="font-body text-xs text-muted-foreground">
+                          {pct.toFixed(0)}%
+                        </span>
+                      </div>
+                      <span className="font-body text-[11px] text-muted-foreground">
+                        {f.n_analisis_completados} / {f.n_analisis_total} análisis
                       </span>
                     </div>
                   </TableCell>
@@ -150,6 +171,18 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                       semaforo={f.semaforo_sla}
                       diasParaSla={f.dias_para_sla}
                     />
+                  </TableCell>
+                  <TableCell>
+                    {ambosEntregados ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-success/40 bg-success/15 px-2 py-0.5 font-body text-[11px] text-success">
+                        <CheckCircle2 className="h-3 w-3" /> Listo
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <EntregablePill label="Diag" done={f.tiene_diagnostico} />
+                        <EntregablePill label="Pres" done={f.tiene_presentacion} />
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="font-body text-sm">
                     {f.dias_en_gestion}d
