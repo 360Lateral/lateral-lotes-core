@@ -44,6 +44,12 @@ const ESTADOS = [
   { value: "cancelado", label: "Cancelado" },
 ];
 
+const ACTIVACION = [
+  { value: "borrador", label: "Borrador" },
+  { value: "pendiente_pago", label: "Pendiente pago" },
+  { value: "activo", label: "Activo" },
+];
+
 const SEMAFOROS = [
   { value: "verde", label: "Verde", dot: "bg-success" },
   { value: "amarillo", label: "Amarillo", dot: "bg-warning" },
@@ -120,6 +126,7 @@ const FiltrosPortafolio = ({ filtros, onChangeFiltros }: Props) => {
   const conteo =
     (filtros.plan?.length ?? 0) +
     (filtros.estado?.length ?? 0) +
+    (filtros.estado_activacion?.length ?? 0) +
     (filtros.semaforo?.length ?? 0) +
     (filtros.asesor_id ? 1 : 0) +
     (filtros.busqueda && filtros.busqueda.length >= 2 ? 1 : 0);
@@ -163,6 +170,17 @@ const FiltrosPortafolio = ({ filtros, onChangeFiltros }: Props) => {
           options={ESTADOS}
           selected={filtros.estado ?? []}
           onChange={(v) => onChangeFiltros({ ...filtros, estado: v })}
+        />
+        <MultiDropdown
+          label="Activación"
+          options={ACTIVACION}
+          selected={filtros.estado_activacion ?? []}
+          onChange={(v) =>
+            onChangeFiltros({
+              ...filtros,
+              estado_activacion: v as PortafolioFiltrosUI["estado_activacion"],
+            })
+          }
         />
 
         <Select
