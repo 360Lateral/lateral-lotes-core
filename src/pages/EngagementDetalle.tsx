@@ -4,17 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
+import { useActivarEngagement } from "@/hooks/useEngagements";
+import { useAuth } from "@/contexts/AuthContext";
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
+import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
   const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
+  const { isSuperAdmin } = useAuth();
+  const activar = useActivarEngagement();
+
+  const estadoAct = engagement?.estado_activacion ?? "activo";
+  const enBorrador = estadoAct === "borrador";
+  const pendientePago = estadoAct === "pendiente_pago";
 
   return (
     <DashboardLayout>
@@ -39,6 +59,67 @@ const EngagementDetalle = () => {
           </Card>
         ) : (
           <>
+            {enBorrador && (
+              <div className="mb-6 rounded-md border border-yellow-400 bg-yellow-50 p-4 dark:bg-yellow-950/30">
+                <div className="flex items-start gap-3 text-yellow-900 dark:text-yellow-200">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <p className="font-body text-sm">
+                      Este engagement está en <strong>BORRADOR</strong>. Las tareas y
+                      el SLA aún no han iniciado. Un Super Admin debe activarlo
+                      para que los expertos puedan trabajar.
+                    </p>
+                    {isSuperAdmin ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" disabled={activar.isPending}>
+                            {activar.isPending && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Activar engagement
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>¿Activar engagement?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Al activar se crearán las tareas del plan, comenzará
+                              a contar el SLA y los expertos podrán empezar. Esta
+                              acción no se puede deshacer.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => activar.mutate(engagement.id)}
+                            >
+                              Activar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <p className="font-body text-xs">
+                        Solicita a un Super Admin que active este engagement.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {pendientePago && (
+              <div className="mb-6 rounded-md border border-blue-300 bg-blue-50 p-4 dark:bg-blue-950/30">
+                <div className="flex items-start gap-3 text-blue-900 dark:text-blue-200">
+                  <Clock className="mt-0.5 h-5 w-5 shrink-0" />
+                  <p className="font-body text-sm">
+                    Esperando confirmación de pago. El engagement se activará
+                    automáticamente cuando se confirme.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <EngagementHeader engagement={engagement} />
             <Separator className="my-6" />
             <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
