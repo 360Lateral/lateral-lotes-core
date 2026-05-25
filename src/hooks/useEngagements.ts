@@ -155,3 +155,30 @@ export const useActualizarEngagement = () => {
     },
   });
 };
+
+export const useActivarEngagement = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (engagementId: string) => {
+      const { error } = await supabase.rpc("activar_engagement" as any, {
+        p_engagement_id: engagementId,
+      });
+      if (error) throw error;
+      return engagementId;
+    },
+    onSuccess: (engagementId) => {
+      qc.invalidateQueries({ queryKey: ["engagements-list"] });
+      qc.invalidateQueries({ queryKey: ["engagements-por-lote"] });
+      qc.invalidateQueries({ queryKey: ["engagements-activos-lotes"] });
+      qc.invalidateQueries({ queryKey: ["engagement-detalle", engagementId] });
+      qc.invalidateQueries({ queryKey: ["tareas-engagement", engagementId] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
+      toast.success("Engagement activado", {
+        description: "Las tareas fueron creadas y el SLA comenzó a contar.",
+      });
+    },
+    onError: (err: any) => {
+      toast.error("No se pudo activar el engagement", { description: err.message });
+    },
+  });
+};
