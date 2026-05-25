@@ -8,6 +8,7 @@ export interface EngagementDetalle {
   cliente_id: string | null;
   asesor_asignado_id: string | null;
   estado: string;
+  estado_activacion: string | null;
   avance_pct: number;
   fecha_inicio: string | null;
   fecha_sla_objetivo: string | null;
