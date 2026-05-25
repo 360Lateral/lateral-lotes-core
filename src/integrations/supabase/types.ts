@@ -2633,6 +2633,10 @@ export type Database = {
       }
     }
     Functions: {
+      activar_engagement: {
+        Args: { p_engagement_id: string }
+        Returns: undefined
+      }
       calcular_match_score: {
         Args: { p_alerta_id: string; p_lote_id: string }
         Returns: {
