@@ -13,11 +13,15 @@ export interface PortafolioVistaFila {
   asesor_id: string | null;
   asesor_nombre: string | null;
   estado: string;
-  estado_activacion: string | null;
+  estado_activacion: "borrador" | "pendiente_pago" | "activo";
   avance_pct: number;
   dias_en_gestion: number;
   dias_para_sla: number | null;
   semaforo_sla: "verde" | "amarillo" | "ambar" | "rojo" | null;
+  n_analisis_total: number;
+  n_analisis_completados: number;
+  tiene_diagnostico: boolean;
+  tiene_presentacion: boolean;
   ultima_actualizacion: string;
 }
 
@@ -27,6 +31,7 @@ export interface PortafolioFiltrosUI {
   asesor_id?: string;
   semaforo?: string[];
   busqueda?: string;
+  estado_activacion?: ("borrador" | "pendiente_pago" | "activo")[];
 }
 
 export const useVistaPortafolio = (filtros: PortafolioFiltrosUI = {}) => {
@@ -37,8 +42,9 @@ export const useVistaPortafolio = (filtros: PortafolioFiltrosUI = {}) => {
       if (filtros.plan?.length) q = q.in("plan_codigo", filtros.plan);
       if (filtros.estado?.length) q = q.in("estado", filtros.estado);
       if (filtros.asesor_id) q = q.eq("asesor_id", filtros.asesor_id);
+      if (filtros.estado_activacion?.length)
+        q = q.in("estado_activacion", filtros.estado_activacion);
       if (filtros.semaforo?.length) {
-        // map 'amarillo' -> include also 'ambar' for compatibility with view
         const expanded = filtros.semaforo.flatMap((s) =>
           s === "amarillo" ? ["amarillo", "ambar"] : [s],
         );
