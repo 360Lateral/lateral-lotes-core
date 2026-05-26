@@ -3067,6 +3067,15 @@ export type Database = {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
         Returns: number
       }
+      firmar_nda: {
+        Args: {
+          p_contenido_aceptado: string
+          p_lote_id: string
+          p_user_agent: string
+          p_version_nda: string
+        }
+        Returns: string
+      }
       firmar_url_entregable: {
         Args: { p_entregable_id: string; p_expira_segundos?: number }
         Returns: string
@@ -3192,6 +3201,7 @@ export type Database = {
         Returns: Json
       }
       obtener_kpis_portafolio: { Args: never; Returns: Json }
+      obtener_lote_para_usuario: { Args: { p_lote_id: string }; Returns: Json }
       obtener_ranking_asesores: {
         Args: { p_desde?: string; p_hasta?: string }
         Returns: {

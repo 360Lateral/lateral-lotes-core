@@ -1,1099 +1,343 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { GoogleMap, MarkerF } from "@react-google-maps/api";
-import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import ScoreIndicator from "@/components/ScoreIndicator";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Logo from "@/components/ui/Logo";
+import { useParams, Link } from "react-router-dom";
+import { useLoteDetalle } from "@/hooks/useLoteDetalle";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   MapPin,
-  ChevronLeft,
-  ChevronRight,
-  Check,
-  Clock,
-  X,
+  Building2,
+  Ruler,
   FileText,
-  Download,
-  Lock,
-  Pencil,
+  TrendingUp,
+  Mail,
+  ArrowLeft,
+  ShieldCheck,
+  FileSignature,
 } from "lucide-react";
-import AsistenteChat from "@/components/AsistenteChat";
-import { useToast } from "@/hooks/use-toast";
-import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
+import NdaModal from "@/components/lotes/NdaModal";
+import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
-
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(v);
-
-const estadoVariant = (e: string) => {
-  switch (e) {
-    case "Disponible":
-      return "disponible" as const;
-    case "Reservado":
-      return "reservado" as const;
-    case "Vendido":
-      return "vendido" as const;
-    default:
-      return "default" as const;
-  }
-};
-
-const servicioIcon = (estado: string) => {
-  switch (estado) {
-    case "Disponible":
-      return <Check className="h-4 w-4" />;
-    case "En trámite":
-      return <Clock className="h-4 w-4" />;
-    case "No disponible":
-      return <X className="h-4 w-4" />;
-    default:
-      return null;
-  }
-};
-
-const servicioVariant = (estado: string) => {
-  switch (estado) {
-    case "Disponible":
-      return "disponible" as const;
-    case "En trámite":
-      return "reservado" as const;
-    case "No disponible":
-      return "vendido" as const;
-    default:
-      return "default" as const;
-  }
-};
-
-const categoriasDoc = [
-  { key: "financiero", label: "Financiero" },
-  { key: "tecnico", label: "Técnico" },
-  { key: "predial", label: "Predial" },
-  { key: "normativo", label: "Normativo" },
-  { key: "juridico", label: "Jurídico" },
-  { key: "otro", label: "Otro" },
-];
+const formatCOP = (n: number | undefined | null) =>
+  n == null ? "—" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
-  const { user, isDeveloper, isAdminOrAsesor } = useAuth();
-  const { limits: planLimits } = usePlan();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const [contactOpen, setContactOpen] = useState(false);
-  const [creatingNeg, setCreatingNeg] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
+  const { data, isLoading, error } = useLoteDetalle(id);
+  const [ndaOpen, setNdaOpen] = useState(false);
+  const [contactoOpen, setContactoOpen] = useState(false);
 
-  // Form state
-  const [formNombre, setFormNombre] = useState("");
-  const [formEmail, setFormEmail] = useState("");
-  const [formTelefono, setFormTelefono] = useState("");
-  const [formMensaje, setFormMensaje] = useState("");
-
-  // Fetch lote
-  const { data: lote, isLoading: loadingLote } = useQuery({
-    queryKey: ["lote-detalle", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, departamento, direccion, area_total_m2, lat, lng, estado_disponibilidad, tipo_lote, estrato, frente_ml, fondo_ml, destacado, foto_url, video_url, score_juridico, score_normativo, score_servicios, has_resolutoria, es_publico, owner_id, created_at, updated_at, tiene_escritura")
-        .eq("id", id!)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  // Fetch fotos
-  const { data: fotos = [] } = useQuery({
-    queryKey: ["lote-fotos", id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("fotos_lotes")
-        .select("url, orden")
-        .eq("lote_id", id!)
-        .order("orden", { ascending: true });
-      return data ?? [];
-    },
-    enabled: !!id,
-  });
-
-  // Fetch precio
-  const { data: precio } = useQuery({
-    queryKey: ["lote-precio", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("precios")
-        .select("*")
-        .eq("lote_id", id!)
-        .order("vigencia", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  // Fetch precio referencia zona
-  const { data: precioRef } = useQuery({
-    queryKey: ["precio-ref", lote?.ciudad],
-    enabled: !!lote?.ciudad,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("precios")
-        .select("precio_m2_cop, lotes!inner(ciudad)")
-        .eq("lotes.ciudad", lote!.ciudad!)
-        .not("lote_id", "eq", id);
-      if (!data || data.length === 0) return null;
-      const avg = data.reduce((s, r) => s + Number(r.precio_m2_cop), 0) / data.length;
-      return Math.round(avg);
-    },
-  });
-
-  // Fetch precio análisis 360°
-  const { data: precioAnalisis } = useQuery({
-    queryKey: ["precio-analisis", id],
-    enabled: !!id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("analisis_financiero")
-        .select("precio_estimado_min,precio_estimado_promedio,precio_estimado_max")
-        .eq("lote_id", id!)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const { data: normativa } = useQuery({
-    queryKey: ["lote-normativa", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("normativa_urbana")
-        .select("*")
-        .eq("lote_id", id!)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  // Fetch servicios
-  const { data: servicios = [] } = useQuery({
-    queryKey: ["lote-servicios", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("servicios_publicos")
-        .select("*")
-        .eq("lote_id", id!);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  // Fetch documentos (only if authenticated)
-  const { data: documentos = [] } = useQuery({
-    queryKey: ["lote-docs", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("analisis_documentos")
-        .select("*")
-        .eq("lote_id", id!);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id && !!user,
-  });
-
-  // Check if developer has an active negotiation for this lot
-  const { data: negociacionActiva } = useQuery({
-    queryKey: ["neg-activa", id, user?.id],
-    enabled: !!id && !!user && !isAdminOrAsesor,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("negociaciones")
-        .select("id")
-        .eq("lote_id", id!)
-        .eq("developer_id", user!.id)
-        .in("estado", ["activa", "en_revision", "concretada"])
-        .limit(1)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  // Lead mutation
-  const leadMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("leads").insert({
-        nombre: formNombre.trim(),
-        email: formEmail.trim(),
-        telefono: formTelefono.trim() || null,
-        mensaje: formMensaje.trim() || null,
-        lote_id: id!,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "¡Consulta enviada!",
-        description:
-          "Un asesor de 360Lateral se pondrá en contacto contigo pronto.",
-      });
-      setContactOpen(false);
-      setFormNombre("");
-      setFormEmail("");
-      setFormTelefono("");
-      setFormMensaje("");
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "No pudimos enviar tu consulta. Intenta de nuevo.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Mini map is now rendered declaratively via GoogleMap component
-
-  const handleDownload = async (storagePath: string | null, fileName: string) => {
-    if (!storagePath) return;
-    const { data, error } = await supabase.storage
-      .from("documentos")
-      .createSignedUrl(storagePath, 3600);
-    if (error || !data?.signedUrl) {
-      toast({ title: "Error", description: "No se pudo generar el enlace de descarga.", variant: "destructive" });
-      return;
-    }
-    window.open(data.signedUrl, "_blank");
-  };
-
-  const isVendido = lote?.estado_disponibilidad === "Vendido";
-
-  if (loadingLote) {
+  if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="mx-auto w-full max-w-7xl px-4 py-8">
-          <Skeleton className="mb-4 h-8 w-48" />
-          <div className="grid gap-8 lg:grid-cols-5">
-            <Skeleton className="h-96 lg:col-span-3" />
-            <Skeleton className="h-96 lg:col-span-2" />
-          </div>
+        <div className="max-w-5xl mx-auto px-4 py-8 space-y-4">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-32 w-full" />
         </div>
       </div>
     );
   }
 
-  if (!lote) {
+  if (error || !data || data.error) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="flex flex-1 items-center justify-center">
-          <p className="font-body text-muted-foreground">Lote no encontrado.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Protect private lots: if not public and user is not owner or admin
-  const isPrivate = (lote as any).es_publico === false;
-  const isOwner = user && (lote as any).owner_id === user.id;
-  const canViewDocs =
-    isAdminOrAsesor ||
-    isOwner ||
-    !!negociacionActiva;
-
-  if (isPrivate && !isOwner && !isAdminOrAsesor) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Navbar />
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
-          <p className="font-body text-lg font-semibold text-foreground">Este lote no está disponible</p>
-          <p className="font-body text-sm text-muted-foreground">El lote es privado o está en revisión.</p>
-          <Button variant="default" asChild>
-            <Link to="/lotes">Ver lotes disponibles</Link>
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+          <h1 className="text-2xl font-semibold mb-3">Este lote no está disponible</h1>
+          <p className="text-muted-foreground mb-6">
+            {data?.error ?? "No pudimos cargar la información del lote en este momento."}
+          </p>
+          <Button asChild>
+            <Link to="/mercado"><ArrowLeft className="mr-2 h-4 w-4" />Volver al mercado</Link>
           </Button>
         </div>
+        <Footer />
       </div>
     );
   }
 
+  const nivel = data.nivel_usuario;
+  const accesoCompleto = !!data.acceso_completo;
+  const tieneNda = data.tiene_nda_firmado;
+  const anonimo = nivel === "gratuito" && !data.es_propietario && !data.es_admin;
+
+  const verBasico = accesoCompleto || ["basico", "profesional", "premium"].includes(nivel);
+  const verProfesional = accesoCompleto || (["profesional", "premium"].includes(nivel) && tieneNda);
+  const verPremium = accesoCompleto || (nivel === "premium" && tieneNda);
+
+  const necesitaFirmarNdaProfesional = !accesoCompleto && nivel === "profesional" && !tieneNda;
+  const necesitaFirmarNdaPremium = !accesoCompleto && nivel === "premium" && !tieneNda;
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-8">
-        {/* Breadcrumb */}
-        <Link
-          to="/lotes"
-          className="mb-6 inline-flex items-center gap-1 font-body text-sm text-muted-foreground transition-colors hover:text-primary"
-        >
-          <ChevronLeft className="h-4 w-4" /> Volver a lotes
-        </Link>
+      {id && (
+        <NdaModal open={ndaOpen} onOpenChange={setNdaOpen} loteId={id} />
+      )}
 
-        <div className="grid gap-8 lg:grid-cols-5">
-          {/* LEFT COLUMN (60%) */}
-          <div className="flex flex-col gap-6 lg:col-span-3">
-            {/* Gallery */}
-            <div className="relative flex flex-col gap-2">
-              <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-secondary md:h-96">
-                {fotos.length > 0 ? (
-                  <>
-                    <img src={fotos[galleryIndex]?.url} alt={`${lote.nombre_lote} - foto ${galleryIndex + 1}`} className="h-full w-full object-cover" />
-                    {fotos.length > 1 && (
-                      <>
-                        <button
-                          onClick={() => setGalleryIndex((prev) => (prev - 1 + fotos.length) % fotos.length)}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
-                        >
-                          <ChevronLeft className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => setGalleryIndex((prev) => (prev + 1) % fotos.length)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground shadow hover:bg-background"
-                        >
-                          <ChevronRight className="h-5 w-5" />
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (lote as any).foto_url ? (
-                  <img src={(lote as any).foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
-                ) : (
-                  <Logo variant="on-navy" className="opacity-40" />
-                )}
-              </div>
-              {/* Thumbnails */}
-              {fotos.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto">
-                  {fotos.slice(0, 5).map((f, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setGalleryIndex(i)}
-                      className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-colors ${
-                        i === galleryIndex ? "border-primary" : "border-transparent"
-                      }`}
-                    >
-                      <img src={f.url} alt={`Miniatura ${i + 1}`} className="h-full w-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Video */}
-            {(lote as any).video_url && (
-              <div>
-                {(lote as any).video_url.includes("youtube") || (lote as any).video_url.includes("youtu.be") ? (
-                  <iframe
-                    src={(lote as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
-                    className="w-full rounded-lg h-48 md:h-64"
-                    allowFullScreen
-                    title="Video del lote"
-                  />
-                ) : (
-                  <video
-                    src={(lote as any).video_url}
-                    controls
-                    className="w-full rounded-lg max-h-64"
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Mini map */}
-            {lote.lat && lote.lng && (
-              <GoogleMapsGate
-                fallback={<div className="h-48 w-full overflow-hidden rounded-lg bg-muted md:h-64" />}
-              >
-                <div className="h-48 w-full overflow-hidden rounded-lg md:h-64">
-                  <GoogleMap
-                    mapContainerStyle={{ width: "100%", height: "100%" }}
-                    center={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                    zoom={15}
-                    options={{ mapTypeId: "hybrid", disableDefaultUI: true, zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }}
-                  >
-                    <MarkerF
-                      position={{ lat: Number(lote.lat), lng: Number(lote.lng) }}
-                      icon={{ path: 0, fillColor: "#F49D15", fillOpacity: 1, strokeColor: "#FFFFFF", strokeWeight: 2, scale: 8 }}
-                    />
-                  </GoogleMap>
-                </div>
-              </GoogleMapsGate>
-            )}
-
-            {/* Notes - only visible for admin/asesor */}
-            {isAdminOrAsesor && (lote as any).notas && (
-              <div className="rounded-lg border border-border p-4">
-                <h3 className="mb-2 font-body text-sm font-semibold text-foreground">
-                  Descripción
-                </h3>
-                <p className="font-body text-sm leading-relaxed text-muted-foreground">
-                  {(lote as any).notas}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT COLUMN (40%) */}
-          <div className="flex flex-col gap-5 lg:col-span-2">
-            <div className="flex items-center gap-3">
-              <h1 className="font-body text-2xl font-bold text-secondary md:text-3xl">
-                {lote.nombre_lote}
-              </h1>
-              {isAdminOrAsesor && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(`/dashboard/lotes/${id}/editar`)}
-                  className="shrink-0"
-                >
-                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                  Editar
-                </Button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="font-body text-sm text-muted-foreground">
-                {lote.barrio}
-                {lote.ciudad ? `, ${lote.ciudad}` : ""}
-              </span>
-            </div>
-
-            <Badge variant={estadoVariant(lote.estado_disponibilidad)}>
-              {lote.estado_disponibilidad}
-            </Badge>
-
-            {/* Vendido banner */}
-            {isVendido && (
-              <div className="rounded-lg bg-destructive px-4 py-3 text-center font-body text-sm font-semibold text-destructive-foreground">
-                Este lote ya fue vendido
-              </div>
-            )}
-
-            {/* Pricing */}
-            {!isVendido && precio && (
-              <div>
-                {precio.precio_cop != null && (
-                  <p className="font-body text-2xl font-bold text-secondary">
-                    {formatCOP(Number(precio.precio_cop))}
-                  </p>
-                )}
-                 {precio.precio_m2_cop != null && (
-                  <p className="font-body text-sm text-muted-foreground">
-                    {formatCOP(Number(precio.precio_m2_cop))}/m²
-                  </p>
-                )}
-                {precioRef && (
-                  <p className="font-body text-xs text-muted-foreground">
-                    Promedio zona: {formatCOP(precioRef)}/m²
-                  </p>
-                )}
-
-              {precioAnalisis?.precio_estimado_promedio && (
-                <div className="rounded-lg p-3 mt-2" style={{ backgroundColor: "#FDF3E3" }}>
-                  <p className="text-xs font-medium mb-1" style={{ color: "#854F0B" }}>
-                    Valor estimado 360°
-                  </p>
-                  <p className="font-body text-xl font-bold" style={{ color: "#E8951A" }}>
-                    {formatCOP(precioAnalisis.precio_estimado_promedio)}
-                  </p>
-                  {precioAnalisis.precio_estimado_min && precioAnalisis.precio_estimado_max && (
-                    <p className="text-xs mt-0.5" style={{ color: "#BA7517" }}>
-                      Rango: {formatCOP(precioAnalisis.precio_estimado_min)} — {formatCOP(precioAnalisis.precio_estimado_max)}
-                    </p>
-                  )}
-                  {lote.area_total_m2 && (
-                    <p className="text-xs mt-0.5" style={{ color: "#BA7517" }}>
-                      {formatCOP(precioAnalisis.precio_estimado_promedio / Number(lote.area_total_m2))} / m² estimado
-                    </p>
-                  )}
-                  <p className="text-[10px] mt-1.5" style={{ color: "#BA7517", opacity: 0.7 }}>
-                    Según Resolutoría 360° completa
-                  </p>
-                </div>
-              )}
-              </div>
-            )}
-
-
-            {/* Contact button */}
-            {!isVendido && (
-              <Button
-                variant="default"
-                size="lg"
-                className="w-full"
-                disabled={creatingNeg}
-                onClick={async () => {
-                  if (isDeveloper && user) {
-                    setCreatingNeg(true);
-                    try {
-                      // Check existing negociacion
-                      const { data: existing } = await supabase
-                        .from("negociaciones")
-                        .select("id")
-                        .eq("lote_id", id!)
-                        .eq("developer_id", user.id)
-                        .in("estado", ["activa", "en_revision"] as any)
-                        .limit(1)
-                        .maybeSingle();
-                      if (existing) {
-                        navigate(`/negociacion/${existing.id}`);
-                      } else {
-                        const { data: nuevo, error } = await supabase
-                          .from("negociaciones")
-                          .insert({ lote_id: id!, developer_id: user.id } as any)
-                          .select("id")
-                          .single();
-                        if (error) throw error;
-                        navigate(`/negociacion/${nuevo.id}`);
-                      }
-                    } catch {
-                      toast({ title: "Error", description: "No se pudo iniciar la negociación.", variant: "destructive" });
-                    } finally {
-                      setCreatingNeg(false);
-                    }
-                  } else {
-                    setContactOpen(true);
-                  }
-                }}
-              >
-                {creatingNeg ? "Iniciando..." : "Me interesa este lote"}
-              </Button>
-            )}
-
-            {/* Basic data card */}
-            <Card>
-              <CardContent className="grid grid-cols-2 gap-4 p-4">
-                <DataItem
-                  label="Área total"
-                  value={
-                    lote.area_total_m2
-                      ? `${Number(lote.area_total_m2).toLocaleString("es-CO")} m²`
-                      : "—"
-                  }
-                />
-                <DataItem
-                  label="Frente × Fondo"
-                  value={
-                    lote.frente_ml && lote.fondo_ml
-                      ? `${Number(lote.frente_ml)} × ${Number(lote.fondo_ml)} ml`
-                      : "—"
-                  }
-                />
-                {isAdminOrAsesor && (
-                  <DataItem
-                    label="Matrícula"
-                    value={(lote as any).matricula_inmobiliaria ?? "—"}
-                  />
-                )}
-                <DataItem
-                  label="Estrato"
-                  value={lote.estrato != null ? String(lote.estrato) : "—"}
-                />
-                <DataItem
-                  label="Coordenadas"
-                  value={
-                    lote.lat && lote.lng
-                      ? `${Number(lote.lat).toFixed(4)}, ${Number(lote.lng).toFixed(4)}`
-                      : "—"
-                  }
-                />
-              </CardContent>
-            </Card>
-
-            {/* Score de viabilidad */}
-            <div className="flex items-start gap-6 rounded-lg border border-border p-4">
-              <ScoreIndicator score={lote.score_juridico} label="Jurídico" emoji="⚖️" size="lg" />
-              <ScoreIndicator score={lote.score_normativo} label="Normativo" emoji="📋" size="lg" />
-              <ScoreIndicator score={lote.score_servicios} label="Servicios" emoji="🔌" size="lg" />
-            </div>
-
-            {/* Asistente IA 360° */}
-            {planLimits && planLimits.max_consultas_ia_mes === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                  <Lock className="h-8 w-8 text-muted-foreground" />
-                  <p className="font-body text-sm font-semibold text-foreground">
-                    Asistente IA no disponible en tu plan
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground max-w-xs">
-                    Actualiza tu plan para acceder al asistente IA 360°.
-                  </p>
-                  <Button variant="default" size="sm" asChild>
-                    <Link to="/planes">Ver planes</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-            <AsistenteChat
-              loteId={id!}
-              loteContext={{
-                nombre_lote: lote.nombre_lote,
-                ciudad: lote.ciudad,
-                departamento: lote.departamento,
-                area_total_m2: lote.area_total_m2 ? Number(lote.area_total_m2) : null,
-                uso_principal: normativa?.uso_principal ?? null,
-                indice_construccion: normativa?.indice_construccion ? Number(normativa.indice_construccion) : null,
-                indice_ocupacion: normativa?.indice_ocupacion ? Number(normativa.indice_ocupacion) : null,
-                altura_max_pisos: normativa?.altura_max_pisos ?? null,
-                altura_max_metros: normativa?.altura_max_metros ? Number(normativa.altura_max_metros) : null,
-                zona_pot: normativa?.zona_pot ?? null,
-                tratamiento: normativa?.tratamiento ?? null,
-                norma_vigente: normativa?.norma_vigente ?? null,
-                score_juridico: lote.score_juridico,
-                score_normativo: lote.score_normativo,
-                score_servicios: lote.score_servicios,
-                notas: isAdminOrAsesor ? (lote as any).notas ?? null : null,
-              }}
-            />
-            )}
-
-            {/* Tabs */}
-            <Tabs defaultValue="normativa" className="w-full">
-              <TabsList className="w-full">
-                <TabsTrigger value="normativa" className="flex-1 font-body text-xs">
-                  Normativa
-                </TabsTrigger>
-                <TabsTrigger value="servicios" className="flex-1 font-body text-xs">
-                  Servicios
-                </TabsTrigger>
-                <TabsTrigger value="documentos" className="flex-1 font-body text-xs">
-                  Documentos
-                </TabsTrigger>
-                <TabsTrigger value="resolutoria" className="flex-1 font-body text-xs">
-                  Resolutoría
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Tab: Normativa */}
-              <TabsContent value="normativa">
-                {normativa ? (
-                  <div className="flex flex-col gap-4">
-                    {normativa.uso_principal && (
-                      <div>
-                        <Badge variant="default" className="text-sm px-3 py-1">
-                          {normativa.uso_principal}
-                        </Badge>
-                      </div>
-                    )}
-
-                    {normativa.usos_compatibles &&
-                      normativa.usos_compatibles.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {normativa.usos_compatibles.map((u) => (
-                            <Badge key={u} variant="secondary" className="text-xs">
-                              {u}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <DataItem
-                        label="Índice construcción"
-                        value={
-                          normativa.indice_construccion != null
-                            ? String(normativa.indice_construccion)
-                            : "—"
-                        }
-                      />
-                      <DataItem
-                        label="Índice ocupación"
-                        value={
-                          normativa.indice_ocupacion != null
-                            ? String(normativa.indice_ocupacion)
-                            : "—"
-                        }
-                      />
-                      <DataItem
-                        label="Altura máx. pisos"
-                        value={
-                          normativa.altura_max_pisos != null
-                            ? String(normativa.altura_max_pisos)
-                            : "—"
-                        }
-                      />
-                      <DataItem
-                        label="Altura máx. metros"
-                        value={
-                          normativa.altura_max_metros != null
-                            ? `${normativa.altura_max_metros} m`
-                            : "—"
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <DataItem
-                        label="Aisl. frontal"
-                        value={
-                          normativa.aislamiento_frontal_m != null
-                            ? `${normativa.aislamiento_frontal_m} m`
-                            : "—"
-                        }
-                      />
-                      <DataItem
-                        label="Aisl. posterior"
-                        value={
-                          normativa.aislamiento_posterior_m != null
-                            ? `${normativa.aislamiento_posterior_m} m`
-                            : "—"
-                        }
-                      />
-                      <DataItem
-                        label="Aisl. lateral"
-                        value={
-                          normativa.aislamiento_lateral_m != null
-                            ? `${normativa.aislamiento_lateral_m} m`
-                            : "—"
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <DataItem
-                        label="Zona POT"
-                        value={normativa.zona_pot ?? "—"}
-                      />
-                      <DataItem
-                        label="Tratamiento"
-                        value={normativa.tratamiento ?? "—"}
-                      />
-                      <DataItem
-                        label="Norma vigente"
-                        value={normativa.norma_vigente ?? "—"}
-                      />
-                      {normativa.cesion_tipo_a_pct != null && (
-                        <DataItem
-                          label="Cesión tipo A"
-                          value={`${normativa.cesion_tipo_a_pct}%`}
-                        />
-                      )}
-                    </div>
-
-                    {/* Alertas automáticas */}
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {normativa.indice_construccion != null && Number(normativa.indice_construccion) >= 2.5 && (
-                        <Badge variant="disponible" className="text-xs">IC alto — potencial de densificación</Badge>
-                      )}
-                      {normativa.indice_construccion != null && Number(normativa.indice_construccion) < 1.5 && (
-                        <Badge variant="vendido" className="text-xs">IC bajo — construcción limitada</Badge>
-                      )}
-                      {normativa.altura_max_pisos != null && normativa.altura_max_pisos >= 8 && (
-                        <Badge variant="disponible" className="text-xs">Alta densidad permitida</Badge>
-                      )}
-                      {normativa.cesion_tipo_a_pct != null && Number(normativa.cesion_tipo_a_pct) >= 25 && (
-                        <Badge variant="reservado" className="text-xs">Cesión alta — revisar área útil resultante</Badge>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="py-6 text-center font-body text-sm text-muted-foreground">
-                    No hay datos de normativa para este lote.
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Tab: Servicios */}
-              <TabsContent value="servicios">
-                {servicios.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left font-body text-sm">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="pb-2 font-semibold text-foreground">
-                            Servicio
-                          </th>
-                          <th className="pb-2 font-semibold text-foreground">
-                            Estado
-                          </th>
-                          <th className="pb-2 font-semibold text-foreground">
-                            Operador
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {servicios.map((s) => (
-                          <tr
-                            key={s.id}
-                            className="border-b border-border last:border-0"
-                          >
-                            <td className="py-2 text-foreground">{s.tipo}</td>
-                            <td className="py-2">
-                              <Badge
-                                variant={servicioVariant(s.estado)}
-                                className="gap-1"
-                              >
-                                {servicioIcon(s.estado)}
-                                {s.estado}
-                              </Badge>
-                            </td>
-                            <td className="py-2 text-muted-foreground">
-                              {s.operador ?? "—"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="py-6 text-center font-body text-sm text-muted-foreground">
-                    No hay datos de servicios para este lote.
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Tab: Documentos */}
-              <TabsContent value="documentos">
-                {!user ? (
-                  <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                      <Lock className="h-8 w-8 text-muted-foreground" />
-                      <p className="font-body text-sm text-muted-foreground">
-                        Inicia sesión para acceder a los análisis técnicos,
-                        financieros y prediales de este lote.
-                      </p>
-                      <Button variant="default" size="sm" asChild>
-                        <Link to="/login">Iniciar sesión</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : !canViewDocs ? (
-                  <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                      <Lock className="h-8 w-8 text-muted-foreground" />
-                      <p className="font-body text-sm font-semibold text-foreground">
-                        Documentos restringidos
-                      </p>
-                      <p className="font-body text-xs text-muted-foreground max-w-xs">
-                        Los documentos técnicos y legales están disponibles una vez que inicies una negociación activa sobre este lote.
-                      </p>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => setContactOpen(true)}
-                      >
-                        Me interesa este lote
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : documentos.length > 0 ? (
-                  <div className="flex flex-col gap-4">
-                    {categoriasDoc.map((cat) => {
-                      const docs = documentos.filter(
-                        (d) => d.categoria === cat.key
-                      );
-                      if (docs.length === 0) return null;
-                      return (
-                        <div key={cat.key}>
-                          <h4 className="mb-2 font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            {cat.label}
-                          </h4>
-                          <div className="flex flex-col gap-2">
-                            {docs.map((doc) => (
-                              <div
-                                key={doc.id}
-                                className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
-                              >
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <FileText className="h-4 w-4 shrink-0 text-primary" />
-                                  <div className="min-w-0">
-                                    <p className="truncate font-body text-sm font-medium text-foreground">
-                                      {doc.nombre}
-                                    </p>
-                                    <p className="font-body text-xs text-muted-foreground">
-                                      {new Date(doc.created_at).toLocaleDateString("es-CO")}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleDownload(doc.url_storage, doc.nombre)
-                                  }
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="py-6 text-center font-body text-sm text-muted-foreground">
-                    No hay documentos para este lote.
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Tab: Resolutoría */}
-              <TabsContent value="resolutoria">
-                {planLimits && !planLimits.acceso_analisis_completo ? (
-                  <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                      <Lock className="h-8 w-8 text-muted-foreground" />
-                      <p className="font-body text-sm font-semibold text-foreground">
-                        Análisis completo no incluido en tu plan{" "}
-                        {PLAN_LABELS[planLimits.plan_slug] ?? planLimits.plan_slug}
-                      </p>
-                      <p className="font-body text-xs text-muted-foreground max-w-xs">
-                        Accede a los 8 análisis de la Resolutoría 360° (normativo, jurídico, SSPP, suelos, mercado, ambiental, arquitectónico y financiero) actualizando tu plan.
-                      </p>
-                      <Button variant="default" size="sm" asChild>
-                        <Link to="/planes">Ver planes</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (lote as any).has_resolutoria === true ? (
-                  <div className="flex flex-col gap-4">
-                    <Badge variant="disponible" className="w-fit gap-1 text-sm px-3 py-1">
-                      <Check className="h-4 w-4" /> Resolutoría 360° Completada
-                    </Badge>
-                    <div className="grid grid-cols-2 gap-2">
-                      {["Normativo", "Jurídico", "SSPP", "Suelos", "Mercado", "Ambiental", "Arquitectónico", "Financiero"].map((area) => (
-                        <div key={area} className="flex items-center gap-2 font-body text-sm text-foreground">
-                          <Check className="h-4 w-4 text-green-600 shrink-0" />
-                          {area}
-                        </div>
-                      ))}
-                    </div>
-                    <Button variant="outline" asChild className="w-fit">
-                      <Link to="/planes">Ver Teaser Financiero</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-3 py-6 text-center">
-                    <p className="font-body text-sm font-semibold text-foreground">
-                      Este lote aún no tiene Resolutoría 360°
-                    </p>
-                    <p className="font-body text-xs text-muted-foreground max-w-sm">
-                      Análisis de 8 áreas que transforma tu lote en un activo comercializable con Teaser Financiero.
-                    </p>
-                    <Button className="bg-orange-500 hover:bg-orange-600 text-white" asChild>
-                      <Link to={`/diagnostico?lote_id=${id}`}>Solicitar Resolutoría</Link>
-                    </Button>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </main>
-
-      <Footer />
-
-      {/* Contact Modal */}
-      <Dialog open={contactOpen} onOpenChange={setContactOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={contactoOpen} onOpenChange={setContactoOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-body text-secondary">
-              Me interesa este lote
-            </DialogTitle>
-            <DialogDescription className="font-body text-muted-foreground">
-              Déjanos tus datos y un asesor te contactará pronto.
+            <DialogTitle>Solicitar contacto con el propietario</DialogTitle>
+            <DialogDescription>
+              Esta función se activa en el siguiente prompt (Prompt NN). Pronto podrás solicitar
+              contacto con el propietario mediado por 360Lateral.
             </DialogDescription>
           </DialogHeader>
-
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!formNombre.trim() || !formEmail.trim()) return;
-              leadMutation.mutate();
-            }}
-          >
-            <div>
-              <Label className="font-body text-xs">Nombre completo *</Label>
-              <Input
-                required
-                maxLength={100}
-                value={formNombre}
-                onChange={(e) => setFormNombre(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="font-body text-xs">Email *</Label>
-              <Input
-                type="email"
-                required
-                maxLength={255}
-                value={formEmail}
-                onChange={(e) => setFormEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="font-body text-xs">Teléfono</Label>
-              <Input
-                type="tel"
-                maxLength={20}
-                value={formTelefono}
-                onChange={(e) => setFormTelefono(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="font-body text-xs">Mensaje</Label>
-              <Textarea
-                maxLength={1000}
-                rows={3}
-                value={formMensaje}
-                onChange={(e) => setFormMensaje(e.target.value)}
-              />
-            </div>
-            <Button
-              type="submit"
-              variant="default"
-              className="w-full"
-              disabled={leadMutation.isPending}
-            >
-              {leadMutation.isPending ? "Enviando…" : "Enviar consulta"}
-            </Button>
-          </form>
+          <DialogFooter>
+            <Button onClick={() => setContactoOpen(false)}>Entendido</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        {/* Breadcrumb */}
+        <Link to="/mercado" className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-primary">
+          <ArrowLeft className="h-3.5 w-3.5" /> Volver al mercado
+        </Link>
+
+        {/* Vista admin/propietario badge */}
+        {(data.es_propietario || data.es_admin) && (
+          <Badge variant="secondary" className="text-xs">
+            <ShieldCheck className="h-3 w-3 mr-1" />
+            {data.es_propietario ? "Vista de propietario" : "Vista admin"}
+          </Badge>
+        )}
+
+        {/* Hero */}
+        <Card className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1">
+              <p className="font-mono text-3xl md:text-4xl font-bold text-secondary">
+                {data.nombre_lote ?? data.codigo_anonimo}
+              </p>
+              {data.nombre_lote && (
+                <p className="text-xs text-muted-foreground font-mono mt-1">{data.codigo_anonimo}</p>
+              )}
+              <p className="text-base text-muted-foreground flex items-center gap-1.5 mt-2">
+                <MapPin className="h-4 w-4" />
+                {[data.ciudad, data.barrio].filter(Boolean).join(" · ") || "Ubicación no especificada"}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">{formatearCategoriaArea(data.categoria_area)}</Badge>
+              <Badge variant="secondary">{formatearRangoPrecio(data.rango_precio)}</Badge>
+              {data.tipo_lote && <Badge variant="outline">{data.tipo_lote}</Badge>}
+            </div>
+          </div>
+        </Card>
+
+        {/* Vista general — siempre visible */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Vista general
+          </h2>
+          <Card className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Ciudad</p>
+              <p className="font-medium">{data.ciudad ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Categoría de área</p>
+              <p className="font-medium">{formatearCategoriaArea(data.categoria_area)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Rango de precio</p>
+              <p className="font-medium">{formatearRangoPrecio(data.rango_precio)}</p>
+            </div>
+          </Card>
+        </section>
+
+        {/* Datos básicos (básico+) */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Ruler className="h-5 w-5 text-primary" />
+            Datos básicos del lote
+          </h2>
+          {verBasico ? (
+            <Card className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground">Área total</p>
+                <p className="font-medium">{data.area_total_m2 ? `${data.area_total_m2.toLocaleString("es-CO")} m²` : "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Estrato</p>
+                <p className="font-medium">{data.estrato ?? "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Tipo</p>
+                <p className="font-medium">{data.tipo_lote_detallado ?? data.tipo_lote ?? "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Zona aprox.</p>
+                <p className="font-medium text-sm">
+                  {data.lat_zona && data.lng_zona ? `${data.lat_zona}, ${data.lng_zona}` : "—"}
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <SeccionBloqueada
+              nivelRequerido="basico"
+              nivelActual={nivel}
+              tipo="área exacta, estrato y zona aproximada"
+              anonimo={anonimo}
+            />
+          )}
+        </section>
+
+        {/* Dirección y ficha jurídica (profesional+ con NDA) */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Dirección y ficha jurídica
+          </h2>
+          {verProfesional ? (
+            <Card className="p-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Dirección</p>
+                  <p className="font-medium">{data.direccion ?? "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Matrícula inmobiliaria</p>
+                  <p className="font-medium">{data.matricula ?? "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Coordenadas</p>
+                  <p className="font-medium text-sm">
+                    {data.lat && data.lng ? `${data.lat}, ${data.lng}` : "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Nombre interno</p>
+                  <p className="font-medium">{data.nombre_lote ?? "—"}</p>
+                </div>
+              </div>
+              {data.foto_url && (
+                <img
+                  src={data.foto_url}
+                  alt={`Foto del lote ${data.codigo_anonimo}`}
+                  className="w-full max-h-96 object-cover rounded-md border"
+                  loading="lazy"
+                />
+              )}
+            </Card>
+          ) : necesitaFirmarNdaProfesional || necesitaFirmarNdaPremium ? (
+            <Card className="p-6 border-dashed bg-muted/30 flex flex-col items-center text-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <FileSignature className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold">Firma el NDA para ver el detalle</h3>
+                <p className="text-sm text-muted-foreground max-w-md mt-1">
+                  Para ver dirección, matrícula y fotos reales debes firmar el acuerdo de
+                  confidencialidad con 360Lateral.
+                </p>
+              </div>
+              <Button onClick={() => setNdaOpen(true)}>
+                Firmar NDA y ver detalle
+              </Button>
+            </Card>
+          ) : (
+            <SeccionBloqueada
+              nivelRequerido="profesional"
+              nivelActual={nivel}
+              tipo="dirección exacta, matrícula y fotos reales"
+              mostrarBotonContacto
+              anonimo={anonimo}
+            />
+          )}
+        </section>
+
+        {/* Análisis 360 y precio (premium con NDA) */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Análisis 360 y precio
+          </h2>
+          {verPremium ? (
+            <Card className="p-5 space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground">Precio estimado de venta</p>
+                <p className="text-2xl font-semibold text-primary">{formatCOP(data.precio_venta_estimado)}</p>
+              </div>
+              {data.notas && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Notas del propietario</p>
+                  <p className="text-sm whitespace-pre-wrap">{data.notas}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Análisis 360 disponibles</p>
+                <div className="flex flex-wrap gap-2">
+                  {data.tiene_analisis_juridico && <Badge variant="secondary">Jurídico</Badge>}
+                  {data.tiene_analisis_ambiental && <Badge variant="secondary">Ambiental</Badge>}
+                  {data.tiene_analisis_arquitectonico && <Badge variant="secondary">Arquitectónico</Badge>}
+                  {data.tiene_analisis_financiero && <Badge variant="secondary">Financiero</Badge>}
+                  {data.tiene_analisis_geotecnico && <Badge variant="secondary">Geotécnico</Badge>}
+                  {data.tiene_analisis_mercado && <Badge variant="secondary">Mercado</Badge>}
+                  {data.tiene_analisis_sspp && <Badge variant="secondary">Servicios públicos</Badge>}
+                  {!data.tiene_analisis_juridico &&
+                    !data.tiene_analisis_ambiental &&
+                    !data.tiene_analisis_arquitectonico &&
+                    !data.tiene_analisis_financiero &&
+                    !data.tiene_analisis_geotecnico &&
+                    !data.tiene_analisis_mercado &&
+                    !data.tiene_analisis_sspp && (
+                      <p className="text-sm text-muted-foreground">Sin análisis cargados todavía.</p>
+                    )}
+                </div>
+              </div>
+            </Card>
+          ) : nivel === "premium" && !tieneNda ? (
+            <Card className="p-6 border-dashed bg-muted/30 flex flex-col items-center text-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <FileSignature className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-base font-semibold">Firma el NDA para ver análisis y precio</h3>
+              <Button onClick={() => setNdaOpen(true)}>Firmar NDA</Button>
+            </Card>
+          ) : (
+            <SeccionBloqueada
+              nivelRequerido="premium"
+              nivelActual={nivel}
+              tipo="precio exacto y análisis 360"
+              mostrarBotonContacto
+              anonimo={anonimo}
+            />
+          )}
+        </section>
+
+        {/* Solicitar contacto */}
+        {(accesoCompleto || (["profesional", "premium"].includes(nivel) && tieneNda)) &&
+          !data.es_propietario && (
+            <Card className="p-6 bg-primary/5 border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="font-semibold">¿Te interesa este lote?</h3>
+                <p className="text-sm text-muted-foreground">
+                  Solicita contacto con el propietario mediado por 360Lateral.
+                </p>
+              </div>
+              <Button onClick={() => setContactoOpen(true)}>
+                <Mail className="mr-2 h-4 w-4" />
+                Solicitar contacto
+              </Button>
+            </Card>
+          )}
+      </div>
+
+      <Footer />
     </div>
   );
 };
-
-const DataItem = ({ label, value }: { label: string; value: string }) => (
-  <div>
-    <p className="font-body text-xs text-muted-foreground">{label}</p>
-    <p className="font-body text-sm font-semibold text-foreground">{value}</p>
-  </div>
-);
 
 export default LoteDetalle;
