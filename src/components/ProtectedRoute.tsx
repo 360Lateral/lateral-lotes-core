@@ -4,7 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Props {
   children: React.ReactNode;
   requireDeveloper?: boolean;
-  allowOwner?: boolean; // deprecated alias
+  /** @deprecated Usar allowPropietario en su lugar */
+  allowOwner?: boolean;
   allowPropietario?: boolean;
   requireSuperAdmin?: boolean;
 }
