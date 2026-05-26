@@ -237,8 +237,8 @@ const DashboardUsuarios = () => {
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="dueno">Dueños de lote</SelectItem>
                 <SelectItem value="comisionista">Comisionistas</SelectItem>
-                <SelectItem value="developer">Desarrolladores</SelectItem>
-                <SelectItem value="inversor">Inversionistas</SelectItem>
+                <SelectItem value="desarrollador">Desarrolladores</SelectItem>
+                <SelectItem value="propietario">Propietarios</SelectItem>
                 <SelectItem value="admin">Administradores</SelectItem>
               </SelectContent>
             </Select>
