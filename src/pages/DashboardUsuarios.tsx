@@ -160,7 +160,7 @@ const DashboardUsuarios = () => {
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
     const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
-    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "asesor"].includes(r)));
+    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "experto"].includes(r)));
     return matchSearch && matchType;
   });
 
