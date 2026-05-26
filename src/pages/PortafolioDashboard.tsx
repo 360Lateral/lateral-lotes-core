@@ -121,13 +121,25 @@ const PortafolioDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-6">
-        <h1 className="font-body text-xl font-bold text-foreground">
-          Tablero de portafolio
-        </h1>
-        <p className="mt-1 font-body text-sm text-muted-foreground">
-          Estado de los diagnósticos por lote
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="font-body text-xl font-bold text-foreground">
+            Tablero de portafolio
+          </h1>
+          <p className="mt-1 font-body text-sm text-muted-foreground">
+            Estado de los diagnósticos por lote
+          </p>
+        </div>
+        {isSuperAdmin && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/dashboard/engagements/importar")}
+          >
+            <Upload className="h-4 w-4" />
+            Importar histórico
+          </Button>
+        )}
       </div>
 
       {kpisError ? (
