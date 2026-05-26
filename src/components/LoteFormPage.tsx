@@ -414,7 +414,127 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Foto del lote */}
+        {/* Propietario */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Propietario {isEdit ? "" : "*"}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {propietarioLocked ? (
+              <div className="space-y-2">
+                <Select value={form.propietario_id ?? SIN_ASIGNAR} disabled>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sin asignar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {form.propietario_id && (
+                      <SelectItem value={form.propietario_id}>
+                        {propietariosOptions.find((p) => p.id === form.propietario_id)?.nombre
+                          || propietariosOptions.find((p) => p.id === form.propietario_id)?.email
+                          || (existingLote as any)?.nombre_propietario
+                          || form.propietario_id}
+                      </SelectItem>
+                    )}
+                    <SelectItem value={SIN_ASIGNAR}>Sin asignar todavía</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="flex items-start gap-2 rounded-md border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  {isExpertoOnly
+                    ? "Solo admin o super_admin pueden cambiar el propietario."
+                    : "Solo super_admin puede cambiar el propietario de un lote ya asignado. Para liberar el lote, retira el propietario actual primero (acción super_admin)."}
+                </p>
+              </div>
+            ) : (
+              <Tabs value={propietarioTab} onValueChange={(v) => setPropietarioTab(v as "existente" | "nuevo")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="existente">Seleccionar existente</TabsTrigger>
+                  <TabsTrigger value="nuevo">Crear nuevo</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="existente" className="pt-3">
+                  <Select
+                    value={form.propietario_id ?? SIN_ASIGNAR}
+                    onValueChange={(v) =>
+                      setForm((prev) => ({ ...prev, propietario_id: v === SIN_ASIGNAR ? null : v }))
+                    }
+                    disabled={isLoadingPropietarios}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={isLoadingPropietarios ? "Cargando…" : "Selecciona un propietario"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={SIN_ASIGNAR}>Sin asignar todavía</SelectItem>
+                      {propietariosOptions.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.nombre || p.email || p.id}
+                          {p.email && p.nombre ? (
+                            <span className="text-muted-foreground"> — {p.email}</span>
+                          ) : null}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!form.propietario_id && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      El lote quedará sin propietario hasta que asignes uno.
+                    </p>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="nuevo" className="space-y-3 pt-3">
+                  <p className="text-xs text-muted-foreground">
+                    Al crear, el nuevo propietario recibirá un email de invitación. Quedará seleccionado en este formulario; termina de llenar el lote y guarda.
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-email">Email *</Label>
+                    <Input
+                      id="nuevo-prop-email"
+                      type="email"
+                      value={newPropEmail}
+                      onChange={(e) => setNewPropEmail(e.target.value)}
+                      placeholder="propietario@ejemplo.com"
+                      autoComplete="off"
+                      disabled={invitarCliente.isPending}
+                    />
+                    {newPropErrors.email && <p className="text-xs text-destructive">{newPropErrors.email}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-nombre">Nombre completo *</Label>
+                    <Input
+                      id="nuevo-prop-nombre"
+                      value={newPropNombre}
+                      onChange={(e) => setNewPropNombre(e.target.value)}
+                      placeholder="Nombre y apellido"
+                      disabled={invitarCliente.isPending}
+                    />
+                    {newPropErrors.nombre && <p className="text-xs text-destructive">{newPropErrors.nombre}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-tel">Teléfono (opcional)</Label>
+                    <Input
+                      id="nuevo-prop-tel"
+                      type="tel"
+                      value={newPropTelefono}
+                      onChange={(e) => setNewPropTelefono(e.target.value)}
+                      placeholder="+57 300 000 0000"
+                      disabled={invitarCliente.isPending}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleCrearNuevoPropietario}
+                    disabled={invitarCliente.isPending}
+                  >
+                    {invitarCliente.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Crear propietario
+                  </Button>
+                </TabsContent>
+              </Tabs>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader><CardTitle className="text-base">Foto del lote</CardTitle></CardHeader>
           <CardContent>
