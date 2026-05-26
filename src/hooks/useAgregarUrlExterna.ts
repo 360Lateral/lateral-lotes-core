@@ -9,12 +9,13 @@ interface Args {
   nombre: string;
   url: string;
   notas?: string;
+  tipoAnalisisId?: string | null;
 }
 
 export const useAgregarUrlExterna = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ engagementId, tipo, nombre, url, notas }: Args) => {
+    mutationFn: async ({ engagementId, tipo, nombre, url, notas, tipoAnalisisId }: Args) => {
       if (!url.startsWith("https://")) {
         throw new Error("La URL debe comenzar con https://");
       }
@@ -28,12 +29,14 @@ export const useAgregarUrlExterna = () => {
         version: 1,
         notas: notas || null,
         subido_por: userData.user?.id ?? null,
+        tipo_analisis_id: tipoAnalisisId ?? null,
       });
       if (error) throw error;
       return { engagementId };
     },
     onSuccess: ({ engagementId }) => {
       qc.invalidateQueries({ queryKey: ["entregables-engagement", engagementId] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
       toast.success("URL externa agregada como borrador");
     },
     onError: (e: any) => toast.error(e?.message ?? "No se pudo agregar la URL"),
