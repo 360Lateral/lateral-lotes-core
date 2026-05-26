@@ -129,11 +129,13 @@ const Login = () => {
     setLoading(false);
   };
 
-  const perfilLabel = perfilParam === "dueno"
-    ? "Dueño de Lote"
-    : perfilParam === "developer"
-      ? "Desarrollador / Inversionista"
-      : null;
+  const perfilLabel = perfilParam === "propietario" || perfilParam === "dueno"
+    ? "Propietario de Lote"
+    : perfilParam === "desarrollador" || perfilParam === "developer"
+      ? "Desarrollador"
+      : perfilParam === "comisionista"
+        ? "Comisionista"
+        : null;
 
   const googleButton = (
     <div className="space-y-3">
