@@ -303,6 +303,51 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     },
   });
 
+  // Permisos para el campo Propietario
+  const hadPropietarioOriginally = isEdit && !!(existingLote as any)?.propietario_id;
+  const propietarioLocked = isExpertoOnly || (isEdit && hadPropietarioOriginally && !isSuperAdmin);
+  const canEditPropietario = !propietarioLocked;
+
+  const handleCrearNuevoPropietario = async () => {
+    const emailTrim = newPropEmail.trim();
+    const nombreTrim = newPropNombre.trim();
+    const errs: { email?: string; nombre?: string } = {};
+    if (!EMAIL_RE.test(emailTrim)) errs.email = "Email inválido";
+    if (nombreTrim.length < 4) errs.nombre = "Mínimo 4 caracteres";
+    setNewPropErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    try {
+      const data = await invitarCliente.mutateAsync({
+        email: emailTrim,
+        nombre_completo: nombreTrim,
+        telefono: newPropTelefono.trim() || undefined,
+      });
+      if (data?.conflicto_usuario_existente) {
+        sonnerToast.warning(
+          "Ese email pertenece a un usuario interno. Usa otro email o busca el propietario en 'Seleccionar existente'."
+        );
+        return;
+      }
+      if (!data?.user_id) {
+        sonnerToast.error("No se obtuvo el id del nuevo propietario");
+        return;
+      }
+      // Refrescar lista de propietarios y seleccionar el nuevo
+      await queryClient.invalidateQueries({ queryKey: ["propietarios-list"] });
+      setForm((prev) => ({ ...prev, propietario_id: data.user_id! }));
+      setNewPropEmail("");
+      setNewPropNombre("");
+      setNewPropTelefono("");
+      setPropietarioTab("existente");
+      sonnerToast.success(
+        "Propietario creado, ya está seleccionado. Completa los demás datos del lote y guarda."
+      );
+    } catch (err: any) {
+      sonnerToast.error(err?.message ?? "No se pudo crear el propietario");
+    }
+  };
+
   return (
     <DashboardLayout>
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
