@@ -128,7 +128,7 @@ const Bienvenida = () => {
               <div
                 className={`mb-4 flex h-14 w-14 items-center justify-center rounded-lg ${
                   isSelected
-                    ? perfil.id === "dueno"
+                    ? perfil.id === "propietario"
                       ? "bg-orange/20 text-orange"
                       : perfil.id === "comisionista"
                       ? "bg-emerald-500/20 text-emerald-500"
