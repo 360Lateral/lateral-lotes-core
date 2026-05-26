@@ -78,7 +78,7 @@ const App = () => (
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/lotes" element={<ProtectedRoute><DashboardLotes /></ProtectedRoute>} />
-            <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowOwner><DashboardLoteNuevo /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
@@ -91,7 +91,7 @@ const App = () => (
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
-            <Route path="/dashboard/preferencias" element={<ProtectedRoute allowOwner><PreferenciasUsuario /></ProtectedRoute>} />
+            <Route path="/dashboard/preferencias" element={<ProtectedRoute allowPropietario><PreferenciasUsuario /></ProtectedRoute>} />
 
             {/* Rutas developer */}
             <Route path="/dashboard/developer" element={<ProtectedRoute requireDeveloper><DashboardDeveloper /></ProtectedRoute>} />
@@ -100,10 +100,10 @@ const App = () => (
             {/* Negociaciones */}
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
-            <Route path="/dashboard/owner" element={<ProtectedRoute allowOwner><DashboardOwner /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowOwner><DashboardOwnerLotes /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowOwner><DashboardOwnerDiagnosticos /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowOwner><DashboardOwnerNegociaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/owner" element={<ProtectedRoute allowPropietario><DashboardOwner /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowPropietario><DashboardOwnerLotes /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowPropietario><DashboardOwnerDiagnosticos /></ProtectedRoute>} />
+            <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowPropietario><DashboardOwnerNegociaciones /></ProtectedRoute>} />
 
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
