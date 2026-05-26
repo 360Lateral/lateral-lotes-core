@@ -231,7 +231,7 @@ const DashboardLotes = () => {
                           onClick={() => setAsignarLote({ id: l.id, name: l.nombre_lote })}
                         >
                           <UserPlus className="mr-1 h-3.5 w-3.5" />
-                          Asignar
+                          Asignar propietario
                         </Button>
                       </div>
                     )}
