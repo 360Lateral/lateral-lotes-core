@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -17,10 +18,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
+import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  useEntregablesEngagement,
+  separarEntregables,
+} from "@/hooks/useEntregablesEngagement";
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
@@ -29,8 +35,16 @@ const EngagementDetalle = () => {
   const navigate = useNavigate();
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
   const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
-  const { isSuperAdmin } = useAuth();
+  const { data: entregables } = useEntregablesEngagement(id);
+  const { isSuperAdmin, isAdminOrAsesor } = useAuth();
   const activar = useActivarEngagement();
+
+  const puedeSubir = isSuperAdmin || isAdminOrAsesor;
+
+  const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
+    () => separarEntregables(entregables ?? []),
+    [entregables],
+  );
 
   const estadoAct = engagement?.estado_activacion ?? "activo";
   const enBorrador = estadoAct === "borrador";
@@ -59,8 +73,10 @@ const EngagementDetalle = () => {
           </Card>
         ) : (
           <>
+            <EngagementHeader engagement={engagement} />
+
             {enBorrador && (
-              <div className="mb-6 rounded-md border border-yellow-400 bg-yellow-50 p-4 dark:bg-yellow-950/30">
+              <div className="mt-6 rounded-md border border-yellow-400 bg-yellow-50 p-4 dark:bg-yellow-950/30">
                 <div className="flex items-start gap-3 text-yellow-900 dark:text-yellow-200">
                   <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
                   <div className="flex-1 space-y-3">
@@ -109,7 +125,7 @@ const EngagementDetalle = () => {
             )}
 
             {pendientePago && (
-              <div className="mb-6 rounded-md border border-blue-300 bg-blue-50 p-4 dark:bg-blue-950/30">
+              <div className="mt-6 rounded-md border border-blue-300 bg-blue-50 p-4 dark:bg-blue-950/30">
                 <div className="flex items-start gap-3 text-blue-900 dark:text-blue-200">
                   <Clock className="mt-0.5 h-5 w-5 shrink-0" />
                   <p className="font-body text-sm">
@@ -120,8 +136,20 @@ const EngagementDetalle = () => {
               </div>
             )}
 
-            <EngagementHeader engagement={engagement} />
             <Separator className="my-6" />
+
+            <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
+              Entregables maestros
+            </h2>
+            <TarjetasMaestros
+              engagementId={id!}
+              diagnostico={diagnostico}
+              presentacion={presentacion}
+              puedeSubir={puedeSubir}
+            />
+
+            <Separator className="my-6" />
+
             <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
               Tareas de análisis
             </h2>
@@ -132,15 +160,25 @@ const EngagementDetalle = () => {
                 ))}
               </div>
             ) : (
-              <TareasAnalisisList tareas={tareas ?? []} engagementId={id!} />
+              <TareasAnalisisList
+                tareas={tareas ?? []}
+                engagementId={id!}
+                ligadosPorAnalisis={ligadosPorAnalisis}
+                puedeSubir={puedeSubir}
+              />
             )}
             <p className="mt-6 font-body text-xs text-muted-foreground">
               Cambiar el estado de una tarea actualiza automáticamente el avance del engagement.
             </p>
+
             <Separator className="my-6" />
+
             <SeccionEntregables
               engagementId={id!}
               mostrarAvanceAlCliente={engagement.mostrar_avance_al_cliente}
+              entregables={sueltos}
+              titulo="Otros documentos"
+              emptyText="No hay otros documentos. Usa el botón + Archivo en cada análisis para subir soportes."
             />
           </>
         )}
