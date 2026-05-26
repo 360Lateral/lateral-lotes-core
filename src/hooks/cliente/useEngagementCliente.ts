@@ -4,18 +4,23 @@ import { supabase } from "@/integrations/supabase/client";
 export interface EntregablePublicado {
   id: string;
   tipo: string;
+  tipo_analisis_id: string | null;
   nombre: string;
   version: number;
   notas: string | null;
   created_at: string;
-  url_externa: string | null;
-  storage_path: string | null;
+  updated_at: string;
+  url_externa?: string | null;
+  storage_path?: string | null;
+  tiene_archivo?: boolean;
+  tiene_url_externa?: boolean;
 }
 
 export interface TareaAvance {
   id: string;
   nombre: string;
   tipo_codigo: string | null;
+  tipo_analisis_id: string | null;
   estado: string;
 }
 
@@ -56,12 +61,15 @@ export const useEngagementCliente = (engagementId: string | undefined) => {
     queryKey: ["engagement-cliente", engagementId],
     enabled: !!engagementId,
     refetchOnWindowFocus: true,
+    retry: false,
     queryFn: async (): Promise<EngagementClienteDetalle | null> => {
       const { data, error } = await supabase.rpc(
         "obtener_engagement_para_cliente" as any,
         { p_engagement_id: engagementId },
       );
-      if (error) throw error;
+      // El RPC lanza excepción si el engagement no está activo o no es del cliente:
+      // lo tratamos como "no encontrado" para presentar un mensaje genérico.
+      if (error) return null;
       return (data ?? null) as EngagementClienteDetalle | null;
     },
   });

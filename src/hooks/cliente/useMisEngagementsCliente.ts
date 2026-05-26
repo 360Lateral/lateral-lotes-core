@@ -14,6 +14,8 @@ export interface EngagementClienteResumen {
   fecha_sla: string | null;
   dias_para_sla: number | null;
   total_entregables_publicados: number;
+  tiene_diagnostico: boolean;
+  tiene_presentacion: boolean;
 }
 
 export const useMisEngagementsCliente = () => {
