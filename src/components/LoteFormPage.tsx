@@ -236,7 +236,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     mutationFn: async () => {
       const lotePayload = {
         nombre_lote: form.nombre_lote,
-        nombre_propietario: form.nombre_propietario || null,
+        propietario_id: form.propietario_id,
         ciudad: form.ciudad || null,
         barrio: form.barrio || null,
         direccion: form.direccion || null,
