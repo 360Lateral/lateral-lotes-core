@@ -3,6 +3,8 @@ project_id = "xtcicjrpznawnwvjdqhe"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.get-maps-key]
+    verify_jwt = false
   [functions.mapgis-consulta]
     verify_jwt = true
   [functions.process-email-queue]
