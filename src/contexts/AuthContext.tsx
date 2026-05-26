@@ -3,7 +3,14 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useDevRole } from "@/contexts/DevRoleContext";
 
-type AppRole = "super_admin" | "admin" | "asesor" | "inversor" | "developer" | "dueno" | "comisionista";
+type AppRole =
+  | "super_admin"
+  | "admin"
+  | "experto"
+  | "propietario"
+  | "desarrollador"
+  | "comisionista"
+  | "dueno"; // deprecated, kept for backwards-compat reads
 
 interface AuthContextType {
   session: Session | null;
@@ -11,9 +18,15 @@ interface AuthContextType {
   roles: AppRole[];
   userType: string | null;
   loading: boolean;
+  // Canonical (new) flags
+  isAdminOrExperto: boolean;
+  isDesarrollador: boolean;
+  isSuperAdmin: boolean;
+  isPropietario: boolean;
+  isComisionista: boolean;
+  // Backwards-compatible aliases — DO NOT USE in new code
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
-  isSuperAdmin: boolean;
   isInversor: boolean;
   signOut: () => Promise<void>;
 }
@@ -24,9 +37,13 @@ const AuthContext = createContext<AuthContextType>({
   roles: [],
   userType: null,
   loading: true,
+  isAdminOrExperto: false,
+  isDesarrollador: false,
+  isSuperAdmin: false,
+  isPropietario: false,
+  isComisionista: false,
   isAdminOrAsesor: false,
   isDeveloper: false,
-  isSuperAdmin: false,
   isInversor: false,
   signOut: async () => {},
 });
@@ -66,25 +83,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .upsert({ id: userId, user_type: null })
         .eq("id", userId);
     }
-
-    // Do NOT fall back to user_metadata for role/userType decisions —
-    // user_metadata is client-controlled and could be spoofed.
-    // The trigger handle_new_user() populates perfiles.user_type at signup.
   };
-
-
 
   const applySession = useCallback(async (newSession: Session | null) => {
     const newUserId = newSession?.user?.id ?? null;
 
-    // Skip redundant calls for the same user
     if (newUserId === lastUserIdRef.current && !loading) {
       return;
     }
     lastUserIdRef.current = newUserId;
 
-    // CRITICAL: Set loading=true BEFORE any async work to prevent
-    // ProtectedRoute from redirecting with stale roles
     if (mountedRef.current) {
       setLoading(true);
     }
@@ -110,7 +118,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Safety timeout: force loading=false after 8s to prevent blank screen
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (mountedRef.current) setLoading(false);
@@ -121,20 +128,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     mountedRef.current = true;
 
-    // Initial session load
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mountedRef.current) {
         applySession(session);
       }
     });
 
-    // Listen for auth changes — keep callback synchronous, defer async work
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
-        // Defer to avoid deadlock with Supabase auth internals
         setTimeout(() => {
           if (mountedRef.current) {
-            // Reset lastUserIdRef to force processing on auth state changes
             lastUserIdRef.current = null;
             applySession(newSession);
           }
@@ -148,7 +151,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [applySession]);
 
-  // Simulación de rol para super_admin
   const { devRole, isSimulating } = useDevRole();
   const isRealSuperAdmin = roles.includes("super_admin");
   const canSimulate = isRealSuperAdmin && isSimulating;
@@ -158,16 +160,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     : roles;
 
   const effectiveUserType: string | null = canSimulate
-    ? (["developer", "dueno", "comisionista", "inversor"].includes(devRole) ? devRole : userType)
+    ? (["desarrollador", "propietario", "comisionista"].includes(devRole) ? devRole : userType)
     : userType;
 
-  const isAdminOrAsesor = effectiveRoles.some((r) =>
-    ["super_admin", "admin", "asesor"].includes(r)
+  const isAdminOrExperto = effectiveRoles.some((r) =>
+    ["super_admin", "admin", "experto"].includes(r as string)
   );
 
-  const isDeveloper = effectiveUserType === "developer" || effectiveRoles.some((r) => r === "developer");
+  // userType can be 'propietario' (new) or legacy 'dueno' until full migration
+  const isPropietario =
+    effectiveRoles.includes("propietario") ||
+    effectiveUserType === "propietario" ||
+    effectiveUserType === "dueno";
+
+  const isDesarrollador =
+    effectiveRoles.some((r) => r === "desarrollador") ||
+    effectiveUserType === "desarrollador";
+
   const isSuperAdmin = effectiveRoles.includes("super_admin");
-  const isInversor = effectiveRoles.includes("inversor") || effectiveUserType === "inversor";
+  const isComisionista =
+    effectiveRoles.includes("comisionista") || effectiveUserType === "comisionista";
 
   const signOut = async () => {
     try {
@@ -183,7 +195,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, roles: effectiveRoles, userType: effectiveUserType, loading, isAdminOrAsesor, isDeveloper, isSuperAdmin, isInversor, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        roles: effectiveRoles,
+        userType: effectiveUserType,
+        loading,
+        isAdminOrExperto,
+        isDesarrollador,
+        isSuperAdmin,
+        isPropietario,
+        isComisionista,
+        // Aliases (deprecated)
+        isAdminOrAsesor: isAdminOrExperto,
+        isDeveloper: isDesarrollador,
+        isInversor: isPropietario,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
