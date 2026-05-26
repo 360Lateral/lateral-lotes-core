@@ -35,7 +35,7 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 interface LoteForm {
   nombre_lote: string;
-  nombre_propietario: string;
+  propietario_id: string | null;
   ciudad: string;
   barrio: string;
   direccion: string;
@@ -55,7 +55,7 @@ interface LoteForm {
 
 const emptyForm: LoteForm = {
   nombre_lote: "",
-  nombre_propietario: "",
+  propietario_id: null,
   ciudad: "Medellín",
   barrio: "",
   direccion: "",
