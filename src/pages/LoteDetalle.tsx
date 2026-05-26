@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLoteDetalle } from "@/hooks/useLoteDetalle";
+import { useMiSolicitudParaLote } from "@/hooks/useMiSolicitudParaLote";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MapPin,
   Building2,
@@ -21,6 +22,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
 import NdaModal from "@/components/lotes/NdaModal";
+import SolicitarContactoDialog from "@/components/lotes/SolicitarContactoDialog";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
 const formatCOP = (n: number | undefined | null) =>
@@ -29,6 +31,7 @@ const formatCOP = (n: number | undefined | null) =>
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useLoteDetalle(id);
+  const { data: miSolicitud } = useMiSolicitudParaLote(id);
   const [ndaOpen, setNdaOpen] = useState(false);
   const [contactoOpen, setContactoOpen] = useState(false);
 
