@@ -69,24 +69,22 @@ const Bienvenida = () => {
   const preselect = searchParams.get("preselect") as Perfil | null;
   const [selected, setSelected] = useState<Perfil | null>(preselect);
   const navigate = useNavigate();
-  const { user, isAdminOrAsesor, userType, loading } = useAuth();
+  const { user, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, loading } = useAuth();
 
   // If already logged in, redirect based on role/userType
   useEffect(() => {
     if (!loading && user) {
-      if (isAdminOrAsesor) {
+      if (isAdminOrExperto) {
         navigate("/dashboard", { replace: true });
-      } else if (userType === "dueno") {
+      } else if (isPropietario || isComisionista) {
         navigate("/dashboard/owner", { replace: true });
-      } else if (userType === "developer") {
+      } else if (isDesarrollador) {
         navigate("/dashboard/developer", { replace: true });
-      } else if (userType === "comisionista") {
-        navigate("/dashboard/owner", { replace: true });
       } else {
         navigate("/lotes", { replace: true });
       }
     }
-  }, [user, loading, isAdminOrAsesor, userType, navigate]);
+  }, [user, loading, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, navigate]);
 
   const handleContinue = () => {
     if (!selected) return;
