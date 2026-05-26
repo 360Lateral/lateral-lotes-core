@@ -203,7 +203,28 @@ const DashboardLotes = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {l.propietario_id ? (
+                      <span className="text-foreground">
+                        {(propietariosMap as any)[l.propietario_id]?.nombre
+                          || (propietariosMap as any)[l.propietario_id]?.email
+                          || "—"}
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-[10px]">Sin propietario</Badge>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => setAsignarLote({ id: l.id, name: l.nombre_lote })}
+                        >
+                          <UserPlus className="mr-1 h-3.5 w-3.5" />
+                          Asignar
+                        </Button>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {l.area_total_m2 ? Number(l.area_total_m2).toLocaleString("es-CO") : "—"}
@@ -255,6 +276,20 @@ const DashboardLotes = () => {
                             <Eye className="h-4 w-4" /> Ver ficha
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {l.publicado_venta ? (
+                          <DropdownMenuItem
+                            onClick={() => setRetirarLote({ id: l.id, name: l.nombre_lote })}
+                          >
+                            <EyeOff className="mr-2 h-4 w-4" /> Retirar del mercado
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem
+                            onClick={() => setPublicarLote({ id: l.id, name: l.nombre_lote })}
+                          >
+                            <Store className="mr-2 h-4 w-4" /> Publicar en mercado
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
