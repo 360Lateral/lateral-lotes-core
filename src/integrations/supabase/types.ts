@@ -1659,6 +1659,64 @@ export type Database = {
           },
         ]
       }
+      ndas_firmados: {
+        Row: {
+          contenido_aceptado: string
+          created_at: string
+          desarrollador_id: string
+          fecha_firma: string
+          id: string
+          ip: string | null
+          lote_id: string
+          user_agent: string | null
+          version_nda: string
+        }
+        Insert: {
+          contenido_aceptado: string
+          created_at?: string
+          desarrollador_id: string
+          fecha_firma?: string
+          id?: string
+          ip?: string | null
+          lote_id: string
+          user_agent?: string | null
+          version_nda: string
+        }
+        Update: {
+          contenido_aceptado?: string
+          created_at?: string
+          desarrollador_id?: string
+          fecha_firma?: string
+          id?: string
+          ip?: string | null
+          lote_id?: string
+          user_agent?: string | null
+          version_nda?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ndas_firmados_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ndas_firmados_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ndas_firmados_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       negociaciones: {
         Row: {
           contacto_visible: boolean
@@ -1933,6 +1991,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          nivel_suscripcion: Database["public"]["Enums"]["nivel_suscripcion"]
           nombre: string | null
           onboarding_completado: boolean | null
           onboarding_paso: number | null
@@ -1946,6 +2005,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id: string
+          nivel_suscripcion?: Database["public"]["Enums"]["nivel_suscripcion"]
           nombre?: string | null
           onboarding_completado?: boolean | null
           onboarding_paso?: number | null
@@ -1959,6 +2019,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          nivel_suscripcion?: Database["public"]["Enums"]["nivel_suscripcion"]
           nombre?: string | null
           onboarding_completado?: boolean | null
           onboarding_paso?: number | null
@@ -2319,6 +2380,74 @@ export type Database = {
             columns: ["lote_id"]
             isOneToOne: false
             referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solicitudes_contacto: {
+        Row: {
+          created_at: string
+          desarrollador_id: string
+          estado: Database["public"]["Enums"]["estado_solicitud_contacto"]
+          fecha_procesado: string | null
+          id: string
+          lote_id: string
+          mensaje: string
+          notas_admin: string | null
+          procesado_por: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          desarrollador_id: string
+          estado?: Database["public"]["Enums"]["estado_solicitud_contacto"]
+          fecha_procesado?: string | null
+          id?: string
+          lote_id: string
+          mensaje: string
+          notas_admin?: string | null
+          procesado_por?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          desarrollador_id?: string
+          estado?: Database["public"]["Enums"]["estado_solicitud_contacto"]
+          fecha_procesado?: string | null
+          id?: string
+          lote_id?: string
+          mensaje?: string
+          notas_admin?: string | null
+          procesado_por?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitudes_contacto_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_contacto_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_contacto_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_contacto_procesado_por_fkey"
+            columns: ["procesado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2956,7 +3085,9 @@ export type Database = {
         | "rechazado"
         | "retirado"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
+      estado_solicitud_contacto: "pendiente" | "contactado" | "cerrado"
       nivel_notificacion: "amarillo" | "rojo"
+      nivel_suscripcion: "gratuito" | "basico" | "profesional" | "premium"
       tipo_entregable:
         | "diagnostico_inmobiliario"
         | "presentacion_diagnostico"
@@ -3148,7 +3279,9 @@ export const Constants = {
         "retirado",
       ],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
+      estado_solicitud_contacto: ["pendiente", "contactado", "cerrado"],
       nivel_notificacion: ["amarillo", "rojo"],
+      nivel_suscripcion: ["gratuito", "basico", "profesional", "premium"],
       tipo_entregable: [
         "diagnostico_inmobiliario",
         "presentacion_diagnostico",
