@@ -86,7 +86,8 @@ const exportarCsv = (filas: PortafolioVistaFila[]) => {
 };
 
 const PortafolioDashboard = () => {
-  const { isAdminOrAsesor, loading } = useAuth();
+  const { isAdminOrAsesor, isSuperAdmin, loading } = useAuth();
+  const navigate = useNavigate();
   const { data: kpis, isLoading: kpisLoading, error: kpisError, refetch } =
     usePortafolioKpis();
 
