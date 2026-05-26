@@ -78,7 +78,18 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isAdminOrAsesor } = useAuth();
+  const { isAdminOrAsesor, isSuperAdmin, roles } = useAuth();
+  const isAdminRole = roles.includes("admin");
+  const isExpertoOnly = roles.includes("experto") && !isAdminRole && !isSuperAdmin;
+
+  // Crear-nuevo propietario state
+  const [propietarioTab, setPropietarioTab] = useState<"existente" | "nuevo">("existente");
+  const [newPropEmail, setNewPropEmail] = useState("");
+  const [newPropNombre, setNewPropNombre] = useState("");
+  const [newPropTelefono, setNewPropTelefono] = useState("");
+  const [newPropErrors, setNewPropErrors] = useState<{ email?: string; nombre?: string }>({});
+  const { data: propietariosOptions = [], isLoading: isLoadingPropietarios } = usePropietariosList();
+  const invitarCliente = useInvitarCliente();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
   
