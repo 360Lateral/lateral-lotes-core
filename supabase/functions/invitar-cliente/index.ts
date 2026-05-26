@@ -99,9 +99,9 @@ Deno.serve(async (req) => {
         .select("role")
         .eq("user_id", ya.id);
       const rolesList = (roles ?? []).map((r) => r.role);
-      const soloInversor =
-        rolesList.length === 0 || rolesList.every((r) => r === "inversor");
-      if (!soloInversor) {
+      const soloPropietario =
+        rolesList.length === 0 || rolesList.every((r) => r === "propietario");
+      if (!soloPropietario) {
         return new Response(
           JSON.stringify({
             ok: false,
