@@ -342,6 +342,65 @@ const DashboardLotes = () => {
           onOpenChange={(o) => { if (!o) setEngagementLoteId(null); }}
         />
       )}
+
+      <AsignarPropietarioDialog
+        open={!!asignarLote}
+        onOpenChange={(o) => { if (!o) setAsignarLote(null); }}
+        loteId={asignarLote?.id ?? null}
+        loteName={asignarLote?.name}
+      />
+
+      <AlertDialog open={!!publicarLote} onOpenChange={(o) => { if (!o) setPublicarLote(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Publicar en el mercado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>{publicarLote?.name}</strong> quedará visible en el mercado y los desarrolladores podrán verlo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!publicarLote) return;
+                publicarMercado.mutate(publicarLote.id, {
+                  onSettled: () => setPublicarLote(null),
+                });
+              }}
+              disabled={publicarMercado.isPending}
+            >
+              {publicarMercado.isPending ? "Publicando…" : "Publicar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!retirarLote} onOpenChange={(o) => { if (!o) setRetirarLote(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Retirar del mercado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>{retirarLote?.name}</strong> dejará de aparecer en el mercado. Si tiene propietario, será notificado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (!retirarLote) return;
+                validarLote.mutate(
+                  { lote_id: retirarLote.id, decision: "retirado", notas: "Retirado por 360Lateral desde el panel" },
+                  { onSettled: () => setRetirarLote(null) }
+                );
+              }}
+              disabled={validarLote.isPending}
+            >
+              {validarLote.isPending ? "Retirando…" : "Retirar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
