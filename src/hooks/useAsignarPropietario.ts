@@ -12,23 +12,25 @@ export const usePropietariosList = () => {
   return useQuery({
     queryKey: ["propietarios-list"],
     queryFn: async (): Promise<PropietarioOption[]> => {
-      const { data, error } = await supabase
+      const { data: roles, error: rolesErr } = await supabase
         .from("user_roles")
-        .select("user_id, perfiles!user_roles_user_id_fkey(id, nombre, email)")
+        .select("user_id")
         .eq("role", "propietario");
-      if (error) throw error;
-      const rows = (data ?? []) as Array<{
-        user_id: string;
-        perfiles: { id: string; nombre: string | null; email: string | null } | null;
-      }>;
-      return rows
-        .filter((r) => r.perfiles)
-        .map((r) => ({
-          id: r.perfiles!.id,
-          nombre: r.perfiles!.nombre,
-          email: r.perfiles!.email,
-        }))
-        .sort((a, b) => (a.nombre || a.email || "").localeCompare(b.nombre || b.email || ""));
+      if (rolesErr) throw rolesErr;
+      const ids = Array.from(new Set((roles ?? []).map((r) => r.user_id))).filter(Boolean);
+      if (ids.length === 0) return [];
+
+      const { data: perfiles, error: perfErr } = await supabase
+        .from("perfiles")
+        .select("id, nombre, email")
+        .in("id", ids);
+      if (perfErr) throw perfErr;
+
+      return (perfiles ?? [])
+        .map((p) => ({ id: p.id, nombre: p.nombre, email: (p as any).email ?? null }))
+        .sort((a, b) =>
+          (a.nombre || a.email || "").localeCompare(b.nombre || b.email || "")
+        );
     },
   });
 };
