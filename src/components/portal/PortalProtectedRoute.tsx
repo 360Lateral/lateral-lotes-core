@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, roles, userType, isAdminOrAsesor, loading } = useAuth();
+  const { user, isAdminOrExperto, isPropietario, loading } = useAuth();
 
   if (loading) {
     return (
@@ -17,15 +17,12 @@ const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Admin/asesor/super_admin → dashboard interno
-  if (isAdminOrAsesor) {
+  // Admin/experto/super_admin → dashboard interno
+  if (isAdminOrExperto) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const isInversor =
-    roles.includes("inversor") || userType === "inversor";
-
-  if (!isInversor) {
+  if (!isPropietario) {
     return <Navigate to="/dashboard" replace />;
   }
 
