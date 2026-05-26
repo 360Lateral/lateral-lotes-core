@@ -1,4 +1,4 @@
-import { useState, useDeferredValue } from "react";
+import { useState, useDeferredValue, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,10 +25,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal, Briefcase } from "lucide-react";
+import {
+  Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3,
+  MoreHorizontal, Briefcase, UserPlus, Store, EyeOff,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import AsignarPropietarioDialog from "@/components/portafolio/AsignarPropietarioDialog";
 import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
+import { usePublicarLoteMercado } from "@/hooks/useAsignarPropietario";
+import { useValidarLote } from "@/hooks/useValidarLote";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -39,23 +45,66 @@ const estadoVariant = (e: string) => {
   }
 };
 
+interface LoteRow {
+  id: string;
+  nombre_lote: string;
+  ciudad: string | null;
+  barrio: string | null;
+  area_total_m2: number | null;
+  estado_disponibilidad: string;
+  destacado: boolean | null;
+  es_publico: boolean;
+  propietario_id: string | null;
+  publicado_venta: boolean;
+  estado_publicacion: string;
+}
+
 const DashboardLotes = () => {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
   const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
+  const [asignarLote, setAsignarLote] = useState<{ id: string; name: string } | null>(null);
+  const [publicarLote, setPublicarLote] = useState<{ id: string; name: string } | null>(null);
+  const [retirarLote, setRetirarLote] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const publicarMercado = usePublicarLoteMercado();
+  const validarLote = useValidarLote();
 
   const { data: lotes = [], isLoading } = useQuery({
     queryKey: ["dash-lotes-list"],
-    queryFn: async () => {
+    queryFn: async (): Promise<LoteRow[]> => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario, es_publico")
+        .select(
+          "id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, es_publico, propietario_id, publicado_venta, estado_publicacion"
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return (data ?? []) as LoteRow[];
+    },
+  });
+
+  // Resolve propietario names in one batch
+  const propietarioIds = useMemo(
+    () => Array.from(new Set(lotes.map((l) => l.propietario_id).filter(Boolean))) as string[],
+    [lotes]
+  );
+  const { data: propietariosMap = {} } = useQuery({
+    queryKey: ["dash-lotes-propietarios", propietarioIds],
+    enabled: propietarioIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("perfiles")
+        .select("id, nombre, email")
+        .in("id", propietarioIds);
+      if (error) throw error;
+      const map: Record<string, { nombre: string | null; email: string | null }> = {};
+      (data ?? []).forEach((p: any) => {
+        map[p.id] = { nombre: p.nombre, email: p.email };
+      });
+      return map;
     },
   });
 
