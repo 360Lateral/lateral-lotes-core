@@ -153,7 +153,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     setForm((prev) => ({
       ...prev,
       nombre_lote: existingLote.nombre_lote,
-      nombre_propietario: (existingLote as any).nombre_propietario ?? "",
+      propietario_id: (existingLote as any).propietario_id ?? null,
       ciudad: existingLote.ciudad ?? "Medellín",
       barrio: existingLote.barrio ?? "",
       direccion: existingLote.direccion ?? "",
