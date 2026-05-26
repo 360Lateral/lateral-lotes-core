@@ -86,6 +86,7 @@ const App = () => (
             <Route path="/dashboard/usuarios" element={<ProtectedRoute><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowOwner><PreferenciasUsuario /></ProtectedRoute>} />
