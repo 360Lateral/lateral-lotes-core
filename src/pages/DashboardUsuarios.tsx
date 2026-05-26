@@ -17,9 +17,12 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
+import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
+import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
+import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
 const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "propietario", "desarrollador"] as const;
 
@@ -51,6 +54,7 @@ interface UserRecord {
   full_name: string | null;
   user_type: string | null;
   activo: boolean;
+  nivel_suscripcion: NivelSuscripcion;
   roles: string[];
   comisionista_doc_estado: string | null;
   owner_ids: string[];
@@ -71,8 +75,11 @@ const DashboardUsuarios = () => {
   const [selectedOwnerId, setSelectedOwnerId] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [invitarOpen, setInvitarOpen] = useState(false);
+  const [nivelDialogUser, setNivelDialogUser] = useState<UserRecord | null>(null);
+  const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
 
   const isSuperAdmin = myRoles.includes("super_admin");
+  const isAdmin = myRoles.includes("admin") || isSuperAdmin;
 
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
     queryKey: ["admin-users"],
@@ -259,13 +266,14 @@ const DashboardUsuarios = () => {
                       <TableHead>Usuario</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Roles</TableHead>
+                      <TableHead>Nivel</TableHead>
                       <TableHead>Registro</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                           <Users className="mx-auto mb-2 h-8 w-8" />No se encontraron usuarios
                         </TableCell>
                       </TableRow>
@@ -314,6 +322,39 @@ const DashboardUsuarios = () => {
                                 </Badge>
                               ))}
                             </div>
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            {u.roles.includes("desarrollador") ? (
+                              <div className="flex items-center gap-1.5">
+                                <Badge variant="outline" className={`text-[10px] ${NIVEL_BADGE_CLASS[u.nivel_suscripcion] ?? ""}`}>
+                                  {u.nivel_suscripcion}
+                                </Badge>
+                                {isAdmin && (
+                                  <>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Cambiar nivel"
+                                      onClick={() => setNivelDialogUser(u)}
+                                    >
+                                      <Edit className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Historial de cambios"
+                                      onClick={() => setHistorialDialogUser(u)}
+                                    >
+                                      <Clock className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(u.created_at).toLocaleDateString("es-CO")}
@@ -468,6 +509,27 @@ const DashboardUsuarios = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        <CambiarNivelDialog
+          open={!!nivelDialogUser}
+          onOpenChange={(v) => !v && setNivelDialogUser(null)}
+          usuario={nivelDialogUser ? {
+            id: nivelDialogUser.id,
+            nombre: nivelDialogUser.full_name,
+            email: nivelDialogUser.email,
+            nivel_suscripcion: nivelDialogUser.nivel_suscripcion,
+          } : null}
+        />
+
+        <HistorialNivelDialog
+          open={!!historialDialogUser}
+          onOpenChange={(v) => !v && setHistorialDialogUser(null)}
+          usuario={historialDialogUser ? {
+            id: historialDialogUser.id,
+            nombre: historialDialogUser.full_name,
+            email: historialDialogUser.email,
+          } : null}
+        />
       </div>
     </DashboardLayout>
   );

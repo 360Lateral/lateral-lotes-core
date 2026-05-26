@@ -98,6 +98,7 @@ Deno.serve(async (req) => {
         full_name: u.user_metadata?.full_name ?? perfil?.nombre ?? null,
         user_type: perfil?.user_type ?? null,
         activo: perfil?.activo ?? true,
+        nivel_suscripcion: perfil?.nivel_suscripcion ?? "gratuito",
         roles: rolesMap.get(u.id) ?? [],
         comisionista_doc_estado: comDocStatus.get(u.id) ?? null,
         owner_ids: ownerAssocMap.get(u.id) ?? [],
