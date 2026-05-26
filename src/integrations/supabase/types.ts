@@ -2720,10 +2720,6 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
-      es_asesor_de_engagement: {
-        Args: { _engagement_id: string; _user_id: string }
-        Returns: boolean
-      }
       es_experto_de_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
@@ -2777,7 +2773,6 @@ export type Database = {
         }
         Returns: string
       }
-      is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
       is_admin_or_experto: { Args: { _user_id: string }; Returns: boolean }
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
