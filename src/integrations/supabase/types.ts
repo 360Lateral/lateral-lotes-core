@@ -2904,6 +2904,10 @@ export type Database = {
         Args: { _user_a: string; _user_b: string }
         Returns: boolean
       }
+      validar_lote: {
+        Args: { p_decision: string; p_lote_id: string; p_notas?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
