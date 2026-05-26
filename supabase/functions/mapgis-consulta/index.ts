@@ -398,7 +398,7 @@ serve(async (req) => {
         .select("role")
         .eq("user_id", user.id);
       const isAdmin = (roleRows ?? []).some((r: { role: string }) =>
-        ["super_admin", "admin", "asesor"].includes(r.role)
+        ["super_admin", "admin", "experto"].includes(r.role)
       );
 
       if (lot && (isAdmin || lot.owner_id === user.id)) {
