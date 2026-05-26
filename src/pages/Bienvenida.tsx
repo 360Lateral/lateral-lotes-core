@@ -8,7 +8,7 @@ import { Home, Building2, UserCheck, Check } from "lucide-react";
 
 const BIENVENIDA_IMG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85";
 
-type Perfil = "dueno" | "developer" | "comisionista";
+type Perfil = "propietario" | "desarrollador" | "comisionista";
 
 const perfiles: {
   id: Perfil;
@@ -21,7 +21,7 @@ const perfiles: {
   checkClass: string;
 }[] = [
   {
-    id: "dueno",
+    id: "propietario",
     icon: Home,
     titulo: "Tengo un lote",
     descripcion: "Quiero vender, desarrollar o conocer el valor de mi tierra",
@@ -37,7 +37,7 @@ const perfiles: {
   {
     id: "comisionista",
     icon: UserCheck,
-    titulo: "Represento a un dueño",
+    titulo: "Represento a un propietario",
     descripcion: "Soy comisionista o representante autorizado de un propietario",
     beneficios: [
       "Gestiona lotes en nombre del propietario",
@@ -49,7 +49,7 @@ const perfiles: {
     checkClass: "text-emerald-500",
   },
   {
-    id: "developer",
+    id: "desarrollador",
     icon: Building2,
     titulo: "Busco lotes",
     descripcion: "Quiero encontrar tierra para desarrollar o invertir",
