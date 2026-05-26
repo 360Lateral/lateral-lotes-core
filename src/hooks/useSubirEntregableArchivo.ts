@@ -9,6 +9,7 @@ interface SubirArgs {
   nombre: string;
   archivo: File;
   notas?: string;
+  tipoAnalisisId?: string | null;
 }
 
 const BUCKET = "entregables-clientes";
@@ -16,7 +17,7 @@ const BUCKET = "entregables-clientes";
 export const useSubirEntregableArchivo = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ engagementId, tipo, nombre, archivo, notas }: SubirArgs) => {
+    mutationFn: async ({ engagementId, tipo, nombre, archivo, notas, tipoAnalisisId }: SubirArgs) => {
       const path = `${engagementId}/${Date.now()}_${archivo.name}`;
       const { error: upErr } = await supabase.storage
         .from(BUCKET)
@@ -39,6 +40,7 @@ export const useSubirEntregableArchivo = () => {
           version: 1,
           notas: notas || null,
           subido_por: userId ?? null,
+          tipo_analisis_id: tipoAnalisisId ?? null,
         });
 
       if (insErr) {
@@ -49,6 +51,7 @@ export const useSubirEntregableArchivo = () => {
     },
     onSuccess: ({ engagementId }) => {
       qc.invalidateQueries({ queryKey: ["entregables-engagement", engagementId] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
       toast.success("Archivo subido como borrador");
     },
     onError: (e: any) => {

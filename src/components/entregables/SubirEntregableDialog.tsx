@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,34 +38,59 @@ interface Props {
   engagementId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Si se pasa, el Select de tipo queda bloqueado en este valor en ambas tabs. */
+  tipoForzado?: TipoEntregable;
+  /** Si se pasa, abre directamente en esta tab. */
+  tabInicial?: "archivo" | "url";
+  /** Si se pasa, persiste el entregable ligado a este tipo_analisis_id (tarea). */
+  tipoAnalisisId?: string | null;
 }
 
-const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
+const SubirEntregableDialog = ({
+  engagementId,
+  open,
+  onOpenChange,
+  tipoForzado,
+  tabInicial,
+  tipoAnalisisId,
+}: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Archivo
   const [archivo, setArchivo] = useState<File | null>(null);
-  const [tipoArchivo, setTipoArchivo] = useState<TipoEntregable>("diagnostico_inmobiliario");
+  const [tipoArchivo, setTipoArchivo] = useState<TipoEntregable>(
+    tipoForzado ?? "diagnostico_inmobiliario",
+  );
   const [nombreArchivo, setNombreArchivo] = useState("");
   const [notasArchivo, setNotasArchivo] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
   // URL
   const [url, setUrl] = useState("");
-  const [tipoUrl, setTipoUrl] = useState<TipoEntregable>("presentacion_diagnostico");
+  const [tipoUrl, setTipoUrl] = useState<TipoEntregable>(
+    tipoForzado ?? "presentacion_diagnostico",
+  );
   const [nombreUrl, setNombreUrl] = useState("");
   const [notasUrl, setNotasUrl] = useState("");
 
   const subir = useSubirEntregableArchivo();
   const agregarUrl = useAgregarUrlExterna();
 
+  // Sync defaults when tipoForzado changes
+  useEffect(() => {
+    if (tipoForzado) {
+      setTipoArchivo(tipoForzado);
+      setTipoUrl(tipoForzado);
+    }
+  }, [tipoForzado]);
+
   const reset = () => {
     setArchivo(null);
-    setTipoArchivo("diagnostico_inmobiliario");
+    setTipoArchivo(tipoForzado ?? "diagnostico_inmobiliario");
     setNombreArchivo("");
     setNotasArchivo("");
     setUrl("");
-    setTipoUrl("presentacion_diagnostico");
+    setTipoUrl(tipoForzado ?? "presentacion_diagnostico");
     setNombreUrl("");
     setNotasUrl("");
     setDragOver(false);
@@ -90,6 +115,7 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
       nombre: nombreArchivo.trim(),
       archivo,
       notas: notasArchivo.trim() || undefined,
+      tipoAnalisisId: tipoAnalisisId ?? null,
     });
     reset();
     onOpenChange(false);
@@ -104,10 +130,13 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
       nombre: nombreUrl.trim(),
       url: url.trim(),
       notas: notasUrl.trim() || undefined,
+      tipoAnalisisId: tipoAnalisisId ?? null,
     });
     reset();
     onOpenChange(false);
   };
+
+  const tipoBloqueado = !!tipoForzado;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
@@ -116,7 +145,7 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
           <DialogTitle>Subir / agregar entregable</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="archivo">
+        <Tabs defaultValue={tabInicial ?? "archivo"}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="archivo">Subir archivo</TabsTrigger>
             <TabsTrigger value="url">Agregar URL externa</TabsTrigger>
@@ -158,7 +187,11 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
 
             <div className="space-y-2">
               <Label>Tipo</Label>
-              <Select value={tipoArchivo} onValueChange={(v) => setTipoArchivo(v as TipoEntregable)}>
+              <Select
+                value={tipoArchivo}
+                onValueChange={(v) => setTipoArchivo(v as TipoEntregable)}
+                disabled={tipoBloqueado}
+              >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {TIPOS.map((t) => (
@@ -206,7 +239,11 @@ const SubirEntregableDialog = ({ engagementId, open, onOpenChange }: Props) => {
             </div>
             <div className="space-y-2">
               <Label>Tipo</Label>
-              <Select value={tipoUrl} onValueChange={(v) => setTipoUrl(v as TipoEntregable)}>
+              <Select
+                value={tipoUrl}
+                onValueChange={(v) => setTipoUrl(v as TipoEntregable)}
+                disabled={tipoBloqueado}
+              >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {TIPOS.map((t) => (

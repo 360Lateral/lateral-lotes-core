@@ -14,6 +14,7 @@ export interface TareaAnalisis {
   id: string;
   engagement_id: string;
   tipo_analisis_id: string;
+  responsable_id: string | null;
   estado: EstadoTarea;
   avance_pct: number;
   updated_at: string;
@@ -22,6 +23,9 @@ export interface TareaAnalisis {
     codigo: string;
     nombre: string;
     orden: number | null;
+  } | null;
+  responsable: {
+    nombre: string | null;
   } | null;
 }
 
@@ -33,8 +37,9 @@ export const useTareasEngagement = (engagementId: string | undefined) => {
       const { data, error } = await supabase
         .from("tareas_analisis")
         .select(
-          `id, engagement_id, tipo_analisis_id, estado, avance_pct, updated_at, created_at,
-           tipo_analisis:tipos_analisis!tareas_analisis_tipo_analisis_id_fkey ( codigo, nombre, orden )`,
+          `id, engagement_id, tipo_analisis_id, responsable_id, estado, avance_pct, updated_at, created_at,
+           tipo_analisis:tipos_analisis!tareas_analisis_tipo_analisis_id_fkey ( codigo, nombre, orden ),
+           responsable:perfiles!tareas_analisis_responsable_id_fkey ( nombre )`,
         )
         .eq("engagement_id", engagementId!);
       if (error) throw error;
