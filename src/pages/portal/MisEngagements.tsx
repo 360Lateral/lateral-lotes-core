@@ -5,11 +5,14 @@ import {
   useMisEngagementsCliente,
   EngagementClienteResumen,
 } from "@/hooks/cliente/useMisEngagementsCliente";
+import { useMisActivos } from "@/hooks/useMisActivos";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MisActivosTab from "@/components/portal/MisActivosTab";
 import {
   Folder,
   MapPin,
@@ -148,10 +151,51 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
   );
 };
 
-const MisEngagementsInner = () => {
+const ServiciosList = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { data, isLoading } = useMisEngagementsCliente();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {[...Array(2)].map((_, i) => (
+          <Skeleton key={i} className="h-56 w-full" />
+        ))}
+      </div>
+    );
+  }
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-16 flex flex-col items-center text-center gap-4">
+          <Folder className="h-16 w-16 text-muted-foreground/40" />
+          <div className="space-y-1 max-w-md">
+            <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
+            <p className="text-sm text-muted-foreground">
+              Si crees que esto es un error, contacta a tu asesor.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {data.map((e) => (
+        <EngagementCard
+          key={e.engagement_id}
+          e={e}
+          onClick={() => navigate(`/portal/engagement/${e.engagement_id}`)}
+        />
+      ))}
+    </div>
+  );
+};
+
+const PortalHomeInner = () => {
+  const { user } = useAuth();
+  const { data: engagements } = useMisEngagementsCliente();
+  const { data: activos = [] } = useMisActivos(user?.id);
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
@@ -159,52 +203,52 @@ const MisEngagementsInner = () => {
     user?.email?.split("@")[0] ||
     "Cliente";
 
-  const algunoListo = (data ?? []).some(
-    (e) => e.tiene_diagnostico && e.tiene_presentacion,
-  );
+  const serviciosCount = (engagements ?? []).filter(
+    (e) => e.estado !== "cancelado" && e.estado !== "cerrado"
+  ).length;
+  const activosPublicadosCount = activos.filter(
+    (a) => a.estado_publicacion === "aprobado"
+  ).length;
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
+    <div className="space-y-6">
+      <header className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
           Hola, {nombre}.
         </h1>
-        <p className="text-muted-foreground">
-          {algunoListo
-            ? "Tu Diagnóstico Inmobiliario y Presentación están disponibles."
-            : "Aquí están tus diagnósticos."}
+        <p className="text-muted-foreground text-sm">
+          Aquí encuentras tus servicios contratados y los activos que tienes
+          publicados en el mercado.
         </p>
       </header>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-56 w-full" />
-          ))}
-        </div>
-      ) : !data || data.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 flex flex-col items-center text-center gap-4">
-            <Folder className="h-16 w-16 text-muted-foreground/40" />
-            <div className="space-y-1 max-w-md">
-              <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
-              <p className="text-sm text-muted-foreground">
-                Si crees que esto es un error, contacta a tu asesor.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {data.map((e) => (
-            <EngagementCard
-              key={e.engagement_id}
-              e={e}
-              onClick={() => navigate(`/portal/engagement/${e.engagement_id}`)}
-            />
-          ))}
-        </div>
-      )}
+      <Tabs defaultValue="servicios" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-xl">
+          <TabsTrigger value="servicios" className="gap-2">
+            <span className="truncate">Mis servicios contratados</span>
+            {serviciosCount > 0 && (
+              <Badge variant="secondary" className="h-5 px-1.5">
+                {serviciosCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="activos" className="gap-2">
+            <span className="truncate">Mis activos en venta</span>
+            {activosPublicadosCount > 0 && (
+              <Badge variant="secondary" className="h-5 px-1.5">
+                {activosPublicadosCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="servicios" className="mt-6">
+          <ServiciosList />
+        </TabsContent>
+        <TabsContent value="activos" className="mt-6">
+          <MisActivosTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
@@ -212,7 +256,7 @@ const MisEngagementsInner = () => {
 const MisEngagements = () => (
   <PortalProtectedRoute>
     <PortalClienteLayout>
-      <MisEngagementsInner />
+      <PortalHomeInner />
     </PortalClienteLayout>
   </PortalProtectedRoute>
 );
