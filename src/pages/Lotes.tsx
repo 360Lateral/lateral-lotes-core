@@ -98,8 +98,8 @@ const Lotes = () => {
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
     queryFn: async () => {
-      const { data: lotesData, error } = await supabase
-        .from("lotes")
+      const { data: lotesData, error } = await (supabase as any)
+        .from("vw_lotes_publicos")
         .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios, es_publico");
       if (error) throw error;
 
