@@ -2735,6 +2735,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      importar_engagement_historico: {
+        Args: {
+          p_asesor_id: string
+          p_cliente_id: string
+          p_fecha_entrega: string
+          p_link_diagnostico: string
+          p_link_presentacion: string
+          p_lote_id: string
+          p_notas?: string
+          p_plan_id: string
+          p_precio_cobrado?: number
+          p_tareas_no_aplica?: string[]
+        }
+        Returns: string
+      }
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
