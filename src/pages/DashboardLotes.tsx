@@ -199,6 +199,7 @@ const DashboardLotes = () => {
               <tr className="border-b border-border bg-muted">
                 <th className="px-4 py-3 font-semibold text-foreground">Nombre</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Propietario</th>
+                <th className="px-4 py-3 font-semibold text-foreground">Plan</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Ciudad</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Área m²</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
