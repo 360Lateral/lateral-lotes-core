@@ -29,6 +29,7 @@ export const useActualizarEntregable = () => {
     },
     onSuccess: (cambios, vars) => {
       qc.invalidateQueries({ queryKey: ["entregables-engagement", vars.engagementId] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
       if (cambios.estado === "publicado") toast.success("Entregable publicado");
       else if (cambios.estado === "archivado") toast.success("Entregable archivado");
       else if (cambios.estado === "borrador") toast.success("Entregable despublicado");
