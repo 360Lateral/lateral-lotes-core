@@ -509,6 +509,27 @@ const DashboardUsuarios = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        <CambiarNivelDialog
+          open={!!nivelDialogUser}
+          onOpenChange={(v) => !v && setNivelDialogUser(null)}
+          usuario={nivelDialogUser ? {
+            id: nivelDialogUser.id,
+            nombre: nivelDialogUser.full_name,
+            email: nivelDialogUser.email,
+            nivel_suscripcion: nivelDialogUser.nivel_suscripcion,
+          } : null}
+        />
+
+        <HistorialNivelDialog
+          open={!!historialDialogUser}
+          onOpenChange={(v) => !v && setHistorialDialogUser(null)}
+          usuario={historialDialogUser ? {
+            id: historialDialogUser.id,
+            nombre: historialDialogUser.full_name,
+            email: historialDialogUser.email,
+          } : null}
+        />
       </div>
     </DashboardLayout>
   );
