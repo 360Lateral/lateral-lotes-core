@@ -45,6 +45,23 @@ const estadoVariant = (e: string) => {
   }
 };
 
+const planBadgeClass = (codigo?: string | null) => {
+  switch ((codigo ?? "").toLowerCase()) {
+    case "premium":
+      return "border-transparent bg-success text-primary-foreground hover:bg-success/90";
+    case "pro":
+    case "profesional":
+      return "border-transparent bg-warning text-primary-foreground hover:bg-warning/90";
+    case "basico":
+    case "básico":
+      return "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80";
+    case "gratuito":
+      return "border-transparent bg-muted text-muted-foreground hover:bg-muted/80";
+    default:
+      return "border-border bg-background text-muted-foreground";
+  }
+};
+
 interface LoteRow {
   id: string;
   nombre_lote: string;
