@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
-  const { user, userType, isAdminOrAsesor, isDeveloper, loading, signOut } = useAuth();
+  const { user, userType, isAdminOrExperto, isDesarrollador, isPropietario, isComisionista, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { toast } = useToast();
@@ -24,27 +24,29 @@ const Navbar = () => {
     user?.email?.split("@")[0] ||
     "Usuario";
 
+  const isOwnerLike = isPropietario || isComisionista;
+
   // Single dashboard route based on role
   const getDashboardRoute = () => {
-    if (isAdminOrAsesor) return "/dashboard";
-    if (isDeveloper) return "/dashboard/developer";
-    if (userType === "dueno" || userType === "comisionista") return "/dashboard/owner";
+    if (isAdminOrExperto) return "/dashboard";
+    if (isDesarrollador) return "/dashboard/developer";
+    if (isOwnerLike) return "/dashboard/owner";
     return null;
   };
 
   const dashboardRoute = getDashboardRoute();
-  const dashboardLabel = userType === "dueno" || userType === "comisionista" ? "Mi Panel" : "Dashboard";
+  const dashboardLabel = isOwnerLike ? "Mi Panel" : "Dashboard";
 
   // Contextual nav links based on user type
   const getNavLinks = () => {
-    if (user && (userType === "dueno" || userType === "comisionista")) {
+    if (user && isOwnerLike) {
       return [
         { label: "Mi panel", href: "/dashboard/owner" },
         { label: "Diagnóstico", href: "/diagnostico" },
         { label: "Catálogo público", href: "/lotes" },
       ];
     }
-    if (user && (userType === "developer" || isDeveloper)) {
+    if (user && isDesarrollador) {
       return [
         { label: "Catálogo", href: "/lotes" },
         { label: "Diagnóstico", href: "/diagnostico" },
