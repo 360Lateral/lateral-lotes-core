@@ -49,6 +49,8 @@ import NotFound from "./pages/NotFound";
 import MisEngagements from "./pages/portal/MisEngagements";
 import EngagementClienteDetalle from "./pages/portal/EngagementClienteDetalle";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
+import RecuperarContrasena from "./pages/RecuperarContrasena";
+import RestablecerContrasena from "./pages/RestablecerContrasena";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,8 @@ const App = () => (
             <Route path="/lotes" element={<Lotes />} />
             <Route path="/lotes/:id" element={<LoteDetalle />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+            <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
             <Route path="/bienvenida" element={<Bienvenida />} />
             <Route path="/diagnostico" element={<Diagnostico />} />
             <Route path="/diagnostico/resultado" element={<DiagnosticoResultado />} />

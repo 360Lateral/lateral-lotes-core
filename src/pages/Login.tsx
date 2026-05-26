@@ -229,6 +229,15 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => navigate("/recuperar-contrasena")}
+                  className="text-sm text-primary hover:underline font-body"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
             </div>
 
             {error && <p className="text-sm text-danger font-body">{error}</p>}
