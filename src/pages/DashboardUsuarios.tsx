@@ -266,13 +266,14 @@ const DashboardUsuarios = () => {
                       <TableHead>Usuario</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Roles</TableHead>
+                      <TableHead>Nivel</TableHead>
                       <TableHead>Registro</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                           <Users className="mx-auto mb-2 h-8 w-8" />No se encontraron usuarios
                         </TableCell>
                       </TableRow>
@@ -321,6 +322,39 @@ const DashboardUsuarios = () => {
                                 </Badge>
                               ))}
                             </div>
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            {u.roles.includes("desarrollador") ? (
+                              <div className="flex items-center gap-1.5">
+                                <Badge variant="outline" className={`text-[10px] ${NIVEL_BADGE_CLASS[u.nivel_suscripcion] ?? ""}`}>
+                                  {u.nivel_suscripcion}
+                                </Badge>
+                                {isAdmin && (
+                                  <>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Cambiar nivel"
+                                      onClick={() => setNivelDialogUser(u)}
+                                    >
+                                      <Edit className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Historial de cambios"
+                                      onClick={() => setHistorialDialogUser(u)}
+                                    >
+                                      <Clock className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(u.created_at).toLocaleDateString("es-CO")}
