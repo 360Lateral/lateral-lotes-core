@@ -39,6 +39,7 @@ import DashboardLoteAnalisis from "./pages/DashboardLoteAnalisis";
 import DashboardConfig from "./pages/DashboardConfig";
 import PortafolioDashboard from "./pages/PortafolioDashboard";
 import EngagementDetalle from "./pages/EngagementDetalle";
+import DashboardImportarEngagement from "./pages/DashboardImportarEngagement";
 import MetricasEjecutivas from "./pages/MetricasEjecutivas";
 import Bienvenida from "./pages/Bienvenida";
 import PreferenciasUsuario from "./pages/PreferenciasUsuario";
