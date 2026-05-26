@@ -1,4 +1,4 @@
-import { useState, useDeferredValue } from "react";
+import { useState, useDeferredValue, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,10 +25,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3, MoreHorizontal, Briefcase } from "lucide-react";
+import {
+  Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3,
+  MoreHorizontal, Briefcase, UserPlus, Store, EyeOff,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import AsignarPropietarioDialog from "@/components/portafolio/AsignarPropietarioDialog";
 import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
+import { usePublicarLoteMercado } from "@/hooks/useAsignarPropietario";
+import { useValidarLote } from "@/hooks/useValidarLote";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -39,23 +45,66 @@ const estadoVariant = (e: string) => {
   }
 };
 
+interface LoteRow {
+  id: string;
+  nombre_lote: string;
+  ciudad: string | null;
+  barrio: string | null;
+  area_total_m2: number | null;
+  estado_disponibilidad: string;
+  destacado: boolean | null;
+  es_publico: boolean;
+  propietario_id: string | null;
+  publicado_venta: boolean;
+  estado_publicacion: string;
+}
+
 const DashboardLotes = () => {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
   const [engagementLoteId, setEngagementLoteId] = useState<string | null>(null);
+  const [asignarLote, setAsignarLote] = useState<{ id: string; name: string } | null>(null);
+  const [publicarLote, setPublicarLote] = useState<{ id: string; name: string } | null>(null);
+  const [retirarLote, setRetirarLote] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const publicarMercado = usePublicarLoteMercado();
+  const validarLote = useValidarLote();
 
   const { data: lotes = [], isLoading } = useQuery({
     queryKey: ["dash-lotes-list"],
-    queryFn: async () => {
+    queryFn: async (): Promise<LoteRow[]> => {
       const { data, error } = await supabase
         .from("lotes")
-        .select("id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, nombre_propietario, es_publico")
+        .select(
+          "id, nombre_lote, ciudad, barrio, area_total_m2, estado_disponibilidad, destacado, es_publico, propietario_id, publicado_venta, estado_publicacion"
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return (data ?? []) as LoteRow[];
+    },
+  });
+
+  // Resolve propietario names in one batch
+  const propietarioIds = useMemo(
+    () => Array.from(new Set(lotes.map((l) => l.propietario_id).filter(Boolean))) as string[],
+    [lotes]
+  );
+  const { data: propietariosMap = {} } = useQuery({
+    queryKey: ["dash-lotes-propietarios", propietarioIds],
+    enabled: propietarioIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("perfiles")
+        .select("id, nombre, email")
+        .in("id", propietarioIds);
+      if (error) throw error;
+      const map: Record<string, { nombre: string | null; email: string | null }> = {};
+      (data ?? []).forEach((p: any) => {
+        map[p.id] = { nombre: p.nombre, email: p.email };
+      });
+      return map;
     },
   });
 
@@ -154,7 +203,28 @@ const DashboardLotes = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{(l as any).nombre_propietario ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {l.propietario_id ? (
+                      <span className="text-foreground">
+                        {(propietariosMap as any)[l.propietario_id]?.nombre
+                          || (propietariosMap as any)[l.propietario_id]?.email
+                          || "—"}
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-[10px]">Sin propietario</Badge>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => setAsignarLote({ id: l.id, name: l.nombre_lote })}
+                        >
+                          <UserPlus className="mr-1 h-3.5 w-3.5" />
+                          Asignar
+                        </Button>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {l.area_total_m2 ? Number(l.area_total_m2).toLocaleString("es-CO") : "—"}
@@ -207,6 +277,20 @@ const DashboardLotes = () => {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
+                        {l.publicado_venta ? (
+                          <DropdownMenuItem
+                            onClick={() => setRetirarLote({ id: l.id, name: l.nombre_lote })}
+                          >
+                            <EyeOff className="mr-2 h-4 w-4" /> Retirar del mercado
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem
+                            onClick={() => setPublicarLote({ id: l.id, name: l.nombre_lote })}
+                          >
+                            <Store className="mr-2 h-4 w-4" /> Publicar en mercado
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
                           onClick={() => { setDeleteId(l.id); setDeleteName(l.nombre_lote); }}
@@ -258,6 +342,65 @@ const DashboardLotes = () => {
           onOpenChange={(o) => { if (!o) setEngagementLoteId(null); }}
         />
       )}
+
+      <AsignarPropietarioDialog
+        open={!!asignarLote}
+        onOpenChange={(o) => { if (!o) setAsignarLote(null); }}
+        loteId={asignarLote?.id ?? null}
+        loteName={asignarLote?.name}
+      />
+
+      <AlertDialog open={!!publicarLote} onOpenChange={(o) => { if (!o) setPublicarLote(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Publicar en el mercado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>{publicarLote?.name}</strong> quedará visible en el mercado y los desarrolladores podrán verlo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!publicarLote) return;
+                publicarMercado.mutate(publicarLote.id, {
+                  onSettled: () => setPublicarLote(null),
+                });
+              }}
+              disabled={publicarMercado.isPending}
+            >
+              {publicarMercado.isPending ? "Publicando…" : "Publicar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!retirarLote} onOpenChange={(o) => { if (!o) setRetirarLote(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Retirar del mercado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>{retirarLote?.name}</strong> dejará de aparecer en el mercado. Si tiene propietario, será notificado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (!retirarLote) return;
+                validarLote.mutate(
+                  { lote_id: retirarLote.id, decision: "retirado", notas: "Retirado por 360Lateral desde el panel" },
+                  { onSettled: () => setRetirarLote(null) }
+                );
+              }}
+              disabled={validarLote.isPending}
+            >
+              {validarLote.isPending ? "Retirando…" : "Retirar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
