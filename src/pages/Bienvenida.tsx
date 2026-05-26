@@ -8,7 +8,7 @@ import { Home, Building2, UserCheck, Check } from "lucide-react";
 
 const BIENVENIDA_IMG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85";
 
-type Perfil = "dueno" | "developer" | "comisionista";
+type Perfil = "propietario" | "desarrollador" | "comisionista";
 
 const perfiles: {
   id: Perfil;
@@ -21,7 +21,7 @@ const perfiles: {
   checkClass: string;
 }[] = [
   {
-    id: "dueno",
+    id: "propietario",
     icon: Home,
     titulo: "Tengo un lote",
     descripcion: "Quiero vender, desarrollar o conocer el valor de mi tierra",
@@ -37,7 +37,7 @@ const perfiles: {
   {
     id: "comisionista",
     icon: UserCheck,
-    titulo: "Represento a un dueño",
+    titulo: "Represento a un propietario",
     descripcion: "Soy comisionista o representante autorizado de un propietario",
     beneficios: [
       "Gestiona lotes en nombre del propietario",
@@ -49,7 +49,7 @@ const perfiles: {
     checkClass: "text-emerald-500",
   },
   {
-    id: "developer",
+    id: "desarrollador",
     icon: Building2,
     titulo: "Busco lotes",
     descripcion: "Quiero encontrar tierra para desarrollar o invertir",
@@ -69,24 +69,22 @@ const Bienvenida = () => {
   const preselect = searchParams.get("preselect") as Perfil | null;
   const [selected, setSelected] = useState<Perfil | null>(preselect);
   const navigate = useNavigate();
-  const { user, isAdminOrAsesor, userType, loading } = useAuth();
+  const { user, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, loading } = useAuth();
 
   // If already logged in, redirect based on role/userType
   useEffect(() => {
     if (!loading && user) {
-      if (isAdminOrAsesor) {
+      if (isAdminOrExperto) {
         navigate("/dashboard", { replace: true });
-      } else if (userType === "dueno") {
+      } else if (isPropietario || isComisionista) {
         navigate("/dashboard/owner", { replace: true });
-      } else if (userType === "developer") {
+      } else if (isDesarrollador) {
         navigate("/dashboard/developer", { replace: true });
-      } else if (userType === "comisionista") {
-        navigate("/dashboard/owner", { replace: true });
       } else {
         navigate("/lotes", { replace: true });
       }
     }
-  }, [user, loading, isAdminOrAsesor, userType, navigate]);
+  }, [user, loading, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, navigate]);
 
   const handleContinue = () => {
     if (!selected) return;
@@ -130,7 +128,7 @@ const Bienvenida = () => {
               <div
                 className={`mb-4 flex h-14 w-14 items-center justify-center rounded-lg ${
                   isSelected
-                    ? perfil.id === "dueno"
+                    ? perfil.id === "propietario"
                       ? "bg-orange/20 text-orange"
                       : perfil.id === "comisionista"
                       ? "bg-emerald-500/20 text-emerald-500"

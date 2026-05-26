@@ -99,9 +99,9 @@ Deno.serve(async (req) => {
         .select("role")
         .eq("user_id", ya.id);
       const rolesList = (roles ?? []).map((r) => r.role);
-      const soloInversor =
-        rolesList.length === 0 || rolesList.every((r) => r === "inversor");
-      if (!soloInversor) {
+      const soloPropietario =
+        rolesList.length === 0 || rolesList.every((r) => r === "propietario");
+      if (!soloPropietario) {
         return new Response(
           JSON.stringify({
             ok: false,
@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
             nombre_completo,
             telefono: telefono ?? null,
             invitado_por: caller.id,
-            user_type: "inversor",
+            user_type: "propietario",
           },
           redirectTo,
         });
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
             nombre: nombre_completo,
             email: emailNorm,
             telefono: telefono ?? null,
-            user_type: "inversor",
+            user_type: "propietario",
             activo: true,
           },
           { onConflict: "id" },
@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
       const { error: rolErr } = await adminClient
         .from("user_roles")
         .upsert(
-          { user_id: newUserId, role: "inversor" },
+          { user_id: newUserId, role: "propietario" },
           { onConflict: "user_id,role" },
         );
       if (rolErr) {

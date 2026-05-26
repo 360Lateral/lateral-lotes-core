@@ -14,7 +14,7 @@ type Tab = "login" | "register";
 
 const Login = () => {
   const [searchParams] = useSearchParams();
-  const perfilParam = searchParams.get("perfil"); // "dueno" | "developer"
+  const perfilParam = searchParams.get("perfil"); // "propietario" | "desarrollador" | "comisionista"
   const [tab, setTab] = useState<Tab>(perfilParam ? "register" : "login");
 
   const [email, setEmail] = useState("");
@@ -26,38 +26,35 @@ const Login = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, userType, roles, loading: authLoading, isAdminOrAsesor } = useAuth();
-  const isInversor = roles.includes("inversor") || userType === "inversor";
+  const { user, userType, loading: authLoading, isAdminOrExperto, isPropietario, isDesarrollador, isComisionista } = useAuth();
 
   // Redirect based on AuthContext state after login
   useEffect(() => {
     if (!loginSuccess || authLoading) return;
     if (!user) return;
 
-    if (isAdminOrAsesor) {
+    if (isAdminOrExperto) {
       navigate("/dashboard", { replace: true });
-    } else if (isInversor) {
-      navigate("/portal", { replace: true });
-    } else if (userType === "dueno" || userType === "comisionista") {
+    } else if (isPropietario || isComisionista) {
       navigate("/dashboard/owner", { replace: true });
-    } else if (userType === "developer") {
+    } else if (isDesarrollador) {
       navigate("/lotes", { replace: true });
     } else {
       navigate("/lotes", { replace: true });
     }
-  }, [loginSuccess, authLoading, user, isAdminOrAsesor, isInversor, userType, navigate]);
+  }, [loginSuccess, authLoading, user, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, userType, navigate]);
 
   // Also redirect if user arrives at /login already authenticated
   useEffect(() => {
     if (authLoading || !user || loginSuccess) return;
-    if (isAdminOrAsesor) {
+    if (isAdminOrExperto) {
       navigate("/dashboard", { replace: true });
-    } else if (isInversor) {
+    } else if (isPropietario) {
       navigate("/portal", { replace: true });
     } else {
       navigate("/lotes", { replace: true });
     }
-  }, [authLoading, user, isAdminOrAsesor, isInversor, navigate, loginSuccess]);
+  }, [authLoading, user, isAdminOrExperto, isPropietario, navigate, loginSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,11 +129,13 @@ const Login = () => {
     setLoading(false);
   };
 
-  const perfilLabel = perfilParam === "dueno"
-    ? "Dueño de Lote"
-    : perfilParam === "developer"
-      ? "Desarrollador / Inversionista"
-      : null;
+  const perfilLabel = perfilParam === "propietario" || perfilParam === "dueno"
+    ? "Propietario de Lote"
+    : perfilParam === "desarrollador" || perfilParam === "developer"
+      ? "Desarrollador"
+      : perfilParam === "comisionista"
+        ? "Comisionista"
+        : null;
 
   const googleButton = (
     <div className="space-y-3">

@@ -16,23 +16,22 @@ const ROLE_LABELS: Record<DevRoleSimulated, string> = {
   none: "Sin simulación (mi rol real)",
   super_admin: "Super Admin",
   admin: "Admin",
-  asesor: "Asesor",
-  developer: "Desarrollador",
-  dueno: "Dueño",
+  experto: "Experto",
+  desarrollador: "Desarrollador",
+  propietario: "Propietario",
   comisionista: "Comisionista",
-  inversor: "Inversor",
 };
 
 const ROLE_HOME: Record<DevRoleSimulated, string> = {
   none: "/dashboard",
   super_admin: "/dashboard",
   admin: "/dashboard",
-  asesor: "/dashboard",
-  developer: "/dashboard/developer",
-  dueno: "/dashboard/owner",
+  experto: "/dashboard",
+  desarrollador: "/dashboard/developer",
+  propietario: "/dashboard/owner",
   comisionista: "/dashboard/owner",
-  inversor: "/lotes",
 };
+
 
 const DevRoleBanner = () => {
   const { roles, loading } = useAuth();

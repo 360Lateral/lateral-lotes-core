@@ -4,11 +4,10 @@ export type DevRoleSimulated =
   | "none"
   | "super_admin"
   | "admin"
-  | "asesor"
-  | "developer"
-  | "dueno"
-  | "comisionista"
-  | "inversor";
+  | "experto"
+  | "desarrollador"
+  | "propietario"
+  | "comisionista";
 
 interface DevRoleContextType {
   devRole: DevRoleSimulated;
@@ -25,7 +24,6 @@ const DevRoleContext = createContext<DevRoleContextType>({
 export const useDevRole = () => useContext(DevRoleContext);
 
 export const DevRoleProvider = ({ children }: { children: ReactNode }) => {
-  // No persistencia: se reinicia al recargar
   const [devRole, setDevRole] = useState<DevRoleSimulated>("none");
 
   const value = useMemo(

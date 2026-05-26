@@ -21,7 +21,7 @@ import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 
-const ALL_ROLES = ["super_admin", "admin", "asesor", "dueno", "comisionista", "inversor", "developer"] as const;
+const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "inversor", "developer"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin", admin: "Administrador", asesor: "Asesor",

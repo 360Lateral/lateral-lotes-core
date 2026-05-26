@@ -14,7 +14,7 @@ export const useAsesoresList = () => {
       const { data, error } = await supabase
         .from("user_roles")
         .select("user_id, role, perfiles!inner(id, nombre)")
-        .in("role", ["asesor", "admin", "super_admin"]);
+        .in("role", ["experto", "admin", "super_admin"]);
       if (error) throw error;
       const map = new Map<string, AsesorOption>();
       for (const r of (data ?? []) as any[]) {

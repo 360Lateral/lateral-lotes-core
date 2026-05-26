@@ -2701,6 +2701,10 @@ export type Database = {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
       }
+      es_experto_de_engagement: {
+        Args: { _engagement_id: string; _user_id: string }
+        Returns: boolean
+      }
       factor_avance_por_estado: {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
         Returns: number
@@ -2751,6 +2755,7 @@ export type Database = {
         Returns: string
       }
       is_admin_or_asesor: { Args: { _user_id: string }; Returns: boolean }
+      is_admin_or_experto: { Args: { _user_id: string }; Returns: boolean }
       is_negociacion_participant: {
         Args: { _negociacion_id: string; _user_id: string }
         Returns: boolean
@@ -2881,9 +2886,9 @@ export type Database = {
       app_role:
         | "super_admin"
         | "admin"
-        | "asesor"
-        | "inversor"
-        | "developer"
+        | "experto"
+        | "propietario"
+        | "desarrollador"
         | "dueno"
         | "comisionista"
       categoria_documento:
@@ -3061,9 +3066,9 @@ export const Constants = {
       app_role: [
         "super_admin",
         "admin",
-        "asesor",
-        "inversor",
-        "developer",
+        "experto",
+        "propietario",
+        "desarrollador",
         "dueno",
         "comisionista",
       ],

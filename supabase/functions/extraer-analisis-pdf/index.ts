@@ -158,7 +158,7 @@ serve(async (req) => {
     const { data: roleRows } = await supabaseAuth
       .from("user_roles").select("role").eq("user_id", user.id);
     const allowed = (roleRows ?? []).some((r: { role: string }) =>
-      ["super_admin", "admin", "asesor"].includes(r.role)
+      ["super_admin", "admin", "experto"].includes(r.role)
     );
     if (!allowed) {
       return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {

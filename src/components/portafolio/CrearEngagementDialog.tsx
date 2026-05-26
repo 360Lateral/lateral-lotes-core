@@ -55,7 +55,7 @@ const ESTADOS_VIGENTES = ["prospecto", "activo", "en_revision", "entregado"];
 
 const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
   const { user, roles } = useAuth();
-  const isAsesor = roles.some((r) => ["asesor", "admin", "super_admin"].includes(r));
+  const isAsesor = roles.some((r) => ["experto", "admin", "super_admin"].includes(r));
   const [confirmDup, setConfirmDup] = useState(false);
   const crear = useCrearEngagement();
 
@@ -158,7 +158,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
       const { data: rolesData } = await supabase
         .from("user_roles")
         .select("user_id, role")
-        .in("role", ["asesor", "admin", "super_admin"] as any);
+        .in("role", ["experto", "admin", "super_admin"] as any);
       const ids = Array.from(new Set((rolesData ?? []).map((r: any) => r.user_id)));
       if (ids.length === 0) return [];
       const { data: perfs } = await supabase

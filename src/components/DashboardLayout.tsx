@@ -61,7 +61,7 @@ const DashboardLayout = ({ children }: Props) => {
 
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
   const isSuperAdmin = roles.includes("super_admin" as any);
-  const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "asesor"].includes(r));
+  const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "experto"].includes(r));
   const isOwner = userType === "dueno" || userType === "comisionista";
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
