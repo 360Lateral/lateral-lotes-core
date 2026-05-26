@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
-import { useEngagementCliente, TareaAvance, EntregablePublicado } from "@/hooks/cliente/useEngagementCliente";
+import TarjetasMaestrosCliente from "@/components/portal/TarjetasMaestrosCliente";
+import {
+  useEngagementCliente,
+  TareaAvance,
+  EntregablePublicado,
+} from "@/hooks/cliente/useEngagementCliente";
 import { useDescargarEntregable } from "@/hooks/cliente/useDescargarEntregable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +30,14 @@ import {
   Loader2,
   FileText,
   User as UserIcon,
+  Paperclip,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+const TIPOS_MAESTROS = new Set([
+  "diagnostico_inmobiliario",
+  "presentacion_diagnostico",
+]);
 
 const formatoFecha = (fecha: string | null) => {
   if (!fecha) return "—";
@@ -40,8 +51,6 @@ const formatoFecha = (fecha: string | null) => {
 const planVariant = (codigo?: string | null) => {
   const c = (codigo || "").toLowerCase();
   if (c.includes("premium")) return { className: "bg-amber-500 hover:bg-amber-600 text-white" };
-  if (c.includes("pro")) return { className: "" };
-  if (c.includes("basico") || c.includes("básico")) return { className: "" };
   return { className: "" };
 };
 
@@ -73,10 +82,48 @@ const estadoTareaPill = (estado: string) => {
   );
 };
 
+const ChipSoporte = ({ ent }: { ent: EntregablePublicado }) => {
+  const { descargar } = useDescargarEntregable();
+  const [loading, setLoading] = useState(false);
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const url = await descargar(ent.id);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e: any) {
+      toast({
+        title: "No pudimos abrir el archivo",
+        description: e?.message || "Intenta de nuevo en unos minutos.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={loading}
+      className="inline-flex max-w-[220px] items-center gap-1.5 rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted disabled:opacity-60"
+      aria-label={`Abrir ${ent.nombre}`}
+    >
+      {loading ? (
+        <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+      ) : ent.tiene_url_externa ? (
+        <ExternalLink className="h-3 w-3 shrink-0" />
+      ) : (
+        <TipoEntregableIcon tipo={ent.tipo as TipoEntregable} size={12} />
+      )}
+      <span className="truncate">{ent.nombre}</span>
+    </button>
+  );
+};
+
 const EntregableRow = ({ ent }: { ent: EntregablePublicado }) => {
   const { descargar } = useDescargarEntregable();
   const [loading, setLoading] = useState(false);
-  const esExterno = !!ent.url_externa;
+  const esExterno = !!ent.tiene_url_externa;
   const handleClick = async () => {
     setLoading(true);
     try {
@@ -127,7 +174,29 @@ const EntregableRow = ({ ent }: { ent: EntregablePublicado }) => {
 const EngagementClienteDetalleInner = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useEngagementCliente(id);
+  const { data, isLoading } = useEngagementCliente(id);
+
+  const { diagnostico, presentacion, soportesPorTarea, sueltos } = useMemo(() => {
+    const ent = data?.entregables_publicados ?? [];
+    const diag = ent.find((e) => e.tipo === "diagnostico_inmobiliario");
+    const pres = ent.find((e) => e.tipo === "presentacion_diagnostico");
+    const soportes: Record<string, EntregablePublicado[]> = {};
+    const otros: EntregablePublicado[] = [];
+    for (const e of ent) {
+      if (TIPOS_MAESTROS.has(e.tipo)) continue;
+      if (e.tipo_analisis_id) {
+        (soportes[e.tipo_analisis_id] ||= []).push(e);
+      } else {
+        otros.push(e);
+      }
+    }
+    return {
+      diagnostico: diag,
+      presentacion: pres,
+      soportesPorTarea: soportes,
+      sueltos: otros,
+    };
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -139,7 +208,7 @@ const EngagementClienteDetalleInner = () => {
     );
   }
 
-  if (isError || !data) {
+  if (!data) {
     return (
       <Card>
         <CardContent className="py-16 text-center space-y-4">
@@ -156,7 +225,7 @@ const EngagementClienteDetalleInner = () => {
     );
   }
 
-  const { engagement, lote, plan, asesor, avance, entregables_publicados } = data;
+  const { engagement, lote, plan, asesor, avance } = data;
   const planUI = planVariant(plan?.codigo);
 
   return (
@@ -244,64 +313,94 @@ const EngagementClienteDetalleInner = () => {
         </CardContent>
       </Card>
 
-      {/* Bloque 2: avance detallado */}
+      {/* Bloque 2: TARJETAS MAESTRAS — destacadas arriba */}
+      <Separator />
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Tus entregables principales</h2>
+          <p className="text-sm text-muted-foreground">
+            Abre tu Diagnóstico y tu Presentación con un solo clic.
+          </p>
+        </div>
+        <TarjetasMaestrosCliente
+          diagnostico={diagnostico}
+          presentacion={presentacion}
+        />
+      </div>
+
+      {/* Bloque 3: avance detallado con soportes ligados */}
       {avance?.mostrar_detalle && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Avance detallado de tus análisis</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Sigue en tiempo real cómo va cada parte de tu diagnóstico.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(avance.tareas || []).length === 0 ? (
+        <>
+          <Separator />
+          <Card>
+            <CardHeader>
+              <CardTitle>Avance detallado de tus análisis</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Aún no hay análisis configurados.
+                Sigue en tiempo real cómo va cada parte de tu diagnóstico.
               </p>
-            ) : (
-              avance.tareas.map((t: TareaAvance) => (
-                <div
-                  key={t.id}
-                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-card"
-                >
-                  <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center shrink-0">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{t.nombre}</p>
-                  </div>
-                  {estadoTareaPill(t.estado)}
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {(avance.tareas || []).length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aún no hay análisis configurados.
+                </p>
+              ) : (
+                avance.tareas.map((t: TareaAvance) => {
+                  const soportes = t.tipo_analisis_id
+                    ? soportesPorTarea[t.tipo_analisis_id] ?? []
+                    : [];
+                  return (
+                    <div
+                      key={t.id}
+                      className="p-3 rounded-lg border border-border bg-card space-y-2"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center shrink-0">
+                          <FileText className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{t.nombre}</p>
+                        </div>
+                        {estadoTareaPill(t.estado)}
+                      </div>
+                      {soportes.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 pl-14">
+                          <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                          {soportes.map((s) => (
+                            <ChipSoporte key={s.id} ent={s} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
+        </>
       )}
 
-      {/* Bloque 3: entregables */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Entregables disponibles</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {(entregables_publicados || []).length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Tu asesor aún no ha publicado entregables. Te avisaremos cuando estén listos.
-            </p>
-          ) : (
-            <>
-              {entregables_publicados.map((e) => (
+      {/* Bloque 4: otros documentos compartidos */}
+      {sueltos.length > 0 && (
+        <>
+          <Separator />
+          <Card>
+            <CardHeader>
+              <CardTitle>Otros documentos compartidos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {sueltos.map((e) => (
                 <EntregableRow key={e.id} ent={e} />
               ))}
               <p className="text-xs text-muted-foreground pt-2">
                 Los enlaces de descarga son temporales y se generan en cada click.
               </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
-      {/* Bloque 4: contacto asesor */}
+      {/* Bloque 5: contacto asesor */}
       {asesor && (
         <Card>
           <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
