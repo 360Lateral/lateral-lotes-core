@@ -21,28 +21,28 @@ import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 
-const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "inversor", "developer"] as const;
+const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "propietario", "desarrollador"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
-  super_admin: "Super Admin", admin: "Administrador", asesor: "Asesor",
-  dueno: "Dueño", comisionista: "Comisionista", inversor: "Inversor", developer: "Developer",
+  super_admin: "Super Admin", admin: "Administrador", experto: "Experto",
+  dueno: "Dueño", comisionista: "Comisionista", propietario: "Propietario", desarrollador: "Desarrollador",
 };
 
 const ROLE_COLORS: Record<string, string> = {
   super_admin: "bg-destructive text-destructive-foreground",
   admin: "bg-primary text-primary-foreground",
-  asesor: "bg-accent text-accent-foreground",
+  experto: "bg-accent text-accent-foreground",
   dueno: "bg-primary/80 text-primary-foreground",
   comisionista: "bg-accent/80 text-accent-foreground",
-  inversor: "bg-muted text-muted-foreground",
-  developer: "bg-secondary text-secondary-foreground",
+  propietario: "bg-muted text-muted-foreground",
+  desarrollador: "bg-secondary text-secondary-foreground",
 };
 
 const USER_TYPES = [
   { value: "dueno", label: "Dueño" },
   { value: "comisionista", label: "Comisionista" },
-  { value: "developer", label: "Developer" },
-  { value: "inversor", label: "Inversor" },
+  { value: "desarrollador", label: "Desarrollador" },
+  { value: "propietario", label: "Propietario" },
 ];
 
 interface UserRecord {
@@ -160,7 +160,7 @@ const DashboardUsuarios = () => {
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
     const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
-    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "asesor"].includes(r)));
+    const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "experto"].includes(r)));
     return matchSearch && matchType;
   });
 
@@ -237,8 +237,8 @@ const DashboardUsuarios = () => {
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="dueno">Dueños de lote</SelectItem>
                 <SelectItem value="comisionista">Comisionistas</SelectItem>
-                <SelectItem value="developer">Desarrolladores</SelectItem>
-                <SelectItem value="inversor">Inversionistas</SelectItem>
+                <SelectItem value="desarrollador">Desarrolladores</SelectItem>
+                <SelectItem value="propietario">Propietarios</SelectItem>
                 <SelectItem value="admin">Administradores</SelectItem>
               </SelectContent>
             </Select>

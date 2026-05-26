@@ -270,7 +270,7 @@ const EngagementClienteDetalleInner = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{asesor.nombre || "Asesor"}</p>
+                    <p className="text-sm font-medium truncate">{asesor.nombre || "Experto"}</p>
                     {asesor.email && (
                       <p className="text-xs text-muted-foreground truncate">{asesor.email}</p>
                     )}

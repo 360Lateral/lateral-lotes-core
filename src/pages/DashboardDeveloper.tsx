@@ -306,6 +306,9 @@ const DashboardDeveloper = () => {
 
   return (
     <DashboardLayout>
+      <div className="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900">
+        <strong>Pantalla de debug interna.</strong> Esta vista es para depuración del sistema y NO está relacionada con el rol de usuario "Desarrollador" (que se gestiona en <code>/dashboard/usuarios</code>).
+      </div>
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-body text-xl font-bold text-foreground">Mis Criterios de Inversión</h1>

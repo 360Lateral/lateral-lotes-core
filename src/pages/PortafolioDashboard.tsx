@@ -49,7 +49,7 @@ const exportarCsv = (filas: PortafolioVistaFila[]) => {
     "Ciudad",
     "Plan",
     "Cliente",
-    "Asesor",
+    "Experto",
     "Estado",
     "Avance %",
     "SLA",
