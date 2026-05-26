@@ -39,6 +39,7 @@ import DashboardLoteAnalisis from "./pages/DashboardLoteAnalisis";
 import DashboardConfig from "./pages/DashboardConfig";
 import PortafolioDashboard from "./pages/PortafolioDashboard";
 import EngagementDetalle from "./pages/EngagementDetalle";
+import DashboardImportarEngagement from "./pages/DashboardImportarEngagement";
 import MetricasEjecutivas from "./pages/MetricasEjecutivas";
 import Bienvenida from "./pages/Bienvenida";
 import PreferenciasUsuario from "./pages/PreferenciasUsuario";
@@ -85,6 +86,7 @@ const App = () => (
             <Route path="/dashboard/usuarios" element={<ProtectedRoute><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowOwner><PreferenciasUsuario /></ProtectedRoute>} />

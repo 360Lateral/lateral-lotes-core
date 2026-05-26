@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { usePortafolioKpis } from "@/hooks/usePortafolioKpis";
@@ -15,7 +16,6 @@ import FiltrosPortafolio from "@/components/portafolio/FiltrosPortafolio";
 import TablaPortafolio from "@/components/portafolio/TablaPortafolio";
 import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
 
 const ESTADO_LABEL: Record<string, string> = {
   pendiente: "Pendiente",
@@ -86,7 +86,8 @@ const exportarCsv = (filas: PortafolioVistaFila[]) => {
 };
 
 const PortafolioDashboard = () => {
-  const { isAdminOrAsesor, loading } = useAuth();
+  const { isAdminOrAsesor, isSuperAdmin, loading } = useAuth();
+  const navigate = useNavigate();
   const { data: kpis, isLoading: kpisLoading, error: kpisError, refetch } =
     usePortafolioKpis();
 
@@ -120,13 +121,25 @@ const PortafolioDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-6">
-        <h1 className="font-body text-xl font-bold text-foreground">
-          Tablero de portafolio
-        </h1>
-        <p className="mt-1 font-body text-sm text-muted-foreground">
-          Estado de los diagnósticos por lote
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="font-body text-xl font-bold text-foreground">
+            Tablero de portafolio
+          </h1>
+          <p className="mt-1 font-body text-sm text-muted-foreground">
+            Estado de los diagnósticos por lote
+          </p>
+        </div>
+        {isSuperAdmin && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/dashboard/engagements/importar")}
+          >
+            <Upload className="h-4 w-4" />
+            Importar histórico
+          </Button>
+        )}
       </div>
 
       {kpisError ? (
