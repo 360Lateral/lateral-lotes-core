@@ -17,9 +17,12 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
+import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
+import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
+import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
 const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "propietario", "desarrollador"] as const;
 
@@ -51,6 +54,7 @@ interface UserRecord {
   full_name: string | null;
   user_type: string | null;
   activo: boolean;
+  nivel_suscripcion: NivelSuscripcion;
   roles: string[];
   comisionista_doc_estado: string | null;
   owner_ids: string[];
@@ -71,8 +75,11 @@ const DashboardUsuarios = () => {
   const [selectedOwnerId, setSelectedOwnerId] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [invitarOpen, setInvitarOpen] = useState(false);
+  const [nivelDialogUser, setNivelDialogUser] = useState<UserRecord | null>(null);
+  const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
 
   const isSuperAdmin = myRoles.includes("super_admin");
+  const isAdmin = myRoles.includes("admin") || isSuperAdmin;
 
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
     queryKey: ["admin-users"],
