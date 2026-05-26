@@ -11,6 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePropietariosList } from "@/hooks/useAsignarPropietario";
+import { useInvitarCliente } from "@/hooks/useInvitarCliente";
+import { toast as sonnerToast } from "sonner";
 
 import {
   Select,
@@ -20,15 +24,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, Loader2, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const SIN_ASIGNAR = "__SIN_ASIGNAR__";
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 
 
 
 interface LoteForm {
   nombre_lote: string;
-  nombre_propietario: string;
+  propietario_id: string | null;
   ciudad: string;
   barrio: string;
   direccion: string;
@@ -48,7 +55,7 @@ interface LoteForm {
 
 const emptyForm: LoteForm = {
   nombre_lote: "",
-  nombre_propietario: "",
+  propietario_id: null,
   ciudad: "Medellín",
   barrio: "",
   direccion: "",
@@ -71,7 +78,18 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isAdminOrAsesor } = useAuth();
+  const { isAdminOrAsesor, isSuperAdmin, roles } = useAuth();
+  const isAdminRole = roles.includes("admin");
+  const isExpertoOnly = roles.includes("experto") && !isAdminRole && !isSuperAdmin;
+
+  // Crear-nuevo propietario state
+  const [propietarioTab, setPropietarioTab] = useState<"existente" | "nuevo">("existente");
+  const [newPropEmail, setNewPropEmail] = useState("");
+  const [newPropNombre, setNewPropNombre] = useState("");
+  const [newPropTelefono, setNewPropTelefono] = useState("");
+  const [newPropErrors, setNewPropErrors] = useState<{ email?: string; nombre?: string }>({});
+  const { data: propietariosOptions = [], isLoading: isLoadingPropietarios } = usePropietariosList();
+  const invitarCliente = useInvitarCliente();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
   
@@ -135,7 +153,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     setForm((prev) => ({
       ...prev,
       nombre_lote: existingLote.nombre_lote,
-      nombre_propietario: (existingLote as any).nombre_propietario ?? "",
+      propietario_id: (existingLote as any).propietario_id ?? null,
       ciudad: existingLote.ciudad ?? "Medellín",
       barrio: existingLote.barrio ?? "",
       direccion: existingLote.direccion ?? "",
@@ -218,7 +236,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     mutationFn: async () => {
       const lotePayload = {
         nombre_lote: form.nombre_lote,
-        nombre_propietario: form.nombre_propietario || null,
+        propietario_id: form.propietario_id,
         ciudad: form.ciudad || null,
         barrio: form.barrio || null,
         direccion: form.direccion || null,
@@ -285,6 +303,51 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     },
   });
 
+  // Permisos para el campo Propietario
+  const hadPropietarioOriginally = isEdit && !!(existingLote as any)?.propietario_id;
+  const propietarioLocked = isExpertoOnly || (isEdit && hadPropietarioOriginally && !isSuperAdmin);
+  const canEditPropietario = !propietarioLocked;
+
+  const handleCrearNuevoPropietario = async () => {
+    const emailTrim = newPropEmail.trim();
+    const nombreTrim = newPropNombre.trim();
+    const errs: { email?: string; nombre?: string } = {};
+    if (!EMAIL_RE.test(emailTrim)) errs.email = "Email inválido";
+    if (nombreTrim.length < 4) errs.nombre = "Mínimo 4 caracteres";
+    setNewPropErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    try {
+      const data = await invitarCliente.mutateAsync({
+        email: emailTrim,
+        nombre_completo: nombreTrim,
+        telefono: newPropTelefono.trim() || undefined,
+      });
+      if (data?.conflicto_usuario_existente) {
+        sonnerToast.warning(
+          "Ese email pertenece a un usuario interno. Usa otro email o busca el propietario en 'Seleccionar existente'."
+        );
+        return;
+      }
+      if (!data?.user_id) {
+        sonnerToast.error("No se obtuvo el id del nuevo propietario");
+        return;
+      }
+      // Refrescar lista de propietarios y seleccionar el nuevo
+      await queryClient.invalidateQueries({ queryKey: ["propietarios-list"] });
+      setForm((prev) => ({ ...prev, propietario_id: data.user_id! }));
+      setNewPropEmail("");
+      setNewPropNombre("");
+      setNewPropTelefono("");
+      setPropietarioTab("existente");
+      sonnerToast.success(
+        "Propietario creado, ya está seleccionado. Completa los demás datos del lote y guarda."
+      );
+    } catch (err: any) {
+      sonnerToast.error(err?.message ?? "No se pudo crear el propietario");
+    }
+  };
+
   return (
     <DashboardLayout>
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
@@ -307,10 +370,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
               <Label className="text-xs">Nombre del lote *</Label>
               <Input required value={form.nombre_lote} onChange={(e) => update("nombre_lote", e.target.value)} />
             </div>
-            <div>
-              <Label className="text-xs">Nombre del propietario</Label>
-              <Input value={form.nombre_propietario} onChange={(e) => update("nombre_propietario", e.target.value)} placeholder="Ej: Juan Pérez o Constructora XYZ" />
-            </div>
+            {/* Propietario movido a su propia sección abajo */}
             <div>
               <Label className="text-xs">Ciudad</Label>
               <Input value={form.ciudad} onChange={(e) => update("ciudad", e.target.value)} />
@@ -354,7 +414,127 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           </CardContent>
         </Card>
 
-        {/* Foto del lote */}
+        {/* Propietario */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Propietario {isEdit ? "" : "*"}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {propietarioLocked ? (
+              <div className="space-y-2">
+                <Select value={form.propietario_id ?? SIN_ASIGNAR} disabled>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sin asignar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {form.propietario_id && (
+                      <SelectItem value={form.propietario_id}>
+                        {propietariosOptions.find((p) => p.id === form.propietario_id)?.nombre
+                          || propietariosOptions.find((p) => p.id === form.propietario_id)?.email
+                          || (existingLote as any)?.nombre_propietario
+                          || form.propietario_id}
+                      </SelectItem>
+                    )}
+                    <SelectItem value={SIN_ASIGNAR}>Sin asignar todavía</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="flex items-start gap-2 rounded-md border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  {isExpertoOnly
+                    ? "Solo admin o super_admin pueden cambiar el propietario."
+                    : "Solo super_admin puede cambiar el propietario de un lote ya asignado. Para liberar el lote, retira el propietario actual primero (acción super_admin)."}
+                </p>
+              </div>
+            ) : (
+              <Tabs value={propietarioTab} onValueChange={(v) => setPropietarioTab(v as "existente" | "nuevo")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="existente">Seleccionar existente</TabsTrigger>
+                  <TabsTrigger value="nuevo">Crear nuevo</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="existente" className="pt-3">
+                  <Select
+                    value={form.propietario_id ?? SIN_ASIGNAR}
+                    onValueChange={(v) =>
+                      setForm((prev) => ({ ...prev, propietario_id: v === SIN_ASIGNAR ? null : v }))
+                    }
+                    disabled={isLoadingPropietarios}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={isLoadingPropietarios ? "Cargando…" : "Selecciona un propietario"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={SIN_ASIGNAR}>Sin asignar todavía</SelectItem>
+                      {propietariosOptions.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.nombre || p.email || p.id}
+                          {p.email && p.nombre ? (
+                            <span className="text-muted-foreground"> — {p.email}</span>
+                          ) : null}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!form.propietario_id && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      El lote quedará sin propietario hasta que asignes uno.
+                    </p>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="nuevo" className="space-y-3 pt-3">
+                  <p className="text-xs text-muted-foreground">
+                    Al crear, el nuevo propietario recibirá un email de invitación. Quedará seleccionado en este formulario; termina de llenar el lote y guarda.
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-email">Email *</Label>
+                    <Input
+                      id="nuevo-prop-email"
+                      type="email"
+                      value={newPropEmail}
+                      onChange={(e) => setNewPropEmail(e.target.value)}
+                      placeholder="propietario@ejemplo.com"
+                      autoComplete="off"
+                      disabled={invitarCliente.isPending}
+                    />
+                    {newPropErrors.email && <p className="text-xs text-destructive">{newPropErrors.email}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-nombre">Nombre completo *</Label>
+                    <Input
+                      id="nuevo-prop-nombre"
+                      value={newPropNombre}
+                      onChange={(e) => setNewPropNombre(e.target.value)}
+                      placeholder="Nombre y apellido"
+                      disabled={invitarCliente.isPending}
+                    />
+                    {newPropErrors.nombre && <p className="text-xs text-destructive">{newPropErrors.nombre}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs" htmlFor="nuevo-prop-tel">Teléfono (opcional)</Label>
+                    <Input
+                      id="nuevo-prop-tel"
+                      type="tel"
+                      value={newPropTelefono}
+                      onChange={(e) => setNewPropTelefono(e.target.value)}
+                      placeholder="+57 300 000 0000"
+                      disabled={invitarCliente.isPending}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleCrearNuevoPropietario}
+                    disabled={invitarCliente.isPending}
+                  >
+                    {invitarCliente.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Crear propietario
+                  </Button>
+                </TabsContent>
+              </Tabs>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader><CardTitle className="text-base">Foto del lote</CardTitle></CardHeader>
           <CardContent>
