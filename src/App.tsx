@@ -41,6 +41,7 @@ import PortafolioDashboard from "./pages/PortafolioDashboard";
 import EngagementDetalle from "./pages/EngagementDetalle";
 import DashboardImportarEngagement from "./pages/DashboardImportarEngagement";
 import DashboardLotesPendientesValidacion from "./pages/DashboardLotesPendientesValidacion";
+import DashboardSolicitudesContacto from "./pages/DashboardSolicitudesContacto";
 import MetricasEjecutivas from "./pages/MetricasEjecutivas";
 import Bienvenida from "./pages/Bienvenida";
 import PreferenciasUsuario from "./pages/PreferenciasUsuario";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
+            <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute><DashboardSolicitudesContacto /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />

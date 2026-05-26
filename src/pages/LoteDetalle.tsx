@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLoteDetalle } from "@/hooks/useLoteDetalle";
+import { useMiSolicitudParaLote } from "@/hooks/useMiSolicitudParaLote";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MapPin,
   Building2,
@@ -21,6 +22,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
 import NdaModal from "@/components/lotes/NdaModal";
+import SolicitarContactoDialog from "@/components/lotes/SolicitarContactoDialog";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
 const formatCOP = (n: number | undefined | null) =>
@@ -29,6 +31,7 @@ const formatCOP = (n: number | undefined | null) =>
 const LoteDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useLoteDetalle(id);
+  const { data: miSolicitud } = useMiSolicitudParaLote(id);
   const [ndaOpen, setNdaOpen] = useState(false);
   const [contactoOpen, setContactoOpen] = useState(false);
 
@@ -83,20 +86,14 @@ const LoteDetalle = () => {
         <NdaModal open={ndaOpen} onOpenChange={setNdaOpen} loteId={id} />
       )}
 
-      <Dialog open={contactoOpen} onOpenChange={setContactoOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Solicitar contacto con el propietario</DialogTitle>
-            <DialogDescription>
-              Esta función se activa en el siguiente prompt (Prompt NN). Pronto podrás solicitar
-              contacto con el propietario mediado por 360Lateral.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setContactoOpen(false)}>Entendido</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {id && data && (
+        <SolicitarContactoDialog
+          open={contactoOpen}
+          onOpenChange={setContactoOpen}
+          loteId={id}
+          codigoAnonimo={data.codigo_anonimo}
+        />
+      )}
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         {/* Breadcrumb */}
@@ -318,8 +315,10 @@ const LoteDetalle = () => {
         </section>
 
         {/* Solicitar contacto */}
-        {(accesoCompleto || (["profesional", "premium"].includes(nivel) && tieneNda)) &&
-          !data.es_propietario && (
+        {["profesional", "premium"].includes(nivel) &&
+          tieneNda &&
+          !data.es_propietario &&
+          !data.es_admin && (
             <Card className="p-6 bg-primary/5 border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <h3 className="font-semibold">¿Te interesa este lote?</h3>
@@ -327,10 +326,29 @@ const LoteDetalle = () => {
                   Solicita contacto con el propietario mediado por 360Lateral.
                 </p>
               </div>
-              <Button onClick={() => setContactoOpen(true)}>
-                <Mail className="mr-2 h-4 w-4" />
-                Solicitar contacto
-              </Button>
+              {miSolicitud?.estado === "pendiente" ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Button disabled>
+                          <Mail className="mr-2 h-4 w-4" />
+                          Solicitud pendiente
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Ya tienes una solicitud pendiente para este lote. 360Lateral se pondrá en
+                      contacto pronto.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button onClick={() => setContactoOpen(true)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Solicitar contacto
+                </Button>
+              )}
             </Card>
           )}
       </div>
