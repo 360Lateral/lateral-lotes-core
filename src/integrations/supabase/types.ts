@@ -853,6 +853,60 @@ export type Database = {
           },
         ]
       }
+      audit_nivel_suscripcion: {
+        Row: {
+          cambiado_por: string | null
+          created_at: string
+          desarrollador_id: string
+          id: string
+          motivo: string | null
+          nivel_anterior:
+            | Database["public"]["Enums"]["nivel_suscripcion"]
+            | null
+          nivel_nuevo: Database["public"]["Enums"]["nivel_suscripcion"]
+          origen: string
+        }
+        Insert: {
+          cambiado_por?: string | null
+          created_at?: string
+          desarrollador_id: string
+          id?: string
+          motivo?: string | null
+          nivel_anterior?:
+            | Database["public"]["Enums"]["nivel_suscripcion"]
+            | null
+          nivel_nuevo: Database["public"]["Enums"]["nivel_suscripcion"]
+          origen?: string
+        }
+        Update: {
+          cambiado_por?: string | null
+          created_at?: string
+          desarrollador_id?: string
+          id?: string
+          motivo?: string | null
+          nivel_anterior?:
+            | Database["public"]["Enums"]["nivel_suscripcion"]
+            | null
+          nivel_nuevo?: Database["public"]["Enums"]["nivel_suscripcion"]
+          origen?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_nivel_suscripcion_cambiado_por_fkey"
+            columns: ["cambiado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_nivel_suscripcion_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultas_ia: {
         Row: {
           created_at: string
@@ -3012,6 +3066,15 @@ export type Database = {
           detalles: Json
           score: number
         }[]
+      }
+      cambiar_nivel_suscripcion: {
+        Args: {
+          p_desarrollador_id: string
+          p_motivo?: string
+          p_nivel_nuevo: Database["public"]["Enums"]["nivel_suscripcion"]
+          p_origen?: string
+        }
+        Returns: string
       }
       check_ai_quota: { Args: { _user_id: string }; Returns: boolean }
       consultar_norma_por_punto: {
