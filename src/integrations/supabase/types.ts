@@ -1451,6 +1451,7 @@ export type Database = {
           direccion: string | null
           es_publico: boolean
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
+          estado_publicacion: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato: number | null
           fondo_ml: number | null
           foto_url: string | null
@@ -1463,8 +1464,12 @@ export type Database = {
           nombre_lote: string
           nombre_propietario: string | null
           notas: string | null
+          notas_publicacion: string | null
           owner_id: string | null
+          precio_venta_estimado: number | null
           problema_juridico: string | null
+          propietario_id: string | null
+          publicado_venta: boolean
           score_ambiental: number | null
           score_arquitectonico: number | null
           score_financiero: number | null
@@ -1490,6 +1495,7 @@ export type Database = {
           direccion?: string | null
           es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
+          estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato?: number | null
           fondo_ml?: number | null
           foto_url?: string | null
@@ -1502,8 +1508,12 @@ export type Database = {
           nombre_lote: string
           nombre_propietario?: string | null
           notas?: string | null
+          notas_publicacion?: string | null
           owner_id?: string | null
+          precio_venta_estimado?: number | null
           problema_juridico?: string | null
+          propietario_id?: string | null
+          publicado_venta?: boolean
           score_ambiental?: number | null
           score_arquitectonico?: number | null
           score_financiero?: number | null
@@ -1529,6 +1539,7 @@ export type Database = {
           direccion?: string | null
           es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
+          estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato?: number | null
           fondo_ml?: number | null
           foto_url?: string | null
@@ -1541,8 +1552,12 @@ export type Database = {
           nombre_lote?: string
           nombre_propietario?: string | null
           notas?: string | null
+          notas_publicacion?: string | null
           owner_id?: string | null
+          precio_venta_estimado?: number | null
           problema_juridico?: string | null
+          propietario_id?: string | null
+          publicado_venta?: boolean
           score_ambiental?: number | null
           score_arquitectonico?: number | null
           score_financiero?: number | null
@@ -1557,7 +1572,15 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lotes_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mapgis_cache: {
         Row: {
@@ -2928,6 +2951,11 @@ export type Database = {
         | "descartado"
       estado_negociacion: "activa" | "en_revision" | "cerrada" | "concretada"
       estado_notificacion: "pendiente" | "leida" | "resuelta"
+      estado_publicacion_lote:
+        | "pendiente_validacion"
+        | "aprobado"
+        | "rechazado"
+        | "retirado"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
       nivel_notificacion: "amarillo" | "rojo"
       tipo_entregable:
@@ -3114,6 +3142,12 @@ export const Constants = {
       ],
       estado_negociacion: ["activa", "en_revision", "cerrada", "concretada"],
       estado_notificacion: ["pendiente", "leida", "resuelta"],
+      estado_publicacion_lote: [
+        "pendiente_validacion",
+        "aprobado",
+        "rechazado",
+        "retirado",
+      ],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
       nivel_notificacion: ["amarillo", "rojo"],
       tipo_entregable: [
