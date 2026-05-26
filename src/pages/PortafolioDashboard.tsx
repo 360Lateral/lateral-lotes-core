@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { usePortafolioKpis } from "@/hooks/usePortafolioKpis";
@@ -15,7 +16,6 @@ import FiltrosPortafolio from "@/components/portafolio/FiltrosPortafolio";
 import TablaPortafolio from "@/components/portafolio/TablaPortafolio";
 import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
 
 const ESTADO_LABEL: Record<string, string> = {
   pendiente: "Pendiente",
