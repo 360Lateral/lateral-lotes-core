@@ -21,7 +21,9 @@ import {
   BarChart3,
   TrendingUp,
   SlidersHorizontal,
+  ShieldCheck,
 } from "lucide-react";
+import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
@@ -35,6 +37,7 @@ const navItems = [
 ];
 
 const adminOnlyItems = [
+  { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
   { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
   { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
   { label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog },
