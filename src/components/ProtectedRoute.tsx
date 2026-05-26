@@ -4,12 +4,19 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Props {
   children: React.ReactNode;
   requireDeveloper?: boolean;
-  allowOwner?: boolean;
+  allowOwner?: boolean; // deprecated alias
+  allowPropietario?: boolean;
   requireSuperAdmin?: boolean;
 }
 
-const ProtectedRoute = ({ children, requireDeveloper, allowOwner, requireSuperAdmin }: Props) => {
-  const { user, roles, isAdminOrAsesor, isDeveloper, userType, loading } = useAuth();
+const ProtectedRoute = ({
+  children,
+  requireDeveloper,
+  allowOwner,
+  allowPropietario,
+  requireSuperAdmin,
+}: Props) => {
+  const { user, isAdminOrExperto, isDesarrollador, isPropietario, isComisionista, isSuperAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -23,8 +30,6 @@ const ProtectedRoute = ({ children, requireDeveloper, allowOwner, requireSuperAd
     return <Navigate to="/login" replace />;
   }
 
-  const isSuperAdmin = roles.includes("super_admin");
-
   if (requireSuperAdmin) {
     if (!isSuperAdmin) {
       return <Navigate to="/dashboard" replace />;
@@ -32,22 +37,23 @@ const ProtectedRoute = ({ children, requireDeveloper, allowOwner, requireSuperAd
     return <>{children}</>;
   }
 
-  const isOwner = userType === "dueno" || userType === "comisionista";
+  const isOwnerLike = isPropietario || isComisionista;
+  const allowsOwner = allowPropietario ?? allowOwner ?? false;
 
-  if (requireDeveloper && !isDeveloper && !isAdminOrAsesor) {
+  if (requireDeveloper && !isDesarrollador && !isAdminOrExperto) {
     return <Navigate to="/lotes" replace />;
   }
 
-  if (allowOwner && isOwner) {
+  if (allowsOwner && isOwnerLike) {
     return <>{children}</>;
   }
 
-  if (!requireDeveloper && !isAdminOrAsesor && !isDeveloper && !isOwner) {
+  if (!requireDeveloper && !isAdminOrExperto && !isDesarrollador && !isOwnerLike) {
     return <Navigate to="/bienvenida" replace />;
   }
 
-  // Owners without allowOwner on admin-only routes
-  if (!requireDeveloper && !allowOwner && isOwner && !isAdminOrAsesor) {
+  // Owners on admin-only routes
+  if (!requireDeveloper && !allowsOwner && isOwnerLike && !isAdminOrExperto) {
     return <Navigate to="/" replace />;
   }
 
