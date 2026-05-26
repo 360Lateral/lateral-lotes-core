@@ -2758,6 +2758,8 @@ export type Database = {
           mostrar_avance_al_cliente: boolean
           plan_codigo: string
           plan_nombre: string
+          tiene_diagnostico: boolean
+          tiene_presentacion: boolean
           total_entregables_publicados: number
         }[]
       }
