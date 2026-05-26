@@ -86,20 +86,14 @@ const LoteDetalle = () => {
         <NdaModal open={ndaOpen} onOpenChange={setNdaOpen} loteId={id} />
       )}
 
-      <Dialog open={contactoOpen} onOpenChange={setContactoOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Solicitar contacto con el propietario</DialogTitle>
-            <DialogDescription>
-              Esta función se activa en el siguiente prompt (Prompt NN). Pronto podrás solicitar
-              contacto con el propietario mediado por 360Lateral.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setContactoOpen(false)}>Entendido</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {id && data && (
+        <SolicitarContactoDialog
+          open={contactoOpen}
+          onOpenChange={setContactoOpen}
+          loteId={id}
+          codigoAnonimo={data.codigo_anonimo}
+        />
+      )}
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         {/* Breadcrumb */}
