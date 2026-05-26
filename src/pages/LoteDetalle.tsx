@@ -315,8 +315,10 @@ const LoteDetalle = () => {
         </section>
 
         {/* Solicitar contacto */}
-        {(accesoCompleto || (["profesional", "premium"].includes(nivel) && tieneNda)) &&
-          !data.es_propietario && (
+        {["profesional", "premium"].includes(nivel) &&
+          tieneNda &&
+          !data.es_propietario &&
+          !data.es_admin && (
             <Card className="p-6 bg-primary/5 border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <h3 className="font-semibold">¿Te interesa este lote?</h3>
@@ -324,10 +326,29 @@ const LoteDetalle = () => {
                   Solicita contacto con el propietario mediado por 360Lateral.
                 </p>
               </div>
-              <Button onClick={() => setContactoOpen(true)}>
-                <Mail className="mr-2 h-4 w-4" />
-                Solicitar contacto
-              </Button>
+              {miSolicitud?.estado === "pendiente" ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Button disabled>
+                          <Mail className="mr-2 h-4 w-4" />
+                          Solicitud pendiente
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Ya tienes una solicitud pendiente para este lote. 360Lateral se pondrá en
+                      contacto pronto.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button onClick={() => setContactoOpen(true)}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Solicitar contacto
+                </Button>
+              )}
             </Card>
           )}
       </div>
