@@ -177,6 +177,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_ambiental_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       analisis_arquitectonico: {
@@ -270,6 +277,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_arquitectonico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       analisis_documentos: {
@@ -320,6 +334,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_documentos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -423,6 +444,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_financiero_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       analisis_geotecnico: {
@@ -512,6 +540,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_geotecnico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -609,6 +644,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_juridico_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       analisis_mercado: {
@@ -698,6 +740,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_mercado_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -795,6 +844,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "analisis_sspp_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       consultas_ia: {
@@ -836,6 +892,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultas_ia_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -885,6 +948,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_matches_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -964,6 +1034,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "diagnosticos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       documentos_comisionista: {
@@ -1011,6 +1088,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -1215,6 +1299,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+          {
             foreignKeyName: "engagements_lote_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
@@ -1340,6 +1431,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favoritos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       fotos_lotes: {
@@ -1378,6 +1476,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fotos_lotes_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -1436,6 +1541,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -1715,6 +1827,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ndas_firmados_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       negociaciones: {
@@ -1762,6 +1881,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "negociaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -1859,6 +1985,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "normativa_urbana_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       notificaciones: {
@@ -1919,6 +2052,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notificaciones_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
           {
             foreignKeyName: "notificaciones_negociacion_id_fkey"
@@ -2322,6 +2462,13 @@ export type Database = {
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "precios_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
         ]
       }
       preferencias_usuario: {
@@ -2381,6 +2528,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "servicios_publicos_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }
@@ -2442,6 +2596,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_contacto_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
           {
             foreignKeyName: "solicitudes_contacto_procesado_por_fkey"
@@ -2737,6 +2898,48 @@ export type Database = {
         }
         Relationships: []
       }
+      vw_mercado_publico: {
+        Row: {
+          area_m2_redondeada: number | null
+          barrio: string | null
+          categoria_area: string | null
+          ciudad: string | null
+          codigo_anonimo: string | null
+          latitud_zona: number | null
+          longitud_zona: number | null
+          lote_id: string | null
+          publicado_en: string | null
+          rango_precio: string | null
+          uso_actual: string | null
+        }
+        Insert: {
+          area_m2_redondeada?: never
+          barrio?: string | null
+          categoria_area?: never
+          ciudad?: string | null
+          codigo_anonimo?: never
+          latitud_zona?: never
+          longitud_zona?: never
+          lote_id?: string | null
+          publicado_en?: string | null
+          rango_precio?: never
+          uso_actual?: string | null
+        }
+        Update: {
+          area_m2_redondeada?: never
+          barrio?: string | null
+          categoria_area?: never
+          ciudad?: string | null
+          codigo_anonimo?: never
+          latitud_zona?: never
+          longitud_zona?: never
+          lote_id?: string | null
+          publicado_en?: string | null
+          rango_precio?: never
+          uso_actual?: string | null
+        }
+        Relationships: []
+      }
       vw_portafolio_resumen: {
         Row: {
           asesor_id: string | null
@@ -2787,6 +2990,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lotes_publicos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
           },
         ]
       }

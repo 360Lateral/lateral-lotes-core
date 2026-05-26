@@ -1,200 +1,96 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2, TrendingUp, MapPin } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Loader2, TrendingUp } from "lucide-react";
+import FiltrosMercado from "@/components/mercado/FiltrosMercado";
+import HeatmapMapa from "@/components/mercado/HeatmapMapa";
+import TarjetaAnonima from "@/components/mercado/TarjetaAnonima";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-interface MunicipioStats {
-  ciudad: string;
-  count: number;
-  min: number;
-  max: number;
-  avg: number;
-}
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
+  useMercadoPublico,
+  type FiltrosMercado as FiltrosType,
+} from "@/hooks/useMercadoPublico";
 
 const Mercado = () => {
-  const [busqueda, setBusqueda] = useState("");
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["mercado-index"],
-    queryFn: async () => {
-      // Fetch lotes with their precios
-      const { data: lotesRaw } = await supabase
-        .from("lotes_publicos" as any)
-        .select("id, ciudad")
-        .not("ciudad", "is", null);
+  const [filtros, setFiltros] = useState<FiltrosType>({});
+  const { data: lotes = [], isLoading } = useMercadoPublico(filtros);
 
-      const lotes = (lotesRaw ?? []) as unknown as { id: string; ciudad: string }[];
-      if (lotes.length === 0) return [];
-
-      const loteIds = lotes.map((l) => l.id);
-
-      const { data: precios } = await supabase
-        .from("precios")
-        .select("lote_id, precio_m2_cop")
-        .in("lote_id", loteIds)
-        .not("precio_m2_cop", "is", null);
-
-      if (!precios || precios.length === 0) return [];
-
-      // Build ciudad → lote_id map
-      const loteMap = new Map<string, string>();
-      lotes.forEach((l) => {
-        if (l.ciudad) loteMap.set(l.id, l.ciudad);
-      });
-
-      // Group precios by ciudad
-      const groups = new Map<string, number[]>();
-      precios.forEach((p) => {
-        const ciudad = loteMap.get(p.lote_id);
-        if (!ciudad) return;
-        const key = ciudad.trim().toLowerCase();
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(Number(p.precio_m2_cop));
-      });
-
-      const result: MunicipioStats[] = [];
-      groups.forEach((values, key) => {
-        const ciudad = lotes.find(
-          (l) => l.ciudad?.trim().toLowerCase() === key
-        )?.ciudad ?? key;
-        result.push({
-          ciudad,
-          count: values.length,
-          min: Math.min(...values),
-          max: Math.max(...values),
-          avg: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
-        });
-      });
-
-      return result.sort((a, b) => b.count - a.count);
-    },
-  });
+  // Para poblar el select de ciudades, hacemos una consulta sin filtros (base)
+  const { data: baseLotes = [] } = useMercadoPublico({});
+  const ciudadesDisponibles = useMemo(() => {
+    const set = new Set<string>();
+    baseLotes.forEach((l) => l.ciudad && set.add(l.ciudad));
+    return Array.from(set).sort();
+  }, [baseLotes]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <main className="flex-1">
-        <div className="mx-auto max-w-4xl px-4 py-12 lg:py-20">
-          <div className="flex items-center gap-3 mb-2">
-            <TrendingUp className="h-7 w-7 text-primary" />
-            <h1 className="font-heading text-3xl font-bold text-secondary">
-              Índice de Mercado
-            </h1>
+        <div className="mx-auto max-w-7xl px-4 py-8 lg:py-12 space-y-6">
+          {/* Hero */}
+          <div className="text-center sm:text-left">
+            <div className="flex items-center gap-3 justify-center sm:justify-start mb-2">
+              <TrendingUp className="h-7 w-7 text-primary" />
+              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-secondary">
+                Mercado de activos disponibles
+              </h1>
+            </div>
+            <p className="text-muted-foreground max-w-2xl">
+              Explora lotes en venta validados por 360Lateral. Información anonimizada para proteger
+              la privacidad del propietario.
+            </p>
           </div>
-          <p className="text-muted-foreground mb-8">
-            Precios de referencia por m² en cada municipio, basados en lotes
-            publicados en la plataforma.
-          </p>
+
+          {/* Filtros */}
+          <FiltrosMercado
+            value={filtros}
+            onChange={setFiltros}
+            ciudadesDisponibles={ciudadesDisponibles}
+          />
+
+          {/* Heatmap */}
+          <HeatmapMapa lotes={lotes} />
+
+          {/* Resultados */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {isLoading
+                ? "Cargando..."
+                : `${lotes.length} ${lotes.length === 1 ? "activo encontrado" : "activos encontrados"}`}
+            </p>
+          </div>
 
           {isLoading ? (
             <div className="flex justify-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : !stats || stats.length === 0 ? (
-            <p className="text-muted-foreground text-center py-16">
-              Aún no hay datos de mercado disponibles.
-            </p>
+          ) : lotes.length === 0 ? (
+            <div className="text-center py-16 border border-dashed border-border rounded-xl">
+              <p className="text-muted-foreground">
+                No hay activos que coincidan con los filtros actuales.
+              </p>
+            </div>
           ) : (
-            <>
-              <Input
-                placeholder="Buscar municipio..."
-                className="mb-6 max-w-sm"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-              />
-              {(() => {
-                const statsFiltrados = (stats ?? []).filter(s =>
-                  s.ciudad.toLowerCase().includes(busqueda.toLowerCase())
-                );
-                return (
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-secondary text-secondary-foreground">
-                          <TableHead className="text-secondary-foreground font-semibold">
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4" /> Municipio
-                            </div>
-                          </TableHead>
-                          <TableHead className="text-secondary-foreground font-semibold text-right">
-                            Mín / m²
-                          </TableHead>
-                          <TableHead className="text-secondary-foreground font-semibold text-right">
-                            Promedio / m²
-                          </TableHead>
-                          <TableHead className="text-secondary-foreground font-semibold text-right">
-                            Máx / m²
-                          </TableHead>
-                          <TableHead className="text-secondary-foreground font-semibold text-center">
-                            Lotes
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {statsFiltrados.map((s) => (
-                          <TableRow key={s.ciudad}>
-                            <TableCell className="font-medium">{s.ciudad}</TableCell>
-                            <TableCell className="text-right text-muted-foreground">
-                              {formatCOP(s.min)}
-                            </TableCell>
-                            <TableCell className="text-right font-semibold text-primary">
-                              {formatCOP(s.avg)}
-                            </TableCell>
-                            <TableCell className="text-right text-muted-foreground">
-                              {formatCOP(s.max)}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {s.count >= 3 ? (
-                                <Badge variant="default" className="bg-success text-white text-xs">
-                                  {s.count} lotes
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-xs text-muted-foreground">
-                                  {s.count} lote — referencia limitada
-                                </Badge>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                );
-              })()}
-            </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lotes.map((l) => (
+                <TarjetaAnonima key={l.lote_id} lote={l} />
+              ))}
+            </div>
           )}
 
-          {/* Banner de conversión */}
-          <div className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-8 text-center">
+          {/* CTA final */}
+          <div className="mt-8 rounded-xl border border-primary/20 bg-primary/5 p-8 text-center">
             <h2 className="font-heading text-xl font-bold text-secondary mb-2">
-              ¿Tu lote no aparece en este índice?
+              ¿Eres desarrollador?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-              Solicita tu Diagnóstico 360° gratuito y te decimos cuánto vale tu tierra con base en referencias reales de mercado.
+              Regístrate para acceder a información detallada de los activos: normativa, análisis,
+              documentos y contacto con el propietario.
             </p>
             <Button asChild size="lg">
-              <Link to="/diagnostico">Solicitar diagnóstico gratuito</Link>
+              <Link to="/login">Crear cuenta</Link>
             </Button>
           </div>
         </div>
