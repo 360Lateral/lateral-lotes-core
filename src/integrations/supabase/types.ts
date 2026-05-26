@@ -3593,6 +3593,18 @@ export type Database = {
         Args: { _user_a: string; _user_b: string }
         Returns: boolean
       }
+      user_has_engagement_on_lote: {
+        Args: { _lote_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_has_nda_on_lote: {
+        Args: { _lote_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_shares_owner_org: {
+        Args: { _owner_id: string; _user_id: string }
+        Returns: boolean
+      }
       validar_lote: {
         Args: { p_decision: string; p_lote_id: string; p_notas?: string }
         Returns: undefined
