@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
-  const { user, userType, isAdminOrExperto, isDesarrollador, isPropietario, isComisionista, loading, signOut } = useAuth();
+  const { user, isAdminOrExperto, isDesarrollador, isPropietario, isComisionista, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { toast } = useToast();
