@@ -45,6 +45,23 @@ const estadoVariant = (e: string) => {
   }
 };
 
+const planBadgeClass = (codigo?: string | null) => {
+  switch ((codigo ?? "").toLowerCase()) {
+    case "premium":
+      return "border-transparent bg-success text-primary-foreground hover:bg-success/90";
+    case "pro":
+    case "profesional":
+      return "border-transparent bg-warning text-primary-foreground hover:bg-warning/90";
+    case "basico":
+    case "básico":
+      return "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80";
+    case "gratuito":
+      return "border-transparent bg-muted text-muted-foreground hover:bg-muted/80";
+    default:
+      return "border-border bg-background text-muted-foreground";
+  }
+};
+
 interface LoteRow {
   id: string;
   nombre_lote: string;
@@ -182,6 +199,7 @@ const DashboardLotes = () => {
               <tr className="border-b border-border bg-muted">
                 <th className="px-4 py-3 font-semibold text-foreground">Nombre</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Propietario</th>
+                <th className="px-4 py-3 font-semibold text-foreground">Plan</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Ciudad</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Área m²</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Estado</th>
@@ -194,14 +212,7 @@ const DashboardLotes = () => {
               {filtered.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted/50">
                   <td className="px-4 py-3 font-medium text-foreground">
-                    <div className="flex items-center gap-2">
-                      <span>{l.nombre_lote}</span>
-                      {(engagementsActivos as any)[l.id]?.planes_diagnostico?.nombre && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {(engagementsActivos as any)[l.id].planes_diagnostico.nombre}
-                        </Badge>
-                      )}
-                    </div>
+                    {l.nombre_lote}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {l.propietario_id ? (
@@ -223,6 +234,17 @@ const DashboardLotes = () => {
                           Asignar
                         </Button>
                       </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {(engagementsActivos as any)[l.id]?.planes_diagnostico?.nombre ? (
+                      <Badge
+                        className={`text-xs ${planBadgeClass((engagementsActivos as any)[l.id].planes_diagnostico.codigo)}`}
+                      >
+                        {(engagementsActivos as any)[l.id].planes_diagnostico.nombre}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{l.ciudad ?? "—"}</td>
@@ -304,7 +326,7 @@ const DashboardLotes = () => {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
                     No se encontraron lotes.
                   </td>
                 </tr>
