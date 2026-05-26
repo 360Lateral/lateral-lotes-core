@@ -1,0 +1,1 @@
+ALTER VIEW public.vw_mercado_publico SET (security_invoker = true);
