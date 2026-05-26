@@ -22,8 +22,10 @@ import {
   TrendingUp,
   SlidersHorizontal,
   ShieldCheck,
+  MessageCircle,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
+import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
@@ -38,6 +40,7 @@ const navItems = [
 
 const adminOnlyItems = [
   { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
+  { label: "Solicitudes de contacto", href: "/dashboard/solicitudes-contacto", icon: MessageCircle },
   { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
   { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
   { label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog },
@@ -115,6 +118,10 @@ const DashboardLayout = ({ children }: Props) => {
   const { data: pendientesValidacion = [] } = useLotesPendientesValidacion();
   const validarCount = isAdmin ? pendientesValidacion.length : 0;
 
+  // Cola de solicitudes de contacto pendientes (admin)
+  const { data: solicitudesPendientes = [] } = useSolicitudesContacto("pendiente");
+  const solicitudesCount = isAdmin ? solicitudesPendientes.length : 0;
+
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
     return location.pathname.startsWith(href);
@@ -135,7 +142,14 @@ const DashboardLayout = ({ children }: Props) => {
           const active = isActive(item.href, (item as any).end);
           const isNotifLink = item.href === "/dashboard/notificaciones";
           const isValidarLink = item.href === "/dashboard/lotes/pendientes-validacion";
-          const badgeNum = isNotifLink ? unreadCount : isValidarLink ? validarCount : 0;
+          const isSolicitudesLink = item.href === "/dashboard/solicitudes-contacto";
+          const badgeNum = isNotifLink
+            ? unreadCount
+            : isValidarLink
+            ? validarCount
+            : isSolicitudesLink
+            ? solicitudesCount
+            : 0;
           return (
             <Link
               key={item.href}
