@@ -111,6 +111,10 @@ const DashboardLayout = ({ children }: Props) => {
     },
   });
 
+  // Cola de validación pendiente (admin/super_admin)
+  const { data: pendientesValidacion = [] } = useLotesPendientesValidacion();
+  const validarCount = isAdmin ? pendientesValidacion.length : 0;
+
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
     return location.pathname.startsWith(href);
@@ -130,6 +134,8 @@ const DashboardLayout = ({ children }: Props) => {
         {finalItems.map((item) => {
           const active = isActive(item.href, (item as any).end);
           const isNotifLink = item.href === "/dashboard/notificaciones";
+          const isValidarLink = item.href === "/dashboard/lotes/pendientes-validacion";
+          const badgeNum = isNotifLink ? unreadCount : isValidarLink ? validarCount : 0;
           return (
             <Link
               key={item.href}
@@ -143,9 +149,9 @@ const DashboardLayout = ({ children }: Props) => {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
-              {isNotifLink && unreadCount > 0 && (
+              {badgeNum > 0 && (
                 <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 font-body text-[10px] font-bold text-primary-foreground">
-                  {unreadCount}
+                  {badgeNum}
                 </span>
               )}
             </Link>
