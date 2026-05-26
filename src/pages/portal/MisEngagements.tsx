@@ -1,13 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
-import { useMisEngagementsCliente, EngagementClienteResumen } from "@/hooks/cliente/useMisEngagementsCliente";
+import {
+  useMisEngagementsCliente,
+  EngagementClienteResumen,
+} from "@/hooks/cliente/useMisEngagementsCliente";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Folder, MapPin, Calendar, FileCheck } from "lucide-react";
+import {
+  Folder,
+  MapPin,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 
 const planVariant = (codigo?: string | null): {
   variant: "default" | "secondary" | "outline" | "destructive";
@@ -55,55 +65,86 @@ const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
   );
 };
 
+const ChipMaestro = ({
+  label,
+  ready,
+}: {
+  label: string;
+  ready: boolean;
+}) => {
+  if (ready) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        {label}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+      <Clock className="h-3.5 w-3.5" />
+      {label} · Pendiente
+    </span>
+  );
+};
+
 const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: () => void }) => {
   const plan = planVariant(e.plan_codigo);
-  const total = e.total_entregables_publicados ?? 0;
+  const ambosListos = e.tiene_diagnostico && e.tiene_presentacion;
+
   return (
-    <Card
+    <button
+      type="button"
       onClick={onClick}
-      className="cursor-pointer transition-shadow hover:shadow-md"
+      className="text-left transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
     >
-      <CardContent className="p-6 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className="text-lg font-semibold truncate">
-              {e.lote_nombre || "Lote sin nombre"}
-            </h3>
-            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-              <MapPin className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">
-                {[e.lote_direccion, e.lote_ciudad].filter(Boolean).join(", ") || "Ubicación no disponible"}
-              </span>
-            </p>
+      <Card className="overflow-hidden">
+        {ambosListos && (
+          <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+            <Sparkles className="h-4 w-4" />
+            Tu Diagnóstico está listo · Haz clic para abrirlo
           </div>
-          {e.plan_nombre && (
-            <Badge variant={plan.variant} className={plan.className}>
-              {e.plan_nombre}
-            </Badge>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Avance</span>
-            <span className="font-medium">{Math.round(e.avance_pct ?? 0)}%</span>
+        )}
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-lg font-semibold truncate">
+                {e.lote_nombre || "Lote sin nombre"}
+              </h3>
+              <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">
+                  {[e.lote_direccion, e.lote_ciudad].filter(Boolean).join(", ") || "Ubicación no disponible"}
+                </span>
+              </p>
+            </div>
+            {e.plan_nombre && (
+              <Badge variant={plan.variant} className={plan.className}>
+                {e.plan_nombre}
+              </Badge>
+            )}
           </div>
-          <Progress value={e.avance_pct ?? 0} />
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
-          <SlaPildora e={e} />
-        </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Avance</span>
+              <span className="font-medium">{Math.round(e.avance_pct ?? 0)}%</span>
+            </div>
+            <Progress value={e.avance_pct ?? 0} />
+          </div>
 
-        <div className="pt-3 border-t border-border text-sm text-muted-foreground flex items-center gap-1.5">
-          <FileCheck className="h-4 w-4" />
-          {total === 0 && "Aún no hay entregables disponibles"}
-          {total === 1 && "1 entregable disponible"}
-          {total > 1 && `${total} entregables disponibles`}
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
+            <SlaPildora e={e} />
+          </div>
+
+          <div className="pt-3 border-t border-border flex flex-wrap items-center gap-2">
+            <ChipMaestro label="Diagnóstico" ready={e.tiene_diagnostico} />
+            <ChipMaestro label="Presentación" ready={e.tiene_presentacion} />
+          </div>
+        </CardContent>
+      </Card>
+    </button>
   );
 };
 
@@ -118,6 +159,10 @@ const MisEngagementsInner = () => {
     user?.email?.split("@")[0] ||
     "Cliente";
 
+  const algunoListo = (data ?? []).some(
+    (e) => e.tiene_diagnostico && e.tiene_presentacion,
+  );
+
   return (
     <div className="space-y-8">
       <header className="space-y-2">
@@ -125,7 +170,9 @@ const MisEngagementsInner = () => {
           Hola, {nombre}.
         </h1>
         <p className="text-muted-foreground">
-          Aquí están tus diagnósticos.
+          {algunoListo
+            ? "Tu Diagnóstico Inmobiliario y Presentación están disponibles."
+            : "Aquí están tus diagnósticos."}
         </p>
       </header>
 
