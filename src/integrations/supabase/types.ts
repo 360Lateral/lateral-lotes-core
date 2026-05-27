@@ -164,6 +164,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "analisis_ambiental_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "analisis_ambiental_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
@@ -269,6 +276,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_arquitectonico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "analisis_arquitectonico_lote_id_fkey"
@@ -452,6 +466,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "analisis_financiero_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "analisis_financiero_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
@@ -554,6 +575,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_geotecnico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "analisis_geotecnico_lote_id_fkey"
@@ -666,6 +694,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "analisis_juridico_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "analisis_juridico_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
@@ -768,6 +803,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analisis_mercado_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "analisis_mercado_lote_id_fkey"
@@ -880,6 +922,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "analisis_sspp_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "analisis_sspp_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
@@ -955,11 +1004,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "audit_nivel_suscripcion_cambiado_por_fkey"
+            columns: ["cambiado_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "audit_nivel_suscripcion_desarrollador_id_fkey"
             columns: ["desarrollador_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_nivel_suscripcion_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
         ]
       }
@@ -1072,6 +1135,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_marco_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "contratos_marco_tipo_analisis_id_fkey"
@@ -1465,8 +1535,29 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "engagements_lote_asesor_asignado_id_fkey"
+            columns: ["asesor_asignado_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "engagements_lote_cliente_id_fkey"
             columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_gerente_id_fkey"
+            columns: ["gerente_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
@@ -1475,8 +1566,8 @@ export type Database = {
             foreignKeyName: "engagements_lote_gerente_id_fkey"
             columns: ["gerente_id"]
             isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "engagements_lote_lead_id_fkey"
@@ -1595,6 +1686,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregables_engagement_subido_por_fkey"
+            columns: ["subido_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "entregables_engagement_tipo_analisis_id_fkey"
@@ -1733,6 +1831,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "invitaciones_orden_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "invitaciones_orden_orden_id_fkey"
             columns: ["orden_id"]
             isOneToOne: false
@@ -1782,6 +1887,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_asignado_a_fkey"
+            columns: ["asignado_a"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "leads_lote_id_fkey"
@@ -1954,6 +2066,13 @@ export type Database = {
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lotes_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
         ]
       }
       mapgis_cache: {
@@ -2074,6 +2193,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ndas_firmados_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "ndas_firmados_lote_id_fkey"
@@ -2413,6 +2539,13 @@ export type Database = {
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notificaciones_sla_destinatario_id_fkey"
+            columns: ["destinatario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
         ]
       }
       ordenes_servicio: {
@@ -2482,6 +2615,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "ordenes_servicio_engagement_id_fkey"
@@ -2951,6 +3091,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "propuestas_experto_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "propuestas_experto_orden_id_fkey"
             columns: ["orden_id"]
             isOneToOne: false
@@ -3058,6 +3205,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "solicitudes_contacto_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
             foreignKeyName: "solicitudes_contacto_lote_id_fkey"
             columns: ["lote_id"]
             isOneToOne: false
@@ -3091,6 +3245,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_contacto_procesado_por_fkey"
+            columns: ["procesado_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
         ]
       }
@@ -3262,6 +3423,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_analisis_responsable_id_fkey"
+            columns: ["responsable_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "tareas_analisis_tipo_analisis_id_fkey"
@@ -3535,6 +3703,26 @@ export type Database = {
         }
         Relationships: []
       }
+      vw_metricas_experto: {
+        Row: {
+          email: string | null
+          experto_id: string | null
+          invitaciones_respondidas: number | null
+          nombre: string | null
+          propuestas_ganadas: number | null
+          propuestas_rechazadas: number | null
+          propuestas_retiradas: number | null
+          servicios_completados: number | null
+          sla_cumplido_pct: number | null
+          tasa_adjudicacion_pct: number | null
+          tasa_respuesta_invitacion_pct: number | null
+          tiempo_entrega_dias_avg: number | null
+          tiempo_respuesta_horas_avg: number | null
+          total_invitaciones: number | null
+          total_propuestas: number | null
+        }
+        Relationships: []
+      }
       vw_portafolio_resumen: {
         Row: {
           asesor_id: string | null
@@ -3571,6 +3759,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_lote_asesor_asignado_id_fkey"
+            columns: ["asesor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
           },
           {
             foreignKeyName: "engagements_lote_lote_id_fkey"
