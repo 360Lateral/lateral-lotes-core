@@ -26,6 +26,7 @@ import {
   ScrollText,
   ClipboardList,
   Briefcase,
+  Trophy,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
