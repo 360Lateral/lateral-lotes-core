@@ -54,6 +54,7 @@ import RestablecerContrasena from "./pages/RestablecerContrasena";
 import DashboardContratosMarco from "./pages/DashboardContratosMarco";
 import DashboardOrdenesServicio from "./pages/DashboardOrdenesServicio";
 import DashboardMisOrdenes from "./pages/DashboardMisOrdenes";
+import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
 import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
 
 const queryClient = new QueryClient();
