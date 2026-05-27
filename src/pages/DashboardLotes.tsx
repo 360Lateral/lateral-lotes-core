@@ -27,8 +27,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Plus, Pencil, FolderOpen, Eye, Star, Upload, Trash2, BarChart3,
-  MoreHorizontal, Briefcase, UserPlus, Store, EyeOff,
+  MoreHorizontal, Briefcase, UserPlus, Store, EyeOff, ClipboardList,
 } from "lucide-react";
+import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
 import { useToast } from "@/hooks/use-toast";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
 import AsignarPropietarioDialog from "@/components/portafolio/AsignarPropietarioDialog";
@@ -84,6 +85,7 @@ const DashboardLotes = () => {
   const [asignarLote, setAsignarLote] = useState<{ id: string; name: string } | null>(null);
   const [publicarLote, setPublicarLote] = useState<{ id: string; name: string } | null>(null);
   const [retirarLote, setRetirarLote] = useState<{ id: string; name: string } | null>(null);
+  const [ordenLoteId, setOrdenLoteId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const publicarMercado = usePublicarLoteMercado();
@@ -292,6 +294,9 @@ const DashboardLotes = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
                           <Briefcase className="mr-2 h-4 w-4" /> Crear engagement
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOrdenLoteId(l.id)}>
+                          <ClipboardList className="mr-2 h-4 w-4" /> Crear orden de servicio
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to={`/lotes/${l.id}`} target="_blank" className="flex items-center gap-2">
