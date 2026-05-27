@@ -28,6 +28,7 @@ import { useMisPropuestas } from "@/hooks/useMisPropuestas";
 import { useTengoPropuestaEnOrden } from "@/hooks/useTengoPropuestaEnOrden";
 import { useRetirarPropuesta } from "@/hooks/useRetirarPropuesta";
 import PostularmeDialog from "@/components/ordenes/PostularmeDialog";
+import MiDesempenoPanel from "@/components/ordenes/MiDesempenoPanel";
 
 const fmtCOP = (n: number) =>
   new Intl.NumberFormat("es-CO", {
