@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   MessageCircle,
   ScrollText,
+  ClipboardList,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
@@ -42,6 +43,7 @@ const navItems = [
 const adminOnlyItems = [
   { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
   { label: "Solicitudes de contacto", href: "/dashboard/solicitudes-contacto", icon: MessageCircle },
+  { label: "Órdenes de servicio", href: "/dashboard/ordenes-servicio", icon: ClipboardList },
   { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
   { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
   { label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog },
