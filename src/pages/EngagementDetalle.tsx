@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,9 @@ import {
   separarEntregables,
 } from "@/hooks/useEntregablesEngagement";
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
+import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
+
+import { ClipboardList } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 const EngagementDetalle = () => {
@@ -40,6 +43,7 @@ const EngagementDetalle = () => {
   const activar = useActivarEngagement();
 
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
+  const [ordenOpen, setOrdenOpen] = useState(false);
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
@@ -74,6 +78,14 @@ const EngagementDetalle = () => {
         ) : (
           <>
             <EngagementHeader engagement={engagement} />
+
+            {(isSuperAdmin || isAdminOrAsesor) && (
+              <div className="mt-4 flex justify-end">
+                <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
+                  <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
+                </Button>
+              </div>
+            )}
 
             {enBorrador && (
               <div className="mt-6 rounded-md border border-yellow-400 bg-yellow-50 p-4 dark:bg-yellow-950/30">
@@ -183,6 +195,14 @@ const EngagementDetalle = () => {
           </>
         )}
       </div>
+      {engagement && (
+        <CrearOrdenServicioDialog
+          open={ordenOpen}
+          onOpenChange={setOrdenOpen}
+          loteId={engagement.lote_id}
+          engagementId={engagement.id}
+        />
+      )}
     </DashboardLayout>
   );
 };
