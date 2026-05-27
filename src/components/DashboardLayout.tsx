@@ -23,6 +23,7 @@ import {
   SlidersHorizontal,
   ShieldCheck,
   MessageCircle,
+  ScrollText,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
@@ -85,6 +86,7 @@ const DashboardLayout = ({ children }: Props) => {
   ] : [];
 
   const superAdminItems = isSuperAdmin ? [
+    { label: "Contratos marco", href: "/dashboard/contratos-marco", icon: ScrollText },
     { label: "Configuración", href: "/dashboard/config", icon: Settings },
   ] : [];
 

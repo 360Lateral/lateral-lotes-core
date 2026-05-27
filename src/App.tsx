@@ -51,6 +51,7 @@ import EngagementClienteDetalle from "./pages/portal/EngagementClienteDetalle";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
 import RestablecerContrasena from "./pages/RestablecerContrasena";
+import DashboardContratosMarco from "./pages/DashboardContratosMarco";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ const App = () => (
             <Route path="/dashboard/leads" element={<ProtectedRoute><DashboardLeads /></ProtectedRoute>} />
             <Route path="/dashboard/usuarios" element={<ProtectedRoute><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
+            <Route path="/dashboard/contratos-marco" element={<ProtectedRoute requireSuperAdmin><DashboardContratosMarco /></ProtectedRoute>} />
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
