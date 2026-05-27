@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
+import { useOrdenesServicio } from "@/hooks/useOrdenesServicio";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlan, PLAN_LABELS } from "@/hooks/usePlan";
@@ -126,6 +127,10 @@ const DashboardLayout = ({ children }: Props) => {
   const { data: solicitudesPendientes = [] } = useSolicitudesContacto("pendiente");
   const solicitudesCount = isAdmin ? solicitudesPendientes.length : 0;
 
+  // Órdenes de servicio abiertas (admin)
+  const { data: ordenesAbiertas = [] } = useOrdenesServicio(isAdmin ? "abierta" : undefined);
+  const ordenesCount = isAdmin ? ordenesAbiertas.length : 0;
+
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
     return location.pathname.startsWith(href);
@@ -147,12 +152,15 @@ const DashboardLayout = ({ children }: Props) => {
           const isNotifLink = item.href === "/dashboard/notificaciones";
           const isValidarLink = item.href === "/dashboard/lotes/pendientes-validacion";
           const isSolicitudesLink = item.href === "/dashboard/solicitudes-contacto";
+          const isOrdenesLink = item.href === "/dashboard/ordenes-servicio";
           const badgeNum = isNotifLink
             ? unreadCount
             : isValidarLink
             ? validarCount
             : isSolicitudesLink
             ? solicitudesCount
+            : isOrdenesLink
+            ? ordenesCount
             : 0;
           return (
             <Link
