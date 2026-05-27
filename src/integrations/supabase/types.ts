@@ -1019,6 +1019,69 @@ export type Database = {
           },
         ]
       }
+      contratos_marco: {
+        Row: {
+          activo: boolean
+          contenido_legal: string
+          creado_por: string | null
+          created_at: string
+          id: string
+          moneda: string
+          plazo_max_dias: number
+          plazo_min_dias: number
+          precio_max: number
+          precio_min: number
+          tipo_analisis_id: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          activo?: boolean
+          contenido_legal: string
+          creado_por?: string | null
+          created_at?: string
+          id?: string
+          moneda?: string
+          plazo_max_dias: number
+          plazo_min_dias: number
+          precio_max: number
+          precio_min: number
+          tipo_analisis_id: string
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          activo?: boolean
+          contenido_legal?: string
+          creado_por?: string | null
+          created_at?: string
+          id?: string
+          moneda?: string
+          plazo_max_dias?: number
+          plazo_min_dias?: number
+          precio_max?: number
+          precio_min?: number
+          tipo_analisis_id?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_marco_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_marco_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       criteria_matches: {
         Row: {
           alerta_id: string
@@ -1645,6 +1708,39 @@ export type Database = {
           },
         ]
       }
+      invitaciones_orden: {
+        Row: {
+          experto_id: string
+          fecha_invitacion: string
+          orden_id: string
+        }
+        Insert: {
+          experto_id: string
+          fecha_invitacion?: string
+          orden_id: string
+        }
+        Update: {
+          experto_id?: string
+          fecha_invitacion?: string
+          orden_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitaciones_orden_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitaciones_orden_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: false
+            referencedRelation: "ordenes_servicio"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           asignado_a: string | null
@@ -2187,7 +2283,7 @@ export type Database = {
           created_at: string
           id: string
           leida: boolean
-          lote_id: string
+          lote_id: string | null
           mensaje: string
           negociacion_id: string | null
           score: number | null
@@ -2199,7 +2295,7 @@ export type Database = {
           created_at?: string
           id?: string
           leida?: boolean
-          lote_id: string
+          lote_id?: string | null
           mensaje: string
           negociacion_id?: string | null
           score?: number | null
@@ -2211,7 +2307,7 @@ export type Database = {
           created_at?: string
           id?: string
           leida?: boolean
-          lote_id?: string
+          lote_id?: string | null
           mensaje?: string
           negociacion_id?: string | null
           score?: number | null
@@ -2315,6 +2411,125 @@ export type Database = {
             columns: ["destinatario_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ordenes_servicio: {
+        Row: {
+          contrato_marco_id: string
+          creado_por: string | null
+          created_at: string
+          engagement_id: string | null
+          estado: Database["public"]["Enums"]["estado_orden_servicio"]
+          fecha_limite_propuestas: string
+          ganador_propuesta_id: string | null
+          id: string
+          lote_id: string
+          notas_admin: string | null
+          tipo_analisis_id: string
+          updated_at: string
+          visibilidad: Database["public"]["Enums"]["visibilidad_orden"]
+        }
+        Insert: {
+          contrato_marco_id: string
+          creado_por?: string | null
+          created_at?: string
+          engagement_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_orden_servicio"]
+          fecha_limite_propuestas: string
+          ganador_propuesta_id?: string | null
+          id?: string
+          lote_id: string
+          notas_admin?: string | null
+          tipo_analisis_id: string
+          updated_at?: string
+          visibilidad?: Database["public"]["Enums"]["visibilidad_orden"]
+        }
+        Update: {
+          contrato_marco_id?: string
+          creado_por?: string | null
+          created_at?: string
+          engagement_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_orden_servicio"]
+          fecha_limite_propuestas?: string
+          ganador_propuesta_id?: string | null
+          id?: string
+          lote_id?: string
+          notas_admin?: string | null
+          tipo_analisis_id?: string
+          updated_at?: string
+          visibilidad?: Database["public"]["Enums"]["visibilidad_orden"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_ordenes_ganador"
+            columns: ["ganador_propuesta_id"]
+            isOneToOne: false
+            referencedRelation: "propuestas_experto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_contrato_marco_id_fkey"
+            columns: ["contrato_marco_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_marco"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+          {
+            foreignKeyName: "ordenes_servicio_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
             referencedColumns: ["id"]
           },
         ]
@@ -2692,6 +2907,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      propuestas_experto: {
+        Row: {
+          estado: Database["public"]["Enums"]["estado_propuesta"]
+          experto_id: string
+          fecha_propuesta: string
+          id: string
+          mensaje_experto: string | null
+          orden_id: string
+          plazo_propuesto_dias: number
+          precio_propuesto: number
+          updated_at: string
+        }
+        Insert: {
+          estado?: Database["public"]["Enums"]["estado_propuesta"]
+          experto_id: string
+          fecha_propuesta?: string
+          id?: string
+          mensaje_experto?: string | null
+          orden_id: string
+          plazo_propuesto_dias: number
+          precio_propuesto: number
+          updated_at?: string
+        }
+        Update: {
+          estado?: Database["public"]["Enums"]["estado_propuesta"]
+          experto_id?: string
+          fecha_propuesta?: string
+          id?: string
+          mensaje_experto?: string | null
+          orden_id?: string
+          plazo_propuesto_dias?: number
+          precio_propuesto?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "propuestas_experto_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "propuestas_experto_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: false
+            referencedRelation: "ordenes_servicio"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       servicios_publicos: {
         Row: {
@@ -3656,6 +3922,13 @@ export type Database = {
         | "descartado"
       estado_negociacion: "activa" | "en_revision" | "cerrada" | "concretada"
       estado_notificacion: "pendiente" | "leida" | "resuelta"
+      estado_orden_servicio:
+        | "abierta"
+        | "adjudicada"
+        | "en_ejecucion"
+        | "completada"
+        | "cancelada"
+      estado_propuesta: "enviada" | "ganadora" | "rechazada" | "retirada"
       estado_publicacion_lote:
         | "pendiente_validacion"
         | "aprobado"
@@ -3671,6 +3944,7 @@ export type Database = {
         | "informe_area"
         | "documento_soporte"
         | "otro"
+      visibilidad_orden: "publica" | "invitacion"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3849,6 +4123,14 @@ export const Constants = {
       ],
       estado_negociacion: ["activa", "en_revision", "cerrada", "concretada"],
       estado_notificacion: ["pendiente", "leida", "resuelta"],
+      estado_orden_servicio: [
+        "abierta",
+        "adjudicada",
+        "en_ejecucion",
+        "completada",
+        "cancelada",
+      ],
+      estado_propuesta: ["enviada", "ganadora", "rechazada", "retirada"],
       estado_publicacion_lote: [
         "pendiente_validacion",
         "aprobado",
@@ -3866,6 +4148,7 @@ export const Constants = {
         "documento_soporte",
         "otro",
       ],
+      visibilidad_orden: ["publica", "invitacion"],
     },
   },
 } as const
