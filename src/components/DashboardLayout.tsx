@@ -47,6 +47,7 @@ const adminOnlyItems = [
   { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
   { label: "Solicitudes de contacto", href: "/dashboard/solicitudes-contacto", icon: MessageCircle },
   { label: "Órdenes de servicio", href: "/dashboard/ordenes-servicio", icon: ClipboardList },
+  { label: "Desempeño expertos", href: "/dashboard/metricas/expertos", icon: Trophy },
   { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
   { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
   { label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog },
