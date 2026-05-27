@@ -28,6 +28,7 @@ import { useMisPropuestas } from "@/hooks/useMisPropuestas";
 import { useTengoPropuestaEnOrden } from "@/hooks/useTengoPropuestaEnOrden";
 import { useRetirarPropuesta } from "@/hooks/useRetirarPropuesta";
 import PostularmeDialog from "@/components/ordenes/PostularmeDialog";
+import MiDesempenoPanel from "@/components/ordenes/MiDesempenoPanel";
 
 const fmtCOP = (n: number) =>
   new Intl.NumberFormat("es-CO", {
@@ -262,6 +263,7 @@ const DashboardMisOrdenes = () => {
                 </span>
               )}
             </TabsTrigger>
+            <TabsTrigger value="mi-desempeno">Mi desempeño</TabsTrigger>
           </TabsList>
 
           <TabsContent value="disponibles" className="mt-4">
@@ -313,6 +315,10 @@ const DashboardMisOrdenes = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="mi-desempeno" className="mt-4">
+            <MiDesempenoPanel />
           </TabsContent>
         </Tabs>
       </div>

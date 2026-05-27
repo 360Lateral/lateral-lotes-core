@@ -54,6 +54,7 @@ import RestablecerContrasena from "./pages/RestablecerContrasena";
 import DashboardContratosMarco from "./pages/DashboardContratosMarco";
 import DashboardOrdenesServicio from "./pages/DashboardOrdenesServicio";
 import DashboardMisOrdenes from "./pages/DashboardMisOrdenes";
+import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
 import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
 
 const queryClient = new QueryClient();
@@ -101,6 +102,7 @@ const App = () => (
             <Route path="/dashboard/ordenes-servicio" element={<ProtectedRoute><DashboardOrdenesServicio /></ProtectedRoute>} />
             <Route path="/dashboard/ordenes-servicio/:id" element={<ProtectedRoute><DashboardOrdenServicioDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/mis-ordenes" element={<ProtectedRoute><DashboardMisOrdenes /></ProtectedRoute>} />
+            <Route path="/dashboard/metricas/expertos" element={<ProtectedRoute><DashboardMetricasExpertos /></ProtectedRoute>} />
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
