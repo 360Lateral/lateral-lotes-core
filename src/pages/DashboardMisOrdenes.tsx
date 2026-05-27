@@ -215,7 +215,7 @@ const PropuestaItem = ({ propuesta }: { propuesta: any }) => {
           {propuesta.estado === "ganadora" && (
             <Button
               size="sm"
-              onClick={() => navigate(`/dashboard/ordenes-servicio`)}
+              onClick={() => navigate(`/dashboard/ordenes-servicio/${propuesta.orden_id}`)}
             >
               Ver orden
             </Button>

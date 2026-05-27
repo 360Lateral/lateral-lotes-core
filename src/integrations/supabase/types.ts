@@ -3608,6 +3608,10 @@ export type Database = {
         Args: { p_engagement_id: string }
         Returns: undefined
       }
+      adjudicar_propuesta: {
+        Args: { p_orden_id: string; p_propuesta_id: string }
+        Returns: undefined
+      }
       calcular_match_score: {
         Args: { p_alerta_id: string; p_lote_id: string }
         Returns: {
@@ -3623,6 +3627,10 @@ export type Database = {
           p_origen?: string
         }
         Returns: string
+      }
+      cancelar_orden_servicio: {
+        Args: { p_motivo?: string; p_orden_id: string }
+        Returns: undefined
       }
       check_ai_quota: { Args: { _user_id: string }; Returns: boolean }
       consultar_norma_por_punto: {

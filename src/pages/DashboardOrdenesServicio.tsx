@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useOrdenesServicio } from "@/hooks/useOrdenesServicio";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,18 +77,9 @@ const OrdenCard = ({ orden }: { orden: any }) => {
           </p>
         )}
         <p className="text-xs">Propuestas recibidas: <strong>{count}</strong></p>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button size="sm" variant="outline" disabled className="w-full">
-                  Ver detalle
-                </Button>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>Disponible próximamente — Prompt YY</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Button asChild size="sm" variant="outline" className="w-full">
+          <Link to={`/dashboard/ordenes-servicio/${orden.id}`}>Ver detalle</Link>
+        </Button>
       </CardContent>
     </Card>
   );
