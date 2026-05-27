@@ -316,6 +316,10 @@ const DashboardMisOrdenes = () => {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="mi-desempeno" className="mt-4">
+            <MiDesempenoPanel />
+          </TabsContent>
         </Tabs>
       </div>
 
