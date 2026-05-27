@@ -263,6 +263,7 @@ const DashboardMisOrdenes = () => {
                 </span>
               )}
             </TabsTrigger>
+            <TabsTrigger value="mi-desempeno">Mi desempeño</TabsTrigger>
           </TabsList>
 
           <TabsContent value="disponibles" className="mt-4">
