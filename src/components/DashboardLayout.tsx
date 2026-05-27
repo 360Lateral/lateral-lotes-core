@@ -25,6 +25,7 @@ import {
   MessageCircle,
   ScrollText,
   ClipboardList,
+  Briefcase,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
@@ -93,9 +94,14 @@ const DashboardLayout = ({ children }: Props) => {
     { label: "Configuración", href: "/dashboard/config", icon: Settings },
   ] : [];
 
+  const expertoItems = isAdminOrAsesor ? [
+    { label: "Mis órdenes", href: "/dashboard/mis-ordenes", icon: Briefcase },
+  ] : [];
+
   const allItems = [
     ...(isAdminOrAsesor ? navItems : []),
     ...(isAdmin ? adminOnlyItems : []),
+    ...expertoItems,
     ...developerItems,
     ...ownerItems,
     ...superAdminItems,
