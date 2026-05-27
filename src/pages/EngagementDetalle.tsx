@@ -43,6 +43,7 @@ const EngagementDetalle = () => {
   const activar = useActivarEngagement();
 
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
+  const [ordenOpen, setOrdenOpen] = useState(false);
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
@@ -77,6 +78,14 @@ const EngagementDetalle = () => {
         ) : (
           <>
             <EngagementHeader engagement={engagement} />
+
+            {(isSuperAdmin || isAdminOrAsesor) && (
+              <div className="mt-4 flex justify-end">
+                <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
+                  <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
+                </Button>
+              </div>
+            )}
 
             {enBorrador && (
               <div className="mt-6 rounded-md border border-yellow-400 bg-yellow-50 p-4 dark:bg-yellow-950/30">
