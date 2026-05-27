@@ -3661,6 +3661,19 @@ export type Database = {
         Args: { p_cliente_id?: string; p_lote_id: string; p_plan_id: string }
         Returns: string
       }
+      crear_nueva_version_contrato: {
+        Args: {
+          p_contenido_legal: string
+          p_contrato_id_actual: string
+          p_moneda?: string
+          p_plazo_max_dias: number
+          p_plazo_min_dias: number
+          p_precio_max: number
+          p_precio_min: number
+          p_version_explicita?: string
+        }
+        Returns: string
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -3858,6 +3871,10 @@ export type Database = {
       shares_negociacion: {
         Args: { _user_a: string; _user_b: string }
         Returns: boolean
+      }
+      toggle_contrato_activo: {
+        Args: { p_activo: boolean; p_contrato_id: string }
+        Returns: undefined
       }
       user_has_engagement_on_lote: {
         Args: { _lote_id: string; _user_id: string }
