@@ -370,6 +370,14 @@ const DashboardLotes = () => {
         />
       )}
 
+      {ordenLoteId && (
+        <CrearOrdenServicioDialog
+          open={!!ordenLoteId}
+          onOpenChange={(o) => { if (!o) setOrdenLoteId(null); }}
+          loteId={ordenLoteId}
+        />
+      )}
+
       <AsignarPropietarioDialog
         open={!!asignarLote}
         onOpenChange={(o) => { if (!o) setAsignarLote(null); }}
