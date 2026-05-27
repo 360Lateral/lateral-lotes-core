@@ -13,6 +13,8 @@ export interface ContratoMarco {
   moneda: string;
   activo: boolean;
   created_at: string;
+  creado_por?: string | null;
+  tipos_analisis?: { nombre: string; codigo: string } | null;
 }
 
 export const useContratosMarco = (soloActivos = true) => {
