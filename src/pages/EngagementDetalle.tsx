@@ -195,6 +195,14 @@ const EngagementDetalle = () => {
           </>
         )}
       </div>
+      {engagement && (
+        <CrearOrdenServicioDialog
+          open={ordenOpen}
+          onOpenChange={setOrdenOpen}
+          loteId={engagement.lote_id}
+          engagementId={engagement.id}
+        />
+      )}
     </DashboardLayout>
   );
 };
