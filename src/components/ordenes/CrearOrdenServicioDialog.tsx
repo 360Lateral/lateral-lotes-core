@@ -58,8 +58,8 @@ const fmtCOP = (n: number) =>
   new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const CrearOrdenServicioDialog = ({ open, onOpenChange, loteId, engagementId }: Props) => {
-  const { query: tiposQ } = useTiposAnalisis();
-  const tipos = (tiposQ.data ?? []).filter((t) => t.activo);
+  const tiposQ = useTiposAnalisis();
+  const tipos = (tiposQ.data ?? []).filter((t: any) => t.activo);
   const { data: contratos = [] } = useContratosMarco();
   const { data: expertos = [] } = useExpertosList();
   const crear = useCrearOrdenServicio();
