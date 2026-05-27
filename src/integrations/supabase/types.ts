@@ -1611,6 +1611,13 @@ export type Database = {
             referencedRelation: "planes_diagnostico"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "engagements_lote_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vw_planes_con_precio"
+            referencedColumns: ["id"]
+          },
         ]
       }
       entregables_engagement: {
@@ -1699,6 +1706,50 @@ export type Database = {
             columns: ["tipo_analisis_id"]
             isOneToOne: false
             referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eventos_wompi: {
+        Row: {
+          error_procesamiento: string | null
+          evento_id_externo: string
+          id: string
+          payload: Json
+          procesado: boolean
+          procesado_en: string | null
+          recibido_en: string
+          tipo_evento: string
+          transaccion_id: string | null
+        }
+        Insert: {
+          error_procesamiento?: string | null
+          evento_id_externo: string
+          id?: string
+          payload: Json
+          procesado?: boolean
+          procesado_en?: string | null
+          recibido_en?: string
+          tipo_evento: string
+          transaccion_id?: string | null
+        }
+        Update: {
+          error_procesamiento?: string | null
+          evento_id_externo?: string
+          id?: string
+          payload?: Json
+          procesado?: boolean
+          procesado_en?: string | null
+          recibido_en?: string
+          tipo_evento?: string
+          transaccion_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_wompi_transaccion_id_fkey"
+            columns: ["transaccion_id"]
+            isOneToOne: false
+            referencedRelation: "transacciones"
             referencedColumns: ["id"]
           },
         ]
@@ -2807,6 +2858,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "planes_analisis_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vw_planes_con_precio"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "planes_analisis_tipo_analisis_id_fkey"
             columns: ["tipo_analisis_id"]
             isOneToOne: false
@@ -3105,6 +3163,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      salarios_minimos: {
+        Row: {
+          anio: number
+          created_at: string
+          decreto: string | null
+          id: string
+          notas: string | null
+          valor_cop: number
+          vigente_desde: string
+          vigente_hasta: string | null
+        }
+        Insert: {
+          anio: number
+          created_at?: string
+          decreto?: string | null
+          id?: string
+          notas?: string | null
+          valor_cop: number
+          vigente_desde: string
+          vigente_hasta?: string | null
+        }
+        Update: {
+          anio?: number
+          created_at?: string
+          decreto?: string | null
+          id?: string
+          notas?: string | null
+          valor_cop?: number
+          vigente_desde?: string
+          vigente_hasta?: string | null
+        }
+        Relationships: []
       }
       servicios_publicos: {
         Row: {
@@ -3467,6 +3558,132 @@ export type Database = {
         }
         Relationships: []
       }
+      transacciones: {
+        Row: {
+          creada_por: string | null
+          engagement_id: string
+          error_msg: string | null
+          estado: Database["public"]["Enums"]["estado_transaccion"]
+          fecha_aprobacion: string | null
+          fecha_creacion: string
+          fecha_expiracion: string | null
+          id: string
+          metadata: Json | null
+          moneda: string
+          monto_cop: number
+          monto_smlmv: number
+          plan_id: string
+          propietario_id: string | null
+          smlmv_referencia: number
+          updated_at: string
+          wompi_payment_link_url: string | null
+          wompi_reference: string | null
+          wompi_status: string | null
+          wompi_transaction_id: string | null
+        }
+        Insert: {
+          creada_por?: string | null
+          engagement_id: string
+          error_msg?: string | null
+          estado?: Database["public"]["Enums"]["estado_transaccion"]
+          fecha_aprobacion?: string | null
+          fecha_creacion?: string
+          fecha_expiracion?: string | null
+          id?: string
+          metadata?: Json | null
+          moneda?: string
+          monto_cop: number
+          monto_smlmv: number
+          plan_id: string
+          propietario_id?: string | null
+          smlmv_referencia: number
+          updated_at?: string
+          wompi_payment_link_url?: string | null
+          wompi_reference?: string | null
+          wompi_status?: string | null
+          wompi_transaction_id?: string | null
+        }
+        Update: {
+          creada_por?: string | null
+          engagement_id?: string
+          error_msg?: string | null
+          estado?: Database["public"]["Enums"]["estado_transaccion"]
+          fecha_aprobacion?: string | null
+          fecha_creacion?: string
+          fecha_expiracion?: string | null
+          id?: string
+          metadata?: Json | null
+          moneda?: string
+          monto_cop?: number
+          monto_smlmv?: number
+          plan_id?: string
+          propietario_id?: string | null
+          smlmv_referencia?: number
+          updated_at?: string
+          wompi_payment_link_url?: string | null
+          wompi_reference?: string | null
+          wompi_status?: string | null
+          wompi_transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transacciones_creada_por_fkey"
+            columns: ["creada_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_creada_por_fkey"
+            columns: ["creada_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "transacciones_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "transacciones_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "planes_diagnostico"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vw_planes_con_precio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -3720,6 +3937,51 @@ export type Database = {
           tiempo_respuesta_horas_avg: number | null
           total_invitaciones: number | null
           total_propuestas: number | null
+        }
+        Relationships: []
+      }
+      vw_planes_con_precio: {
+        Row: {
+          activo: boolean | null
+          codigo: string | null
+          dias_sla: number | null
+          id: string | null
+          moneda: string | null
+          nombre: string | null
+          orden: number | null
+          precio_cop_actual: number | null
+          precio_cop_legacy: number | null
+          precio_smlmv: number | null
+          smlmv_anio: number | null
+          smlmv_referencia: number | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo?: string | null
+          dias_sla?: number | null
+          id?: string | null
+          moneda?: string | null
+          nombre?: string | null
+          orden?: number | null
+          precio_cop_actual?: never
+          precio_cop_legacy?: number | null
+          precio_smlmv?: number | null
+          smlmv_anio?: never
+          smlmv_referencia?: never
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string | null
+          dias_sla?: number | null
+          id?: string | null
+          moneda?: string | null
+          nombre?: string | null
+          orden?: number | null
+          precio_cop_actual?: never
+          precio_cop_legacy?: number | null
+          precio_smlmv?: number | null
+          smlmv_anio?: never
+          smlmv_referencia?: never
         }
         Relationships: []
       }
@@ -4043,6 +4305,7 @@ export type Database = {
           tiempo_medio_cierre_dias: number
         }[]
       }
+      obtener_smlmv_vigente: { Args: { p_fecha?: string }; Returns: number }
       obtener_tendencia_mensual: {
         Args: { p_meses_atras?: number }
         Returns: {
@@ -4156,6 +4419,13 @@ export type Database = {
         | "retirado"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
       estado_solicitud_contacto: "pendiente" | "contactado" | "cerrado"
+      estado_transaccion:
+        | "pendiente"
+        | "aprobada"
+        | "declinada"
+        | "expirada"
+        | "reembolsada"
+        | "error"
       nivel_notificacion: "amarillo" | "rojo"
       nivel_suscripcion: "gratuito" | "basico" | "profesional" | "premium"
       tipo_entregable:
@@ -4359,6 +4629,14 @@ export const Constants = {
       ],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
       estado_solicitud_contacto: ["pendiente", "contactado", "cerrado"],
+      estado_transaccion: [
+        "pendiente",
+        "aprobada",
+        "declinada",
+        "expirada",
+        "reembolsada",
+        "error",
+      ],
       nivel_notificacion: ["amarillo", "rojo"],
       nivel_suscripcion: ["gratuito", "basico", "profesional", "premium"],
       tipo_entregable: [
