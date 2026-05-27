@@ -1,5 +1,7 @@
+// NOTA: ya no usa HeatmapLayer (deprecated por Google en v3.65).
+// Renderiza Markers individuales con coords rasterizadas (~1km) desde vw_mercado_publico.
 import { useMemo } from "react";
-import { GoogleMap, HeatmapLayer } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import type { LoteMercado } from "@/hooks/useMercadoPublico";
 import { Loader2 } from "lucide-react";
@@ -12,20 +14,19 @@ const containerStyle = { width: "100%", height: "100%" };
 const DEFAULT_CENTER = { lat: 6.2442, lng: -75.5812 }; // Medellín
 
 const MapaInterno = ({ lotes }: Props) => {
-  const puntos = useMemo(
-    () =>
-      lotes
-        .filter((l) => l.latitud_zona != null && l.longitud_zona != null)
-        .map((l) => new google.maps.LatLng(Number(l.latitud_zona), Number(l.longitud_zona))),
+  const lotesConCoords = useMemo(
+    () => lotes.filter((l) => l.latitud_zona != null && l.longitud_zona != null),
     [lotes],
   );
 
   const center = useMemo(() => {
-    if (puntos.length === 0) return DEFAULT_CENTER;
-    const lat = puntos.reduce((s, p) => s + p.lat(), 0) / puntos.length;
-    const lng = puntos.reduce((s, p) => s + p.lng(), 0) / puntos.length;
+    if (lotesConCoords.length === 0) return DEFAULT_CENTER;
+    const lat =
+      lotesConCoords.reduce((s, l) => s + Number(l.latitud_zona), 0) / lotesConCoords.length;
+    const lng =
+      lotesConCoords.reduce((s, l) => s + Number(l.longitud_zona), 0) / lotesConCoords.length;
     return { lat, lng };
-  }, [puntos]);
+  }, [lotesConCoords]);
 
   return (
     <GoogleMap
@@ -38,12 +39,16 @@ const MapaInterno = ({ lotes }: Props) => {
         mapTypeControl: false,
       }}
     >
-      {puntos.length > 0 && (
-        <HeatmapLayer
-          data={puntos}
-          options={{ radius: 32, opacity: 0.7 }}
+      {lotesConCoords.map((l) => (
+        <Marker
+          key={l.lote_id}
+          position={{
+            lat: Number(l.latitud_zona),
+            lng: Number(l.longitud_zona),
+          }}
+          title={l.codigo_anonimo}
         />
-      )}
+      ))}
     </GoogleMap>
   );
 };
