@@ -77,7 +77,7 @@ const Bienvenida = () => {
       if (isAdminOrExperto) {
         navigate("/dashboard", { replace: true });
       } else if (isPropietario || isComisionista) {
-        navigate("/dashboard/owner", { replace: true });
+        navigate("/portal", { replace: true });
       } else if (isDesarrollador) {
         navigate("/dashboard/developer", { replace: true });
       } else {
