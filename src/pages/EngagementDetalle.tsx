@@ -29,8 +29,10 @@ import {
 } from "@/hooks/useEntregablesEngagement";
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
+import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog";
+import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, CreditCard } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 const EngagementDetalle = () => {
