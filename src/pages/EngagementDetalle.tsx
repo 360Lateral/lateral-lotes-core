@@ -86,7 +86,16 @@ const EngagementDetalle = () => {
             <EngagementHeader engagement={engagement} />
 
             {(isSuperAdmin || isAdminOrAsesor) && (
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
+                {puedeGenerarLink && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setLinkPagoOpen(true)}
+                  >
+                    <CreditCard className="mr-2 h-4 w-4" /> Generar link de pago
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
                   <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
                 </Button>
@@ -146,10 +155,19 @@ const EngagementDetalle = () => {
               <div className="mt-6 rounded-md border border-blue-300 bg-blue-50 p-4 dark:bg-blue-950/30">
                 <div className="flex items-start gap-3 text-blue-900 dark:text-blue-200">
                   <Clock className="mt-0.5 h-5 w-5 shrink-0" />
-                  <p className="font-body text-sm">
-                    Esperando confirmación de pago. El engagement se activará
-                    automáticamente cuando se confirme.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="font-body text-sm">
+                      Esperando confirmación de pago. El engagement se activará
+                      automáticamente cuando se confirme.
+                    </p>
+                    {ultimaTrans && (
+                      <p className="font-body text-xs opacity-80">
+                        Última transacción: <strong>{ultimaTrans.estado}</strong>
+                        {" · "}
+                        {new Date(ultimaTrans.fecha_creacion).toLocaleString("es-CO")}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
