@@ -56,6 +56,7 @@ import DashboardOrdenesServicio from "./pages/DashboardOrdenesServicio";
 import DashboardMisOrdenes from "./pages/DashboardMisOrdenes";
 import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
 import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
+import PagoCompletado from "./pages/PagoCompletado";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
             <Route path="/mercado" element={<Mercado />} />
             <Route path="/resolutoria" element={<Resolutoria />} />
             <Route path="/planes" element={<Planes />} />
+            <Route path="/portal/pago-completado" element={<PagoCompletado />} />
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
