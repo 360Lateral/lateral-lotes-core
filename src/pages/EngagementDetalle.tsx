@@ -41,11 +41,14 @@ const EngagementDetalle = () => {
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
   const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
   const { data: entregables } = useEntregablesEngagement(id);
-  const { isSuperAdmin, isAdminOrAsesor } = useAuth();
+  const { isSuperAdmin, isAdminOrAsesor, roles } = useAuth();
+  const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
   const activar = useActivarEngagement();
+  const { data: ultimaTrans } = useUltimaTransaccionEngagement(id);
 
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
   const [ordenOpen, setOrdenOpen] = useState(false);
+  const [linkPagoOpen, setLinkPagoOpen] = useState(false);
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
@@ -55,6 +58,7 @@ const EngagementDetalle = () => {
   const estadoAct = engagement?.estado_activacion ?? "activo";
   const enBorrador = estadoAct === "borrador";
   const pendientePago = estadoAct === "pendiente_pago";
+  const puedeGenerarLink = isAdmin && (enBorrador || pendientePago);
 
   return (
     <DashboardLayout>
