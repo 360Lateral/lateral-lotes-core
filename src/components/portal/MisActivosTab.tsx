@@ -156,12 +156,5 @@ const MisActivosTab = () => {
     </div>
   );
 };
-        </div>
-      )}
-
-      <PublicarActivoDialog open={openDialog} onOpenChange={setOpenDialog} />
-    </div>
-  );
-};
 
 export default MisActivosTab;
