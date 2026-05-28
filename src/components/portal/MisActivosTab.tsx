@@ -124,17 +124,38 @@ const MisActivosTab = () => {
                   </p>
                 )}
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="w-full"
-                >
-                  <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setLoteParaDiagnostico(a.id)}
+                  >
+                    <FileSearch className="mr-1 h-4 w-4" />
+                    Contratar diagnóstico
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      <PublicarActivoDialog open={openDialog} onOpenChange={setOpenDialog} />
+      <SolicitarDiagnosticoDialog
+        open={!!loteParaDiagnostico}
+        onOpenChange={(v) => !v && setLoteParaDiagnostico(null)}
+        loteIdPreseleccionado={loteParaDiagnostico ?? undefined}
+      />
+    </div>
+  );
+};
         </div>
       )}
 
