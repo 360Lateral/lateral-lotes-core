@@ -80,7 +80,7 @@ const Index = () => {
           </p>
           <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/dashboard/owner">
+              <Link to="/portal">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
                 Ir a Mi Panel
               </Link>
