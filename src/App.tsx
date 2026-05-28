@@ -58,6 +58,7 @@ import DashboardMisOrdenes from "./pages/DashboardMisOrdenes";
 import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
 import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
 import PagoCompletado from "./pages/PagoCompletado";
+import DashboardPagos from "./pages/DashboardPagos";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +110,7 @@ const App = () => (
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
+            <Route path="/dashboard/pagos" element={<ProtectedRoute><DashboardPagos /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowPropietario><PreferenciasUsuario /></ProtectedRoute>} />
 
