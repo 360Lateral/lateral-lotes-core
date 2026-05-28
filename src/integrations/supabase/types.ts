@@ -4335,6 +4335,10 @@ export type Database = {
           mes_label: string
         }[]
       }
+      obtener_transaccion_publica: {
+        Args: { p_reference: string }
+        Returns: Json
+      }
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
