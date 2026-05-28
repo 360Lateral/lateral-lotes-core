@@ -49,7 +49,7 @@ const PagoCompletado = () => {
         setLoading(false);
         return;
       }
-      const result = (rpcData ?? { encontrada: false }) as TransaccionPublica;
+      const result = (rpcData ?? { encontrada: false }) as unknown as TransaccionPublica;
       setData(result);
       setLoading(false);
 
