@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Plus, PackageOpen } from "lucide-react";
+import { MapPin, Plus, PackageOpen, FileSearch } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
+import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
 
 const fmtCOP = (n: number | null) =>
   n == null
