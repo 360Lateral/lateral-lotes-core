@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
@@ -7,12 +8,15 @@ import {
 } from "@/hooks/cliente/useMisEngagementsCliente";
 import { useMisActivos } from "@/hooks/useMisActivos";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MisActivosTab from "@/components/portal/MisActivosTab";
+import SolicitarDiagnosticoDialog from "@/components/portal/SolicitarDiagnosticoDialog";
 import {
   Folder,
   MapPin,
@@ -20,6 +24,10 @@ import {
   CheckCircle2,
   Clock,
   Sparkles,
+  Plus,
+  CreditCard,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 
 const planVariant = (codigo?: string | null): {
