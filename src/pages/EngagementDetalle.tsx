@@ -220,12 +220,19 @@ const EngagementDetalle = () => {
         )}
       </div>
       {engagement && (
-        <CrearOrdenServicioDialog
-          open={ordenOpen}
-          onOpenChange={setOrdenOpen}
-          loteId={engagement.lote_id}
-          engagementId={engagement.id}
-        />
+        <>
+          <CrearOrdenServicioDialog
+            open={ordenOpen}
+            onOpenChange={setOrdenOpen}
+            loteId={engagement.lote_id}
+            engagementId={engagement.id}
+          />
+          <GenerarLinkPagoDialog
+            open={linkPagoOpen}
+            onOpenChange={setLinkPagoOpen}
+            engagement={engagement as any}
+          />
+        </>
       )}
     </DashboardLayout>
   );
