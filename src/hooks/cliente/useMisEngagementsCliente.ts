@@ -9,6 +9,7 @@ export interface EngagementClienteResumen {
   plan_codigo: string | null;
   plan_nombre: string | null;
   estado: string;
+  estado_activacion: "borrador" | "pendiente_pago" | "activo" | string;
   avance_pct: number;
   fecha_inicio: string | null;
   fecha_sla: string | null;
