@@ -36,7 +36,7 @@ const Login = () => {
     if (isAdminOrExperto) {
       navigate("/dashboard", { replace: true });
     } else if (isPropietario || isComisionista) {
-      navigate("/dashboard/owner", { replace: true });
+      navigate("/portal", { replace: true });
     } else if (isDesarrollador) {
       navigate("/lotes", { replace: true });
     } else {
