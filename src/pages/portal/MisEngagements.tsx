@@ -264,6 +264,7 @@ const PortalHomeInner = () => {
   const { user } = useAuth();
   const { data: engagements } = useMisEngagementsCliente();
   const { data: activos = [] } = useMisActivos(user?.id);
+  const [solicitarOpen, setSolicitarOpen] = useState(false);
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
@@ -311,12 +312,17 @@ const PortalHomeInner = () => {
         </TabsList>
 
         <TabsContent value="servicios" className="mt-6">
-          <ServiciosList />
+          <ServiciosList onSolicitar={() => setSolicitarOpen(true)} />
         </TabsContent>
         <TabsContent value="activos" className="mt-6">
           <MisActivosTab />
         </TabsContent>
       </Tabs>
+
+      <SolicitarDiagnosticoDialog
+        open={solicitarOpen}
+        onOpenChange={setSolicitarOpen}
+      />
     </div>
   );
 };
