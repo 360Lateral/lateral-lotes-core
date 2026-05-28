@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Plus, PackageOpen } from "lucide-react";
+import { MapPin, Plus, PackageOpen, FileSearch } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
+import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
 
 const fmtCOP = (n: number | null) =>
   n == null
@@ -45,6 +46,7 @@ const MisActivosTab = () => {
   const { user } = useAuth();
   const { data: activos = [], isLoading } = useMisActivos(user?.id);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loteParaDiagnostico, setLoteParaDiagnostico] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -122,14 +124,23 @@ const MisActivosTab = () => {
                   </p>
                 )}
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="w-full"
-                >
-                  <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setLoteParaDiagnostico(a.id)}
+                  >
+                    <FileSearch className="mr-1 h-4 w-4" />
+                    Contratar diagnóstico
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -137,6 +148,11 @@ const MisActivosTab = () => {
       )}
 
       <PublicarActivoDialog open={openDialog} onOpenChange={setOpenDialog} />
+      <SolicitarDiagnosticoDialog
+        open={!!loteParaDiagnostico}
+        onOpenChange={(v) => !v && setLoteParaDiagnostico(null)}
+        loteIdPreseleccionado={loteParaDiagnostico ?? undefined}
+      />
     </div>
   );
 };

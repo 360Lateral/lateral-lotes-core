@@ -4065,6 +4065,10 @@ export type Database = {
         Args: { p_engagement_id: string }
         Returns: undefined
       }
+      activar_engagement_gratuito: {
+        Args: { p_engagement_id: string }
+        Returns: undefined
+      }
       activar_engagement_post_pago: {
         Args: { p_transaccion_id: string }
         Returns: undefined
@@ -4229,6 +4233,7 @@ export type Database = {
           dias_para_sla: number
           engagement_id: string
           estado: Database["public"]["Enums"]["estado_engagement"]
+          estado_activacion: Database["public"]["Enums"]["estado_activacion"]
           fecha_inicio: string
           fecha_sla: string
           lote_ciudad: string
@@ -4350,6 +4355,10 @@ export type Database = {
       shares_negociacion: {
         Args: { _user_a: string; _user_b: string }
         Returns: boolean
+      }
+      solicitar_diagnostico: {
+        Args: { p_lote_id: string; p_plan_id: string }
+        Returns: string
       }
       toggle_contrato_activo: {
         Args: { p_activo: boolean; p_contrato_id: string }
