@@ -4065,6 +4065,10 @@ export type Database = {
         Args: { p_engagement_id: string }
         Returns: undefined
       }
+      activar_engagement_post_pago: {
+        Args: { p_transaccion_id: string }
+        Returns: undefined
+      }
       adjudicar_propuesta: {
         Args: { p_orden_id: string; p_propuesta_id: string }
         Returns: undefined
@@ -4267,6 +4271,15 @@ export type Database = {
         Returns: undefined
       }
       marcar_todas_leidas: { Args: never; Returns: number }
+      marcar_transaccion_fallida: {
+        Args: {
+          p_error_msg?: string
+          p_estado_nuevo: Database["public"]["Enums"]["estado_transaccion"]
+          p_transaccion_id: string
+          p_wompi_status?: string
+        }
+        Returns: undefined
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
