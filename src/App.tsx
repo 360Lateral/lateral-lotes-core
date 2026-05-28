@@ -119,10 +119,11 @@ const App = () => (
             {/* Negociaciones */}
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
-            <Route path="/dashboard/owner" element={<ProtectedRoute allowPropietario><DashboardOwner /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowPropietario><DashboardOwnerLotes /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowPropietario><DashboardOwnerDiagnosticos /></ProtectedRoute>} />
-            <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowPropietario><DashboardOwnerNegociaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/owner" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwner /></RedirectIfPropietarioOnly></ProtectedRoute>} />
+            <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerLotes /></RedirectIfPropietarioOnly></ProtectedRoute>} />
+            <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerDiagnosticos /></RedirectIfPropietarioOnly></ProtectedRoute>} />
+            <Route path="/dashboard/owner/negociaciones" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerNegociaciones /></RedirectIfPropietarioOnly></ProtectedRoute>} />
+
 
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
