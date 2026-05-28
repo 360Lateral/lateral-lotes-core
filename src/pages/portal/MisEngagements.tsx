@@ -212,43 +212,50 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
   );
 };
 
-const ServiciosList = () => {
+const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
   const navigate = useNavigate();
   const { data, isLoading } = useMisEngagementsCliente();
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {[...Array(2)].map((_, i) => (
-          <Skeleton key={i} className="h-56 w-full" />
-        ))}
-      </div>
-    );
-  }
-  if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-16 flex flex-col items-center text-center gap-4">
-          <Folder className="h-16 w-16 text-muted-foreground/40" />
-          <div className="space-y-1 max-w-md">
-            <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
-            <p className="text-sm text-muted-foreground">
-              Si crees que esto es un error, contacta a tu asesor.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {data.map((e) => (
-        <EngagementCard
-          key={e.engagement_id}
-          e={e}
-          onClick={() => navigate(`/portal/engagement/${e.engagement_id}`)}
-        />
-      ))}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          Diagnósticos contratados y solicitudes en curso.
+        </p>
+        <Button onClick={onSolicitar} size="sm">
+          <Plus className="mr-1 h-4 w-4" /> Solicitar diagnóstico
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <Skeleton key={i} className="h-56 w-full" />
+          ))}
+        </div>
+      ) : !data || data.length === 0 ? (
+        <Card>
+          <CardContent className="py-16 flex flex-col items-center text-center gap-4">
+            <Folder className="h-16 w-16 text-muted-foreground/40" />
+            <div className="space-y-1 max-w-md">
+              <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
+              <p className="text-sm text-muted-foreground">
+                Solicita uno con el botón "Solicitar diagnóstico" o contacta a tu asesor.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {data.map((e) => (
+            <EngagementCard
+              key={e.engagement_id}
+              e={e}
+              onClick={() => navigate(`/portal/engagement/${e.engagement_id}`)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
