@@ -4233,6 +4233,7 @@ export type Database = {
           dias_para_sla: number
           engagement_id: string
           estado: Database["public"]["Enums"]["estado_engagement"]
+          estado_activacion: Database["public"]["Enums"]["estado_activacion"]
           fecha_inicio: string
           fecha_sla: string
           lote_ciudad: string
