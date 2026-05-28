@@ -381,7 +381,7 @@ const LoteWizard = () => {
         <LoteScoreResult result={scoreResult} />
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Button variant="default" asChild>
-            <Link to="/dashboard/owner">Ver mis lotes</Link>
+            <Link to="/portal">Ver mis lotes</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link to="/diagnostico">Solicitar Diagnóstico 360°</Link>

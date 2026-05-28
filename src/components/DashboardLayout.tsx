@@ -75,7 +75,7 @@ const DashboardLayout = ({ children }: Props) => {
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
   const isSuperAdmin = roles.includes("super_admin" as any);
   const isAdminOrAsesor = roles.some((r) => ["super_admin", "admin", "experto"].includes(r));
-  const isOwner = userType === "dueno" || userType === "comisionista";
+  
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
 
@@ -84,12 +84,15 @@ const DashboardLayout = ({ children }: Props) => {
     { label: "Notificaciones", href: "/dashboard/notificaciones", icon: Bell },
   ] : [];
 
-  const ownerItems = isOwner && !isAdminOrAsesor ? [
-    { label: "Mi Panel", href: "/dashboard/owner", icon: LayoutDashboard, end: true },
-    { label: "Mis Lotes", href: "/dashboard/owner/lotes", icon: MapPin },
-    { label: "Diagnósticos", href: "/dashboard/owner/diagnosticos", icon: FileSearch },
-    { label: "Negociaciones", href: "/dashboard/owner/negociaciones", icon: Handshake },
+  // Vistas legacy /dashboard/owner/* — solo accesibles a admin/super_admin para depuración.
+  // Propietarios puros ven /portal (ver RedirectIfPropietarioOnly).
+  const ownerItems = isAdminOrAsesor ? [
+    { label: "Owner: Panel", href: "/dashboard/owner", icon: LayoutDashboard, end: true },
+    { label: "Owner: Lotes", href: "/dashboard/owner/lotes", icon: MapPin },
+    { label: "Owner: Diagnósticos", href: "/dashboard/owner/diagnosticos", icon: FileSearch },
+    { label: "Owner: Negociaciones", href: "/dashboard/owner/negociaciones", icon: Handshake },
   ] : [];
+
 
   const superAdminItems = isSuperAdmin ? [
     { label: "Contratos marco", href: "/dashboard/contratos-marco", icon: ScrollText },

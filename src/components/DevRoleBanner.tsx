@@ -28,8 +28,8 @@ const ROLE_HOME: Record<DevRoleSimulated, string> = {
   admin: "/dashboard",
   experto: "/dashboard",
   desarrollador: "/dashboard/developer",
-  propietario: "/dashboard/owner",
-  comisionista: "/dashboard/owner",
+  propietario: "/portal",
+  comisionista: "/portal",
 };
 
 
