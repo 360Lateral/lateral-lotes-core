@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DevRoleProvider } from "@/contexts/DevRoleContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import RedirectIfPropietarioOnly from "@/components/RedirectIfPropietarioOnly";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HomeButton from "@/components/ui/HomeButton";
 import DevRoleBanner from "@/components/DevRoleBanner";
