@@ -23,6 +23,15 @@ export const useMisEngagementsCliente = () => {
   return useQuery({
     queryKey: ["mis-engagements-cliente"],
     refetchOnWindowFocus: true,
+    // Auto-poll mientras haya engagements esperando confirmación de pago
+    // (típicamente tras volver del checkout de Wompi).
+    refetchInterval: (query) => {
+      const data = query.state.data as EngagementClienteResumen[] | undefined;
+      if (!data) return false;
+      const hayPendientes = data.some((e) => e.estado_activacion === "pendiente_pago");
+      return hayPendientes ? 5000 : false;
+    },
+    refetchIntervalInBackground: false,
     queryFn: async (): Promise<EngagementClienteResumen[]> => {
       const { data, error } = await supabase.rpc(
         "listar_mis_engagements_cliente" as any,
@@ -32,3 +41,4 @@ export const useMisEngagementsCliente = () => {
     },
   });
 };
+
