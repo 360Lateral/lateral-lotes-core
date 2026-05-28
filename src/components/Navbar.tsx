@@ -30,7 +30,7 @@ const Navbar = () => {
   const getDashboardRoute = () => {
     if (isAdminOrExperto) return "/dashboard";
     if (isDesarrollador) return "/dashboard/developer";
-    if (isOwnerLike) return "/dashboard/owner";
+    if (isOwnerLike) return "/portal";
     return null;
   };
 
