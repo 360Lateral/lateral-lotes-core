@@ -27,6 +27,7 @@ import {
   ClipboardList,
   Briefcase,
   Trophy,
+  CreditCard,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
@@ -47,6 +48,7 @@ const adminOnlyItems = [
   { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
   { label: "Solicitudes de contacto", href: "/dashboard/solicitudes-contacto", icon: MessageCircle },
   { label: "Órdenes de servicio", href: "/dashboard/ordenes-servicio", icon: ClipboardList },
+  { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
   { label: "Desempeño expertos", href: "/dashboard/metricas/expertos", icon: Trophy },
   { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
   { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
@@ -142,6 +144,22 @@ const DashboardLayout = ({ children }: Props) => {
   const { data: ordenesAbiertas = [] } = useOrdenesServicio(isAdmin ? "abierta" : undefined);
   const ordenesCount = isAdmin ? ordenesAbiertas.length : 0;
 
+  // Transacciones pendientes (admin)
+  const { data: transPendientes = [] } = useQuery({
+    queryKey: ["transacciones-pendientes-count"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("transacciones")
+        .select("id", { count: "exact" })
+        .eq("estado", "pendiente");
+      if (error) return [];
+      return data ?? [];
+    },
+  });
+  const pagosCount = isAdmin ? transPendientes.length : 0;
+
   const isActive = (href: string, end?: boolean) => {
     if (end) return location.pathname === href;
     return location.pathname.startsWith(href);
@@ -164,6 +182,7 @@ const DashboardLayout = ({ children }: Props) => {
           const isValidarLink = item.href === "/dashboard/lotes/pendientes-validacion";
           const isSolicitudesLink = item.href === "/dashboard/solicitudes-contacto";
           const isOrdenesLink = item.href === "/dashboard/ordenes-servicio";
+          const isPagosLink = item.href === "/dashboard/pagos";
           const badgeNum = isNotifLink
             ? unreadCount
             : isValidarLink
@@ -172,6 +191,8 @@ const DashboardLayout = ({ children }: Props) => {
             ? solicitudesCount
             : isOrdenesLink
             ? ordenesCount
+            : isPagosLink
+            ? pagosCount
             : 0;
           return (
             <Link

@@ -29,8 +29,10 @@ import {
 } from "@/hooks/useEntregablesEngagement";
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
+import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog";
+import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, CreditCard } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 const EngagementDetalle = () => {
@@ -39,11 +41,14 @@ const EngagementDetalle = () => {
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
   const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
   const { data: entregables } = useEntregablesEngagement(id);
-  const { isSuperAdmin, isAdminOrAsesor } = useAuth();
+  const { isSuperAdmin, isAdminOrAsesor, roles } = useAuth();
+  const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
   const activar = useActivarEngagement();
+  const { data: ultimaTrans } = useUltimaTransaccionEngagement(id);
 
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
   const [ordenOpen, setOrdenOpen] = useState(false);
+  const [linkPagoOpen, setLinkPagoOpen] = useState(false);
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
@@ -53,6 +58,7 @@ const EngagementDetalle = () => {
   const estadoAct = engagement?.estado_activacion ?? "activo";
   const enBorrador = estadoAct === "borrador";
   const pendientePago = estadoAct === "pendiente_pago";
+  const puedeGenerarLink = isAdmin && (enBorrador || pendientePago);
 
   return (
     <DashboardLayout>
@@ -80,7 +86,16 @@ const EngagementDetalle = () => {
             <EngagementHeader engagement={engagement} />
 
             {(isSuperAdmin || isAdminOrAsesor) && (
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
+                {puedeGenerarLink && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setLinkPagoOpen(true)}
+                  >
+                    <CreditCard className="mr-2 h-4 w-4" /> Generar link de pago
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
                   <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
                 </Button>
@@ -140,10 +155,19 @@ const EngagementDetalle = () => {
               <div className="mt-6 rounded-md border border-blue-300 bg-blue-50 p-4 dark:bg-blue-950/30">
                 <div className="flex items-start gap-3 text-blue-900 dark:text-blue-200">
                   <Clock className="mt-0.5 h-5 w-5 shrink-0" />
-                  <p className="font-body text-sm">
-                    Esperando confirmación de pago. El engagement se activará
-                    automáticamente cuando se confirme.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="font-body text-sm">
+                      Esperando confirmación de pago. El engagement se activará
+                      automáticamente cuando se confirme.
+                    </p>
+                    {ultimaTrans && (
+                      <p className="font-body text-xs opacity-80">
+                        Última transacción: <strong>{ultimaTrans.estado}</strong>
+                        {" · "}
+                        {new Date(ultimaTrans.fecha_creacion).toLocaleString("es-CO")}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -196,12 +220,19 @@ const EngagementDetalle = () => {
         )}
       </div>
       {engagement && (
-        <CrearOrdenServicioDialog
-          open={ordenOpen}
-          onOpenChange={setOrdenOpen}
-          loteId={engagement.lote_id}
-          engagementId={engagement.id}
-        />
+        <>
+          <CrearOrdenServicioDialog
+            open={ordenOpen}
+            onOpenChange={setOrdenOpen}
+            loteId={engagement.lote_id}
+            engagementId={engagement.id}
+          />
+          <GenerarLinkPagoDialog
+            open={linkPagoOpen}
+            onOpenChange={setLinkPagoOpen}
+            engagement={engagement as any}
+          />
+        </>
       )}
     </DashboardLayout>
   );
