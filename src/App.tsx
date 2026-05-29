@@ -136,6 +136,9 @@ const App = () => (
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
 
+            {/* Portal del comisionista */}
+            <Route path="/comisionista" element={<ComisionistaPortal />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
