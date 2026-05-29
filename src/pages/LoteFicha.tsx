@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download } from "lucide-react";
+import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { useFichaLote, type FichaLoteData } from "@/hooks/useFichaLote";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
+import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 
 const PROD_BASE = "https://urbanix360.com";
 
@@ -234,6 +235,29 @@ const LoteFicha = () => {
     }
   };
 
+  const [generandoPdf, setGenerandoPdf] = useState(false);
+
+  const descargarPdf = async () => {
+    if (!data) return;
+    setGenerandoPdf(true);
+    try {
+      await generarPdfFicha(data, {
+        secciones: seccionesActivas,
+        titulo: tituloCustom,
+        nota: notaCustom,
+      });
+    } catch (e) {
+      console.error("Error generando PDF:", e);
+      toast({
+        title: "No se pudo generar el PDF",
+        description: "Puedes intentar 'Descargar HTML' como alternativa.",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerandoPdf(false);
+    }
+  };
+
   const descargarHtml = () => {
     if (!data) return;
     const html = generarHtmlStandalone(data, mapsKey, mostrar, tituloCustom, notaCustom);
@@ -315,8 +339,19 @@ const LoteFicha = () => {
                 <ExternalLink className="mr-1.5 h-4 w-4" /> Google Maps
               </Button>
             )}
-            <Button size="sm" onClick={() => window.print()}>
-              <Printer className="mr-1.5 h-4 w-4" /> Descargar PDF
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="mr-1.5 h-4 w-4" /> Imprimir
+            </Button>
+            <Button size="sm" onClick={descargarPdf} disabled={generandoPdf}>
+              {generandoPdf ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Generando PDF…
+                </>
+              ) : (
+                <>
+                  <Download className="mr-1.5 h-4 w-4" /> Descargar PDF
+                </>
+              )}
             </Button>
           </div>
         </div>
