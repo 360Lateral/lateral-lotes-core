@@ -106,7 +106,7 @@ const EngagementDetalle = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => window.open(`/lotes/${engagement.lote_id}/ficha`, "_blank")}
+                    onClick={() => setFichaConfigOpen(true)}
                   >
                     <FileText className="mr-2 h-4 w-4" /> Ver ficha del lote
                   </Button>
