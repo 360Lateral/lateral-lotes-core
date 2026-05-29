@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import MapaEstaticoLote from "./MapaEstaticoLote";
+import FichaConfigDialog from "./FichaConfigDialog";
 import { cn } from "@/lib/utils";
 
 export interface LoteCardData {
@@ -73,6 +74,7 @@ const LoteCardAdmin = ({
 }: Props) => {
   const hasPhoto = !!lote.foto_principal;
   const [vista, setVista] = useState<"foto" | "mapa">(hasPhoto ? "foto" : "mapa");
+  const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
 
   return (
     <Card className="overflow-hidden flex flex-col hover:shadow-md transition-shadow">
@@ -200,9 +202,7 @@ const LoteCardAdmin = ({
               <DropdownMenuItem onClick={onCrearOrden}>
                 <ClipboardList className="mr-2 h-4 w-4" /> Crear orden de servicio
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => window.open(`/lotes/${lote.id}/ficha`, "_blank")}
-              >
+              <DropdownMenuItem onClick={() => setFichaConfigOpen(true)}>
                 <FileText className="mr-2 h-4 w-4" /> Generar ficha
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -223,6 +223,13 @@ const LoteCardAdmin = ({
           </DropdownMenu>
         </div>
       </div>
+
+      <FichaConfigDialog
+        open={fichaConfigOpen}
+        onOpenChange={setFichaConfigOpen}
+        loteId={lote.id}
+        loteNombre={lote.nombre_lote}
+      />
     </Card>
   );
 };

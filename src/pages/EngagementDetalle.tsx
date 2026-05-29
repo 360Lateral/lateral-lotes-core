@@ -30,6 +30,7 @@ import {
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
 import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog";
+import FichaConfigDialog from "@/components/lotes/FichaConfigDialog";
 import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
 import { ClipboardList, CreditCard, FileText } from "lucide-react";
@@ -49,6 +50,8 @@ const EngagementDetalle = () => {
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
   const [ordenOpen, setOrdenOpen] = useState(false);
   const [linkPagoOpen, setLinkPagoOpen] = useState(false);
+  const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
+
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
@@ -103,7 +106,7 @@ const EngagementDetalle = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => window.open(`/lotes/${engagement.lote_id}/ficha`, "_blank")}
+                    onClick={() => setFichaConfigOpen(true)}
                   >
                     <FileText className="mr-2 h-4 w-4" /> Ver ficha del lote
                   </Button>
@@ -241,6 +244,14 @@ const EngagementDetalle = () => {
             onOpenChange={setLinkPagoOpen}
             engagement={engagement as any}
           />
+          {engagement.lote_id && (
+            <FichaConfigDialog
+              open={fichaConfigOpen}
+              onOpenChange={setFichaConfigOpen}
+              loteId={engagement.lote_id}
+              loteNombre={(engagement as any).lote_nombre ?? undefined}
+            />
+          )}
         </>
       )}
     </DashboardLayout>
