@@ -74,6 +74,7 @@ const LoteCardAdmin = ({
 }: Props) => {
   const hasPhoto = !!lote.foto_principal;
   const [vista, setVista] = useState<"foto" | "mapa">(hasPhoto ? "foto" : "mapa");
+  const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
 
   return (
     <Card className="overflow-hidden flex flex-col hover:shadow-md transition-shadow">
