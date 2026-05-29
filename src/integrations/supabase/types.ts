@@ -1142,6 +1142,134 @@ export type Database = {
           },
         ]
       }
+      comisiones_venta: {
+        Row: {
+          autorizacion_id: string | null
+          base_calculo: number
+          comision_monto: number
+          comision_pct: number
+          comisionista_id: string
+          estado: Database["public"]["Enums"]["estado_comision"]
+          fecha_generacion: string
+          fecha_pago: string | null
+          id: string
+          lote_id: string
+          metodo_pago: string | null
+          negociacion_id: string
+          notas: string | null
+          pagada_por: string | null
+          referencia_pago: string | null
+          updated_at: string
+        }
+        Insert: {
+          autorizacion_id?: string | null
+          base_calculo: number
+          comision_monto: number
+          comision_pct: number
+          comisionista_id: string
+          estado?: Database["public"]["Enums"]["estado_comision"]
+          fecha_generacion?: string
+          fecha_pago?: string | null
+          id?: string
+          lote_id: string
+          metodo_pago?: string | null
+          negociacion_id: string
+          notas?: string | null
+          pagada_por?: string | null
+          referencia_pago?: string | null
+          updated_at?: string
+        }
+        Update: {
+          autorizacion_id?: string | null
+          base_calculo?: number
+          comision_monto?: number
+          comision_pct?: number
+          comisionista_id?: string
+          estado?: Database["public"]["Enums"]["estado_comision"]
+          fecha_generacion?: string
+          fecha_pago?: string | null
+          id?: string
+          lote_id?: string
+          metodo_pago?: string | null
+          negociacion_id?: string
+          notas?: string | null
+          pagada_por?: string | null
+          referencia_pago?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comisiones_venta_autorizacion_id_fkey"
+            columns: ["autorizacion_id"]
+            isOneToOne: false
+            referencedRelation: "autorizaciones_comisionista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_comisionista_id_fkey"
+            columns: ["comisionista_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_comisionista_id_fkey"
+            columns: ["comisionista_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_negociacion_id_fkey"
+            columns: ["negociacion_id"]
+            isOneToOne: false
+            referencedRelation: "negociaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_pagada_por_fkey"
+            columns: ["pagada_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comisiones_venta_pagada_por_fkey"
+            columns: ["pagada_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+        ]
+      }
       consultas_ia: {
         Row: {
           created_at: string
@@ -2520,36 +2648,71 @@ export type Database = {
       }
       negociaciones: {
         Row: {
+          cerrada_por: string | null
+          comprador_externo: string | null
           contacto_visible: boolean
           created_at: string
           developer_id: string
           estado: Database["public"]["Enums"]["estado_negociacion"]
+          fecha_cierre: string | null
+          fee_360_monto: number | null
+          fee_360_pct: number | null
           id: string
           lote_id: string
+          notas_cierre: string | null
           owner_id: string | null
+          precio_venta_final: number | null
           updated_at: string | null
         }
         Insert: {
+          cerrada_por?: string | null
+          comprador_externo?: string | null
           contacto_visible?: boolean
           created_at?: string
           developer_id: string
           estado?: Database["public"]["Enums"]["estado_negociacion"]
+          fecha_cierre?: string | null
+          fee_360_monto?: number | null
+          fee_360_pct?: number | null
           id?: string
           lote_id: string
+          notas_cierre?: string | null
           owner_id?: string | null
+          precio_venta_final?: number | null
           updated_at?: string | null
         }
         Update: {
+          cerrada_por?: string | null
+          comprador_externo?: string | null
           contacto_visible?: boolean
           created_at?: string
           developer_id?: string
           estado?: Database["public"]["Enums"]["estado_negociacion"]
+          fecha_cierre?: string | null
+          fee_360_monto?: number | null
+          fee_360_pct?: number | null
           id?: string
           lote_id?: string
+          notas_cierre?: string | null
           owner_id?: string | null
+          precio_venta_final?: number | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "negociaciones_cerrada_por_fkey"
+            columns: ["cerrada_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "negociaciones_cerrada_por_fkey"
+            columns: ["cerrada_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
           {
             foreignKeyName: "negociaciones_lote_id_fkey"
             columns: ["lote_id"]
@@ -4333,6 +4496,16 @@ export type Database = {
         Args: { p_motivo?: string; p_orden_id: string }
         Returns: undefined
       }
+      cerrar_venta: {
+        Args: {
+          p_comprador_externo?: string
+          p_fee_360_pct?: number
+          p_negociacion_id: string
+          p_notas?: string
+          p_precio_venta_final: number
+        }
+        Returns: undefined
+      }
       check_ai_quota: { Args: { _user_id: string }; Returns: boolean }
       consultar_norma_por_punto: {
         Args: { p_lat: number; p_lng: number }
@@ -4507,6 +4680,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      marcar_comision_pagada: {
+        Args: {
+          p_comision_id: string
+          p_metodo_pago: string
+          p_notas?: string
+          p_referencia_pago?: string
+        }
+        Returns: undefined
+      }
       marcar_liquidacion_pagada: {
         Args: {
           p_liquidacion_id: string
@@ -4661,6 +4843,7 @@ export type Database = {
         | "rechazado"
         | "entregado"
       estado_autorizacion_comisionista: "activa" | "revocada" | "vencida"
+      estado_comision: "pendiente" | "pagada" | "cancelada"
       estado_disponibilidad:
         | "Disponible"
         | "Reservado"
@@ -4868,6 +5051,7 @@ export const Constants = {
         "entregado",
       ],
       estado_autorizacion_comisionista: ["activa", "revocada", "vencida"],
+      estado_comision: ["pendiente", "pagada", "cancelada"],
       estado_disponibilidad: [
         "Disponible",
         "Reservado",
