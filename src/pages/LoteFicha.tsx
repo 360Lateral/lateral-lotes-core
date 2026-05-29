@@ -339,8 +339,19 @@ const LoteFicha = () => {
                 <ExternalLink className="mr-1.5 h-4 w-4" /> Google Maps
               </Button>
             )}
-            <Button size="sm" onClick={() => window.print()}>
-              <Printer className="mr-1.5 h-4 w-4" /> Descargar PDF
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="mr-1.5 h-4 w-4" /> Imprimir
+            </Button>
+            <Button size="sm" onClick={descargarPdf} disabled={generandoPdf}>
+              {generandoPdf ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Generando PDF…
+                </>
+              ) : (
+                <>
+                  <Download className="mr-1.5 h-4 w-4" /> Descargar PDF
+                </>
+              )}
             </Button>
           </div>
         </div>
