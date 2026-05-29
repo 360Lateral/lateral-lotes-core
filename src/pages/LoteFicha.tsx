@@ -235,6 +235,29 @@ const LoteFicha = () => {
     }
   };
 
+  const [generandoPdf, setGenerandoPdf] = useState(false);
+
+  const descargarPdf = async () => {
+    if (!data) return;
+    setGenerandoPdf(true);
+    try {
+      await generarPdfFicha(data, {
+        secciones: seccionesActivas,
+        titulo: tituloCustom,
+        nota: notaCustom,
+      });
+    } catch (e) {
+      console.error("Error generando PDF:", e);
+      toast({
+        title: "No se pudo generar el PDF",
+        description: "Puedes intentar 'Descargar HTML' como alternativa.",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerandoPdf(false);
+    }
+  };
+
   const descargarHtml = () => {
     if (!data) return;
     const html = generarHtmlStandalone(data, mapsKey, mostrar, tituloCustom, notaCustom);
