@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import Logo from "@/components/ui/Logo";
 import { useFichaLote, type FichaLoteData } from "@/hooks/useFichaLote";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
+import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
 
 const PROD_BASE = "https://urbanix360.com";
 
@@ -86,7 +87,13 @@ const Galeria = ({ fotos, fallback, nombre }: { fotos: { url: string; orden: num
   );
 };
 
-const generarHtmlStandalone = (ficha: FichaLoteData, mapsKey: string | undefined): string => {
+const generarHtmlStandalone = (
+  ficha: FichaLoteData,
+  mapsKey: string | undefined,
+  mostrar: (k: string) => boolean,
+  titulo: string,
+  nota: string,
+): string => {
   const staticMapUrl =
     ficha.lat != null && ficha.lng != null && mapsKey
       ? `https://maps.googleapis.com/maps/api/staticmap?center=${ficha.lat},${ficha.lng}&zoom=15&size=600x300&scale=2&markers=color:0xF5A623%7C${ficha.lat},${ficha.lng}&key=${mapsKey}`
@@ -97,34 +104,83 @@ const generarHtmlStandalone = (ficha: FichaLoteData, mapsKey: string | undefined
       ? `https://www.google.com/maps/search/?api=1&query=${ficha.lat},${ficha.lng}`
       : "";
 
-  const fotosHtml = (ficha.fotos ?? [])
-    .map((f) => `<img src="${f.url}" style="width:100%;border-radius:8px;margin-bottom:8px;" />`)
-    .join("");
+  const fotosHtml = mostrar("fotos")
+    ? (ficha.fotos ?? [])
+        .map((f) => `<img src="${f.url}" style="width:100%;border-radius:8px;margin-bottom:8px;" />`)
+        .join("")
+    : "";
 
-  const analisisHtml = (
-    [
-      ["Jurídico", ficha.tiene_analisis_juridico],
-      ["Ambiental", ficha.tiene_analisis_ambiental],
-      ["Arquitectónico", ficha.tiene_analisis_arquitectonico],
-      ["Financiero", ficha.tiene_analisis_financiero],
-      ["Geotécnico", ficha.tiene_analisis_geotecnico],
-      ["Mercado", ficha.tiene_analisis_mercado],
-      ["SSPP", ficha.tiene_analisis_sspp],
-    ] as [string, boolean | undefined][]
-  )
-    .filter(([, tiene]) => tiene)
-    .map(
-      ([nombre]) =>
-        `<span style="display:inline-block;background:#ecfdf5;color:#059669;padding:4px 10px;border-radius:99px;font-size:13px;margin:2px;">✓ ${nombre}</span>`,
-    )
-    .join("");
+  const analisisHtml = mostrar("analisis")
+    ? (
+        [
+          ["Jurídico", ficha.tiene_analisis_juridico],
+          ["Ambiental", ficha.tiene_analisis_ambiental],
+          ["Arquitectónico", ficha.tiene_analisis_arquitectonico],
+          ["Financiero", ficha.tiene_analisis_financiero],
+          ["Geotécnico", ficha.tiene_analisis_geotecnico],
+          ["Mercado", ficha.tiene_analisis_mercado],
+          ["SSPP", ficha.tiene_analisis_sspp],
+        ] as [string, boolean | undefined][]
+      )
+        .filter(([, tiene]) => tiene)
+        .map(
+          ([nombre]) =>
+            `<span style="display:inline-block;background:#ecfdf5;color:#059669;padding:4px 10px;border-radius:99px;font-size:13px;margin:2px;">✓ ${nombre}</span>`,
+        )
+        .join("")
+    : "";
 
-  const mapaBloque = staticMapUrl
-    ? `<img src="${staticMapUrl}" style="width:100%;border-radius:8px;" />`
-    : `<div style="background:#f3f4f6;border-radius:8px;height:200px;display:flex;align-items:center;justify-content:center;color:#9ca3af;">Sin ubicación</div>`;
+  const mapaBloque = mostrar("ubicacion")
+    ? staticMapUrl
+      ? `<img src="${staticMapUrl}" style="width:100%;border-radius:8px;" />`
+      : `<div style="background:#f3f4f6;border-radius:8px;height:200px;display:flex;align-items:center;justify-content:center;color:#9ca3af;">Sin ubicación</div>`
+    : "";
 
-  const gmapsBloque = gmapsLink
+  const gmapsBloque = mostrar("ubicacion") && gmapsLink
     ? `<div style="margin-top:8px;text-align:center;"><a href="${gmapsLink}" target="_blank" rel="noopener" style="display:inline-block;color:#1a2744;text-decoration:none;font-size:13px;font-weight:600;border:1px solid #d1d5db;border-radius:6px;padding:6px 12px;">📍 Abrir ubicación en Google Maps</a></div>`
+    : "";
+
+  const filasDatos: string[] = [];
+  if (mostrar("area"))
+    filasDatos.push(
+      `<tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? Number(ficha.area_total_m2).toLocaleString("es-CO") + " m²" : "—"}</td></tr>`,
+    );
+  if (mostrar("uso"))
+    filasDatos.push(
+      `<tr><td style="padding:8px 0;color:#6b7280;">Uso / tipo</td><td style="padding:8px 0;font-weight:600;">${ficha.tipo_lote ?? "—"}</td></tr>`,
+    );
+  if (mostrar("sector"))
+    filasDatos.push(
+      `<tr><td style="padding:8px 0;color:#6b7280;">Ciudad / sector</td><td style="padding:8px 0;font-weight:600;">${[ficha.ciudad, ficha.barrio].filter(Boolean).join(" · ") || "—"}</td></tr>`,
+    );
+  if (mostrar("precio") && ficha.precio_venta_estimado)
+    filasDatos.push(
+      `<tr><td style="padding:8px 0;color:#6b7280;">Precio</td><td style="padding:8px 0;font-weight:600;">$${Number(ficha.precio_venta_estimado).toLocaleString("es-CO")} COP</td></tr>`,
+    );
+  if (mostrar("propietario") && ficha.propietario_nombre)
+    filasDatos.push(
+      `<tr><td style="padding:8px 0;color:#6b7280;">Propietario</td><td style="padding:8px 0;font-weight:600;">${ficha.propietario_nombre}</td></tr>`,
+    );
+
+  const datosBloque =
+    filasDatos.length > 0
+      ? `<h2 style="font-size:18px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;">Datos del activo</h2><table style="width:100%;border-collapse:collapse;margin-bottom:24px;">${filasDatos.join("")}</table>`
+      : "";
+
+  const ubicacionLinea = mostrar("sector")
+    ? [ficha.ciudad, ficha.barrio, ficha.direccion].filter(Boolean).join(" · ")
+    : "";
+
+  const tituloBloque = titulo
+    ? `<div style="background:#fff7ed;border-left:4px solid #F5A623;padding:10px 14px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;font-size:15px;font-weight:600;color:#1a2744;">${titulo}</p></div>`
+    : "";
+
+  const notaBloque = nota
+    ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:12px 14px;margin-bottom:20px;border-radius:8px;"><p style="margin:0;font-size:14px;color:#374151;white-space:pre-wrap;">${nota}</p></div>`
+    : "";
+
+  const contactoBloque = mostrar("contacto")
+    ? `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;text-align:center;">Para más información sobre este activo, contacta a 360Lateral · urbanix360.com</div>`
     : "";
 
   return `<!DOCTYPE html>
@@ -137,34 +193,39 @@ const generarHtmlStandalone = (ficha: FichaLoteData, mapsKey: string | undefined
     <div style="font-size:24px;font-weight:800;">360<span style="color:#F5A623;">LATERAL</span></div>
     <div style="text-align:right;color:#6b7280;font-size:13px;">FICHA DEL ACTIVO<br/>Generada el ${new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })}</div>
   </div>
+  ${tituloBloque}
   <h1 style="font-size:32px;margin:0 0 4px;">${ficha.nombre_lote ?? "Sin nombre"}</h1>
-  <p style="color:#6b7280;margin:0 0 20px;">📍 ${[ficha.ciudad, ficha.barrio, ficha.direccion].filter(Boolean).join(" · ")}</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-    <div>${fotosHtml || '<div style="background:#f3f4f6;border-radius:8px;height:200px;display:flex;align-items:center;justify-content:center;color:#9ca3af;">Sin fotos</div>'}</div>
-    <div>${mapaBloque}${gmapsBloque}</div>
-  </div>
-  <h2 style="font-size:18px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;">Datos del activo</h2>
-  <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-    <tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? Number(ficha.area_total_m2).toLocaleString("es-CO") + " m²" : "—"}</td></tr>
-    <tr><td style="padding:8px 0;color:#6b7280;">Uso / tipo</td><td style="padding:8px 0;font-weight:600;">${ficha.tipo_lote ?? "—"}</td></tr>
-    <tr><td style="padding:8px 0;color:#6b7280;">Ciudad / sector</td><td style="padding:8px 0;font-weight:600;">${[ficha.ciudad, ficha.barrio].filter(Boolean).join(" · ") || "—"}</td></tr>
-    ${ficha.precio_venta_estimado ? `<tr><td style="padding:8px 0;color:#6b7280;">Precio</td><td style="padding:8px 0;font-weight:600;">$${Number(ficha.precio_venta_estimado).toLocaleString("es-CO")} COP</td></tr>` : ""}
-    ${ficha.propietario_nombre ? `<tr><td style="padding:8px 0;color:#6b7280;">Propietario</td><td style="padding:8px 0;font-weight:600;">${ficha.propietario_nombre}</td></tr>` : ""}
-  </table>
+  ${ubicacionLinea ? `<p style="color:#6b7280;margin:0 0 20px;">📍 ${ubicacionLinea}</p>` : '<div style="margin-bottom:20px;"></div>'}
+  ${notaBloque}
+  ${(fotosHtml || mapaBloque) ? `<div style="display:grid;grid-template-columns:${fotosHtml && mapaBloque ? "1fr 1fr" : "1fr"};gap:16px;margin-bottom:24px;">${fotosHtml ? `<div>${fotosHtml}</div>` : ""}${mapaBloque ? `<div>${mapaBloque}${gmapsBloque}</div>` : ""}</div>` : ""}
+  ${datosBloque}
   ${analisisHtml ? `<h2 style="font-size:18px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;">Análisis disponibles</h2><div style="margin-bottom:8px;">${analisisHtml}</div><p style="color:#6b7280;font-size:13px;">Los análisis detallados están disponibles bajo solicitud a 360Lateral.</p>` : ""}
-  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;text-align:center;">
-    Para más información sobre este activo, contacta a 360Lateral · urbanix360.com
-  </div>
+  ${contactoBloque}
 </body></html>`;
 };
 
 const LoteFicha = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const { data, isLoading, error } = useFichaLote(id);
   const { data: mapsKey } = useGoogleMapsKey();
 
+  const seccionesActivas = useMemo(
+    () => decodificarSecciones(searchParams.get("s")),
+    [searchParams],
+  );
+  const tituloCustom = searchParams.get("titulo") ?? "";
+  const notaCustom = useMemo(
+    () => decodeNotaB64(searchParams.get("nota")),
+    [searchParams],
+  );
+
+  const mostrar = (key: string) =>
+    seccionesActivas === null || seccionesActivas.includes(key);
+
   const copiarLink = async () => {
-    const linkProduccion = `${PROD_BASE}/lotes/${id}/ficha`;
+    const qs = searchParams.toString();
+    const linkProduccion = `${PROD_BASE}/lotes/${id}/ficha${qs ? `?${qs}` : ""}`;
     try {
       await navigator.clipboard.writeText(linkProduccion);
       toast({ title: "Link copiado", description: linkProduccion });
@@ -175,7 +236,7 @@ const LoteFicha = () => {
 
   const descargarHtml = () => {
     if (!data) return;
-    const html = generarHtmlStandalone(data, mapsKey);
+    const html = generarHtmlStandalone(data, mapsKey, mostrar, tituloCustom, notaCustom);
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -224,8 +285,18 @@ const LoteFicha = () => {
     { label: "SSPP", on: data.tiene_analisis_sspp },
   ].filter((a) => a.on);
 
-  const ubicacion = [data.ciudad, data.barrio, data.direccion].filter(Boolean).join(" · ");
+  const ubicacionLinea = mostrar("sector")
+    ? [data.ciudad, data.barrio, data.direccion].filter(Boolean).join(" · ")
+    : "";
   const tieneCoords = data.lat != null && data.lng != null;
+
+  // Decide if "Datos del activo" section has any row
+  const tieneFilasDatos =
+    mostrar("area") ||
+    mostrar("uso") ||
+    (mostrar("sector") && (data.ciudad || data.barrio)) ||
+    (mostrar("precio") && data.publicado_venta && data.precio_venta_estimado != null) ||
+    (mostrar("propietario") && !!data.propietario_nombre);
 
   return (
     <div className="min-h-screen bg-muted/30 print:bg-background">
@@ -239,7 +310,7 @@ const LoteFicha = () => {
             <Button variant="outline" size="sm" onClick={descargarHtml}>
               <Download className="mr-1.5 h-4 w-4" /> Descargar HTML
             </Button>
-            {tieneCoords && (
+            {tieneCoords && mostrar("ubicacion") && (
               <Button variant="outline" size="sm" onClick={abrirGoogleMaps}>
                 <ExternalLink className="mr-1.5 h-4 w-4" /> Google Maps
               </Button>
@@ -261,53 +332,77 @@ const LoteFicha = () => {
             </div>
           </header>
 
+          {tituloCustom && (
+            <div className="mb-4 rounded-md border-l-4 border-primary bg-primary/5 px-4 py-2.5">
+              <p className="text-base font-semibold text-foreground">{tituloCustom}</p>
+            </div>
+          )}
+
           <section className="mb-6">
             <h1 className="text-3xl font-bold text-foreground md:text-4xl">{data.nombre_lote}</h1>
-            {ubicacion && (
+            {ubicacionLinea && (
               <p className="mt-2 flex items-start gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                <span>{ubicacion}</span>
+                <span>{ubicacionLinea}</span>
               </p>
             )}
           </section>
 
-          <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 print:grid-cols-2">
-            <Galeria fotos={data.fotos ?? []} fallback={data.foto_url} nombre={data.nombre_lote ?? "Lote"} />
-            <div className="space-y-2">
-              <div className="h-[250px] w-full overflow-hidden rounded-lg">
-                <MapaEstaticoLote
-                  lat={data.lat ?? null}
-                  lng={data.lng ?? null}
-                  nombre={data.nombre_lote ?? "Lote"}
-                />
-              </div>
-              {tieneCoords && (
-                <div className="no-print text-center">
-                  <Button variant="outline" size="sm" onClick={abrirGoogleMaps}>
-                    <ExternalLink className="mr-1.5 h-4 w-4" /> Abrir en Google Maps
-                  </Button>
+          {notaCustom && (
+            <section className="mb-6">
+              <Card className="border-border bg-muted/40 p-4">
+                <p className="whitespace-pre-wrap text-sm text-foreground">{notaCustom}</p>
+              </Card>
+            </section>
+          )}
+
+          {(mostrar("fotos") || mostrar("ubicacion")) && (
+            <section className={`mb-8 grid grid-cols-1 gap-4 ${mostrar("fotos") && mostrar("ubicacion") ? "md:grid-cols-2 print:grid-cols-2" : ""}`}>
+              {mostrar("fotos") && (
+                <Galeria fotos={data.fotos ?? []} fallback={data.foto_url} nombre={data.nombre_lote ?? "Lote"} />
+              )}
+              {mostrar("ubicacion") && (
+                <div className="space-y-2">
+                  <div className="h-[250px] w-full overflow-hidden rounded-lg">
+                    <MapaEstaticoLote
+                      lat={data.lat ?? null}
+                      lng={data.lng ?? null}
+                      nombre={data.nombre_lote ?? "Lote"}
+                    />
+                  </div>
+                  {tieneCoords && (
+                    <div className="no-print text-center">
+                      <Button variant="outline" size="sm" onClick={abrirGoogleMaps}>
+                        <ExternalLink className="mr-1.5 h-4 w-4" /> Abrir en Google Maps
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          </section>
+            </section>
+          )}
 
-          <section className="mb-8">
-            <h2 className="mb-3 text-lg font-semibold text-foreground">Datos del activo</h2>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-              <DatoCard label="Área total" value={data.area_total_m2 ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²` : "—"} />
-              <DatoCard label="Uso / tipo" value={data.tipo_lote ?? "—"} />
-              <DatoCard label="Ciudad" value={data.ciudad ?? "—"} />
-              {data.barrio && <DatoCard label="Sector" value={data.barrio} />}
-              {data.publicado_venta && data.precio_venta_estimado != null && (
-                <DatoCard label="Precio" value={formatCOP(Number(data.precio_venta_estimado))} highlight />
-              )}
-              {data.propietario_nombre && (
-                <DatoCard label="Propietario" value={data.propietario_nombre} />
-              )}
-            </div>
-          </section>
+          {tieneFilasDatos && (
+            <section className="mb-8">
+              <h2 className="mb-3 text-lg font-semibold text-foreground">Datos del activo</h2>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {mostrar("area") && (
+                  <DatoCard label="Área total" value={data.area_total_m2 ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²` : "—"} />
+                )}
+                {mostrar("uso") && <DatoCard label="Uso / tipo" value={data.tipo_lote ?? "—"} />}
+                {mostrar("sector") && data.ciudad && <DatoCard label="Ciudad" value={data.ciudad} />}
+                {mostrar("sector") && data.barrio && <DatoCard label="Sector" value={data.barrio} />}
+                {mostrar("precio") && data.publicado_venta && data.precio_venta_estimado != null && (
+                  <DatoCard label="Precio" value={formatCOP(Number(data.precio_venta_estimado))} highlight />
+                )}
+                {mostrar("propietario") && data.propietario_nombre && (
+                  <DatoCard label="Propietario" value={data.propietario_nombre} />
+                )}
+              </div>
+            </section>
+          )}
 
-          {analisis.length > 0 && (
+          {mostrar("analisis") && analisis.length > 0 && (
             <section className="mb-8">
               <h2 className="mb-3 text-lg font-semibold text-foreground">Análisis disponibles</h2>
               <div className="flex flex-wrap gap-2">
@@ -323,17 +418,19 @@ const LoteFicha = () => {
             </section>
           )}
 
-          <footer className="ficha-footer mt-10 rounded-lg border border-border bg-muted/40 p-5 text-center">
-            <p className="mb-1 text-sm font-semibold text-foreground">
-              Para más información sobre este activo, contacta a 360Lateral.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              contacto@urbanix360.com · urbanix360.com
-            </p>
-            <div className="mt-3 flex justify-center">
-              <Logo />
-            </div>
-          </footer>
+          {mostrar("contacto") && (
+            <footer className="ficha-footer mt-10 rounded-lg border border-border bg-muted/40 p-5 text-center">
+              <p className="mb-1 text-sm font-semibold text-foreground">
+                Para más información sobre este activo, contacta a 360Lateral.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                contacto@urbanix360.com · urbanix360.com
+              </p>
+              <div className="mt-3 flex justify-center">
+                <Logo />
+              </div>
+            </footer>
+          )}
         </Card>
       </main>
     </div>
