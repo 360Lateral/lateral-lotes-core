@@ -205,8 +205,8 @@ const DashboardLotes = () => {
       const precio = l.precio_venta_estimado != null ? Number(l.precio_venta_estimado) : null;
       if (deferredFiltros.precioMin && (precio == null || precio < Number(deferredFiltros.precioMin))) return false;
       if (deferredFiltros.precioMax && (precio == null || precio > Number(deferredFiltros.precioMax))) return false;
-      if (deferredFiltros.propietario === "con" && !l.propietario_id) return false;
-      if (deferredFiltros.propietario === "sin" && l.propietario_id) return false;
+      if (deferredFiltros.propietarioId === "__sin__" && l.propietario_id) return false;
+      if (deferredFiltros.propietarioId && deferredFiltros.propietarioId !== "__sin__" && l.propietario_id !== deferredFiltros.propietarioId) return false;
       if (deferredFiltros.publicacion === "publicos" && !l.es_publico) return false;
       if (deferredFiltros.publicacion === "no_publicos" && l.es_publico) return false;
       if (deferredFiltros.soloDestacados && !l.destacado) return false;
