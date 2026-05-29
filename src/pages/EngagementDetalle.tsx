@@ -244,6 +244,14 @@ const EngagementDetalle = () => {
             onOpenChange={setLinkPagoOpen}
             engagement={engagement as any}
           />
+          {engagement.lote_id && (
+            <FichaConfigDialog
+              open={fichaConfigOpen}
+              onOpenChange={setFichaConfigOpen}
+              loteId={engagement.lote_id}
+              loteNombre={(engagement as any).lote_nombre ?? undefined}
+            />
+          )}
         </>
       )}
     </DashboardLayout>
