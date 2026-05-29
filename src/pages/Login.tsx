@@ -35,7 +35,9 @@ const Login = () => {
 
     if (isAdminOrExperto) {
       navigate("/dashboard", { replace: true });
-    } else if (isPropietario || isComisionista) {
+    } else if (isComisionista) {
+      navigate("/comisionista", { replace: true });
+    } else if (isPropietario) {
       navigate("/portal", { replace: true });
     } else if (isDesarrollador) {
       navigate("/lotes", { replace: true });
@@ -49,12 +51,14 @@ const Login = () => {
     if (authLoading || !user || loginSuccess) return;
     if (isAdminOrExperto) {
       navigate("/dashboard", { replace: true });
+    } else if (isComisionista) {
+      navigate("/comisionista", { replace: true });
     } else if (isPropietario) {
       navigate("/portal", { replace: true });
     } else {
       navigate("/lotes", { replace: true });
     }
-  }, [authLoading, user, isAdminOrExperto, isPropietario, navigate, loginSuccess]);
+  }, [authLoading, user, isAdminOrExperto, isPropietario, isComisionista, navigate, loginSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -55,7 +55,8 @@ const ProtectedRoute = ({
 
   // Owners on admin-only routes
   if (!requireDeveloper && !allowsOwner && isOwnerLike && !isAdminOrExperto) {
-    return <Navigate to="/" replace />;
+    if (isComisionista) return <Navigate to="/comisionista" replace />;
+    return <Navigate to="/portal" replace />;
   }
 
   return <>{children}</>;

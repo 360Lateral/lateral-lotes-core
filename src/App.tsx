@@ -61,6 +61,7 @@ import PagoCompletado from "./pages/PagoCompletado";
 import DashboardPagos from "./pages/DashboardPagos";
 import DashboardLiquidaciones from "./pages/DashboardLiquidaciones";
 import LoteFicha from "./pages/LoteFicha";
+import ComisionistaPortal from "./pages/ComisionistaPortal";
 
 const queryClient = new QueryClient();
 
@@ -134,6 +135,9 @@ const App = () => (
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
+
+            {/* Portal del comisionista */}
+            <Route path="/comisionista" element={<ComisionistaPortal />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
