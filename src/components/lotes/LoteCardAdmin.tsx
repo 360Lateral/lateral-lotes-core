@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import MapaEstaticoLote from "./MapaEstaticoLote";
+import FichaConfigDialog from "./FichaConfigDialog";
 import { cn } from "@/lib/utils";
 
 export interface LoteCardData {
