@@ -59,6 +59,7 @@ import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
 import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
 import PagoCompletado from "./pages/PagoCompletado";
 import DashboardPagos from "./pages/DashboardPagos";
+import LoteFicha from "./pages/LoteFicha";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
             {/* Rutas públicas */}
             <Route path="/" element={<Index />} />
             <Route path="/lotes" element={<Lotes />} />
+            <Route path="/lotes/:id/ficha" element={<LoteFicha />} />
             <Route path="/lotes/:id" element={<LoteDetalle />} />
             <Route path="/login" element={<Login />} />
             <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />

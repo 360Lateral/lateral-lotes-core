@@ -4307,6 +4307,7 @@ export type Database = {
         Args: { p_engagement_id: string }
         Returns: Json
       }
+      obtener_ficha_lote: { Args: { p_lote_id: string }; Returns: Json }
       obtener_kpis_portafolio: { Args: never; Returns: Json }
       obtener_lote_para_usuario: { Args: { p_lote_id: string }; Returns: Json }
       obtener_ranking_asesores: {

@@ -12,7 +12,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 import MapaEstaticoLote from "./MapaEstaticoLote";
 import { cn } from "@/lib/utils";
 
@@ -200,18 +200,11 @@ const LoteCardAdmin = ({
               <DropdownMenuItem onClick={onCrearOrden}>
                 <ClipboardList className="mr-2 h-4 w-4" /> Crear orden de servicio
               </DropdownMenuItem>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <DropdownMenuItem disabled>
-                        <FileText className="mr-2 h-4 w-4" /> Generar ficha
-                      </DropdownMenuItem>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Disponible próximamente</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <DropdownMenuItem
+                onClick={() => window.open(`/lotes/${lote.id}/ficha`, "_blank")}
+              >
+                <FileText className="mr-2 h-4 w-4" /> Generar ficha
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               {lote.publicado_venta ? (
                 <DropdownMenuItem onClick={onRetirarMercado}>

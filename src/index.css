@@ -85,3 +85,42 @@
     animation: none !important;
   }
 }
+
+/* Print styles para ficha del lote */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html, body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print,
+  nav,
+  header[role="banner"],
+  [data-sidebar],
+  button:not(.print-keep) {
+    display: none !important;
+  }
+
+  .ficha-doc {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .ficha-badge,
+  .ficha-highlight,
+  .ficha-footer {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  a[href]::after { content: ""; }
+}
+
