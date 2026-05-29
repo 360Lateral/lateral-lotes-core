@@ -352,6 +352,14 @@ const DashboardMisOrdenes = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="mi-desempeno">Mi desempeño</TabsTrigger>
+            <TabsTrigger value="mis-pagos">
+              Mis pagos
+              {kpiLiqs.pendCount > 0 && (
+                <span className="ml-2 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 px-1.5 text-xs">
+                  {kpiLiqs.pendCount}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="disponibles" className="mt-4">
