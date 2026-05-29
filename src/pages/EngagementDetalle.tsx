@@ -50,6 +50,8 @@ const EngagementDetalle = () => {
   const puedeSubir = isSuperAdmin || isAdminOrAsesor;
   const [ordenOpen, setOrdenOpen] = useState(false);
   const [linkPagoOpen, setLinkPagoOpen] = useState(false);
+  const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
+
 
   const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
