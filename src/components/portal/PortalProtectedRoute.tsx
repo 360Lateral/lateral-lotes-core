@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdminOrExperto, isPropietario, loading } = useAuth();
+  const { user, isAdminOrExperto, isPropietario, isComisionista, loading } = useAuth();
 
   if (loading) {
     return (
