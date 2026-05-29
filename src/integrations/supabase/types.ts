@@ -1976,6 +1976,126 @@ export type Database = {
           },
         ]
       }
+      liquidaciones_experto: {
+        Row: {
+          engagement_id: string | null
+          estado: Database["public"]["Enums"]["estado_liquidacion"]
+          experto_id: string
+          fecha_generacion: string
+          fecha_pago: string | null
+          fee_monto: number
+          fee_pct: number
+          id: string
+          metodo_pago: string | null
+          moneda: string
+          monto_bruto: number
+          monto_neto: number
+          notas: string | null
+          orden_id: string | null
+          pagado_por: string | null
+          referencia_pago: string | null
+          tipo_analisis_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          engagement_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_liquidacion"]
+          experto_id: string
+          fecha_generacion?: string
+          fecha_pago?: string | null
+          fee_monto: number
+          fee_pct?: number
+          id?: string
+          metodo_pago?: string | null
+          moneda?: string
+          monto_bruto: number
+          monto_neto: number
+          notas?: string | null
+          orden_id?: string | null
+          pagado_por?: string | null
+          referencia_pago?: string | null
+          tipo_analisis_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          engagement_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_liquidacion"]
+          experto_id?: string
+          fecha_generacion?: string
+          fecha_pago?: string | null
+          fee_monto?: number
+          fee_pct?: number
+          id?: string
+          metodo_pago?: string | null
+          moneda?: string
+          monto_bruto?: number
+          monto_neto?: number
+          notas?: string | null
+          orden_id?: string | null
+          pagado_por?: string | null
+          referencia_pago?: string | null
+          tipo_analisis_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liquidaciones_experto_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_experto_id_fkey"
+            columns: ["experto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: true
+            referencedRelation: "ordenes_servicio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_pagado_por_fkey"
+            columns: ["pagado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_pagado_por_fkey"
+            columns: ["pagado_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "liquidaciones_experto_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lotes: {
         Row: {
           area_total_m2: number | null
@@ -4271,6 +4391,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      marcar_liquidacion_pagada: {
+        Args: {
+          p_liquidacion_id: string
+          p_metodo_pago: string
+          p_notas?: string
+          p_referencia_pago?: string
+        }
+        Returns: undefined
+      }
       marcar_notificacion_leida: {
         Args: { p_notif_id: string }
         Returns: undefined
@@ -4430,6 +4559,7 @@ export type Database = {
         | "negociacion"
         | "cerrado"
         | "descartado"
+      estado_liquidacion: "pendiente" | "pagada" | "cancelada"
       estado_negociacion: "activa" | "en_revision" | "cerrada" | "concretada"
       estado_notificacion: "pendiente" | "leida" | "resuelta"
       estado_orden_servicio:
@@ -4638,6 +4768,7 @@ export const Constants = {
         "cerrado",
         "descartado",
       ],
+      estado_liquidacion: ["pendiente", "pagada", "cancelada"],
       estado_negociacion: ["activa", "en_revision", "cerrada", "concretada"],
       estado_notificacion: ["pendiente", "leida", "resuelta"],
       estado_orden_servicio: [
