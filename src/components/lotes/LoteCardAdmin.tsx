@@ -223,6 +223,13 @@ const LoteCardAdmin = ({
           </DropdownMenu>
         </div>
       </div>
+
+      <FichaConfigDialog
+        open={fichaConfigOpen}
+        onOpenChange={setFichaConfigOpen}
+        loteId={lote.id}
+        loteNombre={lote.nombre_lote}
+      />
     </Card>
   );
 };
