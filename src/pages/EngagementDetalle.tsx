@@ -32,7 +32,7 @@ import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDia
 import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog";
 import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
-import { ClipboardList, CreditCard } from "lucide-react";
+import { ClipboardList, CreditCard, FileText } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 const EngagementDetalle = () => {
@@ -99,6 +99,15 @@ const EngagementDetalle = () => {
                 <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
                   <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
                 </Button>
+                {engagement?.lote_id && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(`/lotes/${engagement.lote_id}/ficha`, "_blank")}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> Ver ficha del lote
+                  </Button>
+                )}
               </div>
             )}
 
