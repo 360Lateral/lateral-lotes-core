@@ -200,18 +200,11 @@ const LoteCardAdmin = ({
               <DropdownMenuItem onClick={onCrearOrden}>
                 <ClipboardList className="mr-2 h-4 w-4" /> Crear orden de servicio
               </DropdownMenuItem>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <DropdownMenuItem disabled>
-                        <FileText className="mr-2 h-4 w-4" /> Generar ficha
-                      </DropdownMenuItem>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Disponible próximamente</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <DropdownMenuItem
+                onClick={() => window.open(`/lotes/${lote.id}/ficha`, "_blank")}
+              >
+                <FileText className="mr-2 h-4 w-4" /> Generar ficha
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               {lote.publicado_venta ? (
                 <DropdownMenuItem onClick={onRetirarMercado}>
