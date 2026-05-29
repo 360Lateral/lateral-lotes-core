@@ -22,11 +22,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Briefcase, ChevronDown } from "lucide-react";
+import { Briefcase, ChevronDown, Wallet } from "lucide-react";
 import { useMisOrdenesExperto } from "@/hooks/useMisOrdenesExperto";
 import { useMisPropuestas } from "@/hooks/useMisPropuestas";
 import { useTengoPropuestaEnOrden } from "@/hooks/useTengoPropuestaEnOrden";
 import { useRetirarPropuesta } from "@/hooks/useRetirarPropuesta";
+import { useMisLiquidaciones } from "@/hooks/useMisLiquidaciones";
 import PostularmeDialog from "@/components/ordenes/PostularmeDialog";
 import MiDesempenoPanel from "@/components/ordenes/MiDesempenoPanel";
 
