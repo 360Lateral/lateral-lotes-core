@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download } from "lucide-react";
+import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { useFichaLote, type FichaLoteData } from "@/hooks/useFichaLote";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
+import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 
 const PROD_BASE = "https://urbanix360.com";
 
