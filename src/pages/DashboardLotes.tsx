@@ -185,6 +185,15 @@ const DashboardLotes = () => {
     return Array.from(map.entries()).map(([codigo, nombre]) => ({ codigo, nombre }));
   }, [engagementsActivos]);
 
+  const propietariosOptions = useMemo(() => {
+    return propietarioIds
+      .map((id) => {
+        const p = (propietariosMap as any)[id];
+        return { id, label: (p?.nombre || p?.email || id) as string };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label, "es"));
+  }, [propietarioIds, propietariosMap]);
+
   const deferredFiltros = useDeferredValue(filtros);
 
   const filtered = useMemo(() => {
@@ -205,8 +214,8 @@ const DashboardLotes = () => {
       const precio = l.precio_venta_estimado != null ? Number(l.precio_venta_estimado) : null;
       if (deferredFiltros.precioMin && (precio == null || precio < Number(deferredFiltros.precioMin))) return false;
       if (deferredFiltros.precioMax && (precio == null || precio > Number(deferredFiltros.precioMax))) return false;
-      if (deferredFiltros.propietario === "con" && !l.propietario_id) return false;
-      if (deferredFiltros.propietario === "sin" && l.propietario_id) return false;
+      if (deferredFiltros.propietarioId === "__sin__" && l.propietario_id) return false;
+      if (deferredFiltros.propietarioId && deferredFiltros.propietarioId !== "__sin__" && l.propietario_id !== deferredFiltros.propietarioId) return false;
       if (deferredFiltros.publicacion === "publicos" && !l.es_publico) return false;
       if (deferredFiltros.publicacion === "no_publicos" && l.es_publico) return false;
       if (deferredFiltros.soloDestacados && !l.destacado) return false;
@@ -287,6 +296,7 @@ const DashboardLotes = () => {
           tipos={tipos}
           planes={planes}
           estados={estadosLista}
+          propietarios={propietariosOptions}
         />
       </div>
 

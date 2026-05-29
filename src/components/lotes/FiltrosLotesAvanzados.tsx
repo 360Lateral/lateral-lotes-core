@@ -18,7 +18,8 @@ export interface FiltrosLotesState {
   areaMax: string;
   precioMin: string;
   precioMax: string;
-  propietario: "todos" | "con" | "sin";
+  /** "" = todos, "__sin__" = sin propietario, otro = uuid de propietario */
+  propietarioId: string;
   publicacion: "todos" | "publicos" | "no_publicos";
   soloDestacados: boolean;
 }
@@ -26,8 +27,13 @@ export interface FiltrosLotesState {
 export const FILTROS_INICIALES: FiltrosLotesState = {
   q: "", ciudad: "__all__", barrio: "", tipo: "__all__", plan: "__all__", estado: "__all__",
   areaMin: "", areaMax: "", precioMin: "", precioMax: "",
-  propietario: "todos", publicacion: "todos", soloDestacados: false,
+  propietarioId: "", publicacion: "todos", soloDestacados: false,
 };
+
+export interface PropietarioFiltroOption {
+  id: string;
+  label: string;
+}
 
 interface Props {
   value: FiltrosLotesState;
@@ -37,9 +43,10 @@ interface Props {
   tipos: string[];
   planes: { codigo: string; nombre: string }[];
   estados: string[];
+  propietarios: PropietarioFiltroOption[];
 }
 
-const FiltrosLotesAvanzados = ({ value, onChange, onClear, ciudades, tipos, planes, estados }: Props) => {
+const FiltrosLotesAvanzados = ({ value, onChange, onClear, ciudades, tipos, planes, estados, propietarios }: Props) => {
   const upd = <K extends keyof FiltrosLotesState>(k: K, v: FiltrosLotesState[K]) =>
     onChange({ ...value, [k]: v });
 
@@ -116,12 +123,17 @@ const FiltrosLotesAvanzados = ({ value, onChange, onClear, ciudades, tipos, plan
           />
         </div>
 
-        <Select value={value.propietario} onValueChange={(v) => upd("propietario", v as any)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos los propietarios</SelectItem>
-            <SelectItem value="con">Con propietario</SelectItem>
-            <SelectItem value="sin">Sin propietario</SelectItem>
+        <Select
+          value={value.propietarioId === "" ? "__all__" : value.propietarioId}
+          onValueChange={(v) => upd("propietarioId", v === "__all__" ? "" : v)}
+        >
+          <SelectTrigger><SelectValue placeholder="Propietario" /></SelectTrigger>
+          <SelectContent className="max-h-72">
+            <SelectItem value="__all__">Todos los propietarios</SelectItem>
+            <SelectItem value="__sin__">Sin propietario</SelectItem>
+            {propietarios.map((p) => (
+              <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
