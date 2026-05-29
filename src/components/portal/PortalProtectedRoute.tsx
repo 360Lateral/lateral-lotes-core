@@ -22,6 +22,10 @@ const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  if (isComisionista && !isPropietario) {
+    return <Navigate to="/comisionista" replace />;
+  }
+
   if (!isPropietario) {
     return <Navigate to="/dashboard" replace />;
   }
