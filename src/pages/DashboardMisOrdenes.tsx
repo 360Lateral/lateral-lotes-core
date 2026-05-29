@@ -228,11 +228,98 @@ const PropuestaItem = ({ propuesta }: { propuesta: any }) => {
   );
 };
 
+const MetodoPagoLabel: Record<string, string> = {
+  transferencia: "Transferencia bancaria",
+  nequi: "Nequi",
+  daviplata: "Daviplata",
+  otro: "Otro",
+};
+
+const LiquidacionItem = ({ liq }: { liq: any }) => {
+  const estadoBadge = () => {
+    switch (liq.estado) {
+      case "pendiente":
+        return <Badge className="bg-amber-500 hover:bg-amber-500 text-white">Pendiente de pago</Badge>;
+      case "pagada":
+        return <Badge className="bg-emerald-600 hover:bg-emerald-600">Pagada</Badge>;
+      case "cancelada":
+        return <Badge variant="secondary">Cancelada</Badge>;
+      default:
+        return <Badge variant="outline">{liq.estado}</Badge>;
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          {estadoBadge()}
+          <span className="text-xs text-muted-foreground">
+            Generada el {fmtFecha(liq.fecha_generacion)}
+          </span>
+        </div>
+
+        <div>
+          <p className="font-semibold text-foreground">
+            {liq.orden?.lotes?.nombre_lote ?? "—"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {liq.tipo?.nombre ?? "—"}
+            {liq.orden?.lotes?.ciudad ? ` · ${liq.orden.lotes.ciudad}` : ""}
+          </p>
+        </div>
+
+        <div className="rounded-md bg-muted/40 p-3 space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Tu precio</span>
+            <span>{fmtCOP(Number(liq.monto_bruto))}</span>
+          </div>
+          <div className="flex justify-between text-muted-foreground">
+            <span>Fee 360Lateral ({Number(liq.fee_pct)}%)</span>
+            <span>−{fmtCOP(Number(liq.fee_monto))}</span>
+          </div>
+          <div className="border-t pt-1 mt-1 flex justify-between font-semibold text-emerald-700 dark:text-emerald-500">
+            <span>Recibes</span>
+            <span>{fmtCOP(Number(liq.monto_neto))}</span>
+          </div>
+        </div>
+
+        {liq.estado === "pagada" && liq.fecha_pago && (
+          <p className="text-xs text-emerald-700 dark:text-emerald-500">
+            Pagado el {fmtFecha(liq.fecha_pago)}
+            {liq.metodo_pago ? ` vía ${MetodoPagoLabel[liq.metodo_pago] ?? liq.metodo_pago}` : ""}.
+          </p>
+        )}
+        {liq.estado === "pendiente" && (
+          <p className="text-xs text-muted-foreground">
+            360Lateral procesará tu pago próximamente.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 const DashboardMisOrdenes = () => {
   const [tab, setTab] = useState("disponibles");
   const [postularOrden, setPostularOrden] = useState<any | null>(null);
   const { data: ordenes = [], isLoading: loadingOrdenes } = useMisOrdenesExperto();
   const { data: propuestas = [], isLoading: loadingProps } = useMisPropuestas();
+  const { data: liquidaciones = [], isLoading: loadingLiqs } = useMisLiquidaciones();
+
+  const kpiLiqs = liquidaciones.reduce(
+    (acc: { total: number; pendiente: number; pagado: number; pendCount: number }, l: any) => {
+      const neto = Number(l.monto_neto) || 0;
+      if (l.estado !== "cancelada") acc.total += neto;
+      if (l.estado === "pendiente") {
+        acc.pendiente += neto;
+        acc.pendCount += 1;
+      }
+      if (l.estado === "pagada") acc.pagado += neto;
+      return acc;
+    },
+    { total: 0, pendiente: 0, pagado: 0, pendCount: 0 }
+  );
 
   return (
     <DashboardLayout>
