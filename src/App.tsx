@@ -61,6 +61,7 @@ import PagoCompletado from "./pages/PagoCompletado";
 import DashboardPagos from "./pages/DashboardPagos";
 import DashboardLiquidaciones from "./pages/DashboardLiquidaciones";
 import LoteFicha from "./pages/LoteFicha";
+import ComisionistaPortal from "./pages/ComisionistaPortal";
 
 const queryClient = new QueryClient();
 
