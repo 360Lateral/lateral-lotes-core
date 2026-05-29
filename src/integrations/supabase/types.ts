@@ -1026,6 +1026,122 @@ export type Database = {
           },
         ]
       }
+      autorizaciones_comisionista: {
+        Row: {
+          comision_pct: number
+          comisionista_id: string
+          creada_por: string | null
+          created_at: string
+          documento_url: string
+          estado: Database["public"]["Enums"]["estado_autorizacion_comisionista"]
+          fecha_vencimiento: string | null
+          id: string
+          lote_id: string
+          notas: string | null
+          propietario_id: string
+          updated_at: string
+        }
+        Insert: {
+          comision_pct: number
+          comisionista_id: string
+          creada_por?: string | null
+          created_at?: string
+          documento_url: string
+          estado?: Database["public"]["Enums"]["estado_autorizacion_comisionista"]
+          fecha_vencimiento?: string | null
+          id?: string
+          lote_id: string
+          notas?: string | null
+          propietario_id: string
+          updated_at?: string
+        }
+        Update: {
+          comision_pct?: number
+          comisionista_id?: string
+          creada_por?: string | null
+          created_at?: string
+          documento_url?: string
+          estado?: Database["public"]["Enums"]["estado_autorizacion_comisionista"]
+          fecha_vencimiento?: string | null
+          id?: string
+          lote_id?: string
+          notas?: string | null
+          propietario_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autorizaciones_comisionista_comisionista_id_fkey"
+            columns: ["comisionista_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_comisionista_id_fkey"
+            columns: ["comisionista_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_creada_por_fkey"
+            columns: ["creada_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_creada_por_fkey"
+            columns: ["creada_por"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autorizaciones_comisionista_propietario_id_fkey"
+            columns: ["propietario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+        ]
+      }
       consultas_ia: {
         Row: {
           created_at: string
@@ -4486,6 +4602,10 @@ export type Database = {
         Args: { p_alerta_id: string }
         Returns: undefined
       }
+      revocar_autorizacion_comisionista: {
+        Args: { p_autorizacion_id: string; p_motivo?: string }
+        Returns: undefined
+      }
       shares_negociacion: {
         Args: { _user_a: string; _user_b: string }
         Returns: boolean
@@ -4540,6 +4660,7 @@ export type Database = {
         | "aprobado"
         | "rechazado"
         | "entregado"
+      estado_autorizacion_comisionista: "activa" | "revocada" | "vencida"
       estado_disponibilidad:
         | "Disponible"
         | "Reservado"
@@ -4746,6 +4867,7 @@ export const Constants = {
         "rechazado",
         "entregado",
       ],
+      estado_autorizacion_comisionista: ["activa", "revocada", "vencida"],
       estado_disponibilidad: [
         "Disponible",
         "Reservado",
