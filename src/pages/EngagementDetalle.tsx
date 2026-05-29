@@ -30,6 +30,7 @@ import {
 import SeccionEntregables from "@/components/entregables/SeccionEntregables";
 import CrearOrdenServicioDialog from "@/components/ordenes/CrearOrdenServicioDialog";
 import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog";
+import FichaConfigDialog from "@/components/lotes/FichaConfigDialog";
 import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
 import { ClipboardList, CreditCard, FileText } from "lucide-react";
