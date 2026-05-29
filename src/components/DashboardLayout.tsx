@@ -26,6 +26,7 @@ import {
   Briefcase,
   Trophy,
   CreditCard,
+  Wallet,
   ChevronDown,
   ChevronRight,
   type LucideIcon,
@@ -120,6 +121,20 @@ const DashboardLayout = ({ children }: Props) => {
   });
   const pagosCount = isAdmin ? transPendientes.length : 0;
 
+  const { data: liquidacionesPendCount = 0 } = useQuery({
+    queryKey: ["liquidaciones-pendientes-count"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("liquidaciones_experto")
+        .select("id", { count: "exact", head: true })
+        .eq("estado", "pendiente");
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
   const badgeFor = (href: string): number => {
     switch (href) {
       case "/dashboard/notificaciones":
@@ -132,6 +147,8 @@ const DashboardLayout = ({ children }: Props) => {
         return ordenesCount;
       case "/dashboard/pagos":
         return pagosCount;
+      case "/dashboard/liquidaciones":
+        return isAdmin ? (liquidacionesPendCount as number) : 0;
       default:
         return 0;
     }
@@ -186,6 +203,7 @@ const DashboardLayout = ({ children }: Props) => {
         title: "Finanzas",
         items: [
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
+          { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
           { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
         ],
       });
