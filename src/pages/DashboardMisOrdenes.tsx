@@ -416,6 +416,59 @@ const DashboardMisOrdenes = () => {
           <TabsContent value="mi-desempeno" className="mt-4">
             <MiDesempenoPanel />
           </TabsContent>
+
+          <TabsContent value="mis-pagos" className="mt-4 space-y-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Total ganado (neto)</p>
+                  <p className="text-2xl font-semibold text-foreground mt-1">
+                    {fmtCOP(kpiLiqs.total)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Pendiente de cobro</p>
+                  <p className="text-2xl font-semibold text-amber-600 dark:text-amber-500 mt-1">
+                    {fmtCOP(kpiLiqs.pendiente)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Ya cobrado</p>
+                  <p className="text-2xl font-semibold text-emerald-700 dark:text-emerald-500 mt-1">
+                    {fmtCOP(kpiLiqs.pagado)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {loadingLiqs ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-40 w-full" />
+                ))}
+              </div>
+            ) : liquidaciones.length === 0 ? (
+              <Card>
+                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
+                  <Wallet className="h-10 w-10" />
+                  <p>
+                    Aún no tienes liquidaciones. Se generan automáticamente cuando
+                    completas un análisis adjudicado.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {liquidaciones.map((l: any) => (
+                  <LiquidacionItem key={l.id} liq={l} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
 
