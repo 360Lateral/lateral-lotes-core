@@ -296,6 +296,7 @@ const DashboardLotes = () => {
           tipos={tipos}
           planes={planes}
           estados={estadosLista}
+          propietarios={propietariosOptions}
         />
       </div>
 
