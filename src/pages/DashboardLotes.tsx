@@ -185,6 +185,15 @@ const DashboardLotes = () => {
     return Array.from(map.entries()).map(([codigo, nombre]) => ({ codigo, nombre }));
   }, [engagementsActivos]);
 
+  const propietariosOptions = useMemo(() => {
+    return propietarioIds
+      .map((id) => {
+        const p = (propietariosMap as any)[id];
+        return { id, label: (p?.nombre || p?.email || id) as string };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label, "es"));
+  }, [propietarioIds, propietariosMap]);
+
   const deferredFiltros = useDeferredValue(filtros);
 
   const filtered = useMemo(() => {
