@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
 import NdaModal from "@/components/lotes/NdaModal";
 import SolicitarContactoDialog from "@/components/lotes/SolicitarContactoDialog";
+import PayPerViewCTA from "@/components/lotes/PayPerViewCTA";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
 const formatCOP = (n: number | undefined | null) =>
@@ -107,6 +108,11 @@ const LoteDetalle = () => {
             <ShieldCheck className="h-3 w-3 mr-1" />
             {data.es_propietario ? "Vista de propietario" : "Vista admin"}
           </Badge>
+        )}
+
+        {/* Badge acceso pay-per-view */}
+        {data.acceso_por_ppv && !data.es_propietario && !data.es_admin && id && (
+          <PayPerViewCTA loteId={id} accesoActivoExpira={data.ppv_expira ?? undefined} />
         )}
 
         {/* Hero */}
@@ -245,13 +251,20 @@ const LoteDetalle = () => {
               </Button>
             </Card>
           ) : (
-            <SeccionBloqueada
-              nivelRequerido="profesional"
-              nivelActual={nivel}
-              tipo="dirección exacta, matrícula y fotos reales"
-              mostrarBotonContacto
-              anonimo={anonimo}
-            />
+            <div className="space-y-3">
+              <SeccionBloqueada
+                nivelRequerido="profesional"
+                nivelActual={nivel}
+                tipo="dirección exacta, matrícula y fotos reales"
+                mostrarBotonContacto
+                anonimo={anonimo}
+              />
+              {!anonimo && id && !data.acceso_por_ppv && (
+                <div className="flex justify-center">
+                  <PayPerViewCTA loteId={id} />
+                </div>
+              )}
+            </div>
           )}
         </section>
 
@@ -304,13 +317,20 @@ const LoteDetalle = () => {
               <Button onClick={() => setNdaOpen(true)}>Firmar NDA</Button>
             </Card>
           ) : (
-            <SeccionBloqueada
-              nivelRequerido="premium"
-              nivelActual={nivel}
-              tipo="precio exacto y análisis 360"
-              mostrarBotonContacto
-              anonimo={anonimo}
-            />
+            <div className="space-y-3">
+              <SeccionBloqueada
+                nivelRequerido="premium"
+                nivelActual={nivel}
+                tipo="precio exacto y análisis 360"
+                mostrarBotonContacto
+                anonimo={anonimo}
+              />
+              {!anonimo && id && !data.acceso_por_ppv && (
+                <div className="flex justify-center">
+                  <PayPerViewCTA loteId={id} />
+                </div>
+              )}
+            </div>
           )}
         </section>
 

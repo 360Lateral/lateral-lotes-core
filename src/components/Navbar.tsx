@@ -49,8 +49,9 @@ const Navbar = () => {
     if (user && isDesarrollador) {
       return [
         { label: "Catálogo", href: "/lotes" },
+        { label: "Suscripción", href: "/suscripcion" },
+        { label: "Mi cuenta", href: "/mi-cuenta" },
         { label: "Diagnóstico", href: "/diagnostico" },
-        { label: "Nosotros", href: "/#nosotros" },
       ];
     }
     return [
