@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
 import NdaModal from "@/components/lotes/NdaModal";
 import SolicitarContactoDialog from "@/components/lotes/SolicitarContactoDialog";
+import PayPerViewCTA from "@/components/lotes/PayPerViewCTA";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
 const formatCOP = (n: number | undefined | null) =>
