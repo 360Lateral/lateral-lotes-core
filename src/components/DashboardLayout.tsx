@@ -220,6 +220,7 @@ const DashboardLayout = ({ children }: Props) => {
         items: [
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
           { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
+          { label: "Ventas y comisiones", href: "/dashboard/ventas", icon: Handshake },
           { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
         ],
       });
