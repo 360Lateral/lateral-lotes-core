@@ -140,6 +140,7 @@ const Suscripcion = () => {
             const precio = precioPorNivel.get(n.nivel);
             const esActual = miSuscripcion?.nivel === n.nivel;
             const destacado = n.nivel === "profesional";
+            const requiereAcuerdo = n.nivel === "profesional" || n.nivel === "premium";
             return (
               <Card
                 key={n.nivel}
@@ -173,6 +174,13 @@ const Suscripcion = () => {
                     </li>
                   ))}
                 </ul>
+                {requiereAcuerdo && (
+                  <p className="text-xs text-muted-foreground bg-muted/40 border rounded-md p-2 mb-3 leading-snug">
+                    Este plan da acceso a información identificable de los activos. Para verla,
+                    deberás aceptar el Acuerdo de Confidencialidad y No Elusión (tramitar negocios
+                    solo a través de 360Lateral).
+                  </p>
+                )}
                 {!isDesarrollador ? (
                   <Button disabled variant="outline" className="w-full">
                     Disponible para desarrolladores

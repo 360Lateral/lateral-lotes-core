@@ -204,6 +204,7 @@ const DashboardLayout = ({ children }: Props) => {
           { label: "Validar activos", href: "/dashboard/lotes/pendientes-validacion", icon: ShieldCheck },
           { label: "Solicitudes de contacto", href: "/dashboard/solicitudes-contacto", icon: MessageCircle },
           { label: "Negociaciones", href: "/dashboard/negociaciones", icon: Handshake },
+          { label: "Acuerdos firmados", href: "/dashboard/acuerdos-firmados", icon: ScrollText },
         ],
       });
     }

@@ -29,9 +29,10 @@ const NdaModal = ({ open, onOpenChange, loteId }: NdaModalProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Acuerdo de confidencialidad — 360Lateral</DialogTitle>
+          <DialogTitle>Acuerdo de Confidencialidad y No Elusión — 360Lateral</DialogTitle>
           <DialogDescription>
-            Lee y acepta los términos para ver la información detallada de este lote.
+            Lee y acepta los términos para ver la información identificable de este activo.
+            Incluye la obligación de tramitar cualquier negocio exclusivamente a través de 360Lateral.
           </DialogDescription>
         </DialogHeader>
 
@@ -46,7 +47,8 @@ const NdaModal = ({ open, onOpenChange, loteId }: NdaModalProps) => {
             onCheckedChange={(v) => setAcepta(v === true)}
           />
           <label htmlFor="acepta-nda" className="text-sm leading-tight cursor-pointer">
-            He leído y acepto los términos del acuerdo de confidencialidad.
+            He leído y acepto el Acuerdo de Confidencialidad y No Elusión, incluyendo la
+            obligación de tramitar cualquier negocio exclusivamente a través de 360Lateral.
           </label>
         </div>
 
@@ -55,7 +57,7 @@ const NdaModal = ({ open, onOpenChange, loteId }: NdaModalProps) => {
             Cancelar
           </Button>
           <Button onClick={handleFirmar} disabled={!acepta || isPending}>
-            {isPending ? "Firmando..." : "Firmar y continuar"}
+            {isPending ? "Firmando..." : "Aceptar y firmar"}
           </Button>
         </DialogFooter>
       </DialogContent>
