@@ -452,6 +452,16 @@ const SalaNegociacion = () => {
           </div>
         </div>
       )}
+      <CerrarVentaDialog
+        open={openCerrar}
+        onOpenChange={setOpenCerrar}
+        negociacion={{
+          id: negociacion.id,
+          lote_id: negociacion.lote_id,
+          lote_nombre: loteData?.nombre_lote ?? null,
+          developer_nombre: getPerfilName(negociacion.developer_id),
+        }}
+      />
     </div>
   );
 };
