@@ -135,6 +135,20 @@ const DashboardLayout = ({ children }: Props) => {
     },
   });
 
+  const { data: comisionesPendCount = 0 } = useQuery({
+    queryKey: ["comisiones-pendientes-count"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("comisiones_venta")
+        .select("id", { count: "exact", head: true })
+        .eq("estado", "pendiente");
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
   const badgeFor = (href: string): number => {
     switch (href) {
       case "/dashboard/notificaciones":
