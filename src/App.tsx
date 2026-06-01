@@ -64,6 +64,8 @@ import DashboardVentas from "./pages/DashboardVentas";
 import LoteFicha from "./pages/LoteFicha";
 import ComisionistaPortal from "./pages/ComisionistaPortal";
 import DashboardFinanzas from "./pages/DashboardFinanzas";
+import Suscripcion from "./pages/Suscripcion";
+import MiCuentaDesarrollador from "./pages/MiCuentaDesarrollador";
 
 const queryClient = new QueryClient();
 
