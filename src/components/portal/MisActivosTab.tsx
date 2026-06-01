@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Plus, PackageOpen, FileSearch } from "lucide-react";
+import { MapPin, Plus, PackageOpen, FileSearch, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
+import GestionarComisionistasDialog from "./GestionarComisionistasDialog";
 import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
 
 const fmtCOP = (n: number | null) =>
@@ -47,6 +48,9 @@ const MisActivosTab = () => {
   const { data: activos = [], isLoading } = useMisActivos(user?.id);
   const [openDialog, setOpenDialog] = useState(false);
   const [loteParaDiagnostico, setLoteParaDiagnostico] = useState<string | null>(null);
+  const [loteParaComisionistas, setLoteParaComisionistas] = useState<
+    { id: string; nombre: string | null } | null
+  >(null);
 
   return (
     <div className="space-y-6">
@@ -140,6 +144,17 @@ const MisActivosTab = () => {
                     <FileSearch className="mr-1 h-4 w-4" />
                     Contratar diagnóstico
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="col-span-2"
+                    onClick={() =>
+                      setLoteParaComisionistas({ id: a.id, nombre: a.nombre_lote })
+                    }
+                  >
+                    <Users className="mr-1 h-4 w-4" />
+                    Gestionar comisionistas
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -153,6 +168,13 @@ const MisActivosTab = () => {
         onOpenChange={(v) => !v && setLoteParaDiagnostico(null)}
         loteIdPreseleccionado={loteParaDiagnostico ?? undefined}
       />
+      {loteParaComisionistas && (
+        <GestionarComisionistasDialog
+          open={!!loteParaComisionistas}
+          onOpenChange={(v) => !v && setLoteParaComisionistas(null)}
+          lote={loteParaComisionistas}
+        />
+      )}
     </div>
   );
 };
