@@ -95,6 +95,8 @@ const App = () => (
             <Route path="/mercado" element={<Mercado />} />
             <Route path="/resolutoria" element={<Resolutoria />} />
             <Route path="/planes" element={<Planes />} />
+            <Route path="/suscripcion" element={<ProtectedRoute allowPropietario><Suscripcion /></ProtectedRoute>} />
+            <Route path="/mi-cuenta" element={<ProtectedRoute allowPropietario><MiCuentaDesarrollador /></ProtectedRoute>} />
             <Route path="/portal/pago-completado" element={<PagoCompletado />} />
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
