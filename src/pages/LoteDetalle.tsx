@@ -317,13 +317,20 @@ const LoteDetalle = () => {
               <Button onClick={() => setNdaOpen(true)}>Firmar NDA</Button>
             </Card>
           ) : (
-            <SeccionBloqueada
-              nivelRequerido="premium"
-              nivelActual={nivel}
-              tipo="precio exacto y análisis 360"
-              mostrarBotonContacto
-              anonimo={anonimo}
-            />
+            <div className="space-y-3">
+              <SeccionBloqueada
+                nivelRequerido="premium"
+                nivelActual={nivel}
+                tipo="precio exacto y análisis 360"
+                mostrarBotonContacto
+                anonimo={anonimo}
+              />
+              {!anonimo && id && !data.acceso_por_ppv && (
+                <div className="flex justify-center">
+                  <PayPerViewCTA loteId={id} />
+                </div>
+              )}
+            </div>
           )}
         </section>
 
