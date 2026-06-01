@@ -4787,6 +4787,7 @@ export type Database = {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
       }
+      expirar_suscripciones_y_accesos: { Args: never; Returns: undefined }
       factor_avance_por_estado: {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
         Returns: number

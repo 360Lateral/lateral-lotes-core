@@ -28,6 +28,8 @@ import {
   CreditCard,
   Wallet,
   PieChart,
+  Repeat,
+  Tag,
   ChevronDown,
   ChevronRight,
   type LucideIcon,
@@ -220,6 +222,7 @@ const DashboardLayout = ({ children }: Props) => {
         title: "Finanzas",
         items: [
           { label: "Panorama financiero", href: "/dashboard/finanzas", icon: PieChart },
+          { label: "Suscripciones", href: "/dashboard/suscripciones", icon: Repeat },
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
           { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
           { label: "Ventas y comisiones", href: "/dashboard/ventas", icon: Handshake },
@@ -231,6 +234,7 @@ const DashboardLayout = ({ children }: Props) => {
     // Administración (admin)
     if (isAdmin) {
       const admItems: NavItem[] = [{ label: "Usuarios", href: "/dashboard/usuarios", icon: UserCog }];
+      if (isSuperAdmin) admItems.push({ label: "Precios y planes", href: "/dashboard/config-suscripciones", icon: Tag });
       if (isSuperAdmin) admItems.push({ label: "Configuración", href: "/dashboard/config", icon: Settings });
       g.push({ key: "administracion", title: "Administración", items: admItems });
     }
