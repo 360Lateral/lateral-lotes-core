@@ -4751,7 +4751,15 @@ export type Database = {
           tiempo_medio_cierre_dias: number
         }[]
       }
+      obtener_resumen_financiero: {
+        Args: { p_desde?: string; p_hasta?: string }
+        Returns: Json
+      }
       obtener_smlmv_vigente: { Args: { p_fecha?: string }; Returns: number }
+      obtener_tendencia_financiera: {
+        Args: { p_meses?: number }
+        Returns: Json
+      }
       obtener_tendencia_mensual: {
         Args: { p_meses_atras?: number }
         Returns: {
