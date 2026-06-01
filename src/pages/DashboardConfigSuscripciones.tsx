@@ -53,6 +53,9 @@ const DashboardConfigSuscripciones = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8 max-w-5xl">
+        <header>
+          <h1 className="text-2xl font-semibold">Precios y planes</h1>
+        </header>
         {/* Precios de suscripción */}
         <Card className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
