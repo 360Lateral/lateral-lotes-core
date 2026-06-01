@@ -37,6 +37,8 @@ export interface LoteDetalle {
   tiene_analisis_mercado?: boolean;
   tiene_analisis_sspp?: boolean;
   acceso_completo?: boolean;
+  acceso_por_ppv?: boolean;
+  ppv_expira?: string | null;
   error?: string;
 }
 
