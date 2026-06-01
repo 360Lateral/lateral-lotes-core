@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
 
     const { data: transData, error: transErr } = await admin
       .from("transacciones")
-      .select("id, estado, engagement_id, propietario_id")
+      .select("id, estado, engagement_id, propietario_id, tipo_pago")
       .eq("wompi_reference", reference)
       .single();
 
@@ -185,7 +185,14 @@ Deno.serve(async (req) => {
       .eq("id", transaccionLocalId);
 
     if (wompiStatus === "APPROVED") {
-      const { error: rpcErr } = await admin.rpc("activar_engagement_post_pago", {
+      const tipoPago = (transData as any).tipo_pago ?? "diagnostico";
+      const rpcName =
+        tipoPago === "suscripcion"
+          ? "activar_suscripcion_post_pago"
+          : tipoPago === "pay_per_view"
+          ? "activar_acceso_lote_post_pago"
+          : "activar_engagement_post_pago";
+      const { error: rpcErr } = await admin.rpc(rpcName, {
         p_transaccion_id: transaccionLocalId,
       });
       if (rpcErr) throw rpcErr;
