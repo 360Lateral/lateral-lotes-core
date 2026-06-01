@@ -144,6 +144,17 @@ const MisActivosTab = () => {
                     <FileSearch className="mr-1 h-4 w-4" />
                     Contratar diagnóstico
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="col-span-2"
+                    onClick={() =>
+                      setLoteParaComisionistas({ id: a.id, nombre: a.nombre_lote })
+                    }
+                  >
+                    <Users className="mr-1 h-4 w-4" />
+                    Gestionar comisionistas
+                  </Button>
                 </div>
               </CardContent>
             </Card>
