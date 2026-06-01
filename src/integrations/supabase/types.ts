@@ -14,6 +14,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      accesos_lote: {
+        Row: {
+          created_at: string
+          desarrollador_id: string
+          estado: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_compra: string | null
+          fecha_expiracion: string | null
+          id: string
+          lote_id: string
+          precio_cop: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          desarrollador_id: string
+          estado?: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_compra?: string | null
+          fecha_expiracion?: string | null
+          id?: string
+          lote_id: string
+          precio_cop: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          desarrollador_id?: string
+          estado?: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_compra?: string | null
+          fecha_expiracion?: string | null
+          id?: string
+          lote_id?: string
+          precio_cop?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accesos_lote_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accesos_lote_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "accesos_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accesos_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accesos_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accesos_lote_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+        ]
+      }
       alertas: {
         Row: {
           activa: boolean
@@ -1269,6 +1348,30 @@ export type Database = {
             referencedColumns: ["experto_id"]
           },
         ]
+      }
+      config_payperview: {
+        Row: {
+          activo: boolean
+          dias_acceso: number
+          id: number
+          precio_cop: number
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          dias_acceso?: number
+          id?: number
+          precio_cop?: number
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          dias_acceso?: number
+          id?: number
+          precio_cop?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       consultas_ia: {
         Row: {
@@ -3484,6 +3587,36 @@ export type Database = {
           },
         ]
       }
+      precios_suscripcion: {
+        Row: {
+          activo: boolean
+          created_at: string
+          id: string
+          nivel: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses: number
+          precio_cop: number
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nivel: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses: number
+          precio_cop: number
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nivel?: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses?: number
+          precio_cop?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       preferencias_usuario: {
         Row: {
           created_at: string
@@ -3843,6 +3976,60 @@ export type Database = {
           },
         ]
       }
+      suscripciones_desarrollador: {
+        Row: {
+          created_at: string
+          desarrollador_id: string
+          estado: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_fin: string | null
+          fecha_inicio: string | null
+          id: string
+          nivel: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses: number
+          precio_cop: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          desarrollador_id: string
+          estado?: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_fin?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          nivel: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses: number
+          precio_cop: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          desarrollador_id?: string
+          estado?: Database["public"]["Enums"]["estado_suscripcion"]
+          fecha_fin?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          nivel?: Database["public"]["Enums"]["nivel_suscripcion"]
+          periodo_meses?: number
+          precio_cop?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suscripciones_desarrollador_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suscripciones_desarrollador_desarrollador_id_fkey"
+            columns: ["desarrollador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+        ]
+      }
       tareas_analisis: {
         Row: {
           avance_pct: number
@@ -3959,6 +4146,7 @@ export type Database = {
       }
       transacciones: {
         Row: {
+          acceso_lote_id: string | null
           creada_por: string | null
           engagement_id: string
           error_msg: string | null
@@ -3974,6 +4162,8 @@ export type Database = {
           plan_id: string
           propietario_id: string | null
           smlmv_referencia: number
+          suscripcion_id: string | null
+          tipo_pago: Database["public"]["Enums"]["tipo_pago"]
           updated_at: string
           wompi_payment_link_url: string | null
           wompi_reference: string | null
@@ -3981,6 +4171,7 @@ export type Database = {
           wompi_transaction_id: string | null
         }
         Insert: {
+          acceso_lote_id?: string | null
           creada_por?: string | null
           engagement_id: string
           error_msg?: string | null
@@ -3996,6 +4187,8 @@ export type Database = {
           plan_id: string
           propietario_id?: string | null
           smlmv_referencia: number
+          suscripcion_id?: string | null
+          tipo_pago?: Database["public"]["Enums"]["tipo_pago"]
           updated_at?: string
           wompi_payment_link_url?: string | null
           wompi_reference?: string | null
@@ -4003,6 +4196,7 @@ export type Database = {
           wompi_transaction_id?: string | null
         }
         Update: {
+          acceso_lote_id?: string | null
           creada_por?: string | null
           engagement_id?: string
           error_msg?: string | null
@@ -4018,6 +4212,8 @@ export type Database = {
           plan_id?: string
           propietario_id?: string | null
           smlmv_referencia?: number
+          suscripcion_id?: string | null
+          tipo_pago?: Database["public"]["Enums"]["tipo_pago"]
           updated_at?: string
           wompi_payment_link_url?: string | null
           wompi_reference?: string | null
@@ -4025,6 +4221,13 @@ export type Database = {
           wompi_transaction_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "transacciones_acceso_lote_id_fkey"
+            columns: ["acceso_lote_id"]
+            isOneToOne: false
+            referencedRelation: "accesos_lote"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transacciones_creada_por_fkey"
             columns: ["creada_por"]
@@ -4080,6 +4283,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_metricas_experto"
             referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "transacciones_suscripcion_id_fkey"
+            columns: ["suscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "suscripciones_desarrollador"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4460,6 +4670,10 @@ export type Database = {
       }
     }
     Functions: {
+      activar_acceso_lote_post_pago: {
+        Args: { p_transaccion_id: string }
+        Returns: undefined
+      }
       activar_engagement: {
         Args: { p_engagement_id: string }
         Returns: undefined
@@ -4469,6 +4683,10 @@ export type Database = {
         Returns: undefined
       }
       activar_engagement_post_pago: {
+        Args: { p_transaccion_id: string }
+        Returns: undefined
+      }
+      activar_suscripcion_post_pago: {
         Args: { p_transaccion_id: string }
         Returns: undefined
       }
@@ -4888,6 +5106,7 @@ export type Database = {
         | "retirado"
       estado_servicio: "Disponible" | "En trámite" | "No disponible"
       estado_solicitud_contacto: "pendiente" | "contactado" | "cerrado"
+      estado_suscripcion: "pendiente_pago" | "activa" | "vencida" | "cancelada"
       estado_transaccion:
         | "pendiente"
         | "aprobada"
@@ -4903,6 +5122,7 @@ export type Database = {
         | "informe_area"
         | "documento_soporte"
         | "otro"
+      tipo_pago: "diagnostico" | "suscripcion" | "pay_per_view"
       visibilidad_orden: "publica" | "invitacion"
     }
     CompositeTypes: {
@@ -5101,6 +5321,7 @@ export const Constants = {
       ],
       estado_servicio: ["Disponible", "En trámite", "No disponible"],
       estado_solicitud_contacto: ["pendiente", "contactado", "cerrado"],
+      estado_suscripcion: ["pendiente_pago", "activa", "vencida", "cancelada"],
       estado_transaccion: [
         "pendiente",
         "aprobada",
@@ -5118,6 +5339,7 @@ export const Constants = {
         "documento_soporte",
         "otro",
       ],
+      tipo_pago: ["diagnostico", "suscripcion", "pay_per_view"],
       visibilidad_orden: ["publica", "invitacion"],
     },
   },
