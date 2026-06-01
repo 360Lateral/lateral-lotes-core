@@ -55,6 +55,7 @@ const SalaNegociacion = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [mensaje, setMensaje] = useState("");
   const [nuevoEstado, setNuevoEstado] = useState("");
+  const [openCerrar, setOpenCerrar] = useState(false);
 
   // Fetch negociacion with lote and precio
   const { data: negociacion, isLoading } = useQuery({
