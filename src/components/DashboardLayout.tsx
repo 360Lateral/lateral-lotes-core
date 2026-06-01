@@ -28,6 +28,8 @@ import {
   CreditCard,
   Wallet,
   PieChart,
+  Repeat,
+  Tag,
   ChevronDown,
   ChevronRight,
   type LucideIcon,
