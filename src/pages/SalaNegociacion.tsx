@@ -17,9 +17,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Send, MessageSquare, Info } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Info, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CerrarVentaDialog from "@/components/negociaciones/CerrarVentaDialog";
 
 const estadoBadgeClass = (e: string) => {
   switch (e) {
@@ -54,6 +55,7 @@ const SalaNegociacion = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [mensaje, setMensaje] = useState("");
   const [nuevoEstado, setNuevoEstado] = useState("");
+  const [openCerrar, setOpenCerrar] = useState(false);
 
   // Fetch negociacion with lote and precio
   const { data: negociacion, isLoading } = useQuery({
@@ -348,6 +350,16 @@ const SalaNegociacion = () => {
                 onCheckedChange={(val) => toggleContacto.mutate(val)}
               />
             </div>
+            {(negociacion.estado === "activa" || negociacion.estado === "en_revision") && (
+              <Button
+                size="sm"
+                className="w-full"
+                onClick={() => setOpenCerrar(true)}
+              >
+                <Handshake className="mr-2 h-4 w-4" />
+                Cerrar venta
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
@@ -440,6 +452,16 @@ const SalaNegociacion = () => {
           </div>
         </div>
       )}
+      <CerrarVentaDialog
+        open={openCerrar}
+        onOpenChange={setOpenCerrar}
+        negociacion={{
+          id: negociacion.id,
+          lote_id: negociacion.lote_id,
+          lote_nombre: loteData?.nombre_lote ?? null,
+          developer_nombre: getPerfilName(negociacion.developer_id),
+        }}
+      />
     </div>
   );
 };

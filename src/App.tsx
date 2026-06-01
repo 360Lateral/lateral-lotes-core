@@ -60,6 +60,7 @@ import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle
 import PagoCompletado from "./pages/PagoCompletado";
 import DashboardPagos from "./pages/DashboardPagos";
 import DashboardLiquidaciones from "./pages/DashboardLiquidaciones";
+import DashboardVentas from "./pages/DashboardVentas";
 import LoteFicha from "./pages/LoteFicha";
 import ComisionistaPortal from "./pages/ComisionistaPortal";
 
@@ -116,6 +117,7 @@ const App = () => (
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/pagos" element={<ProtectedRoute><DashboardPagos /></ProtectedRoute>} />
             <Route path="/dashboard/liquidaciones" element={<ProtectedRoute><DashboardLiquidaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/ventas" element={<ProtectedRoute><DashboardVentas /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowPropietario><PreferenciasUsuario /></ProtectedRoute>} />
 

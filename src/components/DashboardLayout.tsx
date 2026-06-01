@@ -135,6 +135,20 @@ const DashboardLayout = ({ children }: Props) => {
     },
   });
 
+  const { data: comisionesPendCount = 0 } = useQuery({
+    queryKey: ["comisiones-pendientes-count"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("comisiones_venta")
+        .select("id", { count: "exact", head: true })
+        .eq("estado", "pendiente");
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
   const badgeFor = (href: string): number => {
     switch (href) {
       case "/dashboard/notificaciones":
@@ -149,6 +163,8 @@ const DashboardLayout = ({ children }: Props) => {
         return pagosCount;
       case "/dashboard/liquidaciones":
         return isAdmin ? (liquidacionesPendCount as number) : 0;
+      case "/dashboard/ventas":
+        return isAdmin ? (comisionesPendCount as number) : 0;
       default:
         return 0;
     }
@@ -204,6 +220,7 @@ const DashboardLayout = ({ children }: Props) => {
         items: [
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
           { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
+          { label: "Ventas y comisiones", href: "/dashboard/ventas", icon: Handshake },
           { label: "Métricas", href: "/dashboard/metricas", icon: TrendingUp },
         ],
       });
