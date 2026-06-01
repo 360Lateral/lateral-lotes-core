@@ -48,6 +48,9 @@ const MisActivosTab = () => {
   const { data: activos = [], isLoading } = useMisActivos(user?.id);
   const [openDialog, setOpenDialog] = useState(false);
   const [loteParaDiagnostico, setLoteParaDiagnostico] = useState<string | null>(null);
+  const [loteParaComisionistas, setLoteParaComisionistas] = useState<
+    { id: string; nombre: string | null } | null
+  >(null);
 
   return (
     <div className="space-y-6">
