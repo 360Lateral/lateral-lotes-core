@@ -251,13 +251,20 @@ const LoteDetalle = () => {
               </Button>
             </Card>
           ) : (
-            <SeccionBloqueada
-              nivelRequerido="profesional"
-              nivelActual={nivel}
-              tipo="dirección exacta, matrícula y fotos reales"
-              mostrarBotonContacto
-              anonimo={anonimo}
-            />
+            <div className="space-y-3">
+              <SeccionBloqueada
+                nivelRequerido="profesional"
+                nivelActual={nivel}
+                tipo="dirección exacta, matrícula y fotos reales"
+                mostrarBotonContacto
+                anonimo={anonimo}
+              />
+              {!anonimo && id && !data.acceso_por_ppv && (
+                <div className="flex justify-center">
+                  <PayPerViewCTA loteId={id} />
+                </div>
+              )}
+            </div>
           )}
         </section>
 
