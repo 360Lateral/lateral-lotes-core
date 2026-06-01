@@ -66,6 +66,8 @@ import ComisionistaPortal from "./pages/ComisionistaPortal";
 import DashboardFinanzas from "./pages/DashboardFinanzas";
 import Suscripcion from "./pages/Suscripcion";
 import MiCuentaDesarrollador from "./pages/MiCuentaDesarrollador";
+import DashboardSuscripciones from "./pages/DashboardSuscripciones";
+import DashboardConfigSuscripciones from "./pages/DashboardConfigSuscripciones";
 
 const queryClient = new QueryClient();
 
