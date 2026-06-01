@@ -11,13 +11,28 @@ export const useVentasCerradas = () => {
           id, precio_venta_final, fee_360_pct, fee_360_monto,
           comprador_externo, fecha_cierre, cerrada_por, developer_id,
           lote:lotes(id, nombre_lote, ciudad, barrio),
-          cerrada_por_perfil:perfiles!negociaciones_cerrada_por_fkey(nombre),
-          developer:perfiles!negociaciones_developer_id_fkey(nombre, email)
+          cerrada_por_perfil:perfiles!negociaciones_cerrada_por_fkey(nombre)
         `)
         .eq("estado", "concretada")
         .order("fecha_cierre", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const rows = (data ?? []) as any[];
+
+      // Fetch developer profiles separately (no FK alias on developer_id)
+      const devIds = Array.from(
+        new Set(rows.map((r) => r.developer_id).filter(Boolean))
+      ) as string[];
+      let devsMap: Record<string, { nombre: string | null; email: string | null }> = {};
+      if (devIds.length) {
+        const { data: devs } = await supabase
+          .from("perfiles")
+          .select("id, nombre, email")
+          .in("id", devIds);
+        (devs ?? []).forEach((d: any) => {
+          devsMap[d.id] = { nombre: d.nombre, email: d.email };
+        });
+      }
+      return rows.map((r) => ({ ...r, developer: devsMap[r.developer_id] ?? null }));
     },
   });
 };
