@@ -222,6 +222,7 @@ const DashboardLayout = ({ children }: Props) => {
         title: "Finanzas",
         items: [
           { label: "Panorama financiero", href: "/dashboard/finanzas", icon: PieChart },
+          { label: "Suscripciones", href: "/dashboard/suscripciones", icon: Repeat },
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
           { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
           { label: "Ventas y comisiones", href: "/dashboard/ventas", icon: Handshake },
