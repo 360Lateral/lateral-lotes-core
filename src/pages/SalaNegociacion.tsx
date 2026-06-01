@@ -350,6 +350,16 @@ const SalaNegociacion = () => {
                 onCheckedChange={(val) => toggleContacto.mutate(val)}
               />
             </div>
+            {(negociacion.estado === "activa" || negociacion.estado === "en_revision") && (
+              <Button
+                size="sm"
+                className="w-full"
+                onClick={() => setOpenCerrar(true)}
+              >
+                <Handshake className="mr-2 h-4 w-4" />
+                Cerrar venta
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
