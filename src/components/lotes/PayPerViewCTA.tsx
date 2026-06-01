@@ -54,10 +54,16 @@ const PayPerViewCTA = ({ loteId, accesoActivoExpira }: Props) => {
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={handleClick} disabled={loading} className="gap-2">
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
-      Desbloquear solo este lote por {formatCOP(config.precio_cop)} ({config.dias_acceso} días)
-    </Button>
+    <div className="flex flex-col items-center gap-2">
+      <Button variant="outline" size="sm" onClick={handleClick} disabled={loading} className="gap-2">
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+        Desbloquear solo este lote por {formatCOP(config.precio_cop)} ({config.dias_acceso} días)
+      </Button>
+      <p className="text-xs text-muted-foreground max-w-md text-center">
+        Al desbloquear aceptarás el Acuerdo de No Elusión: cualquier negocio sobre este activo se
+        tramita exclusivamente a través de 360Lateral.
+      </p>
+    </div>
   );
 };
 

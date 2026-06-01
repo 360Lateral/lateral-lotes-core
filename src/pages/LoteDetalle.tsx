@@ -240,14 +240,17 @@ const LoteDetalle = () => {
                 <FileSignature className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-base font-semibold">Firma el NDA para ver el detalle</h3>
+                <h3 className="text-base font-semibold">
+                  Acepta el Acuerdo de Confidencialidad y No Elusión para ver el detalle
+                </h3>
                 <p className="text-sm text-muted-foreground max-w-md mt-1">
-                  Para ver dirección, matrícula y fotos reales debes firmar el acuerdo de
-                  confidencialidad con 360Lateral.
+                  Para ver dirección, matrícula y fotos reales debes aceptar el Acuerdo con
+                  360Lateral, que incluye tramitar cualquier negocio sobre este activo
+                  exclusivamente a través de la plataforma.
                 </p>
               </div>
               <Button onClick={() => setNdaOpen(true)}>
-                Firmar NDA y ver detalle
+                Ver y aceptar el acuerdo
               </Button>
             </Card>
           ) : (
@@ -313,8 +316,10 @@ const LoteDetalle = () => {
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <FileSignature className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-base font-semibold">Firma el NDA para ver análisis y precio</h3>
-              <Button onClick={() => setNdaOpen(true)}>Firmar NDA</Button>
+              <h3 className="text-base font-semibold">
+                Acepta el Acuerdo de Confidencialidad y No Elusión para ver análisis y precio
+              </h3>
+              <Button onClick={() => setNdaOpen(true)}>Ver y aceptar el acuerdo</Button>
             </Card>
           ) : (
             <div className="space-y-3">

@@ -68,6 +68,7 @@ import Suscripcion from "./pages/Suscripcion";
 import MiCuentaDesarrollador from "./pages/MiCuentaDesarrollador";
 import DashboardSuscripciones from "./pages/DashboardSuscripciones";
 import DashboardConfigSuscripciones from "./pages/DashboardConfigSuscripciones";
+import DashboardAcuerdosFirmados from "./pages/DashboardAcuerdosFirmados";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +109,7 @@ const App = () => (
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
             <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute><DashboardSolicitudesContacto /></ProtectedRoute>} />
+            <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute><DashboardAcuerdosFirmados /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
