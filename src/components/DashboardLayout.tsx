@@ -27,6 +27,7 @@ import {
   Trophy,
   CreditCard,
   Wallet,
+  PieChart,
   ChevronDown,
   ChevronRight,
   type LucideIcon,

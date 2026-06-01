@@ -62,7 +62,8 @@ const formatMesCorto = (mes: string) => {
 };
 
 const DashboardFinanzas = () => {
-  const { isAdmin, isSuperAdmin, loading } = useAuth();
+  const { roles, isSuperAdmin, loading } = useAuth();
+  const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
   const [preset, setPreset] = useState<RangoPreset>("todo");
   const [desde, setDesde] = useState<string | undefined>(undefined);
   const [hasta, setHasta] = useState<string | undefined>(undefined);
