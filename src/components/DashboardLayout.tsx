@@ -27,6 +27,7 @@ import {
   Trophy,
   CreditCard,
   Wallet,
+  PieChart,
   ChevronDown,
   ChevronRight,
   type LucideIcon,
@@ -218,6 +219,7 @@ const DashboardLayout = ({ children }: Props) => {
         key: "finanzas",
         title: "Finanzas",
         items: [
+          { label: "Panorama financiero", href: "/dashboard/finanzas", icon: PieChart },
           { label: "Pagos", href: "/dashboard/pagos", icon: CreditCard },
           { label: "Liquidaciones", href: "/dashboard/liquidaciones", icon: Wallet },
           { label: "Ventas y comisiones", href: "/dashboard/ventas", icon: Handshake },
