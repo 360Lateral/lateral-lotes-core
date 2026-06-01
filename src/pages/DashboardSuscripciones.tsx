@@ -65,6 +65,9 @@ const DashboardSuscripciones = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold">Suscripciones y accesos</h1>
+        </header>
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <KpiCard icon={<Users className="h-4 w-4" />} label="Suscripciones activas" value={kpis.activas} />
