@@ -163,6 +163,8 @@ const DashboardLayout = ({ children }: Props) => {
         return pagosCount;
       case "/dashboard/liquidaciones":
         return isAdmin ? (liquidacionesPendCount as number) : 0;
+      case "/dashboard/ventas":
+        return isAdmin ? (comisionesPendCount as number) : 0;
       default:
         return 0;
     }
