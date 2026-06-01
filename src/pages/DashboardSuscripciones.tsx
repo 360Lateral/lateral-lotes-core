@@ -63,7 +63,7 @@ const DashboardSuscripciones = () => {
   );
 
   return (
-    <DashboardLayout title="Suscripciones y accesos">
+    <DashboardLayout>
       <div className="space-y-6">
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

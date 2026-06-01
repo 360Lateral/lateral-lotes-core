@@ -51,7 +51,7 @@ const DashboardConfigSuscripciones = () => {
   };
 
   return (
-    <DashboardLayout title="Precios y planes">
+    <DashboardLayout>
       <div className="space-y-8 max-w-5xl">
         {/* Precios de suscripción */}
         <Card className="p-6">
