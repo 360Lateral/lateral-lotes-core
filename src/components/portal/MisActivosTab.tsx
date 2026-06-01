@@ -168,6 +168,13 @@ const MisActivosTab = () => {
         onOpenChange={(v) => !v && setLoteParaDiagnostico(null)}
         loteIdPreseleccionado={loteParaDiagnostico ?? undefined}
       />
+      {loteParaComisionistas && (
+        <GestionarComisionistasDialog
+          open={!!loteParaComisionistas}
+          onOpenChange={(v) => !v && setLoteParaComisionistas(null)}
+          lote={loteParaComisionistas}
+        />
+      )}
     </div>
   );
 };
