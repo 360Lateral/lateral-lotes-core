@@ -60,6 +60,7 @@ import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle
 import PagoCompletado from "./pages/PagoCompletado";
 import DashboardPagos from "./pages/DashboardPagos";
 import DashboardLiquidaciones from "./pages/DashboardLiquidaciones";
+import DashboardVentas from "./pages/DashboardVentas";
 import LoteFicha from "./pages/LoteFicha";
 import ComisionistaPortal from "./pages/ComisionistaPortal";
 
