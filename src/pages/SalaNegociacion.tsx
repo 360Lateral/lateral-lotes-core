@@ -17,9 +17,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Send, MessageSquare, Info } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Info, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CerrarVentaDialog from "@/components/negociaciones/CerrarVentaDialog";
 
 const estadoBadgeClass = (e: string) => {
   switch (e) {
