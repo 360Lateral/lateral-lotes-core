@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
 
     const { data: transData, error: transErr } = await admin
       .from("transacciones")
-      .select("id, estado, engagement_id, propietario_id")
+      .select("id, estado, engagement_id, propietario_id, tipo_pago")
       .eq("wompi_reference", reference)
       .single();
 
