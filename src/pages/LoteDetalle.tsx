@@ -110,6 +110,11 @@ const LoteDetalle = () => {
           </Badge>
         )}
 
+        {/* Badge acceso pay-per-view */}
+        {data.acceso_por_ppv && !data.es_propietario && !data.es_admin && id && (
+          <PayPerViewCTA loteId={id} accesoActivoExpira={data.ppv_expira ?? undefined} />
+        )}
+
         {/* Hero */}
         <Card className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
