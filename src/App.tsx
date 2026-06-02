@@ -124,13 +124,13 @@ const App = () => (
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
-            <Route path="/dashboard/pagos" element={<ProtectedRoute><DashboardPagos /></ProtectedRoute>} />
-            <Route path="/dashboard/liquidaciones" element={<ProtectedRoute><DashboardLiquidaciones /></ProtectedRoute>} />
-            <Route path="/dashboard/ventas" element={<ProtectedRoute><DashboardVentas /></ProtectedRoute>} />
-            <Route path="/dashboard/finanzas" element={<ProtectedRoute><DashboardFinanzas /></ProtectedRoute>} />
-            <Route path="/dashboard/suscripciones" element={<ProtectedRoute><DashboardSuscripciones /></ProtectedRoute>} />
+            <Route path="/dashboard/pagos" element={<ProtectedRoute requireAdmin><DashboardPagos /></ProtectedRoute>} />
+            <Route path="/dashboard/liquidaciones" element={<ProtectedRoute requireAdmin><DashboardLiquidaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/ventas" element={<ProtectedRoute requireAdmin><DashboardVentas /></ProtectedRoute>} />
+            <Route path="/dashboard/finanzas" element={<ProtectedRoute requireAdmin><DashboardFinanzas /></ProtectedRoute>} />
+            <Route path="/dashboard/suscripciones" element={<ProtectedRoute requireAdmin><DashboardSuscripciones /></ProtectedRoute>} />
             <Route path="/dashboard/config-suscripciones" element={<ProtectedRoute requireSuperAdmin><DashboardConfigSuscripciones /></ProtectedRoute>} />
-            <Route path="/dashboard/metricas" element={<ProtectedRoute><MetricasEjecutivas /></ProtectedRoute>} />
+            <Route path="/dashboard/metricas" element={<ProtectedRoute requireAdmin><MetricasEjecutivas /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowPropietario><PreferenciasUsuario /></ProtectedRoute>} />
 
             {/* Rutas developer */}
