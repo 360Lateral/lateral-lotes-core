@@ -139,7 +139,7 @@ const App = () => (
 
             {/* Negociaciones */}
             <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
-            <Route path="/dashboard/negociaciones" element={<ProtectedRoute><DashboardNegociaciones /></ProtectedRoute>} />
+            <Route path="/dashboard/negociaciones" element={<ProtectedRoute requireAdmin><DashboardNegociaciones /></ProtectedRoute>} />
             <Route path="/dashboard/owner" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwner /></RedirectIfPropietarioOnly></ProtectedRoute>} />
             <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerLotes /></RedirectIfPropietarioOnly></ProtectedRoute>} />
             <Route path="/dashboard/owner/diagnosticos" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerDiagnosticos /></RedirectIfPropietarioOnly></ProtectedRoute>} />
