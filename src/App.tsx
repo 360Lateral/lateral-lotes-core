@@ -106,10 +106,10 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/lotes" element={<ProtectedRoute><DashboardLotes /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
-            <Route path="/dashboard/lotes/importar" element={<ProtectedRoute><DashboardLotesImportar /></ProtectedRoute>} />
-            <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
-            <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute><DashboardSolicitudesContacto /></ProtectedRoute>} />
-            <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute><DashboardAcuerdosFirmados /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes/importar" element={<ProtectedRoute requireAdmin><DashboardLotesImportar /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute requireAdmin><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
+            <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute requireAdmin><DashboardSolicitudesContacto /></ProtectedRoute>} />
+            <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute requireAdmin><DashboardAcuerdosFirmados /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
