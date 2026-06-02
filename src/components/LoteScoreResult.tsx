@@ -43,7 +43,7 @@ const levelConfig = {
     border: "border-destructive/30",
     title: "Tu lote necesita viabilización",
     description:
-      "Te recomendamos la Resolutoría 360° de 360 Lateral para preparar tu lote jurídica y técnicamente, y así obtener la mejor oferta posible.",
+      "Te recomendamos la Resultoría 360° de 360 Lateral para preparar tu lote jurídica y técnicamente, y así obtener la mejor oferta posible.",
   },
 };
 

@@ -324,7 +324,7 @@ const Diagnostico = () => {
                         className="w-full bg-orange hover:bg-orange/90 text-white"
                         onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
                       >
-                        Quiero la Resolutoría completa
+                        Quiero la Resultoría completa
                       </Button>
                       <p className="text-white/50 text-xs text-center">
                         Análisis de 8 áreas + Teaser Financiero desde 4 SMLMV
