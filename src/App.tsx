@@ -151,7 +151,7 @@ const App = () => (
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
 
             {/* Portal del comisionista */}
-            <Route path="/comisionista" element={<ComisionistaPortal />} />
+            <Route path="/comisionista" element={<ProtectedRoute><ComisionistaPortal /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
