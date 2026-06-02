@@ -36,7 +36,7 @@ const Index = () => {
     { label: "Lotes disponibles", value: "—" },
     { label: "Municipios", value: "—" },
     { label: "Diagnósticos realizados", value: "—" },
-    { label: "Resolutoría 360° Verificada", value: "—" },
+    { label: "Resultoría 360° Verificada", value: "—" },
   ] } = useQuery({
     queryKey: ["trust-stats"],
     queryFn: async () => {
@@ -51,7 +51,7 @@ const Index = () => {
         { label: "Lotes disponibles", value: String(lotesRes.count ?? 0) },
         { label: "Municipios", value: String(uniqueCiudades.size) },
         { label: "Diagnósticos realizados", value: String(diagRes.data ?? 0) },
-        { label: "Resolutoría 360° Verificada", value: String(resoRes.count ?? 0) },
+        { label: "Resultoría 360° Verificada", value: String(resoRes.count ?? 0) },
       ];
     },
   });

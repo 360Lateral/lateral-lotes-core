@@ -28,7 +28,7 @@ const perfiles: {
     beneficios: [
       "Diagnóstico gratuito de tu lote",
       "Conexión con desarrolladores calificados",
-      "Resolutoría 360° para viabilizar tu predio",
+      "Resultoría 360° para viabilizar tu predio",
     ],
     accentClass: "border-orange text-orange",
     borderClass: "hover:border-orange",

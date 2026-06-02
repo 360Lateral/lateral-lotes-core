@@ -55,7 +55,7 @@ const Navbar = () => {
       ];
     }
     return [
-      { label: "Resolutoría", href: "/resolutoria" },
+      { label: "Resultoría", href: "/resolutoria" },
       { label: "Planes", href: "/planes" },
       { label: "Índice de mercado", href: "/mercado" },
       { label: "Diagnóstico", href: "/diagnostico" },
