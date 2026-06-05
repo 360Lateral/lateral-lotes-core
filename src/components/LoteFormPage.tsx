@@ -406,6 +406,47 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   return (
     <DashboardLayout>
+      <AlertDialog open={mostrarDialogoRecuperar}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tienes un borrador sin guardar</AlertDialogTitle>
+            <AlertDialogDescription>
+              Encontramos un borrador de este formulario guardado{" "}
+              {borradorPendiente?.guardadoEn
+                ? formatRelativeDate(borradorPendiente.guardadoEn)
+                : "recientemente"}
+              . ¿Quieres recuperarlo o empezar de cero?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                borrarBorrador();
+                setBorradorPendiente(null);
+                setMostrarDialogoRecuperar(false);
+                setYaInicializado(true);
+              }}
+            >
+              Empezar de cero
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (borradorPendiente?.data) {
+                  const recovered = { ...emptyForm, ...(borradorPendiente.data as Partial<LoteForm>) } as LoteForm;
+                  setForm(recovered);
+                  initialFormRef.current = emptyForm; // marcar como dirty para que se note que hay cambios sin guardar
+                }
+                setBorradorPendiente(null);
+                setMostrarDialogoRecuperar(false);
+                setYaInicializado(true);
+              }}
+            >
+              Recuperar borrador
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
         {isEdit ? "Editar lote" : "Nuevo lote"}
       </h1>
