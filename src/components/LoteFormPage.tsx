@@ -798,13 +798,18 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         )}
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <Button type="submit" variant="default" size="lg" disabled={saveMutation.isPending}>
             {saveMutation.isPending ? "Guardando…" : "Guardar lote"}
           </Button>
           <Button type="button" variant="outline" size="lg" onClick={() => navigate("/dashboard/lotes")}>
             Cancelar
           </Button>
+          {ultimoGuardado && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              Borrador guardado {formatRelativeDate(ultimoGuardado)}
+            </span>
+          )}
         </div>
       </form>
     </DashboardLayout>
