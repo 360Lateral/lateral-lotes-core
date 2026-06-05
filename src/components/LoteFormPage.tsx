@@ -1,5 +1,18 @@
-import { useState, useEffect, ChangeEvent, useCallback } from "react";
+import { useState, useEffect, ChangeEvent, useCallback, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
+import { useAdvertenciaSalirSinGuardar } from "@/hooks/useAdvertenciaSalirSinGuardar";
+import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
@@ -92,10 +105,46 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const invitarCliente = useInvitarCliente();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
-  
+
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
+
+  // === Autosave de borrador ===
+  const loteId = id;
+  const storageKey = useMemo(
+    () => (loteId ? `borrador_lote_${loteId}` : "borrador_lote_nuevo"),
+    [loteId],
+  );
+  const [yaInicializado, setYaInicializado] = useState(false);
+  const [mostrarDialogoRecuperar, setMostrarDialogoRecuperar] = useState(false);
+  const [borradorPendiente, setBorradorPendiente] = useState<{ data: Record<string, any>; guardadoEn: string } | null>(null);
+  const initialFormRef = useRef<LoteForm>(emptyForm);
+
+  const { ultimoGuardado, cargarBorrador, borrarBorrador } = useAutosaveBorrador({
+    storageKey,
+    data: form as unknown as Record<string, any>,
+    enabled: yaInicializado,
+  });
+
+  // Verificar borrador existente al montar
+  useEffect(() => {
+    const borrador = cargarBorrador();
+    if (borrador && borrador.data) {
+      setBorradorPendiente(borrador);
+      setMostrarDialogoRecuperar(true);
+    } else {
+      setYaInicializado(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hayCambiosSinGuardar = useMemo(
+    () => yaInicializado && JSON.stringify(form) !== JSON.stringify(initialFormRef.current),
+    [form, yaInicializado],
+  );
+  useAdvertenciaSalirSinGuardar(hayCambiosSinGuardar);
+
 
 
 
@@ -150,8 +199,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   // Populate form on edit
   useEffect(() => {
     if (!existingLote) return;
-    setForm((prev) => ({
-      ...prev,
+    // Si hay un borrador pendiente sin resolver, esperamos la decisión del usuario.
+    if (mostrarDialogoRecuperar) return;
+    const fromDb = {
       nombre_lote: existingLote.nombre_lote,
       propietario_id: (existingLote as any).propietario_id ?? null,
       ciudad: existingLote.ciudad ?? "Medellín",
@@ -166,11 +216,13 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
       es_publico: existingLote.es_publico ?? true,
-    }));
+    };
+    setForm((prev) => ({ ...prev, ...fromDb }));
+    initialFormRef.current = { ...initialFormRef.current, ...fromDb } as LoteForm;
     if ((existingLote as any).foto_url) {
       setExistingPhotoUrl((existingLote as any).foto_url);
     }
-  }, [existingLote]);
+  }, [existingLote, mostrarDialogoRecuperar]);
 
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -188,12 +240,14 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   useEffect(() => {
     if (!existingPrecio) return;
-    setForm((prev) => ({
-      ...prev,
+    if (mostrarDialogoRecuperar) return;
+    const precios = {
       precio_cop: existingPrecio.precio_cop != null ? String(existingPrecio.precio_cop) : "",
       precio_m2_cop: existingPrecio.precio_m2_cop != null ? String(existingPrecio.precio_m2_cop) : "",
-    }));
-  }, [existingPrecio]);
+    };
+    setForm((prev) => ({ ...prev, ...precios }));
+    initialFormRef.current = { ...initialFormRef.current, ...precios };
+  }, [existingPrecio, mostrarDialogoRecuperar]);
 
   const handleMapClick = useCallback((e: any) => {
     if (!e.latLng) return;
@@ -294,6 +348,8 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       return loteId;
     },
     onSuccess: () => {
+      borrarBorrador();
+      initialFormRef.current = form;
       toast({ title: "Lote guardado correctamente" });
       queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
       navigate("/dashboard/lotes");
@@ -350,6 +406,47 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   return (
     <DashboardLayout>
+      <AlertDialog open={mostrarDialogoRecuperar}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tienes un borrador sin guardar</AlertDialogTitle>
+            <AlertDialogDescription>
+              Encontramos un borrador de este formulario guardado{" "}
+              {borradorPendiente?.guardadoEn
+                ? formatRelativeDate(borradorPendiente.guardadoEn)
+                : "recientemente"}
+              . ¿Quieres recuperarlo o empezar de cero?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                borrarBorrador();
+                setBorradorPendiente(null);
+                setMostrarDialogoRecuperar(false);
+                setYaInicializado(true);
+              }}
+            >
+              Empezar de cero
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (borradorPendiente?.data) {
+                  const recovered = { ...emptyForm, ...(borradorPendiente.data as Partial<LoteForm>) } as LoteForm;
+                  setForm(recovered);
+                  initialFormRef.current = emptyForm; // marcar como dirty para que se note que hay cambios sin guardar
+                }
+                setBorradorPendiente(null);
+                setMostrarDialogoRecuperar(false);
+                setYaInicializado(true);
+              }}
+            >
+              Recuperar borrador
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
         {isEdit ? "Editar lote" : "Nuevo lote"}
       </h1>
@@ -701,13 +798,18 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         )}
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <Button type="submit" variant="default" size="lg" disabled={saveMutation.isPending}>
             {saveMutation.isPending ? "Guardando…" : "Guardar lote"}
           </Button>
           <Button type="button" variant="outline" size="lg" onClick={() => navigate("/dashboard/lotes")}>
             Cancelar
           </Button>
+          {ultimoGuardado && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              Borrador guardado {formatRelativeDate(ultimoGuardado)}
+            </span>
+          )}
         </div>
       </form>
     </DashboardLayout>
