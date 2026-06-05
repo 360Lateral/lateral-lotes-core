@@ -199,8 +199,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   // Populate form on edit
   useEffect(() => {
     if (!existingLote) return;
-    setForm((prev) => ({
-      ...prev,
+    // Si hay un borrador pendiente sin resolver, esperamos la decisión del usuario.
+    if (mostrarDialogoRecuperar) return;
+    const fromDb = {
       nombre_lote: existingLote.nombre_lote,
       propietario_id: (existingLote as any).propietario_id ?? null,
       ciudad: existingLote.ciudad ?? "Medellín",
@@ -215,11 +216,13 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       matricula_inmobiliaria: existingLote.matricula_inmobiliaria ?? "",
       notas: existingLote.notas ?? "",
       es_publico: existingLote.es_publico ?? true,
-    }));
+    };
+    setForm((prev) => ({ ...prev, ...fromDb }));
+    initialFormRef.current = { ...initialFormRef.current, ...fromDb } as LoteForm;
     if ((existingLote as any).foto_url) {
       setExistingPhotoUrl((existingLote as any).foto_url);
     }
-  }, [existingLote]);
+  }, [existingLote, mostrarDialogoRecuperar]);
 
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
