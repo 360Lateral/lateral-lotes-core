@@ -348,6 +348,8 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       return loteId;
     },
     onSuccess: () => {
+      borrarBorrador();
+      initialFormRef.current = form;
       toast({ title: "Lote guardado correctamente" });
       queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
       navigate("/dashboard/lotes");
