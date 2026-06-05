@@ -105,10 +105,46 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const invitarCliente = useInvitarCliente();
 
   const [form, setForm] = useState<LoteForm>(emptyForm);
-  
+
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
+
+  // === Autosave de borrador ===
+  const loteId = id;
+  const storageKey = useMemo(
+    () => (loteId ? `borrador_lote_${loteId}` : "borrador_lote_nuevo"),
+    [loteId],
+  );
+  const [yaInicializado, setYaInicializado] = useState(false);
+  const [mostrarDialogoRecuperar, setMostrarDialogoRecuperar] = useState(false);
+  const [borradorPendiente, setBorradorPendiente] = useState<{ data: Record<string, any>; guardadoEn: string } | null>(null);
+  const initialFormRef = useRef<LoteForm>(emptyForm);
+
+  const { ultimoGuardado, cargarBorrador, borrarBorrador } = useAutosaveBorrador({
+    storageKey,
+    data: form as unknown as Record<string, any>,
+    enabled: yaInicializado,
+  });
+
+  // Verificar borrador existente al montar
+  useEffect(() => {
+    const borrador = cargarBorrador();
+    if (borrador && borrador.data) {
+      setBorradorPendiente(borrador);
+      setMostrarDialogoRecuperar(true);
+    } else {
+      setYaInicializado(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hayCambiosSinGuardar = useMemo(
+    () => yaInicializado && JSON.stringify(form) !== JSON.stringify(initialFormRef.current),
+    [form, yaInicializado],
+  );
+  useAdvertenciaSalirSinGuardar(hayCambiosSinGuardar);
+
 
 
 
