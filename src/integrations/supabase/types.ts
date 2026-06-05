@@ -5027,6 +5027,10 @@ export type Database = {
         Args: { p_activo: boolean; p_contrato_id: string }
         Returns: undefined
       }
+      user_has_active_engagement_on_lote: {
+        Args: { _lote_id: string; _user_id: string }
+        Returns: boolean
+      }
       user_has_engagement_on_lote: {
         Args: { _lote_id: string; _user_id: string }
         Returns: boolean
