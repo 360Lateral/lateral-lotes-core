@@ -1,5 +1,18 @@
-import { useState, useEffect, ChangeEvent, useCallback } from "react";
+import { useState, useEffect, ChangeEvent, useCallback, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
+import { useAdvertenciaSalirSinGuardar } from "@/hooks/useAdvertenciaSalirSinGuardar";
+import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
