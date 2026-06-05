@@ -240,12 +240,14 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   useEffect(() => {
     if (!existingPrecio) return;
-    setForm((prev) => ({
-      ...prev,
+    if (mostrarDialogoRecuperar) return;
+    const precios = {
       precio_cop: existingPrecio.precio_cop != null ? String(existingPrecio.precio_cop) : "",
       precio_m2_cop: existingPrecio.precio_m2_cop != null ? String(existingPrecio.precio_m2_cop) : "",
-    }));
-  }, [existingPrecio]);
+    };
+    setForm((prev) => ({ ...prev, ...precios }));
+    initialFormRef.current = { ...initialFormRef.current, ...precios };
+  }, [existingPrecio, mostrarDialogoRecuperar]);
 
   const handleMapClick = useCallback((e: any) => {
     if (!e.latLng) return;
