@@ -4431,8 +4431,8 @@ export type Database = {
           frente_ml?: number | null
           has_resolutoria?: boolean | null
           id?: string | null
-          lat?: number | null
-          lng?: number | null
+          lat?: never
+          lng?: never
           nombre_lote?: string | null
           precio_venta_estimado?: number | null
           publicado_venta?: boolean | null
@@ -4468,8 +4468,8 @@ export type Database = {
           frente_ml?: number | null
           has_resolutoria?: boolean | null
           id?: string | null
-          lat?: number | null
-          lng?: number | null
+          lat?: never
+          lng?: never
           nombre_lote?: string | null
           precio_venta_estimado?: number | null
           publicado_venta?: boolean | null

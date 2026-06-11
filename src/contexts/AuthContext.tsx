@@ -183,9 +183,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut({ scope: 'local' });
-    } catch {
-      // Force local cleanup even if server call fails
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (err) {
+      console.warn('signOut global falló, limpiando local:', err);
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch {
+        // Force local cleanup even if both calls fail
+      }
     }
     setSession(null);
     setUser(null);

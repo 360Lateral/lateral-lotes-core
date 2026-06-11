@@ -7,6 +7,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+
 /**
  * Verifica la firma SHA256 que Wompi envía con cada webhook.
  */
@@ -37,7 +47,7 @@ async function verificarFirmaWompi(payload: any, eventsKey: string): Promise<boo
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
-    return hashHex === expectedChecksum;
+    return timingSafeEqual(hashHex, expectedChecksum);
   } catch (e) {
     console.error("Error verificando firma:", e);
     return false;
@@ -74,7 +84,17 @@ Deno.serve(async (req) => {
 
     console.log("Webhook recibido:", eventType, "id_externo:", eventId);
 
-    // Idempotencia
+    // 1) Validar firma ANTES de persistir (evita inflar eventos_wompi con basura)
+    const firmaOk = await verificarFirmaWompi(payload, WOMPI_EVENTS_KEY);
+    if (!firmaOk) {
+      console.warn("Firma inválida para evento (no se persiste):", eventId);
+      return new Response(JSON.stringify({ error: "Firma inválida" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 2) Idempotencia: insertar solo si firma válida
     const { error: insertErr } = await admin.from("eventos_wompi").insert({
       evento_id_externo: eventId,
       tipo_evento: eventType,
@@ -90,24 +110,6 @@ Deno.serve(async (req) => {
         });
       }
       throw insertErr;
-    }
-
-    // Firma
-    const firmaOk = await verificarFirmaWompi(payload, WOMPI_EVENTS_KEY);
-    if (!firmaOk) {
-      console.error("Firma inválida para evento:", eventId);
-      await admin
-        .from("eventos_wompi")
-        .update({
-          procesado: true,
-          procesado_en: new Date().toISOString(),
-          error_procesamiento: "Firma inválida",
-        })
-        .eq("evento_id_externo", eventId);
-      return new Response(JSON.stringify({ error: "Firma inválida" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
     if (eventType !== "transaction.updated") {
