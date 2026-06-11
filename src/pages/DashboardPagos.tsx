@@ -251,7 +251,7 @@ export default function DashboardPagos() {
                         </TableCell>
                         <TableCell className="text-sm">{t.plan?.nombre ?? "—"}</TableCell>
                         <TableCell className="whitespace-nowrap text-right text-sm">
-                          {formatCOP(t.monto_cop)}
+                          {formatCOP(t.monto_cop == null ? null : Number(t.monto_cop))}
                         </TableCell>
                         <TableCell>
                           <Badge className={badge.className}>{badge.label}</Badge>
