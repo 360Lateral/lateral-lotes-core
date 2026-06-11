@@ -1,12 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type {
+  EventoWompiRow,
+  TransaccionDetalle,
+} from "@/types/finanzas";
+
+interface TransaccionDetalleResult {
+  transaccion: TransaccionDetalle | null;
+  eventos: EventoWompiRow[];
+}
 
 export const useTransaccionDetalle = (transaccionId: string | undefined) => {
-  return useQuery({
+  return useQuery<TransaccionDetalleResult>({
     queryKey: ["transaccion-detalle", transaccionId],
     enabled: !!transaccionId,
     queryFn: async () => {
-      const { data: trans, error } = await (supabase as any)
+      const { data: trans, error } = await supabase
         .from("transacciones")
         .select(`
           id, engagement_id, monto_cop, monto_smlmv, smlmv_referencia, moneda,
@@ -23,13 +32,16 @@ export const useTransaccionDetalle = (transaccionId: string | undefined) => {
         .single();
       if (error) throw error;
 
-      const { data: eventos } = await (supabase as any)
+      const { data: eventos } = await supabase
         .from("eventos_wompi")
         .select("id, evento_id_externo, tipo_evento, procesado, error_procesamiento, recibido_en, procesado_en")
         .eq("transaccion_id", transaccionId!)
         .order("recibido_en", { ascending: false });
 
-      return { transaccion: trans, eventos: (eventos ?? []) as any[] };
+      return {
+        transaccion: (trans ?? null) as unknown as TransaccionDetalle | null,
+        eventos: (eventos ?? []) as unknown as EventoWompiRow[],
+      };
     },
   });
 };
