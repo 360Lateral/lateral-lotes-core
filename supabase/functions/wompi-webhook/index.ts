@@ -84,7 +84,17 @@ Deno.serve(async (req) => {
 
     console.log("Webhook recibido:", eventType, "id_externo:", eventId);
 
-    // Idempotencia
+    // 1) Validar firma ANTES de persistir (evita inflar eventos_wompi con basura)
+    const firmaOk = await verificarFirmaWompi(payload, WOMPI_EVENTS_KEY);
+    if (!firmaOk) {
+      console.warn("Firma inválida para evento (no se persiste):", eventId);
+      return new Response(JSON.stringify({ error: "Firma inválida" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 2) Idempotencia: insertar solo si firma válida
     const { error: insertErr } = await admin.from("eventos_wompi").insert({
       evento_id_externo: eventId,
       tipo_evento: eventType,
@@ -100,24 +110,6 @@ Deno.serve(async (req) => {
         });
       }
       throw insertErr;
-    }
-
-    // Firma
-    const firmaOk = await verificarFirmaWompi(payload, WOMPI_EVENTS_KEY);
-    if (!firmaOk) {
-      console.error("Firma inválida para evento:", eventId);
-      await admin
-        .from("eventos_wompi")
-        .update({
-          procesado: true,
-          procesado_en: new Date().toISOString(),
-          error_procesamiento: "Firma inválida",
-        })
-        .eq("evento_id_externo", eventId);
-      return new Response(JSON.stringify({ error: "Firma inválida" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
     if (eventType !== "transaction.updated") {
