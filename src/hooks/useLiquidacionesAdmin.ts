@@ -13,7 +13,7 @@ export const useLiquidacionesAdmin = (estado?: string) => {
         tipo:tipos_analisis(nombre),
         orden:ordenes_servicio(lote_id, lotes(nombre_lote, ciudad))
       `);
-      if (estado) q = q.eq("estado", estado);
+      if (estado) q = q.eq("estado", estado as "pendiente" | "pagada" | "cancelada");
       const { data, error } = await q.order("fecha_generacion", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as LiquidacionRow[];

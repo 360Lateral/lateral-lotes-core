@@ -12,7 +12,7 @@ export const useComisionesAdmin = (estado?: string) => {
         comisionista:perfiles!comisiones_venta_comisionista_id_fkey(id, nombre, email),
         lote:lotes(id, nombre_lote, ciudad)
       `);
-      if (estado) q = q.eq("estado", estado);
+      if (estado) q = q.eq("estado", estado as "pendiente" | "pagada" | "cancelada");
       const { data, error } = await q.order("fecha_generacion", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as ComisionRow[];
