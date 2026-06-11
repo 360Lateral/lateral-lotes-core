@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { AlertTriangle } from "lucide-react";
 import { useMarcarLiquidacionPagada } from "@/hooks/useMarcarLiquidacionPagada";
+import type { LiquidacionRow } from "@/types/finanzas";
 
 export const formatCOP = (n: number | null | undefined) =>
   n == null
@@ -33,7 +34,7 @@ export const formatCOP = (n: number | null | undefined) =>
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  liquidacion: any | null;
+  liquidacion: LiquidacionRow | null;
 }
 
 const METODOS = [

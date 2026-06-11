@@ -13,7 +13,7 @@ export const useMarcarLiquidacionPagada = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: Input) => {
-      const { error } = await (supabase as any).rpc("marcar_liquidacion_pagada", {
+      const { error } = await supabase.rpc("marcar_liquidacion_pagada", {
         p_liquidacion_id: input.id,
         p_metodo_pago: input.metodo_pago,
         p_referencia_pago: input.referencia_pago ?? null,
@@ -26,7 +26,7 @@ export const useMarcarLiquidacionPagada = () => {
       qc.invalidateQueries({ queryKey: ["mis-liquidaciones"] });
       toast.success("Liquidación marcada como pagada");
     },
-    onError: (e: any) =>
+    onError: (e: Error) =>
       toast.error("No se pudo marcar como pagada", { description: e.message }),
   });
 };

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { AlertTriangle } from "lucide-react";
 import { useMarcarComisionPagada } from "@/hooks/useMarcarComisionPagada";
+import type { ComisionRow } from "@/types/finanzas";
 
 export const formatCOP = (n: number | null | undefined) =>
   n == null
@@ -33,7 +34,7 @@ export const formatCOP = (n: number | null | undefined) =>
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  comision: any | null;
+  comision: ComisionRow | null;
 }
 
 const METODOS = [

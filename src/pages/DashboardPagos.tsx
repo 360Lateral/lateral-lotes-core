@@ -80,15 +80,15 @@ export default function DashboardPagos() {
   const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
   const ingresosMes = todas
     .filter(
-      (t: any) =>
+      (t) =>
         t.estado === "aprobada" && new Date(t.fecha_creacion) >= inicioMes,
     )
-    .reduce((acc: number, t: any) => acc + Number(t.monto_cop ?? 0), 0);
+    .reduce((acc, t) => acc + Number(t.monto_cop ?? 0), 0);
 
-  const pendientesCount = todas.filter((t: any) => t.estado === "pendiente").length;
-  const aprobadasCount = todas.filter((t: any) => t.estado === "aprobada").length;
+  const pendientesCount = todas.filter((t) => t.estado === "pendiente").length;
+  const aprobadasCount = todas.filter((t) => t.estado === "aprobada").length;
 
-  const denomTasa = todas.filter((t: any) =>
+  const denomTasa = todas.filter((t) =>
     ["aprobada", "declinada", "expirada", "error"].includes(t.estado),
   ).length;
   const tasaConversion =
@@ -96,7 +96,7 @@ export default function DashboardPagos() {
 
   // Filtrado adicional sobre lista de la tab
   const filtradas = useMemo(() => {
-    return (porEstado as any[]).filter((t) => {
+    return porEstado.filter((t) => {
       if (searchProp) {
         const s = searchProp.toLowerCase();
         const nombre = (t.propietario?.nombre ?? "").toLowerCase();
@@ -233,7 +233,7 @@ export default function DashboardPagos() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtradas.map((t: any) => {
+                  {filtradas.map((t) => {
                     const badge = estadoBadgeVariant(t.estado);
                     return (
                       <TableRow key={t.id}>
@@ -251,7 +251,7 @@ export default function DashboardPagos() {
                         </TableCell>
                         <TableCell className="text-sm">{t.plan?.nombre ?? "—"}</TableCell>
                         <TableCell className="whitespace-nowrap text-right text-sm">
-                          {formatCOP(t.monto_cop)}
+                          {formatCOP(t.monto_cop == null ? null : Number(t.monto_cop))}
                         </TableCell>
                         <TableCell>
                           <Badge className={badge.className}>{badge.label}</Badge>

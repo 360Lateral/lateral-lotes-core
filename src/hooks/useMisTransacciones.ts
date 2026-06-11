@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import type { TransaccionRow } from "@/types/finanzas";
 
 export const useMisTransacciones = () => {
   const { user } = useAuth();
-  return useQuery({
+  return useQuery<TransaccionRow[]>({
     queryKey: ["mis-transacciones", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("transacciones")
         .select(`
           id, engagement_id, monto_cop, estado, wompi_payment_link_url,
@@ -19,7 +20,7 @@ export const useMisTransacciones = () => {
         .eq("propietario_id", user!.id)
         .order("fecha_creacion", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as TransaccionRow[];
     },
   });
 };

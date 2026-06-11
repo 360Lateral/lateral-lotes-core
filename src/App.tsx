@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,65 +11,69 @@ import RedirectIfPropietarioOnly from "@/components/RedirectIfPropietarioOnly";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HomeButton from "@/components/ui/HomeButton";
 import DevRoleBanner from "@/components/DevRoleBanner";
+import PageLoadingFallback from "@/components/PageLoadingFallback";
 
+// Eager: landing, auth y rutas críticas de primera carga
 import Index from "./pages/Index";
-import Lotes from "./pages/Lotes";
-import LoteDetalle from "./pages/LoteDetalle";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import DashboardLotes from "./pages/DashboardLotes";
-import DashboardLoteNuevo from "./pages/DashboardLoteNuevo";
-import DashboardLotesImportar from "./pages/DashboardLotesImportar";
-import DashboardLoteEditar from "./pages/DashboardLoteEditar";
-import DashboardLoteDocs from "./pages/DashboardLoteDocs";
-import DashboardLeads from "./pages/DashboardLeads";
-import DashboardDeveloper from "./pages/DashboardDeveloper";
-import DashboardNotificaciones from "./pages/DashboardNotificaciones";
-import DashboardNegociaciones from "./pages/DashboardNegociaciones";
-import SalaNegociacion from "./pages/SalaNegociacion";
-import Diagnostico from "./pages/Diagnostico";
-import DiagnosticoResultado from "./pages/DiagnosticoResultado";
-import Mercado from "./pages/Mercado";
-import Resolutoria from "./pages/Resolutoria";
-import Planes from "./pages/Planes";
-import DashboardOwner from "./pages/DashboardOwner";
-import DashboardOwnerLotes from "./pages/DashboardOwnerLotes";
-import DashboardOwnerDiagnosticos from "./pages/DashboardOwnerDiagnosticos";
-import DashboardOwnerNegociaciones from "./pages/DashboardOwnerNegociaciones";
-import DashboardUsuarios from "./pages/DashboardUsuarios";
-import DashboardLoteAnalisis from "./pages/DashboardLoteAnalisis";
-import DashboardConfig from "./pages/DashboardConfig";
-import PortafolioDashboard from "./pages/PortafolioDashboard";
-import EngagementDetalle from "./pages/EngagementDetalle";
-import DashboardImportarEngagement from "./pages/DashboardImportarEngagement";
-import DashboardLotesPendientesValidacion from "./pages/DashboardLotesPendientesValidacion";
-import DashboardSolicitudesContacto from "./pages/DashboardSolicitudesContacto";
-import MetricasEjecutivas from "./pages/MetricasEjecutivas";
-import Bienvenida from "./pages/Bienvenida";
-import PreferenciasUsuario from "./pages/PreferenciasUsuario";
 import NotFound from "./pages/NotFound";
-import MisEngagements from "./pages/portal/MisEngagements";
-import EngagementClienteDetalle from "./pages/portal/EngagementClienteDetalle";
-import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
-import RecuperarContrasena from "./pages/RecuperarContrasena";
-import RestablecerContrasena from "./pages/RestablecerContrasena";
-import DashboardContratosMarco from "./pages/DashboardContratosMarco";
-import DashboardOrdenesServicio from "./pages/DashboardOrdenesServicio";
-import DashboardMisOrdenes from "./pages/DashboardMisOrdenes";
-import DashboardMetricasExpertos from "./pages/DashboardMetricasExpertos";
-import DashboardOrdenServicioDetalle from "./pages/DashboardOrdenServicioDetalle";
-import PagoCompletado from "./pages/PagoCompletado";
-import DashboardPagos from "./pages/DashboardPagos";
-import DashboardLiquidaciones from "./pages/DashboardLiquidaciones";
-import DashboardVentas from "./pages/DashboardVentas";
-import LoteFicha from "./pages/LoteFicha";
-import ComisionistaPortal from "./pages/ComisionistaPortal";
-import DashboardFinanzas from "./pages/DashboardFinanzas";
-import Suscripcion from "./pages/Suscripcion";
-import MiCuentaDesarrollador from "./pages/MiCuentaDesarrollador";
-import DashboardSuscripciones from "./pages/DashboardSuscripciones";
-import DashboardConfigSuscripciones from "./pages/DashboardConfigSuscripciones";
-import DashboardAcuerdosFirmados from "./pages/DashboardAcuerdosFirmados";
+
+// Lazy: resto del árbol — reduce bundle inicial
+const Lotes = lazy(() => import("./pages/Lotes"));
+const LoteDetalle = lazy(() => import("./pages/LoteDetalle"));
+const LoteFicha = lazy(() => import("./pages/LoteFicha"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardLotes = lazy(() => import("./pages/DashboardLotes"));
+const DashboardLoteNuevo = lazy(() => import("./pages/DashboardLoteNuevo"));
+const DashboardLotesImportar = lazy(() => import("./pages/DashboardLotesImportar"));
+const DashboardLoteEditar = lazy(() => import("./pages/DashboardLoteEditar"));
+const DashboardLoteDocs = lazy(() => import("./pages/DashboardLoteDocs"));
+const DashboardLeads = lazy(() => import("./pages/DashboardLeads"));
+const DashboardDeveloper = lazy(() => import("./pages/DashboardDeveloper"));
+const DashboardNotificaciones = lazy(() => import("./pages/DashboardNotificaciones"));
+const DashboardNegociaciones = lazy(() => import("./pages/DashboardNegociaciones"));
+const SalaNegociacion = lazy(() => import("./pages/SalaNegociacion"));
+const Diagnostico = lazy(() => import("./pages/Diagnostico"));
+const DiagnosticoResultado = lazy(() => import("./pages/DiagnosticoResultado"));
+const Mercado = lazy(() => import("./pages/Mercado"));
+const Resolutoria = lazy(() => import("./pages/Resolutoria"));
+const Planes = lazy(() => import("./pages/Planes"));
+const DashboardOwner = lazy(() => import("./pages/DashboardOwner"));
+const DashboardOwnerLotes = lazy(() => import("./pages/DashboardOwnerLotes"));
+const DashboardOwnerDiagnosticos = lazy(() => import("./pages/DashboardOwnerDiagnosticos"));
+const DashboardOwnerNegociaciones = lazy(() => import("./pages/DashboardOwnerNegociaciones"));
+const DashboardUsuarios = lazy(() => import("./pages/DashboardUsuarios"));
+const DashboardLoteAnalisis = lazy(() => import("./pages/DashboardLoteAnalisis"));
+const DashboardConfig = lazy(() => import("./pages/DashboardConfig"));
+const PortafolioDashboard = lazy(() => import("./pages/PortafolioDashboard"));
+const EngagementDetalle = lazy(() => import("./pages/EngagementDetalle"));
+const DashboardImportarEngagement = lazy(() => import("./pages/DashboardImportarEngagement"));
+const DashboardLotesPendientesValidacion = lazy(() => import("./pages/DashboardLotesPendientesValidacion"));
+const DashboardSolicitudesContacto = lazy(() => import("./pages/DashboardSolicitudesContacto"));
+const MetricasEjecutivas = lazy(() => import("./pages/MetricasEjecutivas"));
+const Bienvenida = lazy(() => import("./pages/Bienvenida"));
+const PreferenciasUsuario = lazy(() => import("./pages/PreferenciasUsuario"));
+const MisEngagements = lazy(() => import("./pages/portal/MisEngagements"));
+const EngagementClienteDetalle = lazy(() => import("./pages/portal/EngagementClienteDetalle"));
+const PortalProtectedRoute = lazy(() => import("@/components/portal/PortalProtectedRoute"));
+const RecuperarContrasena = lazy(() => import("./pages/RecuperarContrasena"));
+const RestablecerContrasena = lazy(() => import("./pages/RestablecerContrasena"));
+const DashboardContratosMarco = lazy(() => import("./pages/DashboardContratosMarco"));
+const DashboardOrdenesServicio = lazy(() => import("./pages/DashboardOrdenesServicio"));
+const DashboardMisOrdenes = lazy(() => import("./pages/DashboardMisOrdenes"));
+const DashboardMetricasExpertos = lazy(() => import("./pages/DashboardMetricasExpertos"));
+const DashboardOrdenServicioDetalle = lazy(() => import("./pages/DashboardOrdenServicioDetalle"));
+const PagoCompletado = lazy(() => import("./pages/PagoCompletado"));
+const DashboardPagos = lazy(() => import("./pages/DashboardPagos"));
+const DashboardLiquidaciones = lazy(() => import("./pages/DashboardLiquidaciones"));
+const DashboardVentas = lazy(() => import("./pages/DashboardVentas"));
+const ComisionistaPortal = lazy(() => import("./pages/ComisionistaPortal"));
+const DashboardFinanzas = lazy(() => import("./pages/DashboardFinanzas"));
+const Suscripcion = lazy(() => import("./pages/Suscripcion"));
+const MiCuentaDesarrollador = lazy(() => import("./pages/MiCuentaDesarrollador"));
+const DashboardSuscripciones = lazy(() => import("./pages/DashboardSuscripciones"));
+const DashboardConfigSuscripciones = lazy(() => import("./pages/DashboardConfigSuscripciones"));
+const DashboardAcuerdosFirmados = lazy(() => import("./pages/DashboardAcuerdosFirmados"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -96,6 +101,7 @@ const App = () => (
           <BrowserRouter>
             <DevRoleBanner />
             <HomeButton />
+            <Suspense fallback={<PageLoadingFallback />}>
             <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Index />} />
@@ -168,6 +174,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </BrowserRouter>
         </ErrorBoundary>
         </TooltipProvider>
