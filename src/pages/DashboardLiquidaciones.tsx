@@ -21,6 +21,7 @@ import MarcarLiquidacionPagadaDialog, {
   formatCOP,
 } from "@/components/liquidaciones/MarcarLiquidacionPagadaDialog";
 import { Wallet, Search } from "lucide-react";
+import type { LiquidacionRow } from "@/types/finanzas";
 
 const formatFecha = (s: string | null | undefined) =>
   s ? new Date(s).toLocaleDateString("es-CO") : "—";
@@ -58,7 +59,8 @@ export default function DashboardLiquidaciones() {
   const [searchExperto, setSearchExperto] = useState("");
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
-  const [liqSeleccionada, setLiqSeleccionada] = useState<any | null>(null);
+  const [liqSeleccionada, setLiqSeleccionada] =
+    useState<LiquidacionRow | null>(null);
 
   const { data: todas = [], isLoading: loadingTodas } = useLiquidacionesAdmin();
   const { data: porEstado = [], isLoading: loadingEstado } =
@@ -79,22 +81,22 @@ export default function DashboardLiquidaciones() {
   }
 
   // KPIs sobre TODAS
-  const porPagar = (todas as any[])
+  const porPagar = todas
     .filter((l) => l.estado === "pendiente")
     .reduce((acc, l) => acc + Number(l.monto_neto ?? 0), 0);
-  const pagadoHistorico = (todas as any[])
+  const pagadoHistorico = todas
     .filter((l) => l.estado === "pagada")
     .reduce((acc, l) => acc + Number(l.monto_neto ?? 0), 0);
-  const feeAcumulado = (todas as any[]).reduce(
+  const feeAcumulado = todas.reduce(
     (acc, l) => acc + Number(l.fee_monto ?? 0),
     0
   );
-  const pendientesCount = (todas as any[]).filter(
+  const pendientesCount = todas.filter(
     (l) => l.estado === "pendiente"
   ).length;
 
-  const filtradas = useMemo(() => {
-    return (porEstado as any[]).filter((l) => {
+  const filtradas = useMemo<LiquidacionRow[]>(() => {
+    return porEstado.filter((l) => {
       if (searchExperto) {
         const s = searchExperto.toLowerCase();
         const nombre = (l.experto?.nombre ?? "").toLowerCase();
@@ -226,7 +228,7 @@ export default function DashboardLiquidaciones() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtradas.map((l: any) => {
+                  {filtradas.map((l) => {
                     const badge = estadoBadge(l.estado);
                     return (
                       <TableRow key={l.id}>
