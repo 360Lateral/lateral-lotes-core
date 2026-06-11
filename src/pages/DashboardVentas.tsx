@@ -21,6 +21,19 @@ import MarcarComisionPagadaDialog, {
   formatCOP,
 } from "@/components/comisiones/MarcarComisionPagadaDialog";
 import { Handshake, TrendingUp, Wallet, Calendar } from "lucide-react";
+import type { ComisionRow } from "@/types/finanzas";
+
+interface VentaRow {
+  id: string;
+  fecha_cierre: string | null;
+  precio_venta_final: number | string | null;
+  fee_360_pct: number | string | null;
+  fee_360_monto: number | string | null;
+  comprador_externo: string | null;
+  lote?: { nombre_lote: string | null; ciudad: string | null } | null;
+  developer?: { nombre: string | null } | null;
+  cerrada_por_perfil?: { nombre: string | null } | null;
+}
 
 const formatFecha = (s: string | null | undefined) =>
   s ? new Date(s).toLocaleDateString("es-CO") : "—";
@@ -30,9 +43,10 @@ export default function DashboardVentas() {
   const isAdmin = roles.some((r) => ["super_admin", "admin"].includes(r));
 
   const [subTab, setSubTab] = useState<"pendiente" | "pagada">("pendiente");
-  const [comisionSeleccionada, setComisionSeleccionada] = useState<any | null>(null);
+  const [comisionSeleccionada, setComisionSeleccionada] = useState<ComisionRow | null>(null);
 
-  const { data: ventas = [], isLoading: loadingVentas } = useVentasCerradas();
+  const { data: ventasData = [], isLoading: loadingVentas } = useVentasCerradas();
+  const ventas = ventasData as unknown as VentaRow[];
   const { data: todasComisiones = [] } = useComisionesAdmin();
   const { data: comisionesFiltradas = [], isLoading: loadingComisiones } =
     useComisionesAdmin(subTab);
@@ -48,21 +62,21 @@ export default function DashboardVentas() {
   }
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
-  const totalVendido = (ventas as any[]).reduce(
+  const totalVendido = ventas.reduce(
     (acc, v) => acc + Number(v.precio_venta_final ?? 0),
     0
   );
-  const feeAcumulado = (ventas as any[]).reduce(
+  const feeAcumulado = ventas.reduce(
     (acc, v) => acc + Number(v.fee_360_monto ?? 0),
     0
   );
   const hoy = new Date();
-  const ventasMes = (ventas as any[]).filter((v) => {
+  const ventasMes = ventas.filter((v) => {
     if (!v.fecha_cierre) return false;
     const f = new Date(v.fecha_cierre);
     return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
   }).length;
-  const comisionesPorPagar = (todasComisiones as any[])
+  const comisionesPorPagar = todasComisiones
     .filter((c) => c.estado === "pendiente")
     .reduce((acc, c) => acc + Number(c.comision_monto ?? 0), 0);
 
@@ -123,7 +137,7 @@ export default function DashboardVentas() {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : (ventas as any[]).length === 0 ? (
+              ) : ventas.length === 0 ? (
                 <div className="p-10 text-center text-sm text-muted-foreground">
                   Aún no hay ventas cerradas.
                 </div>
@@ -141,7 +155,7 @@ export default function DashboardVentas() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {(ventas as any[]).map((v) => (
+                      {ventas.map((v) => (
                         <TableRow key={v.id}>
                           <TableCell className="whitespace-nowrap text-xs">
                             {formatFecha(v.fecha_cierre)}
@@ -177,7 +191,7 @@ export default function DashboardVentas() {
           </TabsContent>
 
           <TabsContent value="comisiones" className="space-y-3">
-            <Tabs value={subTab} onValueChange={(v) => setSubTab(v as any)}>
+            <Tabs value={subTab} onValueChange={(v) => setSubTab(v as "pendiente" | "pagada")}>;
               <TabsList>
                 <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
                 <TabsTrigger value="pagada">Pagadas</TabsTrigger>
@@ -191,7 +205,7 @@ export default function DashboardVentas() {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : (comisionesFiltradas as any[]).length === 0 ? (
+              ) : comisionesFiltradas.length === 0 ? (
                 <div className="p-10 text-center text-sm text-muted-foreground">
                   {subTab === "pendiente"
                     ? "No hay comisiones pendientes de pago."
@@ -214,7 +228,7 @@ export default function DashboardVentas() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {(comisionesFiltradas as any[]).map((c) => (
+                      {comisionesFiltradas.map((c) => (
                         <TableRow key={c.id}>
                           <TableCell className="whitespace-nowrap text-xs">
                             {formatFecha(c.fecha_generacion)}
