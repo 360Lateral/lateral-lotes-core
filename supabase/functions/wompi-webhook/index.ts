@@ -47,7 +47,7 @@ async function verificarFirmaWompi(payload: any, eventsKey: string): Promise<boo
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
-    return hashHex === expectedChecksum;
+    return timingSafeEqual(hashHex, expectedChecksum);
   } catch (e) {
     console.error("Error verificando firma:", e);
     return false;
