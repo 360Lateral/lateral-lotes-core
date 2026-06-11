@@ -70,7 +70,20 @@ import DashboardSuscripciones from "./pages/DashboardSuscripciones";
 import DashboardConfigSuscripciones from "./pages/DashboardConfigSuscripciones";
 import DashboardAcuerdosFirmados from "./pages/DashboardAcuerdosFirmados";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -151,7 +164,7 @@ const App = () => (
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
 
             {/* Portal del comisionista */}
-            <Route path="/comisionista" element={<ProtectedRoute><ComisionistaPortal /></ProtectedRoute>} />
+            <Route path="/comisionista" element={<ProtectedRoute allowComisionista><ComisionistaPortal /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

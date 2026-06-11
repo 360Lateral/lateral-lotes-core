@@ -20,6 +20,8 @@ interface Props {
   /** @deprecated Usar allowPropietario en su lugar */
   allowOwner?: boolean;
   allowPropietario?: boolean;
+  /** Permite que un usuario con rol comisionista entre sin redirect (evita bucles en /comisionista). */
+  allowComisionista?: boolean;
 }
 
 const ProtectedRoute = ({
@@ -30,6 +32,7 @@ const ProtectedRoute = ({
   requireDeveloper,
   allowOwner,
   allowPropietario,
+  allowComisionista,
 }: Props) => {
   const {
     user,
@@ -112,6 +115,7 @@ const ProtectedRoute = ({
 
   if (isOwnerLike) {
     if (allowsOwner) return <>{children}</>;
+    if (isComisionista && allowComisionista) return <>{children}</>;
     const target = isComisionista ? "/comisionista" : "/portal";
     console.warn(`[ProtectedRoute] owner sin allow → redirect ${target}`);
     return <Navigate to={target} replace />;
