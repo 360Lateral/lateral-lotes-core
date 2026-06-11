@@ -191,7 +191,7 @@ export default function DashboardVentas() {
           </TabsContent>
 
           <TabsContent value="comisiones" className="space-y-3">
-            <Tabs value={subTab} onValueChange={(v) => setSubTab(v as "pendiente" | "pagada")}>;
+            <Tabs value={subTab} onValueChange={(v) => setSubTab(v as "pendiente" | "pagada")}>
               <TabsList>
                 <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
                 <TabsTrigger value="pagada">Pagadas</TabsTrigger>

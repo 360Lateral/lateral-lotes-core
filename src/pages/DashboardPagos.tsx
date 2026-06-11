@@ -96,7 +96,7 @@ export default function DashboardPagos() {
 
   // Filtrado adicional sobre lista de la tab
   const filtradas = useMemo(() => {
-    return (porEstado as any[]).filter((t) => {
+    return porEstado.filter((t) => {
       if (searchProp) {
         const s = searchProp.toLowerCase();
         const nombre = (t.propietario?.nombre ?? "").toLowerCase();
@@ -233,7 +233,7 @@ export default function DashboardPagos() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtradas.map((t: any) => {
+                  {filtradas.map((t) => {
                     const badge = estadoBadgeVariant(t.estado);
                     return (
                       <TableRow key={t.id}>
