@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { UserPlus } from "lucide-react";
 
 const estadoOptions = ["nuevo", "contactado", "negociacion", "cerrado", "descartado"];
 
