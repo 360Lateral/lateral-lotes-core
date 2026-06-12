@@ -322,9 +322,11 @@ const KanbanColumna = ({
 };
 
 // ============ Principal ============
-export const KanbanPortafolio = ({ filas }: Props) => {
+export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
   const navigate = useNavigate();
-  const { user, isSuperAdmin, isAdminOrExperto } = useAuth();
+  const { user, roles, isSuperAdmin, isAdminOrExperto } = useAuth();
+  const isAdmin =
+    isSuperAdmin || (roles ?? []).some((r) => r === "admin" || r === "super_admin");
   const actualizar = useActualizarEstadoEngagement();
 
   const [activeFila, setActiveFila] = useState<PortafolioVistaFila | null>(
