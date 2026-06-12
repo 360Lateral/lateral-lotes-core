@@ -330,63 +330,70 @@ const DashboardLayout = ({ children }: Props) => {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex items-center px-5 py-5">
+      <div className="px-4 pb-4 pt-5 mb-2 border-b border-white/10">
         <Link to="/">
           <Logo variant="on-navy" />
         </Link>
+        <div className="mt-1 text-[10px] uppercase tracking-wider text-white/45">Panel admin</div>
       </div>
 
       {/* Nav */}
-      <nav className="mt-2 flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4">
+      <nav className="flex flex-1 flex-col overflow-y-auto px-2 pb-3">
         {groups.map((group, idx) => {
           const hasActive = group.items.some((it) => isActive(it.href, it.end));
           const userCollapsed = !!collapsed[group.key];
-          // Inicio (no title): never collapsible
           const collapsible = group.title !== null;
           const isCollapsed = collapsible && userCollapsed && !hasActive;
           const groupBadgeSum = group.items.reduce((sum, it) => sum + badgeFor(it.href), 0);
 
           return (
-            <div key={group.key} className={idx > 0 ? "mt-3" : ""}>
+            <div key={group.key} className={idx > 0 ? "mt-4" : "mt-1"}>
               {group.title && (
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.key)}
-                  className="flex w-full items-center gap-1.5 rounded px-2 py-1.5 text-left font-body text-xs font-semibold uppercase tracking-wide text-secondary-foreground/50 hover:text-secondary-foreground/80"
+                  className="flex w-full items-center gap-1 px-3 mb-1 text-left text-[10px] font-semibold uppercase tracking-wider text-white/45 hover:text-white/70 transition-colors"
                 >
                   {isCollapsed ? (
-                    <ChevronRight className="h-3 w-3 shrink-0" />
+                    <ChevronRight className="h-2.5 w-2.5 shrink-0" />
                   ) : (
-                    <ChevronDown className="h-3 w-3 shrink-0" />
+                    <ChevronDown className="h-2.5 w-2.5 shrink-0" />
                   )}
                   <span className="flex-1">{group.title}</span>
                   {isCollapsed && groupBadgeSum > 0 && (
-                    <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 font-body text-[10px] font-bold text-primary-foreground">
+                    <span className="rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-secondary">
                       {groupBadgeSum}
                     </span>
                   )}
                 </button>
               )}
               {!isCollapsed && (
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col">
                   {group.items.map((item) => {
                     const active = isActive(item.href, item.end);
                     const badgeNum = badgeFor(item.href);
+                    const urgent = isUrgentBadge(item.href);
                     return (
                       <Link
                         key={item.href}
                         to={item.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`flex items-center gap-3 rounded-md px-3 py-2 font-body text-sm transition-colors ${
+                        className={`flex items-center gap-2.5 px-3 py-1.5 text-xs transition-colors border-l-2 ${
                           active
-                            ? "bg-primary text-primary-foreground font-semibold"
-                            : "text-secondary-foreground/80 hover:bg-secondary-foreground/10 hover:text-secondary-foreground"
+                            ? "border-primary bg-primary/15 text-white font-medium"
+                            : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
                         }`}
                       >
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {item.label}
+                        <item.icon className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{item.label}</span>
                         {badgeNum > 0 && (
-                          <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 font-body text-[10px] font-bold text-primary-foreground">
+                          <span
+                            className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+                              urgent
+                                ? "bg-primary text-secondary"
+                                : "bg-white/12 text-white/85"
+                            }`}
+                          >
                             {badgeNum}
                           </span>
                         )}
@@ -400,37 +407,44 @@ const DashboardLayout = ({ children }: Props) => {
         })}
       </nav>
 
-      {/* User info */}
-      <div className="border-t border-secondary-foreground/10 px-4 py-4">
-        <p className="truncate font-body text-xs text-secondary-foreground/70">{displayName}</p>
-        {planSlug && (
+      {/* User footer */}
+      <div className="mt-auto border-t border-white/10 p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white">
+            {iniciales(displayName)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-xs font-medium text-white">{displayName}</div>
+            <div className="flex items-center gap-1.5 truncate text-[10px] text-white/55">
+              <span>{etiquetaDeRol}</span>
+              {planSlug && (
+                <Link
+                  to="/planes"
+                  className="rounded-full bg-primary/20 px-1.5 py-0 text-[9px] font-semibold text-primary hover:bg-primary/30 transition-colors"
+                >
+                  {PLAN_LABELS[planSlug] ?? planSlug}
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-1.5">
           <Link
-            to="/planes"
-            className="mt-1 inline-block rounded-full bg-primary/20 px-2 py-0.5 font-body text-[10px] font-semibold text-primary hover:bg-primary/30 transition-colors"
+            to="/dashboard/preferencias"
+            onClick={() => setMobileOpen(false)}
+            className="flex flex-1 items-center justify-center gap-1 rounded-md border border-white/15 py-1.5 text-[10px] text-white/75 hover:bg-white/5 hover:text-white transition-colors"
           >
-            Plan {PLAN_LABELS[planSlug] ?? planSlug}
-          </Link>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          asChild
-          className="mt-2 w-full justify-start text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
-        >
-          <Link to="/dashboard/preferencias" onClick={() => setMobileOpen(false)}>
-            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            <SlidersHorizontal className="h-3 w-3" />
             Preferencias
           </Link>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-1 w-full justify-start text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
-          onClick={handleSignOut}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Cerrar sesión
-        </Button>
+          <button
+            onClick={handleSignOut}
+            className="flex flex-1 items-center justify-center gap-1 rounded-md border border-white/15 py-1.5 text-[10px] text-white/75 hover:bg-white/5 hover:text-white transition-colors"
+          >
+            <LogOut className="h-3 w-3" />
+            Salir
+          </button>
+        </div>
       </div>
     </div>
   );
