@@ -712,8 +712,8 @@ const DashboardMisOrdenes = () => {
       return (
         <EmptyState
           icon={Briefcase}
-          title="No hay órdenes que coincidan con tus filtros"
-          description="Ajusta los filtros o vuelve más tarde para ver nuevas órdenes."
+          titulo="No hay órdenes que coincidan con tus filtros"
+          descripcion="Ajusta los filtros o vuelve más tarde para ver nuevas órdenes."
           action={
             <Button size="sm" variant="outline" onClick={() => setFiltros(defaultFiltrosOrdenes)}>
               Limpiar filtros
