@@ -868,9 +868,6 @@ const DashboardLotes = () => {
         </div>
       )}
 
-      {/* Switch silenciador para evitar warning de variable Switch no usada */}
-      <span className="hidden"><Switch checked={false} /></span>
-
       {/* Dialogs */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
         <AlertDialogContent>
