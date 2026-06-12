@@ -40,10 +40,14 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-const EmptyState = () => (
-  <p className="py-16 text-center font-body text-sm text-muted-foreground">
-    Sin datos en el periodo seleccionado
-  </p>
+const EmptyTendencia = () => (
+  <EmptyState
+    icon={TrendingUp}
+    titulo="Sin datos en el periodo seleccionado"
+    descripcion="Cambia el rango de fechas para ver la tendencia."
+    size="sm"
+    className="my-4"
+  />
 );
 
 const GraficoTendencia = ({ data }: Props) => {
