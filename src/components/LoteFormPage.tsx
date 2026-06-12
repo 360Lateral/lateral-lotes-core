@@ -637,11 +637,20 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           <CardContent>
             {(photoPreview || existingPhotoUrl) ? (
               <div className="relative">
-                <img
-                  src={photoPreview || existingPhotoUrl!}
-                  alt="Foto del lote"
-                  className="h-48 w-full rounded-lg object-cover"
-                />
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Foto del lote"
+                    className="h-48 w-full rounded-lg object-cover"
+                  />
+                ) : (
+                  <FotoLote
+                    url={existingPhotoUrl}
+                    alt="Foto del lote"
+                    className="h-48 w-full rounded-lg object-cover"
+                    fallbackClassName="h-48 w-full rounded-lg"
+                  />
+                )}
                 <Button
                   type="button"
                   variant="destructive"
