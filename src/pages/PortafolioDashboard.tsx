@@ -417,6 +417,20 @@ const PortafolioDashboard = () => {
                 <LayoutGrid className="h-4 w-4" />
               </button>
             </div>
+
+            <div className="flex items-center gap-2 pl-1">
+              <Switch
+                id="mostrar-cerrados"
+                checked={mostrarCerrados}
+                onCheckedChange={(v) => setMostrarCerrados(!!v)}
+              />
+              <Label
+                htmlFor="mostrar-cerrados"
+                className="text-xs text-muted-foreground cursor-pointer"
+              >
+                Mostrar cerrados
+              </Label>
+            </div>
           </div>
 
           <div className="mt-4">
