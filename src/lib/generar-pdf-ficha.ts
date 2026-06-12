@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
+import { getSignedFotoUrl } from "@/lib/foto-storage";
 
 export interface FichaPdfData {
   nombre_lote?: string;
@@ -168,7 +169,8 @@ export async function generarPdfFicha(
         ? [...ficha.fotos].sort((a, b) => a.orden - b.orden)[0].url
         : ficha.foto_url ?? null;
     if (fotoUrl) {
-      const b64 = await imagenABase64(fotoUrl);
+      const signed = await getSignedFotoUrl(fotoUrl);
+      const b64 = signed ? await imagenABase64(signed) : null;
       if (b64) {
         try {
           const imgW = pageW - margin * 2;

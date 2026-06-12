@@ -24,6 +24,7 @@ import SeccionBloqueada from "@/components/lotes/SeccionBloqueada";
 import NdaModal from "@/components/lotes/NdaModal";
 import SolicitarContactoDialog from "@/components/lotes/SolicitarContactoDialog";
 import PayPerViewCTA from "@/components/lotes/PayPerViewCTA";
+import { FotoLote } from "@/components/lotes/FotoLote";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 
 const formatCOP = (n: number | undefined | null) =>
@@ -226,11 +227,11 @@ const LoteDetalle = () => {
                 </div>
               </div>
               {data.foto_url && (
-                <img
-                  src={data.foto_url}
+                <FotoLote
+                  url={data.foto_url}
                   alt={`Foto del lote ${data.codigo_anonimo}`}
                   className="w-full max-h-96 object-cover rounded-md border"
-                  loading="lazy"
+                  fallbackClassName="w-full h-64 rounded-md border"
                 />
               )}
             </Card>

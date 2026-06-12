@@ -11,6 +11,8 @@ import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
 import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
+import { FotoLote } from "@/components/lotes/FotoLote";
+import { getSignedFotoUrl } from "@/lib/foto-storage";
 
 const PROD_BASE = "https://urbanix360.com";
 
@@ -46,7 +48,12 @@ const Galeria = ({ fotos, fallback, nombre }: { fotos: { url: string; orden: num
   return (
     <div className="space-y-2">
       <div className="relative h-[250px] w-full overflow-hidden rounded-lg bg-muted">
-        <img src={lista[idx]} alt={`${nombre} - foto ${idx + 1}`} className="h-full w-full object-cover" />
+        <FotoLote
+          url={lista[idx]}
+          alt={`${nombre} - foto ${idx + 1}`}
+          className="h-full w-full object-cover"
+          fallbackClassName="h-full w-full"
+        />
         {lista.length > 1 && (
           <>
             <button
@@ -79,7 +86,7 @@ const Galeria = ({ fotos, fallback, nombre }: { fotos: { url: string; orden: num
                 i === idx ? "border-primary" : "border-transparent opacity-70"
               }`}
             >
-              <img src={url} alt="" className="h-full w-full object-cover" />
+              <FotoLote url={url} alt="" className="h-full w-full object-cover" fallbackClassName="h-full w-full" />
             </button>
           ))}
         </div>
@@ -107,7 +114,7 @@ const generarHtmlStandalone = (
 
   const fotosHtml = mostrar("fotos")
     ? (ficha.fotos ?? [])
-        .map((f) => `<img src="${f.url}" style="width:100%;border-radius:8px;margin-bottom:8px;" />`)
+        .map((f) => `<img src="${(f as { signedUrl?: string }).signedUrl ?? f.url}" style="width:100%;border-radius:8px;margin-bottom:8px;" />`)
         .join("")
     : "";
 
@@ -258,9 +265,16 @@ const LoteFicha = () => {
     }
   };
 
-  const descargarHtml = () => {
+  const descargarHtml = async () => {
     if (!data) return;
-    const html = generarHtmlStandalone(data, mapsKey, mostrar, tituloCustom, notaCustom);
+    const fotosSignedRaw = await Promise.all(
+      (data.fotos ?? []).map(async (f) => ({
+        ...f,
+        signedUrl: (await getSignedFotoUrl(f.url)) ?? f.url,
+      })),
+    );
+    const dataConSigned = { ...data, fotos: fotosSignedRaw } as typeof data;
+    const html = generarHtmlStandalone(dataConSigned, mapsKey, mostrar, tituloCustom, notaCustom);
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

@@ -15,6 +15,7 @@ import {
 
 import MapaEstaticoLote from "./MapaEstaticoLote";
 import FichaConfigDialog from "./FichaConfigDialog";
+import { FotoLote } from "./FotoLote";
 import { cn } from "@/lib/utils";
 
 export interface LoteCardData {
@@ -80,11 +81,11 @@ const LoteCardAdmin = ({
     <Card className="overflow-hidden flex flex-col hover:shadow-md transition-shadow">
       <div className="relative h-[180px] w-full bg-muted">
         {vista === "foto" && hasPhoto ? (
-          <img
-            src={lote.foto_principal!}
+          <FotoLote
+            url={lote.foto_principal}
             alt={lote.nombre_lote}
-            loading="lazy"
             className="h-full w-full object-cover"
+            fallbackClassName="h-full w-full"
           />
         ) : (
           <MapaEstaticoLote lat={lote.lat} lng={lote.lng} nombre={lote.nombre_lote} />

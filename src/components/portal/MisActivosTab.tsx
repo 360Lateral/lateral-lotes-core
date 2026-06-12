@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
 import GestionarComisionistasDialog from "./GestionarComisionistasDialog";
 import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
+import { FotoLote } from "@/components/lotes/FotoLote";
 
 const fmtCOP = (n: number | null) =>
   n == null
@@ -90,10 +91,11 @@ const MisActivosTab = () => {
             <Card key={a.id} className="overflow-hidden">
               <div className="h-32 w-full bg-muted flex items-center justify-center">
                 {a.foto_url ? (
-                  <img
-                    src={a.foto_url}
+                  <FotoLote
+                    url={a.foto_url}
                     alt={a.nombre_lote ?? "Lote"}
                     className="h-full w-full object-cover"
+                    fallbackClassName="h-full w-full"
                   />
                 ) : (
                   <MapPin className="h-10 w-10 text-muted-foreground/30" />
