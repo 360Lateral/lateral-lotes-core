@@ -2443,6 +2443,62 @@ export type Database = {
           },
         ]
       }
+      lote_vistas: {
+        Row: {
+          fecha: string
+          id: string
+          lote_id: string
+          source: string | null
+          user_id: string | null
+          visitor_session: string | null
+        }
+        Insert: {
+          fecha?: string
+          id?: string
+          lote_id: string
+          source?: string | null
+          user_id?: string | null
+          visitor_session?: string | null
+        }
+        Update: {
+          fecha?: string
+          id?: string
+          lote_id?: string
+          source?: string | null
+          user_id?: string | null
+          visitor_session?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lote_vistas_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lote_vistas_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lote_vistas_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_lotes_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lote_vistas_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "vw_mercado_publico"
+            referencedColumns: ["lote_id"]
+          },
+        ]
+      }
       lotes: {
         Row: {
           area_total_m2: number | null
@@ -5011,6 +5067,14 @@ export type Database = {
         Args: { p_alerta_id: string }
         Returns: undefined
       }
+      resumen_vistas_portafolio: {
+        Args: { p_propietario: string }
+        Returns: {
+          total_vistas: number
+          vistas_semana_anterior: number
+          vistas_ultima_semana: number
+        }[]
+      }
       revocar_autorizacion_comisionista: {
         Args: { p_autorizacion_id: string; p_motivo?: string }
         Returns: undefined
@@ -5046,6 +5110,16 @@ export type Database = {
       validar_lote: {
         Args: { p_decision: string; p_lote_id: string; p_notas?: string }
         Returns: undefined
+      }
+      vistas_recientes_propietario: {
+        Args: { p_limit?: number; p_propietario: string }
+        Returns: {
+          fecha: string
+          id: string
+          lote_id: string
+          lote_nombre: string
+          source: string
+        }[]
       }
     }
     Enums: {
