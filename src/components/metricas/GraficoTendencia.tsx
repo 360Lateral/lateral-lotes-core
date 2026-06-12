@@ -13,6 +13,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { TrendingUp } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { TendenciaMensualFila } from "@/hooks/useTendenciaMensual";
 
 interface Props {
