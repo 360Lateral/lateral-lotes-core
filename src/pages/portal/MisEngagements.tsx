@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
@@ -9,14 +9,21 @@ import {
 import { useMisActivos } from "@/hooks/useMisActivos";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
+import { useResumenPortafolio } from "@/hooks/cliente/useResumenPortafolio";
+import {
+  useActividadReciente,
+  type EventoActividad,
+} from "@/hooks/cliente/useActividadReciente";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import MisActivosTab from "@/components/portal/MisActivosTab";
 import SolicitarDiagnosticoDialog from "@/components/portal/SolicitarDiagnosticoDialog";
+import PublicarActivoDialog from "@/components/portal/PublicarActivoDialog";
 import {
   Folder,
   MapPin,
@@ -28,6 +35,15 @@ import {
   CreditCard,
   AlertCircle,
   Loader2,
+  Eye,
+  Briefcase,
+  Building2,
+  TrendingUp,
+  TrendingDown,
+  FileSignature,
+  Activity,
+  ArrowRight,
+  type LucideIcon,
 } from "lucide-react";
 
 const planVariant = (codigo?: string | null): {
@@ -50,6 +66,17 @@ const formatoFecha = (fecha: string | null) => {
   });
 };
 
+const formatoRelativo = (fechaISO: string): string => {
+  const dias = Math.floor(
+    (Date.now() - new Date(fechaISO).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  if (dias <= 0) return "Hoy";
+  if (dias === 1) return "Ayer";
+  if (dias < 7) return `Hace ${dias} días`;
+  if (dias < 30) return `Hace ${Math.floor(dias / 7)} sem`;
+  return `Hace ${Math.floor(dias / 30)} m`;
+};
+
 const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
   if (e.estado === "entregado") {
     return <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white">Entregado</Badge>;
@@ -58,9 +85,7 @@ const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
   if (dias === null || dias === undefined) {
     return <Badge variant="outline">Sin fecha estimada</Badge>;
   }
-  if (dias < 0) {
-    return <Badge variant="destructive">Entrega atrasada</Badge>;
-  }
+  if (dias < 0) return <Badge variant="destructive">Entrega atrasada</Badge>;
   if (dias <= 7) {
     return (
       <Badge className="bg-amber-500 hover:bg-amber-500 text-white">
@@ -71,18 +96,12 @@ const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
   return (
     <Badge variant="outline" className="gap-1">
       <Calendar className="h-3 w-3" />
-      Entrega estimada: {formatoFecha(e.fecha_sla)}
+      Estimada: {formatoFecha(e.fecha_sla)}
     </Badge>
   );
 };
 
-const ChipMaestro = ({
-  label,
-  ready,
-}: {
-  label: string;
-  ready: boolean;
-}) => {
+const ChipMaestro = ({ label, ready }: { label: string; ready: boolean }) => {
   if (ready) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
@@ -118,7 +137,7 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
   };
 
   const cardInner = (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full">
       {ambosListos && isActivo && (
         <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
           <Sparkles className="h-4 w-4" />
@@ -197,15 +216,13 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
     </Card>
   );
 
-  if (!isActivo) {
-    return <div className="rounded-lg">{cardInner}</div>;
-  }
+  if (!isActivo) return <div className="rounded-lg h-full">{cardInner}</div>;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="text-left transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
+      className="text-left transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg h-full"
     >
       {cardInner}
     </button>
@@ -222,13 +239,13 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
         <p className="text-sm text-muted-foreground">
           Diagnósticos contratados y solicitudes en curso.
         </p>
-        <Button onClick={onSolicitar} size="sm">
+        <Button onClick={onSolicitar} size="sm" variant="outline">
           <Plus className="mr-1 h-4 w-4" /> Solicitar diagnóstico
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {[...Array(2)].map((_, i) => (
             <Skeleton key={i} className="h-56 w-full" />
           ))}
@@ -243,10 +260,13 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
                 Solicita uno con el botón "Solicitar diagnóstico" o contacta a tu asesor.
               </p>
             </div>
+            <Button onClick={onSolicitar}>
+              <Plus className="mr-1 h-4 w-4" /> Solicitar mi primer diagnóstico
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {data.map((e) => (
             <EngagementCard
               key={e.engagement_id}
@@ -260,11 +280,238 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
   );
 };
 
+// ---------- Overview ----------
+
+const MetricaOverview = ({
+  label,
+  value,
+  icon: Icon,
+  delta,
+  deltaLabel,
+  sublabel,
+}: {
+  label: string;
+  value: string | number;
+  icon: LucideIcon;
+  delta?: number;
+  deltaLabel?: string;
+  sublabel?: string;
+}) => (
+  <Card>
+    <CardContent className="p-4 flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium truncate">
+          {label}
+        </p>
+        <p className="text-2xl font-semibold mt-1">{value}</p>
+        {deltaLabel && (
+          <p
+            className={`text-xs mt-1 flex items-center gap-1 ${
+              delta && delta > 0
+                ? "text-emerald-600"
+                : delta && delta < 0
+                ? "text-destructive"
+                : "text-muted-foreground"
+            }`}
+          >
+            {delta !== undefined && delta > 0 && <TrendingUp className="h-3 w-3" />}
+            {delta !== undefined && delta < 0 && <TrendingDown className="h-3 w-3" />}
+            {deltaLabel}
+          </p>
+        )}
+        {sublabel && !deltaLabel && (
+          <p className="text-xs mt-1 text-muted-foreground">{sublabel}</p>
+        )}
+      </div>
+      <div className="h-9 w-9 shrink-0 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+        <Icon className="h-4 w-4" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// ---------- Actividad ----------
+
+const iconoPorTipo = (tipo: EventoActividad["tipo"]): LucideIcon => {
+  switch (tipo) {
+    case "diagnostico_entregado":
+      return CheckCircle2;
+    case "nda_firmado":
+      return FileSignature;
+    case "vista_nueva":
+      return Eye;
+    default:
+      return Activity;
+  }
+};
+
+const colorPorTipo = (tipo: EventoActividad["tipo"]): string => {
+  switch (tipo) {
+    case "diagnostico_entregado":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300";
+    case "nda_firmado":
+      return "bg-primary/10 text-primary";
+    case "vista_nueva":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
+
+const ActividadRecientePanel = () => {
+  const { data: actividad, isLoading } = useActividadReciente();
+
+  return (
+    <Card>
+      <CardContent className="p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Activity className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold">Actividad reciente</h3>
+        </div>
+
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : !actividad || actividad.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Sin actividad reciente. Cuando alguien interactúe con tu portafolio, aparecerá aquí.
+          </p>
+        ) : (
+          <ul className="space-y-3">
+            {actividad.slice(0, 5).map((ev) => {
+              const Icon = iconoPorTipo(ev.tipo);
+              return (
+                <li key={ev.id} className="flex items-start gap-3">
+                  <div
+                    className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${colorPorTipo(ev.tipo)}`}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm leading-snug">{ev.titulo}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {formatoRelativo(ev.fecha)}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+interface SugerenciaProximoPaso {
+  descripcion: string;
+  cta: string;
+  onClick: () => void;
+}
+
+const useProximoPasoSugerencia = ({
+  onSolicitar,
+  onPublicar,
+}: {
+  onSolicitar: () => void;
+  onPublicar: () => void;
+}): SugerenciaProximoPaso | null => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data: engagements } = useMisEngagementsCliente();
+  const { data: activos } = useMisActivos(user?.id);
+
+  const ev = engagements ?? [];
+  const ac = activos ?? [];
+
+  const sinNada = ev.length === 0 && ac.length === 0;
+  if (sinNada) {
+    return {
+      descripcion:
+        "Solicita tu primer diagnóstico para conocer el potencial real de un lote.",
+      cta: "Solicitar diagnóstico",
+      onClick: onSolicitar,
+    };
+  }
+
+  const entregadoSinPublicar = ev.find(
+    (e) =>
+      e.estado === "entregado" &&
+      !ac.some((a) => a.nombre_lote === e.lote_nombre && a.publicado_venta)
+  );
+  if (entregadoSinPublicar) {
+    return {
+      descripcion: `Tu diagnóstico de "${entregadoSinPublicar.lote_nombre ?? "tu lote"}" está listo. Publícalo en el mercado para empezar a recibir interesados.`,
+      cta: "Publicar al mercado",
+      onClick: onPublicar,
+    };
+  }
+
+  const pendienteAprobacion = ac.find(
+    (a) => a.estado_publicacion === "pendiente_validacion"
+  );
+  if (pendienteAprobacion) {
+    return {
+      descripcion: `"${pendienteAprobacion.nombre_lote ?? "Tu activo"}" está siendo revisado por 360Lateral. Te avisaremos cuando esté publicado.`,
+      cta: "Ver mis activos",
+      onClick: () => navigate("/portal?tab=activos"),
+    };
+  }
+
+  if (ac.length > 0 && ev.length === 0) {
+    return {
+      descripcion:
+        "Contrata un diagnóstico técnico para que tus activos publicados conviertan más rápido.",
+      cta: "Solicitar diagnóstico",
+      onClick: onSolicitar,
+    };
+  }
+
+  return null;
+};
+
+const ProximoPasoCard = ({
+  onSolicitar,
+  onPublicar,
+}: {
+  onSolicitar: () => void;
+  onPublicar: () => void;
+}) => {
+  const sugerencia = useProximoPasoSugerencia({ onSolicitar, onPublicar });
+  if (!sugerencia) return null;
+
+  return (
+    <Card className="bg-primary/5 border-primary/20">
+      <CardContent className="p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold text-primary">Próximo paso sugerido</h3>
+        </div>
+        <p className="text-sm text-foreground/90 leading-relaxed">
+          {sugerencia.descripcion}
+        </p>
+        <Button size="sm" onClick={sugerencia.onClick} className="w-full">
+          {sugerencia.cta}
+          <ArrowRight className="ml-1 h-3.5 w-3.5" />
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ---------- Página ----------
+
 const PortalHomeInner = () => {
   const { user } = useAuth();
   const { data: engagements } = useMisEngagementsCliente();
   const { data: activos = [] } = useMisActivos(user?.id);
+  const { data: resumen } = useResumenPortafolio();
   const [solicitarOpen, setSolicitarOpen] = useState(false);
+  const [publicarOpen, setPublicarOpen] = useState(false);
+  const generarPago = useGenerarPagoWompi();
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
@@ -272,57 +519,186 @@ const PortalHomeInner = () => {
     user?.email?.split("@")[0] ||
     "Cliente";
 
-  const serviciosCount = (engagements ?? []).filter(
-    (e) => e.estado !== "cancelado" && e.estado !== "cerrado"
-  ).length;
-  const activosPublicadosCount = activos.filter(
-    (a) => a.estado_publicacion === "aprobado"
-  ).length;
+  const serviciosCount =
+    resumen?.serviciosActivos ??
+    (engagements ?? []).filter(
+      (e) => e.estado !== "cancelado" && e.estado !== "cerrado"
+    ).length;
+
+  const activosPublicadosCount =
+    resumen?.activosPublicados ??
+    activos.filter((a) => a.estado_publicacion === "aprobado" && a.publicado_venta).length;
+
+  const engagementsConPagoPendiente = useMemo(
+    () => (engagements ?? []).filter((e) => e.estado_activacion === "pendiente_pago"),
+    [engagements]
+  );
+
+  const handleReintentarPagoPrimero = async () => {
+    const first = engagementsConPagoPendiente[0];
+    if (!first) return;
+    try {
+      const data = await generarPago.mutateAsync(first.engagement_id);
+      if (data.payment_url) window.location.href = data.payment_url;
+    } catch {
+      /* toast manejado */
+    }
+  };
+
+  const initialTab =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("tab") === "activos"
+      ? "activos"
+      : "servicios";
+
+  const deltaSemanal = resumen?.deltaSemanal ?? 0;
+  const deltaLabel =
+    deltaSemanal === 0
+      ? "Sin cambios vs semana anterior"
+      : `${deltaSemanal > 0 ? "+" : ""}${deltaSemanal} vs semana anterior`;
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-          Hola, {nombre}.
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          Aquí encuentras tus servicios contratados y los activos que tienes
-          publicados en el mercado.
-        </p>
+      {/* Header */}
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Hola, {nombre}.
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Tienes{" "}
+            <span className="font-medium text-foreground">
+              {serviciosCount} {serviciosCount === 1 ? "diagnóstico" : "diagnósticos"} en curso
+            </span>{" "}
+            y{" "}
+            <span className="font-medium text-foreground">
+              {activosPublicadosCount} {activosPublicadosCount === 1 ? "activo publicado" : "activos publicados"}
+            </span>{" "}
+            en el mercado.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPublicarOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            Publicar activo
+          </Button>
+          <Button size="sm" onClick={() => setSolicitarOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            Solicitar diagnóstico
+          </Button>
+        </div>
       </header>
 
-      <Tabs defaultValue="servicios" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-xl">
-          <TabsTrigger value="servicios" className="gap-2">
-            <span className="truncate">Mis servicios contratados</span>
-            {serviciosCount > 0 && (
-              <Badge variant="secondary" className="h-5 px-1.5">
-                {serviciosCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="activos" className="gap-2">
-            <span className="truncate">Mis activos en venta</span>
-            {activosPublicadosCount > 0 && (
-              <Badge variant="secondary" className="h-5 px-1.5">
-                {activosPublicadosCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
+      {/* Alert global pagos pendientes */}
+      {engagementsConPagoPendiente.length > 0 && (
+        <Alert className="border-blue-300 bg-blue-50 dark:bg-blue-950/30">
+          <AlertCircle className="h-4 w-4 text-blue-700 dark:text-blue-300" />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <AlertTitle className="text-blue-900 dark:text-blue-100">
+                Pago pendiente
+              </AlertTitle>
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                {engagementsConPagoPendiente.length === 1
+                  ? `El diagnóstico de "${engagementsConPagoPendiente[0].lote_nombre ?? "tu lote"}" está esperando confirmación de pago.`
+                  : `Tienes ${engagementsConPagoPendiente.length} diagnósticos esperando confirmación de pago.`}
+              </AlertDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={handleReintentarPagoPrimero}
+              disabled={generarPago.isPending}
+              className="shrink-0"
+            >
+              {generarPago.isPending && (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+              )}
+              Continuar pago
+            </Button>
+          </div>
+        </Alert>
+      )}
 
-        <TabsContent value="servicios" className="mt-6">
-          <ServiciosList onSolicitar={() => setSolicitarOpen(true)} />
-        </TabsContent>
-        <TabsContent value="activos" className="mt-6">
-          <MisActivosTab />
-        </TabsContent>
-      </Tabs>
+      {/* Overview 2x2 / 4 cols */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <MetricaOverview
+          label="Servicios activos"
+          value={serviciosCount}
+          icon={Briefcase}
+          sublabel={
+            resumen?.proximaEntregaDias != null && resumen.proximaEntregaNombre
+              ? `Próxima entrega en ${resumen.proximaEntregaDias} d`
+              : "Sin entregas próximas"
+          }
+        />
+        <MetricaOverview
+          label="Activos publicados"
+          value={activosPublicadosCount}
+          icon={Building2}
+          sublabel={activosPublicadosCount > 0 ? "En el mercado" : "Sin activos públicos"}
+        />
+        <MetricaOverview
+          label="Vistas totales"
+          value={resumen?.vistasTotales ?? 0}
+          icon={Eye}
+          delta={deltaSemanal}
+          deltaLabel={resumen ? deltaLabel : undefined}
+        />
+        <MetricaOverview
+          label="Vistas (7 días)"
+          value={resumen?.vistasUltimaSemana ?? 0}
+          icon={TrendingUp}
+          sublabel="Última semana"
+        />
+      </div>
+
+      {/* 2 columnas: tabs + sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        <div className="min-w-0">
+          <Tabs defaultValue={initialTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-xl">
+              <TabsTrigger value="servicios" className="gap-2">
+                <span className="truncate">Servicios contratados</span>
+                {serviciosCount > 0 && (
+                  <Badge variant="secondary" className="h-5 px-1.5">
+                    {serviciosCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="activos" className="gap-2">
+                <span className="truncate">Activos en venta</span>
+                {activosPublicadosCount > 0 && (
+                  <Badge variant="secondary" className="h-5 px-1.5">
+                    {activosPublicadosCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="servicios" className="mt-6">
+              <ServiciosList onSolicitar={() => setSolicitarOpen(true)} />
+            </TabsContent>
+            <TabsContent value="activos" className="mt-6">
+              <MisActivosTab />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <aside className="space-y-4">
+          <ProximoPasoCard
+            onSolicitar={() => setSolicitarOpen(true)}
+            onPublicar={() => setPublicarOpen(true)}
+          />
+          <ActividadRecientePanel />
+        </aside>
+      </div>
 
       <SolicitarDiagnosticoDialog
         open={solicitarOpen}
         onOpenChange={setSolicitarOpen}
       />
+      <PublicarActivoDialog open={publicarOpen} onOpenChange={setPublicarOpen} />
     </div>
   );
 };
