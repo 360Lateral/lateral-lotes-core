@@ -65,7 +65,7 @@ const GraficoTendencia = ({ data }: Props) => {
 
           <TabsContent value="engagements" className="mt-4">
             {empty ? (
-              <EmptyState />
+              <EmptyTendencia />
             ) : (
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -102,7 +102,7 @@ const GraficoTendencia = ({ data }: Props) => {
 
           <TabsContent value="ingresos" className="mt-4">
             {empty ? (
-              <EmptyState />
+              <EmptyTendencia />
             ) : (
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -135,7 +135,7 @@ const GraficoTendencia = ({ data }: Props) => {
 
           <TabsContent value="leads" className="mt-4">
             {empty ? (
-              <EmptyState />
+              <EmptyTendencia />
             ) : (
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
