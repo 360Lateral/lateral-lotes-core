@@ -21,8 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, FileText, Download, Trash2 } from "lucide-react";
+import { Plus, FileText, Download, Trash2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const categoriasDoc = [
   { key: "financiero", label: "Financiero" },
