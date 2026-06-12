@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useLoteDetalle } from "@/hooks/useLoteDetalle";
 import { useMiSolicitudParaLote } from "@/hooks/useMiSolicitudParaLote";
+import { supabase } from "@/integrations/supabase/client";
+import { getOrCreateVisitorSession } from "@/lib/visitor";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -87,6 +89,28 @@ const LoteDetalle = () => {
   const { data: miSolicitud } = useMiSolicitudParaLote(id);
   const [ndaOpen, setNdaOpen] = useState(false);
   const [contactoOpen, setContactoOpen] = useState(false);
+  const vistaRegistradaRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!id || !data || data.error) return;
+    if (data.es_propietario || data.es_admin) return;
+    if (vistaRegistradaRef.current === id) return;
+    vistaRegistradaRef.current = id;
+    const session = getOrCreateVisitorSession();
+    (async () => {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        await supabase.from("lote_vistas" as any).insert({
+          lote_id: id,
+          visitor_session: session,
+          user_id: userData.user?.id ?? null,
+          source: "lote_detalle",
+        });
+      } catch {
+        /* tracking no debe romper la página */
+      }
+    })();
+  }, [id, data]);
 
   if (isLoading) {
     return (
