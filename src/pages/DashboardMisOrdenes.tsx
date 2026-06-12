@@ -22,7 +22,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Briefcase, ChevronDown, Wallet } from "lucide-react";
+import { Briefcase, ChevronDown, Wallet, Inbox, Send, Trophy, Coins } from "lucide-react";
 import { useMisOrdenesExperto } from "@/hooks/useMisOrdenesExperto";
 import { useMisPropuestas } from "@/hooks/useMisPropuestas";
 import { useTengoPropuestaEnOrden } from "@/hooks/useTengoPropuestaEnOrden";
@@ -30,6 +30,10 @@ import { useRetirarPropuesta } from "@/hooks/useRetirarPropuesta";
 import { useMisLiquidaciones } from "@/hooks/useMisLiquidaciones";
 import PostularmeDialog from "@/components/ordenes/PostularmeDialog";
 import MiDesempenoPanel from "@/components/ordenes/MiDesempenoPanel";
+import { useAuth } from "@/contexts/AuthContext";
+import { useResumenExperto } from "@/hooks/experto/useResumenExperto";
+import { MetricaOverview } from "@/components/ui/MetricaOverview";
+import { formatCOPCompact } from "@/lib/format";
 
 const fmtCOP = (n: number) =>
   new Intl.NumberFormat("es-CO", {
@@ -306,6 +310,12 @@ const DashboardMisOrdenes = () => {
   const { data: ordenes = [], isLoading: loadingOrdenes } = useMisOrdenesExperto();
   const { data: propuestas = [], isLoading: loadingProps } = useMisPropuestas();
   const { data: liquidaciones = [], isLoading: loadingLiqs } = useMisLiquidaciones();
+  const { user } = useAuth();
+  const { data: resumenExperto } = useResumenExperto();
+  const nombre =
+    (user?.user_metadata as any)?.full_name ??
+    user?.email?.split("@")[0] ??
+    "Experto";
 
   const kpiLiqs = liquidaciones.reduce(
     (acc: { total: number; pendiente: number; pagado: number; pendCount: number }, l: any) => {
@@ -323,14 +333,49 @@ const DashboardMisOrdenes = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-2xl font-semibold text-foreground">
-            Mis órdenes y propuestas
+            Hola, {nombre}.
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Postúlate a órdenes abiertas y monitorea el estado de tus propuestas.
+          <p className="text-sm text-muted-foreground mt-1">
+            Tienes {resumenExperto?.ordenes_activas ?? 0} órdenes activas
+            {resumenExperto?.propuestas_pendientes
+              ? ` y ${resumenExperto.propuestas_pendientes} propuestas pendientes por revisar`
+              : ""}
+            .
           </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricaOverview
+            label="Órdenes abiertas"
+            value={resumenExperto?.ordenes_activas ?? 0}
+            icon={Inbox}
+            sublabel="Disponibles para postular"
+          />
+          <MetricaOverview
+            label="Propuestas pendientes"
+            value={resumenExperto?.propuestas_pendientes ?? 0}
+            icon={Send}
+            sublabel="En evaluación"
+          />
+          <MetricaOverview
+            label="Tasa adjudicación"
+            value={
+              resumenExperto?.tasa_adjudicacion_pct != null
+                ? `${resumenExperto.tasa_adjudicacion_pct}%`
+                : "—"
+            }
+            icon={Trophy}
+            sublabel={`${resumenExperto?.propuestas_ganadas ?? 0} ganadas`}
+          />
+          <MetricaOverview
+            label="Ingresos del mes"
+            value={formatCOPCompact(resumenExperto?.ingresos_mes ?? 0)}
+            icon={Coins}
+            sublabel="Liquidaciones pagadas"
+          />
         </div>
 
         <Tabs value={tab} onValueChange={setTab}>
