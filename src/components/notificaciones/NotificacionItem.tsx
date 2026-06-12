@@ -13,6 +13,7 @@ interface Props {
 const NotificacionItem = ({ notificacion: n, onClose }: Props) => {
   const navigate = useNavigate();
   const marcar = useMarcarLeida();
+  const { isAdminOrExperto } = useAuth();
 
   const barColor =
     n.nivel === "rojo"
@@ -25,7 +26,13 @@ const NotificacionItem = ({ notificacion: n, onClose }: Props) => {
     if (n.estado === "pendiente") marcar.mutate(n.id);
     const data = (n.data ?? {}) as Record<string, unknown>;
     const engagementId = (data.engagement_id as string) ?? n.entidad_id;
-    if (n.entidad_tipo === "engagement" && engagementId) {
+    if (n.entidad_tipo === "mensaje_asesor" && engagementId) {
+      navigate(
+        isAdminOrExperto
+          ? `/dashboard/engagements/${engagementId}`
+          : `/portal/engagement/${engagementId}`
+      );
+    } else if (n.entidad_tipo === "engagement" && engagementId) {
       navigate(`/dashboard/engagements/${engagementId}`);
     }
     onClose();
