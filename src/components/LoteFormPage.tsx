@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
 import { useAdvertenciaSalirSinGuardar } from "@/hooks/useAdvertenciaSalirSinGuardar";
+import { FotoLote } from "@/components/lotes/FotoLote";
 import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
