@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, MapPin, User, Calendar, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const fmtCOP = (n: number | null) =>
   n == null ? "—" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
