@@ -145,6 +145,14 @@ const PortafolioDashboard = () => {
     }
   });
 
+  const [mostrarCerrados, setMostrarCerrados] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(KEY_MOSTRAR_CERRADOS) === "true";
+    } catch {
+      return false;
+    }
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem(KEY_VISTA, vista);
@@ -156,6 +164,12 @@ const PortafolioDashboard = () => {
       localStorage.setItem(KEY_ORDEN, orden);
     } catch {}
   }, [orden]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_MOSTRAR_CERRADOS, String(mostrarCerrados));
+    } catch {}
+  }, [mostrarCerrados]);
 
   const { data: filas = [], isLoading: filasLoading } = useVistaPortafolio(filtros);
 
