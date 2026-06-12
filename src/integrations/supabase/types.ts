@@ -4598,11 +4598,13 @@ export type Database = {
           categoria_area: string | null
           ciudad: string | null
           codigo_anonimo: string | null
+          has_resolutoria: boolean | null
           latitud_zona: number | null
           longitud_zona: number | null
           lote_id: string | null
           publicado_en: string | null
           rango_precio: string | null
+          score_360: number | null
           uso_actual: string | null
         }
         Insert: {
@@ -4611,11 +4613,13 @@ export type Database = {
           categoria_area?: never
           ciudad?: string | null
           codigo_anonimo?: never
+          has_resolutoria?: never
           latitud_zona?: never
           longitud_zona?: never
           lote_id?: string | null
           publicado_en?: string | null
           rango_precio?: never
+          score_360?: never
           uso_actual?: string | null
         }
         Update: {
@@ -4624,11 +4628,13 @@ export type Database = {
           categoria_area?: never
           ciudad?: string | null
           codigo_anonimo?: never
+          has_resolutoria?: never
           latitud_zona?: never
           longitud_zona?: never
           lote_id?: string | null
           publicado_en?: string | null
           rango_precio?: never
+          score_360?: never
           uso_actual?: string | null
         }
         Relationships: []

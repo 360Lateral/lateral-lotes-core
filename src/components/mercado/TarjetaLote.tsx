@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { GoogleMap, MarkerF } from "@react-google-maps/api";
-import { Ruler, Sparkles, MapPin, ArrowRight, Image as ImageIcon } from "lucide-react";
+import { Ruler, Sparkles, MapPin, ArrowRight, Image as ImageIcon, Award, Star } from "lucide-react";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { Badge } from "@/components/ui/badge";
 import type { LoteMercado } from "@/hooks/useMercadoPublico";
@@ -86,12 +86,26 @@ const TarjetaLote = ({ lote }: Props) => {
           <Badge variant="secondary" className="bg-background/90 backdrop-blur text-xs font-mono">
             {lote.codigo_anonimo}
           </Badge>
-          {esNuevo && (
-            <Badge className="bg-primary text-primary-foreground gap-1 text-xs">
-              <Sparkles className="h-3 w-3" />
-              Nuevo
-            </Badge>
-          )}
+          <div className="flex flex-col items-end gap-1">
+            {esNuevo && (
+              <Badge className="bg-primary text-primary-foreground gap-1 text-xs">
+                <Sparkles className="h-3 w-3" />
+                Nuevo
+              </Badge>
+            )}
+            {lote.score_360 != null && (
+              <Badge className="bg-emerald-600 text-white gap-1 text-xs">
+                <Star className="h-3 w-3" />
+                Score {Number(lote.score_360).toFixed(1)}
+              </Badge>
+            )}
+            {lote.has_resolutoria && (
+              <Badge className="bg-secondary text-secondary-foreground gap-1 text-xs">
+                <Award className="h-3 w-3" />
+                Resolutoría
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
