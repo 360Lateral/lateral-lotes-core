@@ -64,6 +64,7 @@ const SEMAFORO_LABEL: Record<string, string> = {
 
 const KEY_VISTA = "portafolio_vista";
 const KEY_ORDEN = "portafolio_orden";
+const KEY_MOSTRAR_CERRADOS = "portafolio_mostrar_cerrados";
 
 type Vista = "tabla" | "kanban";
 type Orden = "urgencia" | "dias-gestion-desc" | "avance-asc" | "sla-asc";
