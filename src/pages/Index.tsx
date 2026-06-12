@@ -224,8 +224,8 @@ const Index = () => {
   const { data: trustStats = [
     { label: "Lotes disponibles", value: "—" },
     { label: "Municipios", value: "—" },
-    { label: "Diagnósticos realizados", value: "—" },
-    { label: "Resultoría 360° Verificada", value: "—" },
+    { label: "Diagnósticos", value: "—" },
+    { label: "Resolutorías", value: "—" },
   ] } = useQuery({
     queryKey: ["trust-stats"],
     queryFn: async () => {
