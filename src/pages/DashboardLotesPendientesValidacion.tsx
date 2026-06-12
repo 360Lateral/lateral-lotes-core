@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, MapPin, User, Calendar, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const fmtCOP = (n: number | null) =>
   n == null ? "—" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
@@ -74,14 +75,11 @@ const DashboardLotesPendientesValidacion = () => {
         {isLoading && <p className="font-body text-sm text-muted-foreground">Cargando…</p>}
 
         {!isLoading && lotes.length === 0 && (
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-              <CheckCircle2 className="h-10 w-10 text-emerald-600" />
-              <p className="font-body text-sm text-muted-foreground">
-                No hay lotes esperando validación. ✓
-              </p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={CheckCircle2}
+            titulo="No hay lotes pendientes de validación"
+            descripcion="Cuando los propietarios envíen nuevos lotes, aparecerán aquí para tu revisión."
+          />
         )}
 
         <div className="flex flex-col gap-4">

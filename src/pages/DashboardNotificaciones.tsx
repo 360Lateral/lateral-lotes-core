@@ -11,6 +11,7 @@ import {
   TrendingUp, Info, Filter,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────
 type TipoNotif = "todas" | "match_lote" | "cambio_estado" | "negociacion" | "sistema";
@@ -164,19 +165,19 @@ const DashboardNotificaciones = () => {
           ))}
         </div>
       ) : filtradas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16">
-          <Bell className="mb-3 h-10 w-10 text-muted-foreground" />
-          <p className="font-body text-sm text-muted-foreground">
-            {filtro === "todas"
-              ? "No tienes notificaciones aún."
-              : `No hay notificaciones de tipo "${TIPO_CONFIG[filtro]?.label ?? filtro}".`}
-          </p>
-          {filtro === "todas" && (
-            <p className="mt-1 font-body text-xs text-muted-foreground">
-              Cuando un lote coincida con tus criterios de inversión, aparecerá aquí.
-            </p>
-          )}
-        </div>
+        <EmptyState
+          icon={Bell}
+          titulo={
+            filtro === "todas"
+              ? "Sin notificaciones"
+              : `Sin notificaciones de tipo "${TIPO_CONFIG[filtro]?.label ?? filtro}"`
+          }
+          descripcion={
+            filtro === "todas"
+              ? "Recibirás aquí actualizaciones sobre tu actividad y la del equipo."
+              : "Cambia el filtro para ver otras notificaciones."
+          }
+        />
       ) : (
         <div className="space-y-3">
           {filtradas.map((n: any) => {

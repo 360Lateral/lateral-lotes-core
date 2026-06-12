@@ -12,6 +12,7 @@ import {
 import { Handshake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 
 const DashboardNegociaciones = () => {
@@ -67,10 +68,11 @@ const DashboardNegociaciones = () => {
           {[1, 2, 3].map((i) => <div key={i} className="h-16 animate-pulse rounded-lg bg-muted" />)}
         </div>
       ) : negociaciones.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16">
-          <Handshake className="mb-3 h-10 w-10 text-muted-foreground" />
-          <p className="font-body text-sm text-muted-foreground">No hay negociaciones aún.</p>
-        </div>
+        <EmptyState
+          icon={Handshake}
+          titulo="Sin negociaciones activas"
+          descripcion="Las negociaciones iniciadas entre desarrolladores y propietarios aparecerán aquí."
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left font-body text-sm">

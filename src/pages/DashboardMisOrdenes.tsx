@@ -45,6 +45,7 @@ import {
   LayoutGrid,
   List,
   Filter,
+  FileText,
 } from "lucide-react";
 import { useMisOrdenesExperto } from "@/hooks/useMisOrdenesExperto";
 import { useMisPropuestas } from "@/hooks/useMisPropuestas";
@@ -701,20 +702,19 @@ const DashboardMisOrdenes = () => {
     }
     if ((ordenes as any[]).length === 0) {
       return (
-        <Card>
-          <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-            <Briefcase className="h-10 w-10" />
-            <p>No hay órdenes disponibles en este momento.</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Briefcase}
+          titulo="No hay órdenes disponibles"
+          descripcion="Cuando se publiquen nuevas órdenes que coincidan con tu perfil, las verás aquí."
+        />
       );
     }
     if (ordenesFiltradasYOrdenadas.length === 0) {
       return (
         <EmptyState
           icon={Briefcase}
-          title="No hay órdenes que coincidan con tus filtros"
-          description="Ajusta los filtros o vuelve más tarde para ver nuevas órdenes."
+          titulo="No hay órdenes que coincidan con tus filtros"
+          descripcion="Ajusta los filtros o vuelve más tarde para ver nuevas órdenes."
           action={
             <Button size="sm" variant="outline" onClick={() => setFiltros(defaultFiltrosOrdenes)}>
               Limpiar filtros
@@ -875,12 +875,11 @@ const DashboardMisOrdenes = () => {
                 ))}
               </div>
             ) : propuestas.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-                  <Briefcase className="h-10 w-10" />
-                  <p>Aún no has enviado propuestas.</p>
-                </CardContent>
-              </Card>
+              <EmptyState
+                icon={FileText}
+                titulo="Aún no has enviado propuestas"
+                descripcion="Cuando postules a una orden disponible, tus propuestas aparecerán aquí."
+              />
             ) : (
               <div className="space-y-3">
                 {propuestas.map((p: any) => (
@@ -929,15 +928,11 @@ const DashboardMisOrdenes = () => {
                 ))}
               </div>
             ) : liquidaciones.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-                  <Wallet className="h-10 w-10" />
-                  <p>
-                    Aún no tienes liquidaciones. Se generan automáticamente cuando
-                    completas un análisis adjudicado.
-                  </p>
-                </CardContent>
-              </Card>
+              <EmptyState
+                icon={Wallet}
+                titulo="Aún no tienes liquidaciones"
+                descripcion="Se generan automáticamente cuando completas un análisis adjudicado."
+              />
             ) : (
               <div className="space-y-3">
                 {liquidaciones.map((l: any) => (

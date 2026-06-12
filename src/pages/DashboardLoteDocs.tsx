@@ -21,8 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, FileText, Download, Trash2 } from "lucide-react";
+import { Plus, FileText, Download, Trash2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const categoriasDoc = [
   { key: "financiero", label: "Financiero" },
@@ -181,9 +182,15 @@ const DashboardLoteDocs = () => {
       })}
 
       {!isLoading && docs.length === 0 && (
-        <p className="py-8 text-center font-body text-sm text-muted-foreground">
-          No hay documentos aún. Haz clic en "Subir análisis" para agregar uno.
-        </p>
+        <EmptyState
+          icon={FolderOpen}
+          titulo="Sin documentos cargados"
+          descripcion="Los documentos del lote se mostrarán aquí cuando se agreguen."
+          ctaLabel="Subir documento"
+          onCtaClick={() => setOpen(true)}
+          ctaVariant="outline"
+          size="sm"
+        />
       )}
 
       {/* Upload Modal */}
