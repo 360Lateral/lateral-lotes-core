@@ -11,6 +11,7 @@ import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
 import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
+import { FotoLote } from "@/components/lotes/FotoLote";
 
 const PROD_BASE = "https://urbanix360.com";
 
