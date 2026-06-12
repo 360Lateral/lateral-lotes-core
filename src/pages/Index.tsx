@@ -239,8 +239,8 @@ const Index = () => {
       return [
         { label: "Lotes disponibles", value: String(lotesRes.count ?? 0) },
         { label: "Municipios", value: String(uniqueCiudades.size) },
-        { label: "Diagnósticos realizados", value: String(diagRes.data ?? 0) },
-        { label: "Resultoría 360° Verificada", value: String(resoRes.count ?? 0) },
+        { label: "Diagnósticos", value: String(diagRes.data ?? 0) },
+        { label: "Resolutorías", value: String(resoRes.count ?? 0) },
       ];
     },
   });
