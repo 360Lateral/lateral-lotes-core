@@ -874,12 +874,11 @@ const DashboardMisOrdenes = () => {
                 ))}
               </div>
             ) : propuestas.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-                  <Briefcase className="h-10 w-10" />
-                  <p>Aún no has enviado propuestas.</p>
-                </CardContent>
-              </Card>
+              <EmptyState
+                icon={FileText}
+                titulo="Aún no has enviado propuestas"
+                descripcion="Cuando postules a una orden disponible, tus propuestas aparecerán aquí."
+              />
             ) : (
               <div className="space-y-3">
                 {propuestas.map((p: any) => (
