@@ -21,6 +21,12 @@ import {
   Award,
   Home,
   Users,
+  Coins,
+  BarChart3,
+  Lock,
+  CreditCard,
+  Cloud,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -402,6 +408,52 @@ const Index = () => {
     },
   ];
 
+  const caracteristicas = [
+    {
+      icon: ShieldCheck,
+      titulo: "Diagnósticos verificados",
+      descripcion: "Cada lote pasa por revisión de expertos jurídicos y técnicos.",
+    },
+    {
+      icon: Lock,
+      titulo: "Información protegida",
+      descripcion: "Acceso bajo NDA. Tus datos no circulan sin tu autorización.",
+    },
+    {
+      icon: CreditCard,
+      titulo: "Pagos seguros",
+      descripcion: "Wompi integrado. PSE, tarjeta, Nequi. Conciliación automática.",
+    },
+    {
+      icon: Cloud,
+      titulo: "Disponible 24/7",
+      descripcion: "Plataforma cloud accesible desde cualquier dispositivo.",
+    },
+  ];
+
+  const faqs = [
+    {
+      pregunta: "¿Cuánto cuesta usar 360Lateral?",
+      respuesta:
+        "Publicar tu lote es gratis. Para desarrolladores ofrecemos suscripción mensual desde $X COP o pago por acceso individual.",
+    },
+    {
+      pregunta: "¿En qué ciudades operan?",
+      respuesta:
+        "Operamos en todo el territorio colombiano. Nuestros expertos hacen diagnósticos jurídicos y técnicos en cualquier municipio del país.",
+    },
+    {
+      pregunta: "¿Qué es un diagnóstico 360°?",
+      respuesta:
+        "Un análisis integral que combina revisión jurídica, técnica y comercial de tu lote para descubrir su mejor destino.",
+    },
+    {
+      pregunta: "¿Cómo protegen mi información?",
+      respuesta:
+        "NDA firmado por todos los desarrolladores antes de ver tu lote. Cumplimos Ley 1581 de protección de datos personales. Solo perfiles verificados pueden acceder a tu información.",
+    },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -523,6 +575,180 @@ const Index = () => {
                   </Button>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Demo visual — only for non-logged users */}
+      {!user && (
+        <section className="mx-auto w-full max-w-6xl px-4 py-20">
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-primary/12 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-primary">
+              Producto
+            </span>
+            <h2 className="mt-3 font-body text-3xl font-bold text-foreground md:text-4xl">
+              Mira la plataforma en acción
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl font-body text-base text-muted-foreground">
+              Una vista unificada de tu portafolio inmobiliario.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+            <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
+              <span className="h-3 w-3 rounded-full bg-destructive/60" />
+              <span className="h-3 w-3 rounded-full bg-primary/60" />
+              <span className="h-3 w-3 rounded-full bg-secondary/40" />
+              <span className="ml-4 rounded-md bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
+                urbanix360.com/dashboard
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr]">
+              <aside className="hidden flex-col gap-3 border-r border-border bg-secondary/[0.04] p-4 md:flex">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary font-body text-xs font-bold text-secondary-foreground">
+                  3L
+                </div>
+                <div className="mt-2 h-2 w-3/4 rounded bg-muted" />
+                <div className="h-2 w-2/3 rounded bg-muted" />
+                <div className="h-2 w-1/2 rounded bg-muted" />
+                <div className="h-2 w-3/4 rounded bg-muted" />
+                <div className="h-2 w-2/3 rounded bg-muted" />
+              </aside>
+
+              <div className="p-6">
+                <h3 className="font-body text-base font-semibold text-foreground">Mi portafolio</h3>
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-border bg-background p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span className="font-body text-xs">Lotes activos</span>
+                    </div>
+                    <p className="mt-2 font-body text-2xl font-bold text-foreground">12</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <FileCheck className="h-4 w-4" />
+                      <span className="font-body text-xs">Diagnósticos</span>
+                    </div>
+                    <p className="mt-2 font-body text-2xl font-bold text-foreground">8</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Coins className="h-4 w-4" />
+                      <span className="font-body text-xs">En negociación</span>
+                    </div>
+                    <p className="mt-2 font-body text-2xl font-bold text-foreground">3</p>
+                  </div>
+                </div>
+
+                <div className="relative mt-4 h-40 overflow-hidden rounded-lg border border-border bg-gradient-to-br from-secondary/10 via-primary/5 to-secondary/15">
+                  <BarChart3 className="absolute right-3 top-3 h-5 w-5 text-muted-foreground/40" />
+                  <span className="absolute left-[20%] top-[30%] flex h-3 w-3 items-center justify-center rounded-full bg-primary ring-4 ring-primary/20" />
+                  <span className="absolute left-[55%] top-[60%] flex h-3 w-3 items-center justify-center rounded-full bg-primary ring-4 ring-primary/20" />
+                  <span className="absolute left-[78%] top-[40%] flex h-3 w-3 items-center justify-center rounded-full bg-secondary ring-4 ring-secondary/20" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Por qué 360Lateral — only for non-logged users */}
+      {!user && (
+        <section className="bg-secondary/[0.03] py-20">
+          <div className="mx-auto w-full max-w-6xl px-4">
+            <div className="text-center">
+              <span className="inline-block rounded-full bg-secondary/10 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-secondary">
+                Por qué 360Lateral
+              </span>
+              <h2 className="mt-3 font-body text-3xl font-bold text-foreground md:text-4xl">
+                Características que marcan diferencia
+              </h2>
+            </div>
+
+            <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {caracteristicas.map((c) => (
+                <div
+                  key={c.titulo}
+                  className="flex flex-col rounded-lg border border-border bg-background p-6 transition-colors hover:border-primary/60 motion-reduce:transition-none"
+                >
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/12">
+                    <c.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-body text-base font-semibold text-foreground">{c.titulo}</h3>
+                  <p className="mt-2 font-body text-sm text-muted-foreground">{c.descripcion}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ — only for non-logged users */}
+      {!user && (
+        <section className="mx-auto w-full max-w-3xl px-4 py-20">
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-primary/12 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-primary">
+              FAQ
+            </span>
+            <h2 className="mt-3 font-body text-3xl font-bold text-foreground md:text-4xl">
+              Preguntas frecuentes
+            </h2>
+          </div>
+
+          <div className="mt-10 space-y-3">
+            {faqs.map((faq, i) => (
+              <details
+                key={faq.pregunta}
+                open={i === 0}
+                className="group rounded-lg border border-border bg-background p-5 transition-colors hover:border-primary/40 motion-reduce:transition-none"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-body text-base font-semibold text-foreground">
+                  <span>{faq.pregunta}</span>
+                  <ChevronDown className="h-5 w-5 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none" />
+                </summary>
+                <p className="mt-3 font-body text-sm text-muted-foreground">{faq.respuesta}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* CTA final — only for non-logged users */}
+      {!user && (
+        <section className="relative overflow-hidden bg-secondary py-20">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-20"
+            style={{
+              background:
+                "radial-gradient(circle at 20% 30%, hsl(var(--primary) / 0.5), transparent 50%), radial-gradient(circle at 80% 70%, hsl(var(--primary) / 0.3), transparent 50%)",
+            }}
+          />
+          <div className="relative mx-auto w-full max-w-4xl px-4 text-center">
+            <h2 className="font-body text-3xl font-bold leading-tight text-secondary-foreground md:text-4xl">
+              ¿Listo para descubrir el valor real de tu lote?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl font-body text-base text-secondary-foreground/75">
+              Empieza gratis. Sin tarjeta, sin compromisos.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button variant="hero" size="xl" asChild>
+                <Link to="/bienvenida?rol=propietario">
+                  Diagnosticar mi lote gratis
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="xl"
+                asChild
+                className="border-white/30 bg-white/5 text-secondary-foreground hover:bg-white/15 hover:text-secondary-foreground"
+              >
+                <Link to="/lotes">Explorar catálogo</Link>
+              </Button>
             </div>
           </div>
         </section>
