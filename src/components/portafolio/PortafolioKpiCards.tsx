@@ -1,6 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin,
   TrendingUp,
@@ -9,6 +6,9 @@ import {
   Receipt,
   ArrowUpRight,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { KPIEstado, KPIFinanciero } from "@/components/ui/KPIEstado";
+import { formatCOPCompact } from "@/lib/format";
 import type { PortafolioKpis } from "@/hooks/usePortafolioKpis";
 
 interface Props {
@@ -16,101 +16,61 @@ interface Props {
   isLoading: boolean;
 }
 
-const formatCop = (n: number) =>
-  `$ ${(n ?? 0).toLocaleString("es-CO", { maximumFractionDigits: 0 })} COP`;
-
-const formatUsd = (n: number) =>
-  `USD $${(n ?? 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-
-const KpiCard = ({
-  label,
-  value,
-  Icon,
-  colorClass,
-  sub,
-  progress,
-}: {
-  label: string;
-  value: React.ReactNode;
-  Icon: React.ComponentType<{ className?: string }>;
-  colorClass: string;
-  sub?: React.ReactNode;
-  progress?: number;
-}) => (
-  <Card>
-    <CardContent className="p-4">
-      <div className="flex items-start justify-between">
-        <p className="font-body text-xs text-muted-foreground">{label}</p>
-        <Icon className={`h-5 w-5 shrink-0 ${colorClass}`} />
-      </div>
-      <p className="mt-2 font-body text-2xl font-bold text-foreground">{value}</p>
-      {typeof progress === "number" && (
-        <Progress value={progress} className="mt-2 h-1.5" />
-      )}
-      {sub && <p className="mt-1 font-body text-xs text-muted-foreground">{sub}</p>}
-    </CardContent>
-  </Card>
-);
-
 const PortafolioKpiCards = ({ kpis, isLoading }: Props) => {
   if (isLoading || !kpis) {
     return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="mt-3 h-8 w-20" />
-              <Skeleton className="mt-2 h-3 w-full" />
-            </CardContent>
-          </Card>
+          <Skeleton key={i} className="h-[72px] w-full" />
         ))}
       </div>
     );
   }
 
-  const slaColor = kpis.sla_vencidos > 0 ? "text-destructive" : "text-success";
+  const slaColor =
+    kpis.sla_vencidos > 0 ? "text-destructive" : "text-foreground";
+  const avance = Number(kpis.avance_promedio_pct ?? 0);
+  const conv = Number(kpis.conversion_gratuito_a_pago_pct ?? 0);
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-      <KpiCard
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <KPIEstado
         label="Lotes activos"
         value={kpis.lotes_activos}
-        Icon={MapPin}
-        colorClass="text-secondary"
+        icon={MapPin}
+        iconColorClass="text-secondary"
       />
-      <KpiCard
+      <KPIEstado
         label="Avance promedio"
-        value={`${Number(kpis.avance_promedio_pct ?? 0).toFixed(1)}%`}
-        Icon={TrendingUp}
-        colorClass="text-primary"
-        progress={Number(kpis.avance_promedio_pct ?? 0)}
+        value={`${avance.toFixed(1)}%`}
+        icon={TrendingUp}
+        iconColorClass="text-primary"
       />
-      <KpiCard
+      <KPIEstado
         label="SLA vencidos"
         value={kpis.sla_vencidos}
-        Icon={AlertTriangle}
+        icon={AlertTriangle}
         colorClass={slaColor}
+        iconColorClass={slaColor}
+        destacado={kpis.sla_vencidos > 0}
       />
-      <KpiCard
+      <KPIFinanciero
         label="Ingresos del mes"
-        value={formatCop(kpis.ingresos_mes_cop)}
-        Icon={DollarSign}
-        colorClass="text-success"
-        sub={`≈ ${formatUsd(kpis.ingresos_mes_usd)}`}
+        value={formatCOPCompact(kpis.ingresos_mes_cop)}
+        icon={DollarSign}
+        sublabel={`≈ USD ${(kpis.ingresos_mes_usd ?? 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
       />
-      <KpiCard
+      <KPIFinanciero
         label="Ticket promedio"
-        value={formatCop(kpis.ticket_promedio_cop)}
-        Icon={Receipt}
-        colorClass="text-secondary"
+        value={formatCOPCompact(kpis.ticket_promedio_cop)}
+        icon={Receipt}
       />
-      <KpiCard
-        label="Conversión Gratuito → Pago"
-        value={`${Number(kpis.conversion_gratuito_a_pago_pct ?? 0).toFixed(1)}%`}
-        Icon={ArrowUpRight}
-        colorClass="text-warning"
-        sub="Últimos 30 días"
+      <KPIEstado
+        label="Conversión Gratuito→Pago"
+        value={`${conv.toFixed(1)}%`}
+        icon={ArrowUpRight}
+        iconColorClass="text-warning"
+        sublabel="Últimos 30 días"
       />
     </div>
   );

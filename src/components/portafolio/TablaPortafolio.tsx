@@ -35,6 +35,16 @@ const progressColor = (pct: number) => {
   return "[&>div]:bg-success";
 };
 
+const urgenciaRowClass = (fila: PortafolioVistaFila): string => {
+  const dias = fila.dias_para_sla != null ? Number(fila.dias_para_sla) : null;
+  if (dias != null && dias < 0) return "bg-destructive/10 border-l-2 border-l-destructive";
+  if (fila.semaforo_sla === "rojo") return "bg-destructive/5 border-l-2 border-l-destructive";
+  if (fila.semaforo_sla === "amarillo" || fila.semaforo_sla === "ambar")
+    return "bg-primary/5 border-l-2 border-l-primary";
+  if (!fila.asesor_nombre) return "bg-muted/30 border-l-2 border-l-muted-foreground";
+  return "";
+};
+
 const EntregablePill = ({ label, done }: { label: string; done: boolean }) => (
   <span
     className={cn(
@@ -100,7 +110,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                 <TableRow
                   key={f.engagement_id}
                   onClick={go}
-                  className="cursor-pointer hover:bg-muted/30"
+                  className={cn("cursor-pointer hover:bg-muted/40", urgenciaRowClass(f))}
                 >
                   <TableCell>
                     <div className="font-body text-sm font-semibold text-foreground">
