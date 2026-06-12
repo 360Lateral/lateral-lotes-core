@@ -92,9 +92,11 @@ const urgenciaCardClass = (f: PortafolioVistaFila): string => {
 const KanbanCard = ({
   fila,
   onOpen,
+  isAdmin,
 }: {
   fila: PortafolioVistaFila;
   onOpen: (id: string) => void;
+  isAdmin: boolean;
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -109,6 +111,10 @@ const KanbanCard = ({
 
   const dias =
     fila.dias_para_sla != null ? Number(fila.dias_para_sla) : null;
+
+  const { data: asesores = [] } = useAsesoresList();
+  const asignar = useAsignarAsesorEngagement();
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   return (
     <div
@@ -140,10 +146,75 @@ const KanbanCard = ({
           {[fila.lote_ciudad, fila.lote_barrio].filter(Boolean).join(" · ") ||
             "—"}
         </p>
-        <p className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground truncate">
-          <User className="h-3 w-3 shrink-0" />
-          {fila.asesor_nombre ?? <span className="italic">Sin asesor</span>}
-        </p>
+      </button>
+
+      {/* Asesor — admin: editable Popover; otros: texto */}
+      <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
+        <User className="h-3 w-3 shrink-0" />
+        {isAdmin ? (
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                className="rounded px-1 py-0.5 text-[10px] hover:bg-muted/60 truncate max-w-[170px] text-left"
+              >
+                {fila.asesor_nombre ?? (
+                  <span className="italic">Asignar asesor</span>
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-56 p-0"
+              align="start"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <Command>
+                <CommandInput placeholder="Buscar asesor..." className="h-8" />
+                <CommandList>
+                  <CommandEmpty>Sin resultados.</CommandEmpty>
+                  <CommandGroup>
+                    {asesores.map((a) => (
+                      <CommandItem
+                        key={a.id}
+                        value={a.nombre}
+                        onSelect={() => {
+                          if (a.id !== fila.asesor_id) {
+                            asignar.mutate({
+                              engagementId: fila.engagement_id,
+                              nuevoAsesorId: a.id,
+                              nuevoAsesorNombre: a.nombre,
+                            });
+                          }
+                          setPopoverOpen(false);
+                        }}
+                        className="text-xs"
+                      >
+                        <Check
+                          className={`mr-2 h-3 w-3 ${fila.asesor_id === a.id ? "opacity-100" : "opacity-0"}`}
+                        />
+                        {a.nombre}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <span className="truncate">
+            {fila.asesor_nombre ?? <span className="italic">Sin asesor</span>}
+          </span>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onOpen(fila.engagement_id)}
+        className="w-full text-left"
+      >
         {fila.avance_pct != null && (
           <div className="mt-2 space-y-1">
             <Progress value={Number(fila.avance_pct)} className="h-1.5" />
