@@ -219,10 +219,16 @@ const PortafolioDashboard = () => {
     setPage(1);
   }, [filtros, busqueda, orden]);
 
+  const filasVisibles = useMemo(() => {
+    if (mostrarCerrados) return filasFiltradasYOrdenadas;
+    return filasFiltradasYOrdenadas.filter(
+      (f) => f.estado !== "cerrado" && f.estado !== "cancelado",
+    );
+  }, [filasFiltradasYOrdenadas, mostrarCerrados]);
+
   const paginadas = useMemo(
-    () =>
-      filasFiltradasYOrdenadas.slice((page - 1) * pageSize, page * pageSize),
-    [filasFiltradasYOrdenadas, page, pageSize],
+    () => filasVisibles.slice((page - 1) * pageSize, page * pageSize),
+    [filasVisibles, page, pageSize],
   );
 
   const enRiesgo = useMemo(
