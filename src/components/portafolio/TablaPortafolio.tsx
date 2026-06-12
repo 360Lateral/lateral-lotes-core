@@ -110,7 +110,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                 <TableRow
                   key={f.engagement_id}
                   onClick={go}
-                  className="cursor-pointer hover:bg-muted/30"
+                  className={cn("cursor-pointer hover:bg-muted/40", urgenciaRowClass(f))}
                 >
                   <TableCell>
                     <div className="font-body text-sm font-semibold text-foreground">
