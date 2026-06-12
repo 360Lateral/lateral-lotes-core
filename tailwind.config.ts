@@ -82,14 +82,25 @@ export default {
           to: { height: "0" },
         },
         "ken-burns": {
-          "0%": { transform: "scale(1)" },
-          "100%": { transform: "scale(1.08)" },
+          "0%": { transform: "scale(1.05) translate(0, 0)" },
+          "50%": { transform: "scale(1.15) translate(-2%, -1%)" },
+          "100%": { transform: "scale(1.05) translate(0, 0)" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "ken-burns": "ken-burns 15s ease-in-out infinite alternate",
+        "ken-burns": "ken-burns 22s ease-in-out infinite",
+        "spin-slow": "spin-slow 40s linear infinite",
+        "fade-in": "fade-in 0.8s ease-out both",
       },
     },
   },
