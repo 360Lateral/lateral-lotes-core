@@ -8,10 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
-  Building2,
   FileSignature,
   FileText,
-  Lock,
   MapPin,
   Ruler,
   ShieldCheck,
