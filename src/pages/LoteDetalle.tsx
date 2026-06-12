@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useLoteDetalle } from "@/hooks/useLoteDetalle";
 import { useMiSolicitudParaLote } from "@/hooks/useMiSolicitudParaLote";
+import { supabase } from "@/integrations/supabase/client";
+import { getOrCreateVisitorSession } from "@/lib/visitor";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
