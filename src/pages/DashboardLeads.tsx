@@ -147,8 +147,13 @@ const DashboardLeads = () => {
               ))}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    No hay leads.
+                  <td colSpan={6} className="p-0">
+                    <EmptyState
+                      icon={UserPlus}
+                      titulo="Sin leads registrados"
+                      descripcion="Los leads desde el mercado público aparecerán aquí cuando un visitante exprese interés en un lote."
+                      className="border-0 rounded-none"
+                    />
                   </td>
                 </tr>
               )}
