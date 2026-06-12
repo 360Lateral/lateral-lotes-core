@@ -19,6 +19,8 @@ import {
   Play,
   Building2,
   Award,
+  Home,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
