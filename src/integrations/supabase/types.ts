@@ -5003,6 +5003,19 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      lotes_recomendados_desarrollador: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          area_total_m2: number
+          barrio: string
+          ciudad: string
+          estrato: number
+          lote_id: string
+          nombre_lote: string
+          similitud_score: number
+          tipo_lote: string
+        }[]
+      }
       marcar_comision_pagada: {
         Args: {
           p_comision_id: string
@@ -5115,6 +5128,11 @@ export type Database = {
         Args: { p_alerta_id: string }
         Returns: undefined
       }
+      resumen_cuenta_desarrollador: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      resumen_panel_experto: { Args: { p_user_id: string }; Returns: Json }
       resumen_vistas_portafolio: {
         Args: { p_propietario: string }
         Returns: {
