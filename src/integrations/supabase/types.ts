@@ -2726,6 +2726,54 @@ export type Database = {
           },
         ]
       }
+      mensajes_asesor_engagement: {
+        Row: {
+          destinatario_id: string | null
+          engagement_id: string
+          fecha: string
+          id: string
+          leido_en: string | null
+          mensaje: string
+          remitente_id: string
+          tema: string | null
+        }
+        Insert: {
+          destinatario_id?: string | null
+          engagement_id: string
+          fecha?: string
+          id?: string
+          leido_en?: string | null
+          mensaje: string
+          remitente_id: string
+          tema?: string | null
+        }
+        Update: {
+          destinatario_id?: string | null
+          engagement_id?: string
+          fecha?: string
+          id?: string
+          leido_en?: string | null
+          mensaje?: string
+          remitente_id?: string
+          tema?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensajes_asesor_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mensajes_asesor_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+        ]
+      }
       ndas_firmados: {
         Row: {
           contenido_aceptado: string
