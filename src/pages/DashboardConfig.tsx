@@ -22,7 +22,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePlanesDiagnostico, usePlanesAnalisis, PlanDiagnostico, PlanAnalisisRow } from "@/hooks/usePlanesConfig";
 import { useTiposAnalisis, TipoAnalisis } from "@/hooks/useTiposAnalisis";
 import { toast } from "sonner";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Package, Layers, Grid3x3, AlertCircle, Settings } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatCOP } from "@/lib/format";
 
 const planSchema = z.object({
   nombre: z.string().min(1, "Nombre requerido"),
@@ -40,10 +42,13 @@ const DashboardConfig = () => {
   const { roles, loading } = useAuth();
   const isSuperAdmin = roles.includes("super_admin" as any);
 
+  const { data: planes } = usePlanesDiagnostico();
+  const { data: tipos } = useTiposAnalisis();
+
   if (loading) {
     return (
       <DashboardLayout>
-        <Skeleton className="h-8 w-64" />
+        <div className="mx-auto max-w-7xl p-6"><Skeleton className="h-40 w-full" /></div>
       </DashboardLayout>
     );
   }
@@ -60,26 +65,53 @@ const DashboardConfig = () => {
     );
   }
 
+  const planesActivos = (planes ?? []).filter((p) => p.activo);
+  const tiposActivos = (tipos ?? []).filter((t) => t.activo);
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-bold text-secondary">Configuración del tablero</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Administra planes de diagnóstico, tipos de análisis y la matriz que los relaciona.
-          </p>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-background p-5">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold text-foreground">
+              <Settings className="h-5 w-5" /> Configuración
+            </h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              <strong className="text-foreground">
+                {planesActivos.length} {planesActivos.length === 1 ? "plan activo" : "planes activos"}
+              </strong>
+              {" · "}
+              <strong className="text-foreground">
+                {tiposActivos.length} tipos de análisis
+              </strong>
+            </p>
+          </div>
+          <div className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-[10px] text-primary">
+            <AlertCircle className="h-3 w-3" />
+            Cambios afectan a futuros usuarios y contratos
+          </div>
+        </header>
 
         <Tabs defaultValue="planes" className="w-full">
-          <TabsList>
-            <TabsTrigger value="planes">Planes</TabsTrigger>
-            <TabsTrigger value="tipos">Tipos de análisis</TabsTrigger>
-            <TabsTrigger value="matriz">Matriz</TabsTrigger>
+          <TabsList className="h-auto w-full justify-start gap-1 rounded-none border-b border-border bg-transparent p-0">
+            {[
+              { v: "planes", l: "Planes", i: Package },
+              { v: "tipos", l: "Tipos de análisis", i: Layers },
+              { v: "matriz", l: "Matriz", i: Grid3x3 },
+            ].map(({ v, l, i: I }) => (
+              <TabsTrigger
+                key={v}
+                value={v}
+                className="rounded-none border-b-2 border-transparent bg-transparent px-3 py-2 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              >
+                <I className="mr-1.5 h-3.5 w-3.5" /> {l}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
-          <TabsContent value="planes" className="mt-6"><PlanesTab /></TabsContent>
-          <TabsContent value="tipos" className="mt-6"><TiposTab /></TabsContent>
-          <TabsContent value="matriz" className="mt-6"><MatrizTab /></TabsContent>
+          <TabsContent value="planes" className="mt-4"><PlanesTab /></TabsContent>
+          <TabsContent value="tipos" className="mt-4"><TiposTab /></TabsContent>
+          <TabsContent value="matriz" className="mt-4"><MatrizTab /></TabsContent>
         </Tabs>
       </div>
     </DashboardLayout>
@@ -99,11 +131,7 @@ const PlanesTab = () => {
   const [form, setForm] = useState<any>(emptyPlan);
 
   const openCreate = () => { setEditing(null); setForm(emptyPlan); setOpen(true); };
-  const openEdit = (p: PlanDiagnostico) => {
-    setEditing(p);
-    setForm({ ...p });
-    setOpen(true);
-  };
+  const openEdit = (p: PlanDiagnostico) => { setEditing(p); setForm({ ...p }); setOpen(true); };
 
   const handleSave = async () => {
     const parsed = planSchema.safeParse(form);
@@ -121,44 +149,63 @@ const PlanesTab = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg font-semibold text-secondary">Planes de diagnóstico</h2>
-        <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo plan</Button>
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Planes de diagnóstico</h2>
+          <p className="text-[11px] text-muted-foreground">Catálogo de planes que el propietario puede contratar.</p>
+        </div>
+        <Button size="sm" onClick={openCreate}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" /> Nuevo plan
+        </Button>
       </div>
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />
+      ) : !planes || planes.length === 0 ? (
+        <EmptyState
+          icon={Package}
+          title="Aún no tienes planes de diagnóstico"
+          description="Crea el primer plan para que los propietarios puedan contratar diagnósticos."
+          action={<Button size="sm" onClick={openCreate}><Plus className="mr-1.5 h-3.5 w-3.5" /> Crear plan</Button>}
+        />
       ) : (
-        <div className="rounded-md border bg-card">
+        <div className="overflow-hidden rounded-md border border-border bg-background">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead className="text-right">SMLMV</TableHead>
-                <TableHead className="text-right">Precio COP</TableHead>
-                <TableHead>Moneda</TableHead>
-                <TableHead className="text-right">SLA</TableHead>
-                <TableHead className="text-right">Orden</TableHead>
-                <TableHead>Activo</TableHead>
-                <TableHead></TableHead>
+              <TableRow className="bg-muted/40">
+                <TableHead className="text-[10px] uppercase tracking-wide">Plan</TableHead>
+                <TableHead className="text-right text-[10px] uppercase tracking-wide">Precio</TableHead>
+                <TableHead className="text-right text-[10px] uppercase tracking-wide">Días SLA</TableHead>
+                <TableHead className="text-center text-[10px] uppercase tracking-wide">Activo</TableHead>
+                <TableHead className="w-8"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {planes?.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.nombre}</TableCell>
-                  <TableCell><code className="text-xs">{p.codigo}</code></TableCell>
-                  <TableCell className="text-right">{p.precio_smlmv}</TableCell>
-                  <TableCell className="text-right">{p.precio_cop?.toLocaleString("es-CO")}</TableCell>
-                  <TableCell>{p.moneda}</TableCell>
-                  <TableCell className="text-right">{p.dias_sla}</TableCell>
-                  <TableCell className="text-right">{p.orden}</TableCell>
-                  <TableCell>{p.activo ? "Sí" : "No"}</TableCell>
+              {planes.map((p) => (
+                <TableRow key={p.id} className={!p.activo ? "opacity-60" : "hover:bg-muted/30"}>
                   <TableCell>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>
-                      <Pencil className="h-4 w-4" />
+                    <div className="text-xs font-semibold text-foreground">{p.nombre}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      <code>{p.codigo}</code> · orden {p.orden}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="text-xs font-semibold text-foreground">{formatCOP(p.precio_cop ?? 0)}</div>
+                    <div className="text-[10px] text-muted-foreground">{p.precio_smlmv} SMLMV</div>
+                  </TableCell>
+                  <TableCell className="text-right text-xs">{p.dias_sla} días</TableCell>
+                  <TableCell className="text-center">
+                    <Switch
+                      checked={p.activo}
+                      onCheckedChange={(v) =>
+                        update.mutateAsync({ id: p.id, activo: v } as any)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openEdit(p)}>
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -169,7 +216,7 @@ const PlanesTab = () => {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="p-6">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar plan" : "Nuevo plan"}</DialogTitle>
           </DialogHeader>
@@ -217,9 +264,7 @@ const PlanesTab = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
-              Guardar
-            </Button>
+            <Button onClick={handleSave} disabled={create.isPending || update.isPending}>Guardar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -257,38 +302,58 @@ const TiposTab = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg font-semibold text-secondary">Tipos de análisis</h2>
-        <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Nuevo tipo</Button>
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Tipos de análisis</h2>
+          <p className="text-[11px] text-muted-foreground">Categorías de análisis disponibles para los expertos.</p>
+        </div>
+        <Button size="sm" onClick={openCreate}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" /> Nuevo tipo
+        </Button>
       </div>
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />
+      ) : !tipos || tipos.length === 0 ? (
+        <EmptyState
+          icon={Layers}
+          title="No hay tipos de análisis"
+          description="Crea el primer tipo para habilitar análisis especializados."
+          action={<Button size="sm" onClick={openCreate}><Plus className="mr-1.5 h-3.5 w-3.5" /> Crear tipo</Button>}
+        />
       ) : (
-        <div className="rounded-md border bg-card">
+        <div className="overflow-hidden rounded-md border border-border bg-background">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Tabla destino</TableHead>
-                <TableHead className="text-right">Orden</TableHead>
-                <TableHead>Activo</TableHead>
-                <TableHead></TableHead>
+              <TableRow className="bg-muted/40">
+                <TableHead className="text-[10px] uppercase tracking-wide">Tipo</TableHead>
+                <TableHead className="text-[10px] uppercase tracking-wide">Tabla destino</TableHead>
+                <TableHead className="text-right text-[10px] uppercase tracking-wide">Orden</TableHead>
+                <TableHead className="text-center text-[10px] uppercase tracking-wide">Activo</TableHead>
+                <TableHead className="w-8"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tipos?.map((t) => (
-                <TableRow key={t.id}>
-                  <TableCell className="font-medium">{t.nombre}</TableCell>
-                  <TableCell><code className="text-xs">{t.codigo}</code></TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{t.tabla_destino ?? "—"}</TableCell>
-                  <TableCell className="text-right">{t.orden}</TableCell>
-                  <TableCell>{t.activo ? "Sí" : "No"}</TableCell>
+              {tipos.map((t) => (
+                <TableRow key={t.id} className={!t.activo ? "opacity-60" : "hover:bg-muted/30"}>
                   <TableCell>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(t)}>
-                      <Pencil className="h-4 w-4" />
+                    <div className="text-xs font-semibold text-foreground">{t.nombre}</div>
+                    <div className="text-[10px] text-muted-foreground"><code>{t.codigo}</code></div>
+                  </TableCell>
+                  <TableCell className="text-[11px] text-muted-foreground">
+                    <code>{t.tabla_destino ?? "—"}</code>
+                  </TableCell>
+                  <TableCell className="text-right text-xs">{t.orden}</TableCell>
+                  <TableCell className="text-center">
+                    <Switch
+                      checked={t.activo}
+                      onCheckedChange={(v) => update.mutateAsync({ id: t.id, activo: v } as any)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openEdit(t)}>
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -299,7 +364,7 @@ const TiposTab = () => {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="p-6">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar tipo" : "Nuevo tipo"}</DialogTitle>
           </DialogHeader>
@@ -343,7 +408,6 @@ const MatrizTab = () => {
   const { data: tipos, isLoading: lt } = useTiposAnalisis();
   const { data: matriz, isLoading: lm, upsertMany } = usePlanesAnalisis();
 
-  // local state: map by `${plan_id}:${tipo_id}` => row
   const [local, setLocal] = useState<Record<string, PlanAnalisisRow>>({});
   const [dirty, setDirty] = useState(false);
 
@@ -354,12 +418,7 @@ const MatrizTab = () => {
       for (const t of tipos) {
         const key = `${p.id}:${t.id}`;
         const existing = matriz?.find((r) => r.plan_id === p.id && r.tipo_analisis_id === t.id);
-        map[key] = existing ?? {
-          plan_id: p.id,
-          tipo_analisis_id: t.id,
-          incluido: false,
-          peso_avance: 1.0,
-        };
+        map[key] = existing ?? { plan_id: p.id, tipo_analisis_id: t.id, incluido: false, peso_avance: 1.0 };
       }
     }
     setLocal(map);
@@ -373,8 +432,7 @@ const MatrizTab = () => {
   };
 
   const handleSave = async () => {
-    const rows = Object.values(local);
-    await upsertMany.mutateAsync(rows);
+    await upsertMany.mutateAsync(Object.values(local));
     setDirty(false);
   };
 
@@ -384,38 +442,43 @@ const MatrizTab = () => {
   if (lp || lt || lm) return <Skeleton className="h-64 w-full" />;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-heading text-lg font-semibold text-secondary">Matriz plan × análisis</h2>
-          {dirty && <p className="text-xs text-primary mt-1">● Cambios sin guardar</p>}
+          <h2 className="text-sm font-semibold text-foreground">Matriz plan × análisis</h2>
+          <p className="text-[11px] text-muted-foreground">
+            Define qué análisis incluye cada plan y su peso de avance.
+            {dirty && <span className="ml-2 text-primary font-medium">● Cambios sin guardar</span>}
+          </p>
         </div>
-        <Button onClick={handleSave} disabled={!dirty || upsertMany.isPending}>
+        <Button size="sm" onClick={handleSave} disabled={!dirty || upsertMany.isPending}>
           Guardar cambios
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card overflow-x-auto">
+      <div className="overflow-hidden rounded-md border border-border bg-background overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="min-w-[200px]">Tipo de análisis</TableHead>
+            <TableRow className="bg-muted/40">
+              <TableHead className="min-w-[200px] text-[10px] uppercase tracking-wide">Tipo de análisis</TableHead>
               {planesOrdenados.map((p) => (
-                <TableHead key={p.id} className="text-center min-w-[140px]">{p.nombre}</TableHead>
+                <TableHead key={p.id} className="text-center min-w-[120px] text-[10px] uppercase tracking-wide">
+                  {p.nombre}
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {tiposOrdenados.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell className="font-medium">{t.nombre}</TableCell>
+              <TableRow key={t.id} className="hover:bg-muted/30">
+                <TableCell className="text-xs font-medium">{t.nombre}</TableCell>
                 {planesOrdenados.map((p) => {
                   const key = `${p.id}:${t.id}`;
                   const cell = local[key];
                   if (!cell) return <TableCell key={p.id} />;
                   return (
                     <TableCell key={p.id} className="text-center">
-                      <div className="flex flex-col items-center gap-2">
+                      <div className="flex flex-col items-center gap-1.5">
                         <Checkbox
                           checked={cell.incluido}
                           onCheckedChange={(v) => setCell(p.id, t.id, { incluido: !!v })}
@@ -425,9 +488,7 @@ const MatrizTab = () => {
                           onValueChange={(v) => setCell(p.id, t.id, { peso_avance: Number(v) })}
                           disabled={!cell.incluido}
                         >
-                          <SelectTrigger className="h-7 w-20 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
+                          <SelectTrigger className="h-6 w-16 text-[10px]"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             {PESOS.map((w) => (
                               <SelectItem key={w} value={String(w)}>{w.toFixed(1)}</SelectItem>

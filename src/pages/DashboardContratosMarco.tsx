@@ -1,33 +1,24 @@
 import { useState, useMemo } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AlertTriangle, FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertTriangle, FileText, Check, Plus, ScrollText,
+} from "lucide-react";
 import { useContratosMarco, ContratoMarco } from "@/hooks/useContratosMarco";
 import { useTiposAnalisis } from "@/hooks/useTiposAnalisis";
 import NuevaVersionContratoDialog from "@/components/contratos/NuevaVersionContratoDialog";
 import HistorialContratosDialog from "@/components/contratos/HistorialContratosDialog";
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { KPIEstado } from "@/components/ui/KPIEstado";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatCOP } from "@/lib/format";
 
 const DashboardContratosMarco = () => {
   const { data: todos = [], isLoading } = useContratosMarco(false);
@@ -35,6 +26,7 @@ const DashboardContratosMarco = () => {
 
   const [verContenido, setVerContenido] = useState<ContratoMarco | null>(null);
   const [nuevaVersionDe, setNuevaVersionDe] = useState<ContratoMarco | null>(null);
+  const [nuevoParaTipo, setNuevoParaTipo] = useState<{ id: string; nombre: string } | null>(null);
   const [historialTipo, setHistorialTipo] = useState<{ id: string; nombre: string } | null>(null);
 
   const tiposActivos = useMemo(() => tipos.filter((t) => t.activo), [tipos]);
@@ -61,158 +53,141 @@ const DashboardContratosMarco = () => {
     return map;
   }, [todos]);
 
+  const conContrato = tiposActivos.filter((t) => vigentePorTipo.has(t.id)).length;
+  const sinContrato = tiposActivos.length - conContrato;
+
   return (
     <DashboardLayout>
-      <div className="space-y-1 mb-6">
-        <h1 className="font-display text-2xl font-bold">
-          Contratos marco — Plantillas legales por tipo de análisis
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Cada experto firma un contrato marco específico al postular a una orden de servicio. Las
-          versiones son inmutables para preservar el audit legal.
-        </p>
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-background p-5">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold text-foreground">
+              <ScrollText className="h-5 w-5" /> Contratos marco
+            </h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Plantillas legales por tipo de análisis. Las versiones son inmutables para preservar el audit legal.
+            </p>
+          </div>
+        </header>
+
+        <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-3">
+          <KPIEstado
+            label="Tipos de análisis"
+            value={tiposActivos.length}
+            icon={FileText}
+            colorClass="text-foreground"
+            iconColorClass="text-muted-foreground"
+          />
+          <KPIEstado
+            label="Con contrato vigente"
+            value={conContrato}
+            icon={Check}
+            colorClass="text-green-600"
+          />
+          <KPIEstado
+            label="Sin contrato"
+            value={sinContrato}
+            icon={AlertTriangle}
+            colorClass="text-primary"
+            destacado={sinContrato > 0}
+          />
+        </div>
+
+        {isLoading ? (
+          <Skeleton className="h-64 w-full" />
+        ) : tiposActivos.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="No hay tipos de análisis"
+            description="Primero crea tipos de análisis en Configuración para asignarles contratos marco."
+          />
+        ) : (
+          <Accordion type="multiple" className="space-y-2">
+            {tiposActivos.map((t) => {
+              const contratoVigente = vigentePorTipo.get(t.id);
+              const versiones = versionesPorTipo.get(t.id) ?? [];
+              return (
+                <AccordionItem
+                  key={t.id}
+                  value={t.id}
+                  className="overflow-hidden rounded-md border border-border bg-background"
+                >
+                  <AccordionTrigger className="px-4 py-2.5 hover:bg-muted/30 hover:no-underline">
+                    <div className="flex flex-1 items-center justify-between gap-3 pr-2">
+                      <div className="flex items-center gap-2 text-xs">
+                        <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="font-semibold text-foreground">{t.nombre}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {versiones.length} {versiones.length === 1 ? "versión" : "versiones"}
+                        </span>
+                      </div>
+                      {contratoVigente ? (
+                        <Badge className="bg-green-100 text-green-700 text-[10px] dark:bg-green-950/40 dark:text-green-300">
+                          <Check className="mr-1 h-2.5 w-2.5" /> {contratoVigente.version}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="border-primary/40 text-[10px] text-primary">
+                          <AlertTriangle className="mr-1 h-2.5 w-2.5" /> Sin contrato
+                        </Badge>
+                      )}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="border-t border-border bg-muted/20 px-4 py-3">
+                    {contratoVigente ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3 text-[11px]">
+                          <div>
+                            <div className="text-[9px] uppercase text-muted-foreground">Precio</div>
+                            <div className="font-semibold text-foreground">
+                              {formatCOP(contratoVigente.precio_min)} – {formatCOP(contratoVigente.precio_max)}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[9px] uppercase text-muted-foreground">Plazo</div>
+                            <div className="font-semibold text-foreground">
+                              {contratoVigente.plazo_min_dias}–{contratoVigente.plazo_max_dias} días
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setVerContenido(contratoVigente)}>
+                            Ver contenido
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setHistorialTipo({ id: t.id, nombre: t.nombre })}>
+                            Historial
+                          </Button>
+                          <Button size="sm" className="h-7 text-xs" onClick={() => setNuevaVersionDe(contratoVigente)}>
+                            Nueva versión
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="py-3 text-center">
+                        <p className="mb-3 text-xs text-muted-foreground">
+                          Este tipo de análisis aún no tiene un contrato marco vigente.
+                          Los expertos no pueden postular hasta que actives uno.
+                        </p>
+                        <Button size="sm" onClick={() => setNuevoParaTipo({ id: t.id, nombre: t.nombre })}>
+                          <Plus className="mr-1 h-3.5 w-3.5" /> Crear primera versión
+                        </Button>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        )}
       </div>
 
-      {isLoading ? (
-        <p className="text-muted-foreground">Cargando contratos...</p>
-      ) : (
-        <Tabs defaultValue="vigentes">
-          <TabsList>
-            <TabsTrigger value="vigentes">Vigentes</TabsTrigger>
-            <TabsTrigger value="historial">Historial completo</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="vigentes" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              {tiposActivos.map((t) => {
-                const c = vigentePorTipo.get(t.id);
-                if (!c) {
-                  return (
-                    <Card key={t.id} className="border-destructive">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <AlertTriangle className="h-4 w-4 text-destructive" />
-                          {t.nombre}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-destructive">
-                          ⚠ Sin contrato vigente. Los expertos no pueden postular a órdenes de este
-                          tipo hasta que actives uno.
-                        </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-3"
-                          onClick={() => setHistorialTipo({ id: t.id, nombre: t.nombre })}
-                        >
-                          Ver historial
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                }
-                return (
-                  <Card key={t.id}>
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between text-base">
-                        <span>{t.nombre}</span>
-                        <Badge>{c.version}</Badge>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Precio: </span>
-                        {fmtCOP(c.precio_min)} – {fmtCOP(c.precio_max)}
-                      </div>
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Plazo: </span>
-                        {c.plazo_min_dias} – {c.plazo_max_dias} días
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Button size="sm" variant="outline" onClick={() => setVerContenido(c)}>
-                          Ver contenido
-                        </Button>
-                        <Button size="sm" onClick={() => setNuevaVersionDe(c)}>
-                          Crear nueva versión
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setHistorialTipo({ id: t.id, nombre: t.nombre })}
-                        >
-                          Ver historial
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="historial" className="mt-4">
-            <Accordion type="multiple" className="space-y-2">
-              {tiposActivos.map((t) => {
-                const versiones = versionesPorTipo.get(t.id) ?? [];
-                return (
-                  <AccordionItem key={t.id} value={t.id} className="border rounded-md px-3">
-                    <AccordionTrigger>
-                      <span className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {t.nombre}
-                        <Badge variant="secondary" className="ml-2">
-                          {versiones.length} versión(es)
-                        </Badge>
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setHistorialTipo({ id: t.id, nombre: t.nombre })}
-                      >
-                        Abrir gestión de historial
-                      </Button>
-                      <div className="mt-3 space-y-1 text-sm">
-                        {versiones.map((c) => (
-                          <div
-                            key={c.id}
-                            className="flex flex-wrap items-center justify-between gap-2 rounded border p-2"
-                          >
-                            <span className="font-semibold">{c.version}</span>
-                            {c.activo ? (
-                              <Badge>Activo</Badge>
-                            ) : (
-                              <Badge variant="secondary">Inactivo</Badge>
-                            )}
-                            <span className="text-xs text-muted-foreground">
-                              {fmtCOP(c.precio_min)} – {fmtCOP(c.precio_max)} •{" "}
-                              {c.plazo_min_dias}–{c.plazo_max_dias}d
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(c.created_at).toLocaleDateString("es-CO")}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
-          </TabsContent>
-        </Tabs>
-      )}
-
       <Dialog open={!!verContenido} onOpenChange={(v) => !v && setVerContenido(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto p-6">
           <DialogHeader>
             <DialogTitle>
               {verContenido?.tipos_analisis?.nombre} — {verContenido?.version}
             </DialogTitle>
           </DialogHeader>
-          <pre className="whitespace-pre-wrap font-mono text-xs bg-muted p-4 rounded">
+          <pre className="whitespace-pre-wrap rounded bg-muted p-4 font-mono text-xs">
             {verContenido?.contenido_legal}
           </pre>
         </DialogContent>
@@ -223,6 +198,15 @@ const DashboardContratosMarco = () => {
           open={!!nuevaVersionDe}
           onOpenChange={(v) => !v && setNuevaVersionDe(null)}
           contratoActual={nuevaVersionDe}
+        />
+      )}
+
+      {nuevoParaTipo && (
+        <HistorialContratosDialog
+          open={!!nuevoParaTipo}
+          onOpenChange={(v) => !v && setNuevoParaTipo(null)}
+          tipoAnalisisId={nuevoParaTipo.id}
+          tipoAnalisisNombre={nuevoParaTipo.nombre}
         />
       )}
 
