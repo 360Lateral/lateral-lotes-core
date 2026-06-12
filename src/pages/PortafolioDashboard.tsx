@@ -266,7 +266,7 @@ const PortafolioDashboard = () => {
   }
 
   const noResultados =
-    !filasLoading && filasFiltradasYOrdenadas.length === 0;
+    !filasLoading && filasVisibles.length === 0;
 
   return (
     <DashboardLayout>
