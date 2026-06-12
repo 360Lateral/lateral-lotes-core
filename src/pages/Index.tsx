@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import FAQPrecioRespuesta from "@/components/landing/FAQPrecioRespuesta";
 
 import {
   LayoutDashboard,
@@ -431,26 +433,34 @@ const Index = () => {
     },
   ];
 
-  const faqs = [
+  const faqs: { pregunta: string; respuesta: ReactNode }[] = [
     {
       pregunta: "¿Cuánto cuesta usar 360Lateral?",
-      respuesta:
-        "Publicar tu lote es gratis. Para desarrolladores ofrecemos suscripción mensual desde $X COP o pago por acceso individual.",
+      respuesta: <FAQPrecioRespuesta />,
     },
     {
       pregunta: "¿En qué ciudades operan?",
-      respuesta:
-        "Operamos en todo el territorio colombiano. Nuestros expertos hacen diagnósticos jurídicos y técnicos en cualquier municipio del país.",
+      respuesta: (
+        <p className="font-body text-sm text-muted-foreground">
+          Operamos en todo el territorio colombiano. Nuestros expertos hacen diagnósticos jurídicos y técnicos en cualquier municipio del país.
+        </p>
+      ),
     },
     {
       pregunta: "¿Qué es un diagnóstico 360°?",
-      respuesta:
-        "Un análisis integral que combina revisión jurídica, técnica y comercial de tu lote para descubrir su mejor destino.",
+      respuesta: (
+        <p className="font-body text-sm text-muted-foreground">
+          Un análisis integral que combina revisión jurídica, técnica y comercial de tu lote para descubrir su mejor destino.
+        </p>
+      ),
     },
     {
       pregunta: "¿Cómo protegen mi información?",
-      respuesta:
-        "NDA firmado por todos los desarrolladores antes de ver tu lote. Cumplimos Ley 1581 de protección de datos personales. Solo perfiles verificados pueden acceder a tu información.",
+      respuesta: (
+        <p className="font-body text-sm text-muted-foreground">
+          NDA firmado por todos los desarrolladores antes de ver tu lote. Cumplimos Ley 1581 de protección de datos personales. Solo perfiles verificados pueden acceder a tu información.
+        </p>
+      ),
     },
   ];
 
@@ -709,7 +719,7 @@ const Index = () => {
                   <span>{faq.pregunta}</span>
                   <ChevronDown className="h-5 w-5 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none" />
                 </summary>
-                <p className="mt-3 font-body text-sm text-muted-foreground">{faq.respuesta}</p>
+                <div className="mt-3">{faq.respuesta}</div>
               </details>
             ))}
           </div>
