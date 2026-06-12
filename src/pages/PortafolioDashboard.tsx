@@ -322,18 +322,8 @@ const PortafolioDashboard = () => {
           <PortafolioKpiCards kpis={kpis} isLoading={kpisLoading} />
 
           <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Card className="p-4">
-              <h2 className="mb-3 text-sm font-semibold text-foreground">
-                Distribución por plan
-              </h2>
-              <DistribucionPlanesChart data={kpis?.engagements_por_plan ?? []} />
-            </Card>
-            <Card className="p-4">
-              <h2 className="mb-3 text-sm font-semibold text-foreground">
-                Distribución por estado
-              </h2>
-              <DistribucionEstadosChart data={kpis?.engagements_por_estado ?? []} />
-            </Card>
+            <DistribucionPlanesChart data={kpis?.engagements_por_plan ?? []} />
+            <DistribucionEstadosChart data={kpis?.engagements_por_estado ?? []} />
           </div>
 
           {/* Toolbar */}
