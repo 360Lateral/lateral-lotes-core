@@ -80,6 +80,13 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-spin-slow {
+    animation: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .animate-ken-burns {
     animation: none !important;
