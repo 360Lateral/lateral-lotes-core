@@ -113,8 +113,6 @@ const LoteDetalle = () => {
   }, [id, data]);
 
   if (isLoading) {
-
-  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
