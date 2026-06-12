@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
 import GestionarComisionistasDialog from "./GestionarComisionistasDialog";
 import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
+import { FotoLote } from "@/components/lotes/FotoLote";
 
 const fmtCOP = (n: number | null) =>
   n == null
