@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { FileSignature } from "lucide-react";
 import { useAcuerdosFirmadosAdmin } from "@/hooks/useAcuerdosFirmadosAdmin";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const formatFecha = (s: string) =>
   new Date(s).toLocaleString("es-CO", {
