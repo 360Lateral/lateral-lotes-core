@@ -173,6 +173,35 @@ const DashboardLayout = ({ children }: Props) => {
     }
   };
 
+  // Badges naranjas = urgentes (requieren acción admin).
+  // Badges grises/blanco = informativos (volumen, no urgentes).
+  const URGENT_HREFS = new Set<string>([
+    "/dashboard/lotes/pendientes-validacion",
+    "/dashboard/pagos",
+    "/dashboard/solicitudes-contacto",
+    "/dashboard/liquidaciones",
+    "/dashboard/ventas",
+  ]);
+  const isUrgentBadge = (href: string) => URGENT_HREFS.has(href);
+
+  const iniciales = (n: string) =>
+    n
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "U";
+
+  const etiquetaDeRol = isSuperAdmin
+    ? "Super admin"
+    : isAdmin
+    ? "Admin"
+    : isExperto
+    ? "Experto"
+    : isDeveloper
+    ? "Desarrollador"
+    : "Usuario";
+
   // Build groups based on role
   const groups: NavGroup[] = useMemo(() => {
     const g: NavGroup[] = [];
