@@ -307,13 +307,11 @@ export default function ComisionistaPortal() {
             ) : lotesRepresentadosCount === 0 ? (
               <EmptyState
                 icon={Briefcase}
-                title="Aún no representas ningún lote"
-                description="Carga un lote de un propietario para comenzar a generar comisiones."
-                action={
-                  <Button onClick={() => setOpenDialog(true)}>
-                    <Plus className="mr-2 h-4 w-4" /> Cargar primer lote
-                  </Button>
-                }
+                titulo="Aún no representas ningún lote"
+                descripcion="Carga el primer lote de un propietario para comenzar a recibir comisiones por su venta."
+                ctaLabel="Cargar primer lote"
+                onCtaClick={() => setOpenDialog(true)}
+                ctaVariant="hero"
               />
             ) : (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
