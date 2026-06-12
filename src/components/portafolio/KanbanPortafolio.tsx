@@ -39,15 +39,32 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { useAsesoresList } from "@/hooks/useAsesoresList";
+import { useAsignarAsesorEngagement } from "@/hooks/useAsignarAsesorEngagement";
+import {
   MapPin,
   User,
   Clock,
   AlertTriangle,
   GripVertical,
+  Check,
 } from "lucide-react";
 
 interface Props {
   filas: PortafolioVistaFila[];
+  mostrarCerrados?: boolean;
 }
 
 const COLUMNAS: { key: EstadoEngagement; label: string; color: string }[] = [
