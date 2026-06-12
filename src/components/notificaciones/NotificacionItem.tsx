@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useMarcarLeida } from "@/hooks/useMarcarLeida";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Notificacion } from "@/hooks/useNotificaciones";
 
 interface Props {
