@@ -66,7 +66,7 @@ const perfiles: {
 
 const Bienvenida = () => {
   const [searchParams] = useSearchParams();
-  const preselect = searchParams.get("preselect") as Perfil | null;
+  const preselect = (searchParams.get("rol") ?? searchParams.get("preselect")) as Perfil | null;
   const [selected, setSelected] = useState<Perfil | null>(preselect);
   const navigate = useNavigate();
   const { user, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, loading } = useAuth();
