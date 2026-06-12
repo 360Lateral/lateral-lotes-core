@@ -94,8 +94,13 @@ const DashboardAcuerdosFirmados = () => {
                 </TableRow>
               ) : filtrados.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                    No hay acuerdos firmados que coincidan.
+                  <TableCell colSpan={5} className="p-0">
+                    <EmptyState
+                      icon={FileSignature}
+                      titulo="Sin acuerdos firmados"
+                      descripcion="Cuando los desarrolladores firmen NDAs sobre lotes, los acuerdos aparecerán aquí."
+                      className="border-0 rounded-none"
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
