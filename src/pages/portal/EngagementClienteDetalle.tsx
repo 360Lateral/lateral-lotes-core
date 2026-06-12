@@ -3,55 +3,56 @@ import { useNavigate, useParams } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
 import TarjetasMaestrosCliente from "@/components/portal/TarjetasMaestrosCliente";
+import TimelineProcesoEngagement, {
+  type PasoTimeline,
+} from "@/components/portal/TimelineProcesoEngagement";
+import SidebarStickyEngagement from "@/components/portal/SidebarStickyEngagement";
+import AnalisisPorAreaAcordeon, {
+  type AreaAcordeon,
+} from "@/components/portal/AnalisisPorAreaAcordeon";
+import ContactarAsesorDialog from "@/components/portal/ContactarAsesorDialog";
 import {
   useEngagementCliente,
-  TareaAvance,
-  EntregablePublicado,
+  type EntregablePublicado,
+  type TareaAvance,
 } from "@/hooks/cliente/useEngagementCliente";
+import { useActividadEngagement } from "@/hooks/cliente/useActividadEngagement";
 import { useDescargarEntregable } from "@/hooks/cliente/useDescargarEntregable";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import TipoEntregableIcon from "@/components/entregables/TipoEntregableIcon";
 import type { TipoEntregable } from "@/hooks/useEntregablesEngagement";
 import {
   ArrowLeft,
-  Calendar,
-  CalendarCheck,
-  Mail,
-  MapPin,
-  StickyNote,
   Download,
   ExternalLink,
-  Loader2,
   FileText,
-  User as UserIcon,
-  Paperclip,
+  Loader2,
+  MapPin,
+  Scale,
+  Leaf,
+  Building2,
+  Coins,
+  Mountain,
+  TrendingUp,
+  Layers,
+  Droplets,
+  StickyNote,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-const TIPOS_MAESTROS = new Set([
-  "diagnostico_inmobiliario",
-  "presentacion_diagnostico",
-]);
+const TIPOS_MAESTROS = new Set(["diagnostico_inmobiliario", "presentacion_diagnostico"]);
 
-const formatoFecha = (fecha: string | null) => {
+const formatoFecha = (fecha?: string | null) => {
   if (!fecha) return "—";
   return new Date(fecha).toLocaleDateString("es-CO", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
-};
-
-const planVariant = (codigo?: string | null) => {
-  const c = (codigo || "").toLowerCase();
-  if (c.includes("premium")) return { className: "bg-amber-500 hover:bg-amber-600 text-white" };
-  return { className: "" };
 };
 
 const iniciales = (nombre?: string | null, email?: string | null) => {
@@ -64,31 +65,72 @@ const iniciales = (nombre?: string | null, email?: string | null) => {
     .toUpperCase();
 };
 
-const estadoTareaPill = (estado: string) => {
-  const map: Record<string, { label: string; cls: string }> = {
-    pendiente: { label: "Por iniciar", cls: "bg-muted text-muted-foreground" },
-    en_progreso: { label: "En proceso", cls: "bg-primary text-primary-foreground" },
-    en_revision: { label: "En revisión", cls: "bg-amber-500 text-white" },
-    aprobado: { label: "Aprobado por revisión", cls: "border border-emerald-600 text-emerald-700 bg-transparent" },
-    entregado: { label: "Entregado", cls: "bg-emerald-600 text-white" },
-    rechazado: { label: "Requiere ajustes", cls: "bg-destructive text-destructive-foreground" },
-    no_aplica: { label: "No aplica", cls: "bg-muted text-muted-foreground" },
-  };
-  const info = map[estado] || { label: estado, cls: "bg-muted text-muted-foreground" };
-  return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${info.cls}`}>
-      {info.label}
-    </span>
-  );
+// Mapeo tipo_codigo → icono y label visible
+const AREA_META: Record<string, { label: string; icon: LucideIcon }> = {
+  juridico: { label: "Análisis Jurídico", icon: Scale },
+  ambiental: { label: "Análisis Ambiental", icon: Leaf },
+  arquitectonico: { label: "Análisis Arquitectónico", icon: Building2 },
+  financiero: { label: "Modelo Financiero", icon: Coins },
+  geotecnico: { label: "Análisis de Suelos", icon: Mountain },
+  mercado: { label: "Análisis de Mercado", icon: TrendingUp },
+  normativo: { label: "Análisis Normativo", icon: Layers },
+  sspp: { label: "Servicios Públicos", icon: Droplets },
+  valoracion_referencial: { label: "Valoración referencial", icon: Coins },
+  score_viabilidad: { label: "Score de viabilidad", icon: TrendingUp },
 };
 
-const ChipSoporte = ({ ent }: { ent: EntregablePublicado }) => {
+const mapEstadoTareaToArea = (estado: string): AreaAcordeon["estado"] => {
+  if (estado === "entregado" || estado === "aprobado") return "listo";
+  if (estado === "en_progreso" || estado === "en_revision") return "en_revision";
+  return "pendiente";
+};
+
+// 4 pasos honestos al enum real (prospecto, activo, en_revision, entregado/cerrado)
+const ESTADOS_ENGAGEMENT_ORDEN = ["prospecto", "activo", "en_revision", "entregado"];
+
+const buildTimeline = (
+  estado: string,
+  fechaInicio?: string | null,
+  fechaEntrega?: string | null,
+  fechaSla?: string | null,
+): PasoTimeline[] => {
+  const idxActual =
+    estado === "cerrado" ? 3 : ESTADOS_ENGAGEMENT_ORDEN.indexOf(estado);
+  const labels = ["Iniciado", "En análisis", "En revisión", "Entregado"];
+  return labels.map((label, i) => {
+    let est: PasoTimeline["estado"] = "pendiente";
+    if (idxActual < 0) est = "pendiente";
+    else if (i < idxActual) est = "completado";
+    else if (i === idxActual) est = "actual";
+    let fecha: string | null = null;
+    if (i === 0) fecha = formatoFecha(fechaInicio);
+    if (i === 3) fecha = formatoFecha(fechaEntrega ?? fechaSla);
+    if (fecha === "—") fecha = null;
+    return { key: `step-${i}`, label, fecha, estado: est };
+  });
+};
+
+const TarjetaMaestraGrande = ({
+  entregable,
+  titulo,
+  subtitulo,
+  icon: Icon,
+}: {
+  entregable?: EntregablePublicado;
+  titulo: string;
+  subtitulo: string;
+  icon: LucideIcon;
+}) => {
   const { descargar } = useDescargarEntregable();
   const [loading, setLoading] = useState(false);
+  const disponible = !!entregable;
+  const esExterno = !!entregable?.tiene_url_externa;
+
   const handleClick = async () => {
+    if (!entregable) return;
     setLoading(true);
     try {
-      const url = await descargar(ent.id);
+      const url = await descargar(entregable.id);
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (e: any) {
       toast({
@@ -100,30 +142,56 @@ const ChipSoporte = ({ ent }: { ent: EntregablePublicado }) => {
       setLoading(false);
     }
   };
+
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={loading}
-      className="inline-flex max-w-[220px] items-center gap-1.5 rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted disabled:opacity-60"
-      aria-label={`Abrir ${ent.nombre}`}
-    >
-      {loading ? (
-        <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
-      ) : ent.tiene_url_externa ? (
-        <ExternalLink className="h-3 w-3 shrink-0" />
-      ) : (
-        <TipoEntregableIcon tipo={ent.tipo as TipoEntregable} size={12} />
-      )}
-      <span className="truncate">{ent.nombre}</span>
-    </button>
+    <Card className="h-full">
+      <CardContent className="flex h-full flex-col gap-4 p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="h-7 w-7" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold tracking-tight">{titulo}</h3>
+            <p className="text-sm text-muted-foreground">{subtitulo}</p>
+            <div className="mt-1.5">
+              {disponible ? (
+                <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
+                  ✓ Disponible · v{entregable!.version}
+                </Badge>
+              ) : (
+                <Badge variant="secondary">En proceso</Badge>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="mt-auto">
+          {disponible ? (
+            <Button onClick={handleClick} disabled={loading} className="w-full" size="lg">
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : esExterno ? (
+                <ExternalLink className="mr-2 h-4 w-4" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {esExterno ? "Abrir" : "Descargar PDF"}
+            </Button>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Te avisaremos cuando esté disponible.
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-const EntregableRow = ({ ent }: { ent: EntregablePublicado }) => {
+const EntregableSueltoRow = ({ ent }: { ent: EntregablePublicado }) => {
   const { descargar } = useDescargarEntregable();
   const [loading, setLoading] = useState(false);
   const esExterno = !!ent.tiene_url_externa;
+
   const handleClick = async () => {
     setLoading(true);
     try {
@@ -141,18 +209,18 @@ const EntregableRow = ({ ent }: { ent: EntregablePublicado }) => {
   };
 
   return (
-    <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
-      <div className="h-12 w-12 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
-        <TipoEntregableIcon tipo={ent.tipo as TipoEntregable} size={24} />
+    <div className="flex items-start gap-4 rounded-lg border border-border bg-card p-4">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <TipoEntregableIcon tipo={ent.tipo as TipoEntregable} size={22} />
       </div>
-      <div className="flex-1 min-w-0 space-y-1">
-        <h4 className="font-medium truncate">{ent.nombre}</h4>
+      <div className="min-w-0 flex-1 space-y-1">
+        <h4 className="truncate font-medium">{ent.nombre}</h4>
         <p className="text-xs text-muted-foreground">
           Versión {ent.version} · publicado {formatoFecha(ent.created_at)}
         </p>
         {ent.notas && ent.notas.trim() !== "" && (
-          <p className="text-xs text-muted-foreground flex items-start gap-1.5 mt-2">
-            <StickyNote className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+            <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>{ent.notas}</span>
           </p>
         )}
@@ -161,9 +229,9 @@ const EntregableRow = ({ ent }: { ent: EntregablePublicado }) => {
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : esExterno ? (
-          <ExternalLink className="h-4 w-4 mr-2" />
+          <ExternalLink className="mr-2 h-4 w-4" />
         ) : (
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="mr-2 h-4 w-4" />
         )}
         {!loading && (esExterno ? "Abrir" : "Descargar")}
       </Button>
@@ -175,6 +243,8 @@ const EngagementClienteDetalleInner = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, isLoading } = useEngagementCliente(id);
+  const { data: actividad } = useActividadEngagement(id);
+  const [contactoOpen, setContactoOpen] = useState(false);
 
   const { diagnostico, presentacion, soportesPorTarea, sueltos } = useMemo(() => {
     const ent = data?.entregables_publicados ?? [];
@@ -198,12 +268,45 @@ const EngagementClienteDetalleInner = () => {
     };
   }, [data]);
 
+  const areas: AreaAcordeon[] = useMemo(() => {
+    const tareas: TareaAvance[] = data?.avance?.tareas ?? [];
+    return tareas
+      .map((t) => {
+        const codigo = (t.tipo_codigo ?? "").toLowerCase();
+        const meta = AREA_META[codigo] ?? { label: t.nombre, icon: FileText };
+        const entregablesArea = t.tipo_analisis_id
+          ? (soportesPorTarea[t.tipo_analisis_id] ?? []).map((e) => ({
+              id: e.id,
+              nombre: e.nombre,
+              tipo: e.tipo,
+              tiene_url_externa: e.tiene_url_externa,
+            }))
+          : [];
+        return {
+          key: t.id,
+          label: meta.label,
+          icon: meta.icon,
+          score: null,
+          estado: mapEstadoTareaToArea(t.estado),
+          entregables: entregablesArea,
+        } as AreaAcordeon;
+      });
+  }, [data, soportesPorTarea]);
+
+  const totalListos = areas.filter((a) => a.estado === "listo").length;
+
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-10 w-40" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-4">
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+          <Skeleton className="h-96 w-full" />
+        </div>
       </div>
     );
   }
@@ -211,13 +314,13 @@ const EngagementClienteDetalleInner = () => {
   if (!data) {
     return (
       <Card>
-        <CardContent className="py-16 text-center space-y-4">
+        <CardContent className="space-y-4 py-16 text-center">
           <h2 className="text-xl font-semibold">No encontramos este diagnóstico</h2>
           <p className="text-muted-foreground">
             No tienes acceso a él, o el enlace es incorrecto.
           </p>
           <Button onClick={() => navigate("/portal")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a mis diagnósticos
           </Button>
         </CardContent>
@@ -225,212 +328,121 @@ const EngagementClienteDetalleInner = () => {
     );
   }
 
-  const { engagement, lote, plan, asesor, avance } = data;
-  const planUI = planVariant(plan?.codigo);
+  const { engagement, lote, plan, asesor } = data;
+  const pasos = buildTimeline(
+    engagement.estado,
+    engagement.fecha_inicio,
+    (engagement as any).fecha_entrega,
+    engagement.fecha_sla,
+  );
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={() => navigate("/portal")} className="-ml-3">
-        <ArrowLeft className="h-4 w-4 mr-2" /> Volver a mis diagnósticos
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/portal")}
+        className="-ml-3"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> Volver a mis diagnósticos
       </Button>
 
-      {/* Bloque 1: encabezado */}
-      <Card>
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-1.5">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {lote?.nombre_lote || "Lote sin nombre"}
-            </h1>
-            <p className="text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              {[lote?.direccion, lote?.ciudad].filter(Boolean).join(", ") || "Ubicación no disponible"}
-            </p>
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">Plan contratado</span>
-              <div>
-                {plan?.nombre ? (
-                  <Badge className={planUI.className}>{plan.nombre}</Badge>
-                ) : (
-                  <span className="text-sm">—</span>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+        {/* Columna principal */}
+        <div className="min-w-0 space-y-6">
+          {/* Hero compacto + timeline */}
+          <Card>
+            <CardContent className="space-y-6 p-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <h1 className="text-2xl font-semibold tracking-tight">
+                    {lote?.nombre_lote ?? "Lote sin nombre"}
+                  </h1>
+                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4 shrink-0" />
+                    <span className="truncate">
+                      {[lote?.direccion, lote?.ciudad].filter(Boolean).join(" · ") ||
+                        "Ubicación no disponible"}
+                    </span>
+                  </p>
+                </div>
+                {plan?.nombre && (
+                  <Badge variant="secondary" className="shrink-0">
+                    {plan.nombre}
+                  </Badge>
                 )}
               </div>
-            </div>
-            <div className="space-y-1">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">Asesor asignado</span>
-              {asesor ? (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                      {iniciales(asesor.nombre, asesor.email)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{asesor.nombre || "Experto"}</p>
-                    {asesor.email && (
-                      <p className="text-xs text-muted-foreground truncate">{asesor.email}</p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Por asignar</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">Fecha de inicio</span>
-              <p className="text-sm flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                {formatoFecha(engagement.fecha_inicio)}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">Fecha estimada de entrega</span>
-              <p className="text-sm flex items-center gap-1.5">
-                <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-                {formatoFecha(engagement.fecha_sla)}
-              </p>
-            </div>
-          </div>
+              <TimelineProcesoEngagement pasos={pasos} />
+            </CardContent>
+          </Card>
 
-          <Separator />
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Avance</span>
-              <span className="text-sm font-semibold">{Math.round(engagement.avance_pct ?? 0)}%</span>
-            </div>
-            <Progress value={engagement.avance_pct ?? 0} className="h-3" />
+          {/* Tarjetas maestras destacadas */}
+          <div className="space-y-3">
             <div>
-              <Badge variant="secondary" className="capitalize">
-                {engagement.estado.replace(/_/g, " ")}
-              </Badge>
+              <h2 className="text-lg font-semibold">Entregables maestros</h2>
+              <p className="text-sm text-muted-foreground">
+                Abre tu Diagnóstico y tu Presentación con un solo clic.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <TarjetaMaestraGrande
+                entregable={diagnostico}
+                titulo="Diagnóstico Inmobiliario"
+                subtitulo="Tu informe integrador"
+                icon={FileText}
+              />
+              <TarjetaMaestraGrande
+                entregable={presentacion}
+                titulo="Presentación del Diagnóstico"
+                subtitulo="Slides resumen"
+                icon={FileText}
+              />
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Bloque 2: TARJETAS MAESTRAS — destacadas arriba */}
-      <Separator />
-      <div className="space-y-3">
-        <div>
-          <h2 className="text-lg font-semibold">Tus entregables principales</h2>
-          <p className="text-sm text-muted-foreground">
-            Abre tu Diagnóstico y tu Presentación con un solo clic.
-          </p>
+          {/* Análisis por área en acordeón */}
+          {data.avance?.mostrar_detalle && areas.length > 0 && (
+            <AnalisisPorAreaAcordeon
+              areas={areas}
+              totalListos={totalListos}
+              total={areas.length}
+            />
+          )}
+
+          {/* Otros documentos sueltos */}
+          {sueltos.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold">Otros documentos</h2>
+              <div className="space-y-3">
+                {sueltos.map((e) => (
+                  <EntregableSueltoRow key={e.id} ent={e} />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Los enlaces de descarga son temporales y se generan en cada click.
+              </p>
+            </div>
+          )}
         </div>
-        <TarjetasMaestrosCliente
-          diagnostico={diagnostico}
-          presentacion={presentacion}
+
+        {/* Sidebar */}
+        <SidebarStickyEngagement
+          asesor={asesor ? { nombre: asesor.nombre, email: asesor.email } : null}
+          fechaInicio={engagement.fecha_inicio ? formatoFecha(engagement.fecha_inicio) : null}
+          fechaEntregaEstimada={engagement.fecha_sla ? formatoFecha(engagement.fecha_sla) : null}
+          avancePct={engagement.avance_pct ?? 0}
+          onContactarAsesor={() => setContactoOpen(true)}
+          iniciales={iniciales(asesor?.nombre, asesor?.email)}
+          actividad={actividad ?? []}
         />
       </div>
 
-      {/* Bloque 3: avance detallado con soportes ligados */}
-      {avance?.mostrar_detalle && (
-        <>
-          <Separator />
-          <Card>
-            <CardHeader>
-              <CardTitle>Avance detallado de tus análisis</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Sigue en tiempo real cómo va cada parte de tu diagnóstico.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {(avance.tareas || []).length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Aún no hay análisis configurados.
-                </p>
-              ) : (
-                avance.tareas.map((t: TareaAvance) => {
-                  const soportes = t.tipo_analisis_id
-                    ? soportesPorTarea[t.tipo_analisis_id] ?? []
-                    : [];
-                  return (
-                    <div
-                      key={t.id}
-                      className="p-3 rounded-lg border border-border bg-card space-y-2"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center shrink-0">
-                          <FileText className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{t.nombre}</p>
-                        </div>
-                        {estadoTareaPill(t.estado)}
-                      </div>
-                      {soportes.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2 pl-14">
-                          <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
-                          {soportes.map((s) => (
-                            <ChipSoporte key={s.id} ent={s} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* Bloque 4: otros documentos compartidos */}
-      {sueltos.length > 0 && (
-        <>
-          <Separator />
-          <Card>
-            <CardHeader>
-              <CardTitle>Otros documentos compartidos</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {sueltos.map((e) => (
-                <EntregableRow key={e.id} ent={e} />
-              ))}
-              <p className="text-xs text-muted-foreground pt-2">
-                Los enlaces de descarga son temporales y se generan en cada click.
-              </p>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* Bloque 5: contacto asesor */}
-      {asesor && (
-        <Card>
-          <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-            <div className="flex items-center gap-3">
-              <UserIcon className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">¿Tienes preguntas?</p>
-                <p className="text-sm text-muted-foreground">
-                  Escribe a {asesor.nombre || "tu asesor"}
-                  {asesor.email && (
-                    <>
-                      {" — "}
-                      <a href={`mailto:${asesor.email}`} className="text-primary hover:underline">
-                        {asesor.email}
-                      </a>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-            {asesor.email && (
-              <Button asChild>
-                <a href={`mailto:${asesor.email}`}>
-                  <Mail className="h-4 w-4 mr-2" /> Enviar email
-                </a>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      <ContactarAsesorDialog
+        open={contactoOpen}
+        onOpenChange={setContactoOpen}
+        engagementId={engagement.id}
+        asesorId={asesor?.id ?? null}
+        asesorNombre={asesor?.nombre ?? null}
+      />
     </div>
   );
 };
