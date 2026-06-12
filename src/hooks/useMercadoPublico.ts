@@ -21,6 +21,8 @@ export interface LoteMercado {
   rango_precio: string;
   uso_actual: string | null;
   publicado_en: string;
+  score_360: number | null;
+  has_resolutoria: boolean;
 }
 
 export const useMercadoPublico = (filtros: FiltrosMercado = {}) => {
