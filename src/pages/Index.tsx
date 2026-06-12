@@ -21,6 +21,12 @@ import {
   Award,
   Home,
   Users,
+  Coins,
+  BarChart3,
+  Lock,
+  CreditCard,
+  Cloud,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
