@@ -701,12 +701,11 @@ const DashboardMisOrdenes = () => {
     }
     if ((ordenes as any[]).length === 0) {
       return (
-        <Card>
-          <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-            <Briefcase className="h-10 w-10" />
-            <p>No hay órdenes disponibles en este momento.</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Briefcase}
+          titulo="No hay órdenes disponibles"
+          descripcion="Cuando se publiquen nuevas órdenes que coincidan con tu perfil, las verás aquí."
+        />
       );
     }
     if (ordenesFiltradasYOrdenadas.length === 0) {
