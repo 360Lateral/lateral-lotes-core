@@ -358,17 +358,47 @@ const Index = () => {
     {
       icon: MapPin,
       title: "Publica tu lote",
-      description: "Registra la ubicación, área y datos clave de tu terreno en minutos.",
+      description: "Registra ubicación, área y datos clave de tu terreno en minutos.",
     },
     {
       icon: FileCheck,
       title: "Diagnóstico 360°",
-      description: "Analizamos la normativa, viabilidad jurídica y valor de mercado de tu lote.",
+      description: "Analizamos normativa, viabilidad jurídica y valor de mercado.",
     },
     {
       icon: Handshake,
       title: "Conecta con compradores",
       description: "Te vinculamos con desarrolladores e inversionistas calificados.",
+    },
+  ];
+
+  const perfiles = [
+    {
+      id: "propietario",
+      icon: Home,
+      titulo: "Propietarios",
+      descripcion: "Publica tu lote, descubre su potencial real y conéctalo con su mejor destino.",
+      beneficios: ["Diagnóstico jurídico", "Valoración técnica", "Compradores verificados"],
+      cta: "Soy propietario",
+      destacado: false,
+    },
+    {
+      id: "desarrollador",
+      icon: Building2,
+      titulo: "Desarrolladores",
+      descripcion: "Accede a un mercado curado con información técnica completa antes de invertir.",
+      beneficios: ["Lotes verificados", "Información normativa", "Suscripción flexible"],
+      cta: "Busco lote",
+      destacado: true,
+    },
+    {
+      id: "comisionista",
+      icon: Users,
+      titulo: "Comisionistas",
+      descripcion: "Trae propietarios al mercado y genera ingresos por comisión sobre ventas concretadas.",
+      beneficios: ["Autorización formal", "Tracking de comisiones", "Pagos automatizados"],
+      cta: "Soy comisionista",
+      destacado: false,
     },
   ];
 
@@ -388,27 +418,112 @@ const Index = () => {
         </div>
       </section>
 
-      {/* How it works — only for non-logged users */}
+      {/* Cómo funciona — only for non-logged users */}
       {!user && (
-        <section className="mx-auto w-full max-w-5xl px-4 py-16">
-          <h2 className="mb-10 text-center font-body text-2xl font-bold text-foreground">
-            ¿Cómo funciona?
-          </h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <section className="mx-auto w-full max-w-6xl px-4 py-20">
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-primary/12 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-primary">
+              Metodología 360°
+            </span>
+            <h2 className="mt-3 font-body text-3xl font-bold text-foreground md:text-4xl">
+              Tres pasos para descubrir el valor real de tu lote
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl font-body text-base text-muted-foreground">
+              Un proceso curado por expertos. Sin demoras, sin sorpresas, con respaldo jurídico.
+            </p>
+          </div>
+          <div className="relative mt-14 grid grid-cols-1 gap-12 md:grid-cols-3">
+            {/* Conector punteado naranja (solo desktop) */}
+            <div
+              aria-hidden="true"
+              className="absolute left-[16.66%] right-[16.66%] top-[44px] hidden h-[2px] md:block"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(90deg, hsl(var(--primary) / 0.35) 0 8px, transparent 8px 16px)",
+              }}
+            />
             {steps.map((step, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <step.icon className="h-7 w-7 text-primary" />
+              <div key={i} className="relative flex flex-col items-center text-center">
+                <div
+                  className="relative mb-5 flex items-center justify-center rounded-full border-2 border-primary bg-background"
+                  style={{ height: 88, width: 88 }}
+                >
+                  <step.icon className="h-8 w-8 text-primary" />
+                  <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-secondary font-body text-xs font-bold text-primary">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                 </div>
                 <h3 className="font-body text-lg font-semibold text-foreground">{step.title}</h3>
-                <p className="mt-2 font-body text-sm text-muted-foreground">{step.description}</p>
+                <p className="mt-2 max-w-xs font-body text-sm text-muted-foreground">
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
-          <div className="mt-12 flex justify-center">
+          <div className="mt-14 flex justify-center">
             <Button variant="hero" size="xl" asChild>
               <Link to="/bienvenida">Crear mi cuenta gratis</Link>
             </Button>
+          </div>
+        </section>
+      )}
+
+      {/* Para quién es 360Lateral — only for non-logged users */}
+      {!user && (
+        <section className="bg-secondary/[0.03] py-20">
+          <div className="mx-auto w-full max-w-6xl px-4">
+            <div className="text-center">
+              <span className="inline-block rounded-full bg-secondary/10 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-secondary">
+                Perfiles
+              </span>
+              <h2 className="mt-3 font-body text-3xl font-bold text-foreground md:text-4xl">
+                ¿Para quién es 360Lateral?
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl font-body text-base text-muted-foreground">
+                Conectamos los tres lados del mercado inmobiliario en una sola plataforma.
+              </p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
+              {perfiles.map((perfil) => (
+                <div
+                  key={perfil.id}
+                  className={`relative flex flex-col rounded-lg border bg-background p-6 transition-all duration-200 motion-reduce:transition-none hover:border-primary/60 ${
+                    perfil.destacado
+                      ? "border-2 border-primary shadow-lg shadow-primary/10 md:scale-[1.02] motion-reduce:md:scale-100"
+                      : "border-border"
+                  }`}
+                >
+                  {perfil.destacado && (
+                    <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 font-body text-[11px] font-bold uppercase tracking-wider text-primary-foreground">
+                      Más activos
+                    </span>
+                  )}
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/12">
+                    <perfil.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-body text-lg font-semibold text-foreground">{perfil.titulo}</h3>
+                  <p className="mt-2 font-body text-sm text-muted-foreground">{perfil.descripcion}</p>
+                  <ul className="mt-5 space-y-2">
+                    {perfil.beneficios.map((b) => (
+                      <li key={b} className="flex items-center gap-2 font-body text-sm text-muted-foreground">
+                        <Check className="h-4 w-4 flex-shrink-0 text-primary" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    variant={perfil.destacado ? "hero" : "outline"}
+                    className="mt-6 w-full"
+                    asChild
+                  >
+                    <Link to={`/bienvenida?rol=${perfil.id}`}>
+                      {perfil.cta}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -419,3 +534,4 @@ const Index = () => {
 };
 
 export default Index;
+
