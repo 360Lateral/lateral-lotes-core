@@ -1,50 +1,42 @@
 import { useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLiquidacionesAdmin } from "@/hooks/useLiquidacionesAdmin";
-import MarcarLiquidacionPagadaDialog, {
-  formatCOP,
-} from "@/components/liquidaciones/MarcarLiquidacionPagadaDialog";
-import { Wallet, Search } from "lucide-react";
+import { useMarcarLiquidacionPagada } from "@/hooks/useMarcarLiquidacionPagada";
+import MarcarLiquidacionPagadaDialog from "@/components/liquidaciones/MarcarLiquidacionPagadaDialog";
+import {
+  Wallet, Search, Coins, Clock, Check, Banknote, MoreHorizontal, CheckCheck,
+} from "lucide-react";
+import { KPIEstado } from "@/components/ui/KPIEstado";
+import { BulkActionsBar } from "@/components/ui/BulkActionsBar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatCOP, formatCOPCompact, formatFecha } from "@/lib/format";
+import { toast } from "sonner";
 import type { LiquidacionRow } from "@/types/finanzas";
-
-const formatFecha = (s: string | null | undefined) =>
-  s ? new Date(s).toLocaleDateString("es-CO") : "—";
 
 const estadoBadge = (estado: string) => {
   switch (estado) {
     case "pendiente":
-      return {
-        className:
-          "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
-        label: "Pendiente",
-      };
+      return { className: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300", label: "Pendiente" };
     case "pagada":
-      return {
-        className:
-          "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300",
-        label: "Pagada",
-      };
+      return { className: "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300", label: "Pagada" };
     case "cancelada":
-      return {
-        className: "bg-muted text-muted-foreground",
-        label: "Cancelada",
-      };
+      return { className: "bg-muted text-muted-foreground", label: "Cancelada" };
     default:
       return { className: "bg-muted text-muted-foreground", label: estado };
   }
@@ -52,245 +44,236 @@ const estadoBadge = (estado: string) => {
 
 export default function DashboardLiquidaciones() {
   const { isSuperAdmin, roles, loading } = useAuth();
-  const isAdmin =
-    isSuperAdmin || roles.some((r) => r === "admin");
+  const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
 
-  const [tab, setTab] = useState<string>("pendiente");
-  const [searchExperto, setSearchExperto] = useState("");
-  const [desde, setDesde] = useState("");
-  const [hasta, setHasta] = useState("");
-  const [liqSeleccionada, setLiqSeleccionada] =
-    useState<LiquidacionRow | null>(null);
+  const [filtroEstado, setFiltroEstado] = useState<string>("todas");
+  const [busqueda, setBusqueda] = useState("");
+  const [orden, setOrden] = useState<"recientes" | "monto-desc">("recientes");
+  const [liqSeleccionada, setLiqSeleccionada] = useState<LiquidacionRow | null>(null);
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
 
-  const { data: todas = [], isLoading: loadingTodas } = useLiquidacionesAdmin();
-  const { data: porEstado = [], isLoading: loadingEstado } =
-    useLiquidacionesAdmin(tab);
+  const { data: todas = [], isLoading } = useLiquidacionesAdmin();
+  const marcarPagada = useMarcarLiquidacionPagada();
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="mx-auto max-w-7xl p-6">
-          <Skeleton className="h-40 w-full" />
-        </div>
+        <div className="mx-auto max-w-7xl p-6"><Skeleton className="h-40 w-full" /></div>
       </DashboardLayout>
     );
   }
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // KPIs sobre TODAS
-  const porPagar = todas
+  const total = todas.length;
+  const pendientesCount = todas.filter((l) => l.estado === "pendiente").length;
+  const pagadasCount = todas.filter((l) => l.estado === "pagada").length;
+  const sumaPendiente = todas
     .filter((l) => l.estado === "pendiente")
-    .reduce((acc, l) => acc + Number(l.monto_neto ?? 0), 0);
-  const pagadoHistorico = todas
-    .filter((l) => l.estado === "pagada")
-    .reduce((acc, l) => acc + Number(l.monto_neto ?? 0), 0);
-  const feeAcumulado = todas.reduce(
-    (acc, l) => acc + Number(l.fee_monto ?? 0),
-    0
-  );
-  const pendientesCount = todas.filter(
-    (l) => l.estado === "pendiente"
-  ).length;
+    .reduce((s, l) => s + Number(l.monto_neto ?? 0), 0);
+  const inicioMes = new Date();
+  inicioMes.setDate(1); inicioMes.setHours(0, 0, 0, 0);
+  const pagadoEsteMes = todas
+    .filter((l) => l.estado === "pagada" && l.fecha_pago && new Date(l.fecha_pago) >= inicioMes)
+    .reduce((s, l) => s + Number(l.monto_neto ?? 0), 0);
 
   const filtradas = useMemo<LiquidacionRow[]>(() => {
-    return porEstado.filter((l) => {
-      if (searchExperto) {
-        const s = searchExperto.toLowerCase();
-        const nombre = (l.experto?.nombre ?? "").toLowerCase();
-        const email = (l.experto?.email ?? "").toLowerCase();
-        if (!nombre.includes(s) && !email.includes(s)) return false;
-      }
-      if (desde && new Date(l.fecha_generacion) < new Date(desde)) return false;
-      if (hasta) {
-        const fin = new Date(hasta);
-        fin.setHours(23, 59, 59, 999);
-        if (new Date(l.fecha_generacion) > fin) return false;
-      }
-      return true;
+    let arr = todas;
+    if (filtroEstado !== "todas") arr = arr.filter((l) => l.estado === filtroEstado);
+    if (busqueda) {
+      const s = busqueda.toLowerCase();
+      arr = arr.filter(
+        (l) =>
+          (l.experto?.nombre ?? "").toLowerCase().includes(s) ||
+          (l.experto?.email ?? "").toLowerCase().includes(s) ||
+          (l.orden?.lotes?.nombre_lote ?? "").toLowerCase().includes(s) ||
+          (l.tipo?.nombre ?? "").toLowerCase().includes(s),
+      );
+    }
+    return [...arr].sort((a, b) => {
+      if (orden === "monto-desc") return Number(b.monto_neto ?? 0) - Number(a.monto_neto ?? 0);
+      return new Date(b.fecha_generacion).getTime() - new Date(a.fecha_generacion).getTime();
     });
-  }, [porEstado, searchExperto, desde, hasta]);
+  }, [todas, filtroEstado, busqueda, orden]);
+
+  const toggleSel = (id: string) => {
+    setSeleccionados((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+  const todasSel = filtradas.length > 0 && filtradas.every((l) => seleccionados.has(l.id));
+  const toggleTodas = () =>
+    todasSel ? setSeleccionados(new Set()) : setSeleccionados(new Set(filtradas.map((l) => l.id)));
+
+  const handleMarcarPagadaMultiple = async () => {
+    const ids = Array.from(seleccionados);
+    const pendientes = todas.filter((l) => ids.includes(l.id) && l.estado === "pendiente");
+    if (pendientes.length === 0) {
+      toast.error("Ninguna seleccionada está pendiente");
+      return;
+    }
+    let ok = 0, fail = 0;
+    for (const l of pendientes) {
+      try {
+        await marcarPagada.mutateAsync({ id: l.id, metodo_pago: "transferencia" });
+        ok++;
+      } catch { fail++; }
+    }
+    const omitidas = ids.length - pendientes.length;
+    toast.success(
+      `${ok} marcadas como pagadas` +
+        (fail > 0 ? ` · ${fail} fallaron` : "") +
+        (omitidas > 0 ? ` · ${omitidas} omitidas (no pendientes)` : ""),
+    );
+    setSeleccionados(new Set());
+  };
 
   return (
     <DashboardLayout>
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 md:px-6">
-        <header>
-          <h1 className="flex items-center gap-2 font-display text-2xl font-semibold text-foreground">
-            <Wallet className="h-6 w-6" /> Liquidaciones a expertos
-          </h1>
-          <p className="font-body text-sm text-muted-foreground">
-            Pagos pendientes y realizados a los expertos por análisis completados.
-          </p>
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-background p-5">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold text-foreground">
+              <Wallet className="h-5 w-5" /> Liquidaciones de expertos
+            </h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              <strong className="text-foreground">{total}</strong> en total
+              {pendientesCount > 0 && (
+                <> · <strong className="text-primary">{pendientesCount} pendientes de pagar</strong></>
+              )}
+              {sumaPendiente > 0 && <> · {formatCOPCompact(sumaPendiente)} en cola</>}
+            </p>
+          </div>
         </header>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="p-4 border-l-4 border-l-amber-500">
-            <p className="text-xs text-muted-foreground">Por pagar</p>
-            <p className="font-display text-xl font-semibold text-amber-700 dark:text-amber-400">
-              {formatCOP(porPagar)}
-            </p>
-          </Card>
-          <Card className="p-4 border-l-4 border-l-green-500">
-            <p className="text-xs text-muted-foreground">Pagado (histórico)</p>
-            <p className="font-display text-xl font-semibold text-green-700 dark:text-green-400">
-              {formatCOP(pagadoHistorico)}
-            </p>
-          </Card>
-          <Card className="p-4 border-l-4 border-l-primary">
-            <p className="text-xs text-muted-foreground">Fee acumulado 360Lateral</p>
-            <p className="font-display text-xl font-semibold text-primary">
-              {formatCOP(feeAcumulado)}
-            </p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs text-muted-foreground">Liquidaciones pendientes</p>
-            <p className="font-display text-xl font-semibold text-foreground">
-              {pendientesCount}
-            </p>
-          </Card>
+        <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+          <KPIEstado label="Total" value={total} icon={Coins} colorClass="text-foreground" iconColorClass="text-muted-foreground" />
+          <KPIEstado
+            label="Pendientes"
+            value={pendientesCount}
+            icon={Clock}
+            colorClass="text-primary"
+            destacado={pendientesCount > 0}
+            onClick={() => setFiltroEstado("pendiente")}
+          />
+          <KPIEstado label="Pagadas" value={pagadasCount} icon={Check} colorClass="text-green-600" />
+          <KPIEstado label="Pagado este mes" value={formatCOPCompact(pagadoEsteMes)} icon={Banknote} colorClass="text-green-600" />
         </div>
 
-        {/* Filtros */}
-        <Card className="p-4">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Experto (nombre / email)"
-                value={searchExperto}
-                onChange={(e) => setSearchExperto(e.target.value)}
-                className="pl-8"
-              />
-            </div>
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-3 py-2">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              type="date"
-              value={desde}
-              onChange={(e) => setDesde(e.target.value)}
-              aria-label="Desde"
-            />
-            <Input
-              type="date"
-              value={hasta}
-              onChange={(e) => setHasta(e.target.value)}
-              aria-label="Hasta"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar experto, lote o análisis..."
+              className="h-8 pl-8 text-xs"
             />
           </div>
-        </Card>
+          <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+            <SelectTrigger className="h-8 w-auto text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas</SelectItem>
+              <SelectItem value="pendiente">Pendientes</SelectItem>
+              <SelectItem value="pagada">Pagadas</SelectItem>
+              <SelectItem value="cancelada">Canceladas</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={orden} onValueChange={(v) => setOrden(v as "recientes" | "monto-desc")}>
+            <SelectTrigger className="h-8 w-auto text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recientes">Recientes</SelectItem>
+              <SelectItem value="monto-desc">Mayor monto</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Tabs */}
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="flex w-full flex-wrap">
-            <TabsTrigger value="pendiente" className="flex-1 min-w-[110px]">
-              Pendientes
-            </TabsTrigger>
-            <TabsTrigger value="pagada" className="flex-1 min-w-[110px]">
-              Pagadas
-            </TabsTrigger>
-            <TabsTrigger value="cancelada" className="flex-1 min-w-[110px]">
-              Canceladas
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <BulkActionsBar
+          count={seleccionados.size}
+          itemLabel={{ singular: "liquidación seleccionada", plural: "liquidaciones seleccionadas" }}
+          onClear={() => setSeleccionados(new Set())}
+        >
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleMarcarPagadaMultiple}>
+            <CheckCheck className="mr-1 h-3 w-3" /> Marcar como pagadas
+          </Button>
+        </BulkActionsBar>
 
-        {/* Tabla */}
-        <Card>
-          {loadingEstado || loadingTodas ? (
-            <div className="space-y-2 p-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : filtradas.length === 0 ? (
-            <div className="p-10 text-center font-body text-sm text-muted-foreground">
-              {tab === "pendiente"
-                ? "No hay liquidaciones pendientes de pago."
-                : tab === "pagada"
-                ? "Aún no se han registrado pagos."
-                : "No hay liquidaciones canceladas."}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Experto</TableHead>
-                    <TableHead>Lote / análisis</TableHead>
-                    <TableHead className="text-right">Bruto</TableHead>
-                    <TableHead className="text-right">Fee</TableHead>
-                    <TableHead className="text-right">Neto</TableHead>
-                    <TableHead>Estado</TableHead>
-                    {tab === "pagada" && <TableHead>Pago</TableHead>}
-                    {tab === "pendiente" && <TableHead></TableHead>}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtradas.map((l) => {
-                    const badge = estadoBadge(l.estado);
-                    return (
-                      <TableRow key={l.id}>
-                        <TableCell className="whitespace-nowrap text-xs">
-                          {formatFecha(l.fecha_generacion)}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          <div>{l.experto?.nombre ?? "—"}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {l.experto?.email ?? ""}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          <div>{l.orden?.lotes?.nombre_lote ?? "—"}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {l.tipo?.nombre ?? ""}
-                          </div>
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-right text-sm">
-                          {formatCOP(Number(l.monto_bruto))}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-right text-xs text-muted-foreground">
-                          {Number(l.fee_pct)}% ={" "}
-                          {formatCOP(Number(l.fee_monto))}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-right text-sm font-semibold text-foreground">
-                          {formatCOP(Number(l.monto_neto))}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={badge.className}>{badge.label}</Badge>
-                        </TableCell>
-                        {tab === "pagada" && (
-                          <TableCell className="text-xs">
-                            <div>{l.metodo_pago ?? "—"}</div>
-                            {l.referencia_pago && (
-                              <div className="font-mono text-[10px] text-muted-foreground">
-                                {l.referencia_pago}
-                              </div>
-                            )}
-                            <div className="text-[10px] text-muted-foreground">
-                              {formatFecha(l.fecha_pago)}
-                            </div>
-                          </TableCell>
-                        )}
-                        {tab === "pendiente" && (
-                          <TableCell>
-                            <Button
-                              size="sm"
-                              onClick={() => setLiqSeleccionada(l)}
-                            >
-                              Marcar como pagada
+        {isLoading ? (
+          <div className="space-y-2"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
+        ) : filtradas.length === 0 ? (
+          <EmptyState icon={Wallet} title="Sin liquidaciones" description="No hay liquidaciones que coincidan con los filtros." />
+        ) : (
+          <div className="overflow-hidden rounded-md border border-border bg-background">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40">
+                  <TableHead className="w-8">
+                    <Checkbox checked={todasSel} onCheckedChange={toggleTodas} />
+                  </TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-wide">ID</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-wide">Experto</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-wide">Concepto</TableHead>
+                  <TableHead className="text-right text-[10px] uppercase tracking-wide">Neto</TableHead>
+                  <TableHead className="text-center text-[10px] uppercase tracking-wide">Estado</TableHead>
+                  <TableHead className="text-right text-[10px] uppercase tracking-wide">Fecha</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtradas.map((l) => {
+                  const badge = estadoBadge(l.estado);
+                  const checked = seleccionados.has(l.id);
+                  return (
+                    <TableRow
+                      key={l.id}
+                      className={`hover:bg-muted/30 ${l.estado === "pendiente" ? "bg-primary/5" : ""}`}
+                    >
+                      <TableCell><Checkbox checked={checked} onCheckedChange={() => toggleSel(l.id)} /></TableCell>
+                      <TableCell className="font-mono text-[10px]">{l.id.slice(0, 8)}</TableCell>
+                      <TableCell className="text-xs">
+                        <div className="text-foreground">{l.experto?.nombre ?? "—"}</div>
+                        <div className="text-[10px] text-muted-foreground">{l.experto?.email ?? ""}</div>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <div className="text-foreground">{l.orden?.lotes?.nombre_lote ?? "—"}</div>
+                        <div className="text-[10px] text-muted-foreground">{l.tipo?.nombre ?? ""}</div>
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-semibold text-foreground whitespace-nowrap">
+                        {formatCOP(Number(l.monto_neto ?? 0))}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge className={`${badge.className} text-[10px]`}>{badge.label}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-[10px] text-muted-foreground whitespace-nowrap">
+                        {formatFecha(l.fecha_pago ?? l.fecha_generacion)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                              <MoreHorizontal className="h-3.5 w-3.5" />
                             </Button>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </Card>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {l.estado === "pendiente" && (
+                              <DropdownMenuItem onClick={() => setLiqSeleccionada(l)}>
+                                <CheckCheck className="mr-2 h-3.5 w-3.5" /> Marcar como pagada
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => setLiqSeleccionada(l)}>
+                              Ver detalle
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       <MarcarLiquidacionPagadaDialog

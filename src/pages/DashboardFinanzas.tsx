@@ -7,30 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, TrendingUp, TrendingDown, Clock, PiggyBank } from "lucide-react";
 import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
-  LineChart,
-  Line,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  ArrowRight, TrendingUp, TrendingDown, Clock, PiggyBank, FileText, BarChart3,
+} from "lucide-react";
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend,
+  CartesianGrid, LineChart, Line,
 } from "recharts";
 import { useResumenFinanciero } from "@/hooks/useResumenFinanciero";
 import { useTendenciaFinanciera } from "@/hooks/useTendenciaFinanciera";
-
-const formatCOP = (n: number | null | undefined) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(Number(n));
+import { KPIFinanciero } from "@/components/ui/KPIEstado";
+import { formatCOP, formatCOPCompact } from "@/lib/format";
 
 const formatCOPShort = (n: number) => {
   if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}MM`;
@@ -53,8 +43,15 @@ const monthsAgoISO = (n: number) => {
 
 type RangoPreset = "mes" | "3meses" | "anio" | "todo" | "custom";
 
+const PERIODO_LABELS: Record<RangoPreset, string> = {
+  mes: "Este mes",
+  "3meses": "Últimos 3 meses",
+  anio: "Este año",
+  todo: "Todo el tiempo",
+  custom: "Personalizado",
+};
+
 const formatMesCorto = (mes: string) => {
-  // mes: "YYYY-MM"
   const [y, m] = mes.split("-");
   const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   const mi = parseInt(m, 10) - 1;
@@ -75,30 +72,15 @@ const DashboardFinanzas = () => {
 
   const aplicarPreset = (p: RangoPreset) => {
     setPreset(p);
-    if (p === "mes") {
-      setDesde(firstOfMonthISO());
-      setHasta(todayISO());
-    } else if (p === "3meses") {
-      setDesde(monthsAgoISO(2));
-      setHasta(todayISO());
-    } else if (p === "anio") {
-      setDesde(firstOfYearISO());
-      setHasta(todayISO());
-    } else if (p === "todo") {
-      setDesde(undefined);
-      setHasta(undefined);
-    } else if (p === "custom") {
-      setDesde(customDesde);
-      setHasta(customHasta);
-    }
+    if (p === "mes") { setDesde(firstOfMonthISO()); setHasta(todayISO()); }
+    else if (p === "3meses") { setDesde(monthsAgoISO(2)); setHasta(todayISO()); }
+    else if (p === "anio") { setDesde(firstOfYearISO()); setHasta(todayISO()); }
+    else if (p === "todo") { setDesde(undefined); setHasta(undefined); }
+    else if (p === "custom") { setDesde(customDesde); setHasta(customHasta); }
   };
 
   const tendenciaData = useMemo(
-    () =>
-      (tendencia ?? []).map((m) => ({
-        ...m,
-        mesLabel: formatMesCorto(m.mes),
-      })),
+    () => (tendencia ?? []).map((m) => ({ ...m, mesLabel: formatMesCorto(m.mes) })),
     [tendencia],
   );
 
@@ -111,259 +93,203 @@ const DashboardFinanzas = () => {
   const ventas = resumen?.ventas;
   const com = resumen?.comisiones;
 
+  const ingresos = balance?.entradas ?? 0;
+  const egresos = balance?.salidas_pagadas ?? 0;
+  const utilidad = ingresos - egresos;
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">Panorama financiero</h1>
-          <p className="text-muted-foreground mt-1">
-            Todos los flujos de dinero de 360Lateral en un solo lugar.
-          </p>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
+        {/* Header */}
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-background p-5">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold text-foreground">
+              <BarChart3 className="h-5 w-5" /> Finanzas
+            </h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Ingresos del período:{" "}
+              <strong className="text-green-600">{formatCOPCompact(ingresos)}</strong>
+              {" · "}Utilidad bruta:{" "}
+              <strong className={utilidad >= 0 ? "text-foreground" : "text-destructive"}>
+                {formatCOPCompact(utilidad)}
+              </strong>
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Select value={preset} onValueChange={(v) => aplicarPreset(v as RangoPreset)}>
+              <SelectTrigger className="h-8 w-auto text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(Object.keys(PERIODO_LABELS) as RangoPreset[]).map((k) => (
+                  <SelectItem key={k} value={k}>{PERIODO_LABELS[k]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" disabled>
+              <FileText className="mr-1.5 h-3.5 w-3.5" /> Reporte
+            </Button>
+          </div>
+        </header>
 
-        {/* Filtro */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {([
-                { key: "mes", label: "Este mes" },
-                { key: "3meses", label: "Últimos 3 meses" },
-                { key: "anio", label: "Este año" },
-                { key: "todo", label: "Todo el tiempo" },
-                { key: "custom", label: "Personalizado" },
-              ] as { key: RangoPreset; label: string }[]).map((p) => (
-                <Button
-                  key={p.key}
-                  size="sm"
-                  variant={preset === p.key ? "default" : "outline"}
-                  onClick={() => aplicarPreset(p.key)}
-                >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
-            {preset === "custom" && (
+        {preset === "custom" && (
+          <Card className="mb-3">
+            <CardContent className="pt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
                 <div>
                   <Label htmlFor="desde">Desde</Label>
-                  <Input
-                    id="desde"
-                    type="date"
-                    value={customDesde}
-                    onChange={(e) => {
-                      setCustomDesde(e.target.value);
-                      setDesde(e.target.value);
-                    }}
-                  />
+                  <Input id="desde" type="date" value={customDesde}
+                    onChange={(e) => { setCustomDesde(e.target.value); setDesde(e.target.value); }} />
                 </div>
                 <div>
                   <Label htmlFor="hasta">Hasta</Label>
-                  <Input
-                    id="hasta"
-                    type="date"
-                    value={customHasta}
-                    onChange={(e) => {
-                      setCustomHasta(e.target.value);
-                      setHasta(e.target.value);
-                    }}
-                  />
+                  <Input id="hasta" type="date" value={customHasta}
+                    onChange={(e) => { setCustomHasta(e.target.value); setHasta(e.target.value); }} />
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* KPIs balance */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <KpiCard
-            title="Entradas"
-            value={balance?.entradas}
-            subtitle="Diagnósticos + fee de ventas"
-            icon={<TrendingUp className="h-5 w-5" />}
-            accent="text-emerald-600"
-            ring="ring-emerald-200"
-            loading={loadingResumen}
-          />
-          <KpiCard
-            title="Salidas pagadas"
-            value={balance?.salidas_pagadas}
-            subtitle="Pagos a expertos y comisionistas"
-            icon={<TrendingDown className="h-5 w-5" />}
-            accent="text-rose-600"
-            ring="ring-rose-200"
-            loading={loadingResumen}
-          />
-          <KpiCard
-            title="Pendiente por pagar"
-            value={balance?.pendiente_por_pagar}
-            subtitle="Compromisos no liquidados"
-            icon={<Clock className="h-5 w-5" />}
-            accent="text-amber-600"
-            ring="ring-amber-200"
-            loading={loadingResumen}
-          />
-          <KpiCard
-            title="Margen diagnósticos"
-            value={balance?.margen_diagnosticos}
-            subtitle="Ingreso diagnóstico − costo expertos"
-            icon={<PiggyBank className="h-5 w-5" />}
-            accent="text-primary"
-            ring="ring-primary/30"
-            loading={loadingResumen}
-          />
+        {/* KPIs financieros */}
+        <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+          {loadingResumen ? (
+            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20" />)
+          ) : (
+            <>
+              <KPIFinanciero label="Ingresos" value={formatCOPCompact(ingresos)} icon={TrendingUp} />
+              <KPIFinanciero label="Egresos" value={formatCOPCompact(egresos)} icon={TrendingDown} invertirColorDelta />
+              <KPIFinanciero label="Utilidad bruta" value={formatCOPCompact(utilidad)} icon={PiggyBank} />
+              <KPIFinanciero
+                label="Pendiente por pagar"
+                value={formatCOPCompact(balance?.pendiente_por_pagar ?? 0)}
+                icon={Clock}
+                sublabel="Compromisos no liquidados"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Evolución mensual</CardTitle>
+              <p className="text-[10px] text-muted-foreground">Últimos 12 meses</p>
+            </CardHeader>
+            <CardContent>
+              {loadingTendencia ? (
+                <Skeleton className="h-64 w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={tendenciaData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
+                      formatter={(v: number) => formatCOP(v)}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="ingresos_diagnostico" name="Ingresos diagnóstico" fill="hsl(142, 76%, 36%)" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="fee_ventas" name="Fee ventas" fill="hsl(142, 50%, 50%)" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="pagos_expertos" name="Pagos expertos" fill="hsl(0, 84%, 60%)" fillOpacity={0.7} radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="comisiones" name="Comisiones" fill="hsl(38, 92%, 50%)" radius={[2, 2, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Valor transado en ventas</CardTitle>
+              <p className="text-[10px] text-muted-foreground">Últimos 12 meses</p>
+            </CardHeader>
+            <CardContent>
+              {loadingTendencia ? (
+                <Skeleton className="h-64 w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={tendenciaData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
+                      formatter={(v: number) => formatCOP(v)}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="valor_transado"
+                      name="Valor transado"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: "hsl(var(--primary))" }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Desglose por fuente */}
-        <div>
-          <h2 className="text-xl font-heading font-semibold mb-3">Desglose por fuente</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <SourceCard
-              title="Diagnósticos"
-              loading={loadingResumen}
-              lines={[
-                { label: "Ingresos", value: formatCOP(diag?.ingresos ?? 0), strong: true },
-                { label: "Transacciones", value: String(diag?.num_transacciones ?? 0) },
-              ]}
-              linkLabel="Ver pagos"
-              to="/dashboard/pagos"
-            />
-            <SourceCard
-              title="Expertos"
-              loading={loadingResumen}
-              lines={[
-                { label: "Pagado", value: formatCOP(exp?.pagado ?? 0), strong: true },
-                { label: "Pendiente", value: formatCOP(exp?.pendiente ?? 0) },
-                { label: "Fee 5% retenido", value: formatCOP(exp?.fee_retenido_360 ?? 0) },
-              ]}
-              linkLabel="Ver liquidaciones"
-              to="/dashboard/liquidaciones"
-            />
-            <SourceCard
-              title="Ventas"
-              loading={loadingResumen}
-              lines={[
-                { label: "Ventas", value: String(ventas?.num_ventas ?? 0) },
-                { label: "Valor transado", value: formatCOP(ventas?.valor_transado ?? 0) },
-                { label: "Fee 360Lateral", value: formatCOP(ventas?.fee_360 ?? 0), strong: true },
-              ]}
-              linkLabel="Ver ventas"
-              to="/dashboard/ventas"
-            />
-            <SourceCard
-              title="Comisiones"
-              loading={loadingResumen}
-              lines={[
-                { label: "Pagado", value: formatCOP(com?.pagado ?? 0), strong: true },
-                { label: "Pendiente", value: formatCOP(com?.pendiente ?? 0) },
-                { label: "Total", value: String(com?.num ?? 0) },
-              ]}
-              linkLabel="Ver comisiones"
-              to="/dashboard/ventas"
-            />
-          </div>
-        </div>
-
-        {/* Tendencia */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Evolución mensual</CardTitle>
+        <Card className="mt-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">Desglose por fuente</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingTendencia ? (
-              <Skeleton className="h-72 w-full" />
-            ) : (
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[640px] h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={tendenciaData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="mesLabel" tick={{ fontSize: 12 }} />
-                      <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 12 }} />
-                      <Tooltip
-                        formatter={(value: number) => formatCOP(value)}
-                        labelClassName="font-medium"
-                      />
-                      <Legend />
-                      <Bar dataKey="ingresos_diagnostico" name="Ingresos diagnóstico" fill="#10b981" />
-                      <Bar dataKey="fee_ventas" name="Fee de ventas" fill="#3b82f6" />
-                      <Bar dataKey="pagos_expertos" name="Pagos a expertos" fill="#ef4444" />
-                      <Bar dataKey="comisiones" name="Comisiones" fill="#f59e0b" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Valor transado en ventas (separado por magnitud) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Valor transado en ventas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingTendencia ? (
-              <Skeleton className="h-64 w-full" />
-            ) : (
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[640px] h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={tendenciaData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="mesLabel" tick={{ fontSize: 12 }} />
-                      <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 12 }} />
-                      <Tooltip formatter={(value: number) => formatCOP(value)} />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="valor_transado"
-                        name="Valor transado"
-                        stroke="#6366f1"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <SourceCard
+                title="Diagnósticos"
+                loading={loadingResumen}
+                lines={[
+                  { label: "Ingresos", value: formatCOP(diag?.ingresos ?? 0), strong: true },
+                  { label: "Transacciones", value: String(diag?.num_transacciones ?? 0) },
+                ]}
+                linkLabel="Ver pagos"
+                to="/dashboard/pagos"
+              />
+              <SourceCard
+                title="Expertos"
+                loading={loadingResumen}
+                lines={[
+                  { label: "Pagado", value: formatCOP(exp?.pagado ?? 0), strong: true },
+                  { label: "Pendiente", value: formatCOP(exp?.pendiente ?? 0) },
+                  { label: "Fee retenido", value: formatCOP(exp?.fee_retenido_360 ?? 0) },
+                ]}
+                linkLabel="Ver liquidaciones"
+                to="/dashboard/liquidaciones"
+              />
+              <SourceCard
+                title="Ventas"
+                loading={loadingResumen}
+                lines={[
+                  { label: "Ventas", value: String(ventas?.num_ventas ?? 0) },
+                  { label: "Valor transado", value: formatCOP(ventas?.valor_transado ?? 0) },
+                  { label: "Fee 360Lateral", value: formatCOP(ventas?.fee_360 ?? 0), strong: true },
+                ]}
+                linkLabel="Ver ventas"
+                to="/dashboard/ventas"
+              />
+              <SourceCard
+                title="Comisiones"
+                loading={loadingResumen}
+                lines={[
+                  { label: "Pagado", value: formatCOP(com?.pagado ?? 0), strong: true },
+                  { label: "Pendiente", value: formatCOP(com?.pendiente ?? 0) },
+                  { label: "Total", value: String(com?.num ?? 0) },
+                ]}
+                linkLabel="Ver comisiones"
+                to="/dashboard/ventas"
+              />
+            </div>
           </CardContent>
         </Card>
       </div>
     </DashboardLayout>
   );
 };
-
-interface KpiCardProps {
-  title: string;
-  value: number | undefined;
-  subtitle: string;
-  icon: React.ReactNode;
-  accent: string;
-  ring: string;
-  loading: boolean;
-}
-
-const KpiCard = ({ title, value, subtitle, icon, accent, ring, loading }: KpiCardProps) => (
-  <Card className={`ring-1 ${ring}`}>
-    <CardContent className="pt-6">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1 min-w-0">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">{title}</p>
-          {loading ? (
-            <Skeleton className="h-7 w-32 mt-1" />
-          ) : (
-            <p className={`text-2xl font-bold font-heading ${accent} break-words`}>
-              {formatCOP(value ?? 0)}
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        </div>
-        <div className={`${accent} shrink-0`}>{icon}</div>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 interface SourceCardProps {
   title: string;
@@ -374,30 +300,22 @@ interface SourceCardProps {
 }
 
 const SourceCard = ({ title, lines, linkLabel, to, loading }: SourceCardProps) => (
-  <Card className="flex flex-col">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-base">{title}</CardTitle>
-    </CardHeader>
-    <CardContent className="flex flex-col flex-1 justify-between gap-3">
-      <div className="space-y-1.5">
-        {loading
-          ? Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-4 w-full" />)
-          : lines.map((l) => (
-              <div key={l.label} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{l.label}</span>
-                <span className={l.strong ? "font-semibold text-foreground" : "text-foreground"}>
-                  {l.value}
-                </span>
-              </div>
-            ))}
-      </div>
-      <Button asChild variant="ghost" size="sm" className="justify-start px-0 text-primary">
-        <Link to={to}>
-          {linkLabel} <ArrowRight className="ml-1 h-4 w-4" />
-        </Link>
-      </Button>
-    </CardContent>
-  </Card>
+  <div className="rounded-md border border-border p-3">
+    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{title}</div>
+    <div className="mt-2 space-y-1">
+      {loading
+        ? Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-4 w-full" />)
+        : lines.map((l) => (
+            <div key={l.label} className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">{l.label}</span>
+              <span className={l.strong ? "font-semibold text-foreground" : "text-foreground"}>{l.value}</span>
+            </div>
+          ))}
+    </div>
+    <Button asChild variant="ghost" size="sm" className="mt-2 h-7 justify-start px-0 text-[11px] text-primary">
+      <Link to={to}>{linkLabel} <ArrowRight className="ml-1 h-3 w-3" /></Link>
+    </Button>
+  </div>
 );
 
 export default DashboardFinanzas;
