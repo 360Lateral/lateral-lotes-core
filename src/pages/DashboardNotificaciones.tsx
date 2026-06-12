@@ -11,6 +11,7 @@ import {
   TrendingUp, Info, Filter,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────
 type TipoNotif = "todas" | "match_lote" | "cambio_estado" | "negociacion" | "sistema";
