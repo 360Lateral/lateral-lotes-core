@@ -377,16 +377,12 @@ const Index = () => {
       {renderHero()}
 
       {/* Trust bar */}
-      <section className="border-b border-border bg-background py-8">
+      <section className="border-b border-border bg-background py-10">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
-          {trustStats.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center">
-              <span className="font-body text-3xl font-bold text-primary">
-                {stat.value}
-              </span>
-              <span className="mt-1 font-body text-xs text-muted-foreground">{stat.label}</span>
-            </div>
-          ))}
+          <TrustStat icon={MapPin} value={trustStats[0]?.value ?? "—"} label={trustStats[0]?.label ?? "Lotes disponibles"} />
+          <TrustStat icon={Building2} value={trustStats[1]?.value ?? "—"} label={trustStats[1]?.label ?? "Municipios"} />
+          <TrustStat icon={FileCheck} value={trustStats[2]?.value ?? "—"} label={trustStats[2]?.label ?? "Diagnósticos"} />
+          <TrustStat icon={Award} value={trustStats[3]?.value ?? "—"} label={trustStats[3]?.label ?? "Resolutorías"} />
         </div>
       </section>
 
