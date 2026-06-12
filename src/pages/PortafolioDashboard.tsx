@@ -12,6 +12,9 @@ import { Navigate, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -64,6 +67,7 @@ const SEMAFORO_LABEL: Record<string, string> = {
 
 const KEY_VISTA = "portafolio_vista";
 const KEY_ORDEN = "portafolio_orden";
+const KEY_MOSTRAR_CERRADOS = "portafolio_mostrar_cerrados";
 
 type Vista = "tabla" | "kanban";
 type Orden = "urgencia" | "dias-gestion-desc" | "avance-asc" | "sla-asc";
@@ -144,6 +148,14 @@ const PortafolioDashboard = () => {
     }
   });
 
+  const [mostrarCerrados, setMostrarCerrados] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(KEY_MOSTRAR_CERRADOS) === "true";
+    } catch {
+      return false;
+    }
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem(KEY_VISTA, vista);
@@ -155,6 +167,12 @@ const PortafolioDashboard = () => {
       localStorage.setItem(KEY_ORDEN, orden);
     } catch {}
   }, [orden]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_MOSTRAR_CERRADOS, String(mostrarCerrados));
+    } catch {}
+  }, [mostrarCerrados]);
 
   const { data: filas = [], isLoading: filasLoading } = useVistaPortafolio(filtros);
 
@@ -204,10 +222,16 @@ const PortafolioDashboard = () => {
     setPage(1);
   }, [filtros, busqueda, orden]);
 
+  const filasVisibles = useMemo(() => {
+    if (mostrarCerrados) return filasFiltradasYOrdenadas;
+    return filasFiltradasYOrdenadas.filter(
+      (f) => f.estado !== "cerrado" && f.estado !== "cancelado",
+    );
+  }, [filasFiltradasYOrdenadas, mostrarCerrados]);
+
   const paginadas = useMemo(
-    () =>
-      filasFiltradasYOrdenadas.slice((page - 1) * pageSize, page * pageSize),
-    [filasFiltradasYOrdenadas, page, pageSize],
+    () => filasVisibles.slice((page - 1) * pageSize, page * pageSize),
+    [filasVisibles, page, pageSize],
   );
 
   const enRiesgo = useMemo(
@@ -245,7 +269,7 @@ const PortafolioDashboard = () => {
   }
 
   const noResultados =
-    !filasLoading && filasFiltradasYOrdenadas.length === 0;
+    !filasLoading && filasVisibles.length === 0;
 
   return (
     <DashboardLayout>
@@ -393,6 +417,20 @@ const PortafolioDashboard = () => {
                 <LayoutGrid className="h-4 w-4" />
               </button>
             </div>
+
+            <div className="flex items-center gap-2 pl-1">
+              <Switch
+                id="mostrar-cerrados"
+                checked={mostrarCerrados}
+                onCheckedChange={(v) => setMostrarCerrados(!!v)}
+              />
+              <Label
+                htmlFor="mostrar-cerrados"
+                className="text-xs text-muted-foreground cursor-pointer"
+              >
+                Mostrar cerrados
+              </Label>
+            </div>
           </div>
 
           <div className="mt-4">
@@ -429,7 +467,7 @@ const PortafolioDashboard = () => {
                 <TablaPortafolio filas={paginadas} isLoading={filasLoading} />
                 <div className="mt-3">
                   <PaginacionControles
-                    total={filasFiltradasYOrdenadas.length}
+                    total={filasVisibles.length}
                     page={page}
                     pageSize={pageSize}
                     onPageChange={setPage}
@@ -441,7 +479,10 @@ const PortafolioDashboard = () => {
                 </div>
               </>
             ) : (
-              <KanbanPortafolio filas={filasFiltradasYOrdenadas} />
+              <KanbanPortafolio
+                filas={filasVisibles}
+                mostrarCerrados={mostrarCerrados}
+              />
             )}
           </div>
         </>
