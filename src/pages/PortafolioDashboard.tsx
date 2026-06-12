@@ -467,7 +467,7 @@ const PortafolioDashboard = () => {
                 <TablaPortafolio filas={paginadas} isLoading={filasLoading} />
                 <div className="mt-3">
                   <PaginacionControles
-                    total={filasFiltradasYOrdenadas.length}
+                    total={filasVisibles.length}
                     page={page}
                     pageSize={pageSize}
                     onPageChange={setPage}
@@ -479,7 +479,10 @@ const PortafolioDashboard = () => {
                 </div>
               </>
             ) : (
-              <KanbanPortafolio filas={filasFiltradasYOrdenadas} />
+              <KanbanPortafolio
+                filas={filasVisibles}
+                mostrarCerrados={mostrarCerrados}
+              />
             )}
           </div>
         </>
