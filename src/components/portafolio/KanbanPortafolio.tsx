@@ -451,6 +451,8 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
                   dragOverColId === col.key ? dropTargetIsValid : null
                 }
                 onOpen={handleOpen}
+                isAdmin={isAdmin}
+                mostrarCerrados={mostrarCerrados}
               />
             ))}
           </div>
