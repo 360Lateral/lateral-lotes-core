@@ -202,7 +202,12 @@ export default function DashboardLiquidaciones() {
         {isLoading ? (
           <div className="space-y-2"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
         ) : filtradas.length === 0 ? (
-          <EmptyState icon={Wallet} title="Sin liquidaciones" description="No hay liquidaciones que coincidan con los filtros." />
+          <EmptyState
+            icon={Wallet}
+            titulo="Sin liquidaciones pendientes"
+            descripcion="Las liquidaciones a expertos por trabajos completados se mostrarán aquí."
+          />
+
         ) : (
           <div className="overflow-hidden rounded-md border border-border bg-background">
             <Table>
