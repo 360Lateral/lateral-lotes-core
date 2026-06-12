@@ -15,7 +15,7 @@ export interface EventoActividad {
   loteNombre?: string;
 }
 
-const safe = async <T>(p: Promise<T>): Promise<T | null> => {
+const safe = async <T>(p: PromiseLike<T>): Promise<T | null> => {
   try {
     return await p;
   } catch {
