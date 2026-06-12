@@ -928,15 +928,11 @@ const DashboardMisOrdenes = () => {
                 ))}
               </div>
             ) : liquidaciones.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-                  <Wallet className="h-10 w-10" />
-                  <p>
-                    Aún no tienes liquidaciones. Se generan automáticamente cuando
-                    completas un análisis adjudicado.
-                  </p>
-                </CardContent>
-              </Card>
+              <EmptyState
+                icon={Wallet}
+                titulo="Aún no tienes liquidaciones"
+                descripcion="Se generan automáticamente cuando completas un análisis adjudicado."
+              />
             ) : (
               <div className="space-y-3">
                 {liquidaciones.map((l: any) => (
