@@ -1,26 +1,24 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { MapPin, CheckCircle, Clock, Users, FileSearch, Handshake, Check, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+  ArrowUp,
+  ClipboardCheck,
+  CreditCard,
+  Download,
+  MessageCircle,
+  Plus,
+  type LucideIcon,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
+import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
 import { useToast } from "@/hooks/use-toast";
-
-
+import { formatCOPCompact, formatoRelativo } from "@/lib/format";
 
 const leadEstadoVariant = (e: string) => {
   switch (e) {
@@ -33,21 +31,75 @@ const leadEstadoVariant = (e: string) => {
   }
 };
 
+interface KPIAdminProps {
+  label: string;
+  value: string | number;
+  deltaLabel?: string;
+  deltaPositive?: boolean;
+  sublabel?: string;
+}
+
+const KPIAdmin = ({ label, value, deltaLabel, deltaPositive, sublabel }: KPIAdminProps) => (
+  <div className="rounded-md bg-muted/40 p-3">
+    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+    <div className="mt-1 flex items-baseline justify-between gap-2">
+      <span className="text-xl font-bold text-foreground">{value}</span>
+      {deltaLabel && (
+        <span className={`text-[10px] ${deltaPositive ? "text-emerald-600" : "text-muted-foreground"}`}>
+          {deltaPositive && <ArrowUp className="inline h-2.5 w-2.5" />}
+          {deltaLabel}
+        </span>
+      )}
+      {sublabel && !deltaLabel && (
+        <span className="text-[10px] text-muted-foreground">{sublabel}</span>
+      )}
+    </div>
+  </div>
+);
+
+interface AccionUrgenteProps {
+  icon: LucideIcon;
+  titulo: string;
+  count: number;
+  countLabel: string;
+  onClick: () => void;
+}
+
+const AccionUrgente = ({ icon: Icon, titulo, count, countLabel, onClick }: AccionUrgenteProps) => (
+  <button
+    onClick={onClick}
+    disabled={count === 0}
+    className="text-left rounded-md border border-border bg-background px-3 py-2 transition-colors hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+      <Icon className="h-3.5 w-3.5" />
+      {titulo}
+    </div>
+    <div className="mt-0.5 text-[11px] text-muted-foreground">{countLabel}</div>
+  </button>
+);
 
 const Dashboard = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const displayName =
+    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Admin";
+  const firstName = displayName.split(" ")[0];
 
+  // Lotes totales
   const { data: lotes = [] } = useQuery({
     queryKey: ["dash-lotes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("lotes").select("id, estado_disponibilidad");
+      const { data, error } = await supabase
+        .from("lotes")
+        .select("id, created_at, estado_disponibilidad");
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 
+  // Leads recientes
   const { data: leads = [] } = useQuery({
     queryKey: ["dash-leads"],
     queryFn: async () => {
@@ -57,24 +109,13 @@ const Dashboard = () => {
         .order("created_at", { ascending: false })
         .limit(5);
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 
-  const { data: diagnosticos = [] } = useQuery({
-    queryKey: ["dash-diagnosticos"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("diagnosticos")
-        .select("id, estado, created_at, nombre, objetivo" as any)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      return (data as any[]) ?? [];
-    },
-  });
-
+  // Negociaciones activas
   const { data: negociaciones = [] } = useQuery({
-    queryKey: ["dash-negociaciones"],
+    queryKey: ["dash-neg-activas-count"],
     queryFn: async () => {
       const { data } = await supabase
         .from("negociaciones")
@@ -84,347 +125,327 @@ const Dashboard = () => {
     },
   });
 
-
-  const { data: lotesPendientes = [] } = useQuery({
-    queryKey: ["dash-lotes-pendientes"],
+  // Usuarios
+  const { data: usuariosData = { total: 0, nuevos: 0 } } = useQuery({
+    queryKey: ["dash-usuarios"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("lotes")
-        .select("id, nombre_lote, ciudad, area_total_m2, created_at, owner_id")
-        .eq("estado_disponibilidad", "En revisión")
-        .order("created_at", { ascending: false });
+      const desde = new Date();
+      desde.setDate(desde.getDate() - 30);
+      const [totalRes, nuevosRes] = await Promise.all([
+        supabase.from("perfiles").select("id", { count: "exact", head: true }),
+        supabase
+          .from("perfiles")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", desde.toISOString()),
+      ]);
+      return {
+        total: totalRes.count ?? 0,
+        nuevos: nuevosRes.count ?? 0,
+      };
+    },
+  });
+
+  // Ingresos del mes (transacciones aprobadas)
+  const { data: ingresosMes = { actual: 0, anterior: 0 } } = useQuery({
+    queryKey: ["dash-ingresos-mes"],
+    queryFn: async () => {
+      const ahora = new Date();
+      const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+      const inicioMesAnt = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+      const finMesAnt = new Date(ahora.getFullYear(), ahora.getMonth(), 0, 23, 59, 59);
+
+      const [actRes, antRes] = await Promise.all([
+        (supabase as any)
+          .from("transacciones")
+          .select("monto_cop")
+          .eq("estado", "aprobada")
+          .gte("fecha_aprobacion", inicioMes.toISOString()),
+        (supabase as any)
+          .from("transacciones")
+          .select("monto_cop")
+          .eq("estado", "aprobada")
+          .gte("fecha_aprobacion", inicioMesAnt.toISOString())
+          .lte("fecha_aprobacion", finMesAnt.toISOString()),
+      ]);
+      const sum = (rows: any[] | null | undefined) =>
+        (rows ?? []).reduce((s, r) => s + Number(r.monto_cop ?? 0), 0);
+      return { actual: sum(actRes.data), anterior: sum(antRes.data) };
+    },
+  });
+
+  // Hooks compartidos con sidebar para badges urgentes
+  const { data: lotesPendientes = [] } = useLotesPendientesValidacion();
+  const { data: solicitudesPendientes = [] } = useSolicitudesContacto("pendiente");
+  const { data: pagosPendientes = [] } = useQuery({
+    queryKey: ["dash-pagos-pendientes"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("transacciones")
+        .select("id")
+        .eq("estado", "pendiente");
       return data ?? [];
     },
   });
 
-  const { data: negociacionesActivas = [] } = useQuery({
-    queryKey: ["dash-neg-activas"],
+  // Actividad reciente últimas 24h
+  const { data: actividad = [] } = useQuery({
+    queryKey: ["dash-actividad-24h"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("negociaciones")
-        .select("id, estado, created_at, lotes(nombre_lote)")
-        .eq("estado", "activa")
-        .order("created_at", { ascending: false })
-        .limit(10);
-      return data ?? [];
+      const desde = new Date();
+      desde.setDate(desde.getDate() - 1);
+      const desdeIso = desde.toISOString();
+      const [nuevosLotes, nuevosLeads, transAp, neg] = await Promise.all([
+        supabase
+          .from("lotes")
+          .select("id, nombre_lote, created_at")
+          .gte("created_at", desdeIso)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("leads")
+          .select("id, nombre, created_at")
+          .gte("created_at", desdeIso)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        (supabase as any)
+          .from("transacciones")
+          .select("id, monto_cop, fecha_aprobacion")
+          .eq("estado", "aprobada")
+          .gte("fecha_aprobacion", desdeIso)
+          .order("fecha_aprobacion", { ascending: false })
+          .limit(5),
+        supabase
+          .from("negociaciones")
+          .select("id, created_at")
+          .gte("created_at", desdeIso)
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+      type Item = { id: string; tipo: string; texto: string; fecha: string };
+      const items: Item[] = [];
+      (nuevosLotes.data ?? []).forEach((l: any) =>
+        items.push({ id: `lote-${l.id}`, tipo: "Lote", texto: `Nuevo lote: ${l.nombre_lote ?? "—"}`, fecha: l.created_at })
+      );
+      (nuevosLeads.data ?? []).forEach((l: any) =>
+        items.push({ id: `lead-${l.id}`, tipo: "Lead", texto: `Nuevo lead: ${l.nombre ?? "—"}`, fecha: l.created_at })
+      );
+      ((transAp.data as any[]) ?? []).forEach((t: any) =>
+        items.push({
+          id: `tx-${t.id}`,
+          tipo: "Pago",
+          texto: `Pago aprobado: ${formatCOPCompact(Number(t.monto_cop ?? 0))}`,
+          fecha: t.fecha_aprobacion,
+        })
+      );
+      (neg.data ?? []).forEach((n: any) =>
+        items.push({ id: `neg-${n.id}`, tipo: "Negociación", texto: `Nueva negociación`, fecha: n.created_at })
+      );
+      return items
+        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+        .slice(0, 8);
     },
   });
 
-  const totalLotes = lotes.length;
-  const disponibles = lotes.filter((l) => l.estado_disponibilidad === "Disponible").length;
-  const reservados = lotes.filter((l) => l.estado_disponibilidad === "Reservado").length;
-  const vendidos = lotes.filter((l) => l.estado_disponibilidad === "Vendido").length;
+  const lotesPendientesCount = lotesPendientes.length;
+  const pagosPendientesCount = pagosPendientes.length;
+  const solicitudesCount = solicitudesPendientes.length;
 
-  const today = new Date().toISOString().split("T")[0];
-  const leadsHoy = leads.filter((l) => l.created_at.startsWith(today)).length;
-  const diagNuevos = diagnosticos.filter((d: any) => d.estado === "nuevo").length;
+  // Lotes nuevos este mes
+  const inicioMes = new Date();
+  inicioMes.setDate(1);
+  inicioMes.setHours(0, 0, 0, 0);
+  const lotesNuevosEsteMes = lotes.filter(
+    (l: any) => l.created_at && new Date(l.created_at) >= inicioMes
+  ).length;
 
-  const metrics = [
-    { label: "Total lotes", value: totalLotes, icon: MapPin, color: "text-secondary" },
-    { label: "Disponibles", value: disponibles, icon: CheckCircle, color: "text-success" },
-    { label: "Reservados", value: reservados, icon: Clock, color: "text-warning" },
-    { label: "Leads nuevos hoy", value: leadsHoy, icon: Users, color: "text-primary" },
-    { label: "Diagnósticos nuevos", value: diagNuevos, icon: FileSearch, color: "text-warning" },
-    { label: "Negociaciones activas", value: negociaciones.length, icon: Handshake, color: "text-primary" },
-  ];
+  const ingresosDelta =
+    ingresosMes.anterior > 0
+      ? Math.round(((ingresosMes.actual - ingresosMes.anterior) / ingresosMes.anterior) * 100)
+      : null;
 
-  const handleAprobar = async (loteId: string) => {
-    const { error } = await supabase
-      .from("lotes")
-      .update({ estado_disponibilidad: "Disponible", es_publico: true } as any)
-      .eq("id", loteId);
-    if (error) {
-      toast({ title: "Error", description: "No se pudo aprobar el lote.", variant: "destructive" });
-    } else {
-      toast({ title: "Lote aprobado" });
-      queryClient.invalidateQueries({ queryKey: ["dash-lotes-pendientes"] });
-      queryClient.invalidateQueries({ queryKey: ["dash-lotes"] });
-    }
+  const tieneAccionesUrgentes =
+    lotesPendientesCount + pagosPendientesCount + solicitudesCount > 0;
+
+  const handleExportar = () => {
+    toast({ title: "Exportar", description: "Próximamente disponible." });
   };
 
-  const handleRechazar = async (loteId: string) => {
-    const { error } = await supabase
-      .from("lotes")
-      .update({ estado_disponibilidad: "En revisión" } as any)
-      .eq("id", loteId);
-    if (error) {
-      toast({ title: "Error", description: "No se pudo rechazar el lote.", variant: "destructive" });
-    } else {
-      toast({ title: "Lote rechazado" });
-      queryClient.invalidateQueries({ queryKey: ["dash-lotes-pendientes"] });
-      queryClient.invalidateQueries({ queryKey: ["dash-lotes"] });
-    }
-  };
-
-  const handleDiagEstado = async (diagId: string, estado: string) => {
-    const { error } = await supabase
-      .from("diagnosticos")
-      .update({ estado } as any)
-      .eq("id", diagId);
-    if (error) {
-      toast({ title: "Error", description: "No se pudo actualizar el estado.", variant: "destructive" });
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["dash-diagnosticos"] });
+  const tipoBadgeColor = (tipo: string) => {
+    switch (tipo) {
+      case "Pago": return "bg-emerald-100 text-emerald-700";
+      case "Lote": return "bg-primary/15 text-primary";
+      case "Lead": return "bg-blue-100 text-blue-700";
+      case "Negociación": return "bg-purple-100 text-purple-700";
+      default: return "bg-muted text-muted-foreground";
     }
   };
 
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-body text-xl font-bold text-foreground">Dashboard</h1>
+      {/* Header */}
+      <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Dashboard</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Hola {firstName},{" "}
+            {lotesPendientesCount > 0 || pagosPendientesCount > 0 ? (
+              <>
+                tienes{" "}
+                <strong className="text-foreground">
+                  {lotesPendientesCount} {lotesPendientesCount === 1 ? "lote" : "lotes"} por validar
+                </strong>
+                {pagosPendientesCount > 0 && (
+                  <>
+                    {" "}y{" "}
+                    <strong className="text-foreground">
+                      {pagosPendientesCount} {pagosPendientesCount === 1 ? "pago pendiente" : "pagos pendientes"}
+                    </strong>{" "}
+                    de revisión
+                  </>
+                )}
+                .
+              </>
+            ) : (
+              <>no hay acciones urgentes por ahora.</>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportar}>
+            <Download className="mr-1.5 h-4 w-4" /> Exportar
+          </Button>
+          <Button size="sm" onClick={() => navigate("/dashboard/lotes/nuevo")}>
+            <Plus className="mr-1.5 h-4 w-4" /> Nuevo lote
+          </Button>
+        </div>
+      </header>
 
+      {/* KPIs */}
+      <section className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+        <KPIAdmin
+          label="Lotes totales"
+          value={lotes.length}
+          deltaLabel={lotesNuevosEsteMes > 0 ? `+${lotesNuevosEsteMes} este mes` : undefined}
+          deltaPositive={lotesNuevosEsteMes > 0}
+        />
+        <KPIAdmin
+          label="Usuarios"
+          value={usuariosData.total}
+          deltaLabel={usuariosData.nuevos > 0 ? `+${usuariosData.nuevos} nuevos` : undefined}
+          deltaPositive={usuariosData.nuevos > 0}
+        />
+        <KPIAdmin
+          label="Negociaciones"
+          value={negociaciones.length}
+          sublabel="en curso"
+        />
+        <KPIAdmin
+          label="Ingresos del mes"
+          value={formatCOPCompact(ingresosMes.actual)}
+          deltaLabel={ingresosDelta != null ? `${ingresosDelta > 0 ? "+" : ""}${ingresosDelta}%` : undefined}
+          deltaPositive={ingresosDelta != null && ingresosDelta > 0}
+        />
+      </section>
 
+      {/* Banner acciones urgentes */}
+      {tieneAccionesUrgentes && (
+        <section
+          className="mb-4 rounded-md border border-primary/40 bg-gradient-to-r from-primary/10 to-primary/[0.04] p-3"
+          style={{ borderLeftWidth: 3, borderLeftColor: "hsl(var(--primary))" }}
+        >
+          <h2 className="mb-2 text-xs font-semibold text-foreground">Acciones urgentes</h2>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <AccionUrgente
+              icon={ClipboardCheck}
+              titulo="Validar lotes"
+              count={lotesPendientesCount}
+              countLabel={
+                lotesPendientesCount === 0
+                  ? "Sin pendientes"
+                  : `${lotesPendientesCount} ${lotesPendientesCount === 1 ? "pendiente" : "pendientes"}`
+              }
+              onClick={() => navigate("/dashboard/lotes/pendientes-validacion")}
+            />
+            <AccionUrgente
+              icon={CreditCard}
+              titulo="Revisar pagos"
+              count={pagosPendientesCount}
+              countLabel={
+                pagosPendientesCount === 0
+                  ? "Sin pendientes"
+                  : `${pagosPendientesCount} ${pagosPendientesCount === 1 ? "transacción" : "transacciones"}`
+              }
+              onClick={() => navigate("/dashboard/pagos")}
+            />
+            <AccionUrgente
+              icon={MessageCircle}
+              titulo="Atender solicitudes"
+              count={solicitudesCount}
+              countLabel={
+                solicitudesCount === 0 ? "Sin pendientes" : `${solicitudesCount} sin asignar`
+              }
+              onClick={() => navigate("/dashboard/solicitudes-contacto")}
+            />
+          </div>
+        </section>
+      )}
 
-
-      {/* Metrics */}
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        {metrics.map((m) => (
-          <Card key={m.label}>
-            <CardContent className="flex items-center gap-3 p-4">
-              <m.icon className={`h-8 w-8 shrink-0 ${m.color}`} />
-              <div>
-                <p className="font-body text-2xl font-bold text-foreground">{m.value}</p>
-                <p className="font-body text-xs text-muted-foreground">{m.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Lotes pendientes — compact approve/reject icons */}
-      <TooltipProvider>
-        {lotesPendientes.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-4">
-              <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-                Lotes pendientes de aprobación
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-body text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-xs text-muted-foreground">
-                      <th className="pb-2">Lote</th>
-                      <th className="pb-2">Ciudad</th>
-                      <th className="pb-2">Área</th>
-                      <th className="pb-2">Fecha</th>
-                      <th className="pb-2 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lotesPendientes.map((l: any) => (
-                      <tr key={l.id} className="border-b border-border last:border-0">
-                        <td className="py-2 text-foreground">{l.nombre_lote}</td>
-                        <td className="py-2 text-muted-foreground">{l.ciudad ?? "—"}</td>
-                        <td className="py-2 text-muted-foreground">
-                          {l.area_total_m2 ? `${Number(l.area_total_m2).toLocaleString("es-CO")} m²` : "—"}
-                        </td>
-                        <td className="py-2 text-xs text-muted-foreground">
-                          {new Date(l.created_at).toLocaleDateString("es-CO")}
-                        </td>
-                        <td className="py-2 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={() => handleAprobar(l.id)}
-                                  className="rounded-md p-1.5 text-success hover:bg-success/10 transition-colors"
-                                >
-                                  <Check className="h-4 w-4" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>Aprobar</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={() => handleRechazar(l.id)}
-                                  className="rounded-md p-1.5 text-destructive hover:bg-destructive/10 transition-colors"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>Rechazar</TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </TooltipProvider>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent leads */}
+      {/* Layout inferior 2 columnas */}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {/* Leads recientes */}
         <Card>
-          <CardContent className="p-4">
-            <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-              Últimos leads
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-body text-sm">
-                <thead>
-                  <tr className="border-b border-border text-xs text-muted-foreground">
-                    <th className="pb-2">Fecha</th>
-                    <th className="pb-2">Nombre</th>
-                    <th className="pb-2">Lote</th>
-                    <th className="pb-2">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((l: any) => (
-                    <tr key={l.id} className="border-b border-border last:border-0">
-                      <td className="py-2 text-xs text-muted-foreground">
-                        {new Date(l.created_at).toLocaleDateString("es-CO")}
-                      </td>
-                      <td className="py-2 text-foreground">{l.nombre}</td>
-                      <td className="py-2 text-muted-foreground">
-                        {l.lotes?.nombre_lote ?? "—"}
-                      </td>
-                      <td className="py-2">
-                        <Badge variant={leadEstadoVariant(l.estado)} className="text-xs">
-                          {l.estado}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                  {leads.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="py-4 text-center text-muted-foreground">
-                        No hay leads aún.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Lotes by status */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-              Lotes por estado
-            </h2>
-            {[
-              { label: "Disponible", count: disponibles, color: "bg-success" },
-              { label: "Reservado", count: reservados, color: "bg-warning" },
-              { label: "Vendido", count: vendidos, color: "bg-muted-foreground" },
-            ].map((s) => (
-              <div key={s.label} className="mb-3">
-                <div className="flex items-center justify-between font-body text-sm">
-                  <span className="text-foreground">{s.label}</span>
-                  <span className="text-muted-foreground">{s.count}</span>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-semibold">Leads recientes</CardTitle>
+            <Link to="/dashboard/leads" className="text-[10px] text-primary hover:underline">
+              Ver todos →
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {leads.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Sin leads recientes.</p>
+            ) : (
+              leads.map((l: any) => (
+                <div
+                  key={l.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border/60 px-2.5 py-1.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-medium text-foreground">{l.nombre ?? "—"}</p>
+                    <p className="truncate text-[10px] text-muted-foreground">
+                      {l.lotes?.nombre_lote ?? "Sin lote"} · {formatoRelativo(l.created_at)}
+                    </p>
+                  </div>
+                  <Badge variant={leadEstadoVariant(l.estado)} className="text-[9px]">
+                    {l.estado}
+                  </Badge>
                 </div>
-                <div className="mt-1 h-2 w-full rounded-full bg-muted">
-                  <div
-                    className={`h-2 rounded-full ${s.color}`}
-                    style={{
-                      width: totalLotes > 0 ? `${(s.count / totalLotes) * 100}%` : "0%",
-                    }}
-                  />
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Actividad de la plataforma */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-semibold">Actividad de la plataforma</CardTitle>
+            <span className="text-[10px] text-muted-foreground">Últimas 24h</span>
+          </CardHeader>
+          <CardContent className="space-y-1.5">
+            {actividad.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Sin actividad en las últimas 24h.</p>
+            ) : (
+              actividad.map((a) => (
+                <div key={a.id} className="flex items-center gap-2 text-xs">
+                  <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${tipoBadgeColor(a.tipo)}`}>
+                    {a.tipo}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-foreground">{a.texto}</span>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">
+                    {formatoRelativo(a.fecha)}
+                  </span>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Diagnósticos recientes — reduced columns */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-              Diagnósticos recientes
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-body text-sm">
-                <thead>
-                  <tr className="border-b border-border text-xs text-muted-foreground">
-                    <th className="pb-2">Fecha</th>
-                    <th className="pb-2">Nombre</th>
-                    <th className="pb-2">Objetivo</th>
-                    <th className="pb-2">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {diagnosticos.map((d: any) => (
-                    <tr key={d.id} className="border-b border-border last:border-0">
-                      <td className="py-2 text-xs text-muted-foreground">
-                        {new Date(d.created_at).toLocaleDateString("es-CO")}
-                      </td>
-                      <td className="py-2 text-foreground">{d.nombre ?? "—"}</td>
-                      <td className="py-2 text-muted-foreground">{d.objetivo ?? "—"}</td>
-                      <td className="py-2">
-                        <Select
-                          value={d.estado ?? "nuevo"}
-                          onValueChange={(val) => handleDiagEstado(d.id, val)}
-                        >
-                          <SelectTrigger className="h-7 w-28 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="nuevo">Nuevo</SelectItem>
-                            <SelectItem value="en_proceso">En proceso</SelectItem>
-                            <SelectItem value="entregado">Entregado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </td>
-                    </tr>
-                  ))}
-                  {diagnosticos.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="py-4 text-center text-muted-foreground">
-                        No hay diagnósticos aún.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Negociaciones activas — clickable rows, no Estado column, no Ver sala button */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-              Negociaciones activas
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-body text-sm">
-                <thead>
-                  <tr className="border-b border-border text-xs text-muted-foreground">
-                    <th className="pb-2">Lote</th>
-                    <th className="pb-2">Fecha inicio</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {negociacionesActivas.map((n: any) => (
-                    <tr
-                      key={n.id}
-                      className="border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => navigate(`/negociacion/${n.id}`)}
-                    >
-                      <td className="py-2 text-foreground">
-                        {(n.lotes as any)?.nombre_lote ?? "Lote"}
-                      </td>
-                      <td className="py-2 text-xs text-muted-foreground">
-                        {new Date(n.created_at).toLocaleDateString("es-CO")}
-                      </td>
-                    </tr>
-                  ))}
-                  {negociacionesActivas.length === 0 && (
-                    <tr>
-                      <td colSpan={2} className="py-4 text-center text-muted-foreground">
-                        No hay negociaciones activas.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
