@@ -408,6 +408,52 @@ const Index = () => {
     },
   ];
 
+  const caracteristicas = [
+    {
+      icon: ShieldCheck,
+      titulo: "Diagnósticos verificados",
+      descripcion: "Cada lote pasa por revisión de expertos jurídicos y técnicos.",
+    },
+    {
+      icon: Lock,
+      titulo: "Información protegida",
+      descripcion: "Acceso bajo NDA. Tus datos no circulan sin tu autorización.",
+    },
+    {
+      icon: CreditCard,
+      titulo: "Pagos seguros",
+      descripcion: "Wompi integrado. PSE, tarjeta, Nequi. Conciliación automática.",
+    },
+    {
+      icon: Cloud,
+      titulo: "Disponible 24/7",
+      descripcion: "Plataforma cloud accesible desde cualquier dispositivo.",
+    },
+  ];
+
+  const faqs = [
+    {
+      pregunta: "¿Cuánto cuesta usar 360Lateral?",
+      respuesta:
+        "Publicar tu lote es gratis. Para desarrolladores ofrecemos suscripción mensual desde $X COP o pago por acceso individual.",
+    },
+    {
+      pregunta: "¿En qué ciudades operan?",
+      respuesta:
+        "Operamos en todo el territorio colombiano. Nuestros expertos hacen diagnósticos jurídicos y técnicos en cualquier municipio del país.",
+    },
+    {
+      pregunta: "¿Qué es un diagnóstico 360°?",
+      respuesta:
+        "Un análisis integral que combina revisión jurídica, técnica y comercial de tu lote para descubrir su mejor destino.",
+    },
+    {
+      pregunta: "¿Cómo protegen mi información?",
+      respuesta:
+        "NDA firmado por todos los desarrolladores antes de ver tu lote. Cumplimos Ley 1581 de protección de datos personales. Solo perfiles verificados pueden acceder a tu información.",
+    },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
