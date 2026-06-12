@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +30,22 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Briefcase, ChevronDown, Wallet, Inbox, Send, Trophy, Coins } from "lucide-react";
+import {
+  Briefcase,
+  ChevronDown,
+  Wallet,
+  Inbox,
+  Send,
+  Trophy,
+  Coins,
+  Clock,
+  MapPin,
+  Check,
+  X,
+  LayoutGrid,
+  List,
+  Filter,
+} from "lucide-react";
 import { useMisOrdenesExperto } from "@/hooks/useMisOrdenesExperto";
 import { useMisPropuestas } from "@/hooks/useMisPropuestas";
 import { useTengoPropuestaEnOrden } from "@/hooks/useTengoPropuestaEnOrden";
@@ -33,7 +56,14 @@ import MiDesempenoPanel from "@/components/ordenes/MiDesempenoPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useResumenExperto } from "@/hooks/experto/useResumenExperto";
 import { MetricaOverview } from "@/components/ui/MetricaOverview";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCOPCompact } from "@/lib/format";
+import {
+  FiltrosOrdenesSticky,
+  defaultFiltrosOrdenes,
+  contarFiltrosActivos,
+  type FiltrosOrdenes,
+} from "@/components/ordenes/FiltrosOrdenesSticky";
 
 const fmtCOP = (n: number) =>
   new Intl.NumberFormat("es-CO", {
@@ -43,6 +73,13 @@ const fmtCOP = (n: number) =>
   }).format(n);
 
 const fmtFecha = (d: string) => new Date(d).toLocaleDateString("es-CO");
+
+const KEY_FILTROS = "experto_filtros_ordenes";
+const KEY_ORDEN = "experto_orden_ordenes";
+const KEY_VISTA = "experto_vista_ordenes";
+
+type OrdenSort = "urgencia" | "precio-asc" | "recientes";
+type VistaOrdenes = "grid" | "lista";
 
 const OrdenDisponibleCard = ({
   orden,
@@ -56,74 +93,301 @@ const OrdenDisponibleCard = ({
   const { data: tengo } = useTengoPropuestaEnOrden(orden.id);
   const fechaLimite = orden.fecha_limite_propuestas ? new Date(orden.fecha_limite_propuestas) : null;
   const diasRest = fechaLimite
-    ? Math.ceil((fechaLimite.getTime() - Date.now()) / (1000 * 3600 * 24))
+    ? Math.ceil((fechaLimite.getTime() - Date.now()) / 86400000)
     : null;
   const cerrada = diasRest !== null && diasRest < 0;
+  const urgente = diasRest !== null && diasRest >= 0 && diasRest <= 3;
   const yaPostulo = tengo && tengo.estado !== "retirada";
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {orden.tipo?.nombre && <Badge variant="secondary">{orden.tipo.nombre}</Badge>}
-          <Badge variant={orden.visibilidad === "publica" ? "default" : "outline"}>
-            {orden.visibilidad === "publica" ? "Pública" : "Invitación"}
-          </Badge>
-          {cerrada && <Badge variant="destructive">Cerrada</Badge>}
-        </div>
-
-        <div>
-          <p className="font-semibold text-foreground">{orden.lote?.nombre_lote ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">
-            {orden.lote?.ciudad ?? "—"}
-            {orden.lote?.barrio ? ` · ${orden.lote.barrio}` : ""}
-          </p>
-        </div>
-
-        {fechaLimite && (
-          <p className="text-xs">
-            Fecha límite: <strong>{fmtFecha(orden.fecha_limite_propuestas)}</strong>
-            {diasRest !== null && (
-              <span className={`ml-2 ${diasRest <= 2 ? "text-destructive" : "text-muted-foreground"}`}>
-                ({diasRest > 0 ? `Vence en ${diasRest} días` : "vencida"})
-              </span>
-            )}
-          </p>
-        )}
-
-        {orden.contrato && (
-          <div className="text-xs text-muted-foreground space-y-0.5">
-            <p>
-              Precio: <strong>{fmtCOP(Number(orden.contrato.precio_min))}</strong> –{" "}
-              <strong>{fmtCOP(Number(orden.contrato.precio_max))}</strong>
-            </p>
-            <p>
-              Plazo: <strong>{orden.contrato.plazo_min_dias}</strong> –{" "}
-              <strong>{orden.contrato.plazo_max_dias}</strong> días
-            </p>
-          </div>
-        )}
-
-        <div className="pt-2">
-          {yaPostulo ? (
-            <div className="flex items-center justify-between gap-2">
-              <Badge variant="outline">Ya postulaste</Badge>
-              <Button size="sm" variant="outline" onClick={onIrAMisPropuestas}>
-                Ver mi propuesta
-              </Button>
-            </div>
-          ) : cerrada ? (
-            <Button size="sm" disabled className="w-full">
-              Cerrada
-            </Button>
-          ) : (
-            <Button size="sm" className="w-full" onClick={() => onPostular(orden)}>
-              Postularme
-            </Button>
+    <div
+      className={`rounded-md border bg-background p-3 transition-shadow hover:shadow-sm ${
+        urgente ? "border-border border-l-[3px] border-l-primary" : "border-border"
+      } ${yaPostulo ? "opacity-90" : ""}`}
+    >
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className="flex flex-wrap gap-1">
+          {orden.tipo?.nombre && (
+            <span className="rounded-full bg-secondary/10 px-2 py-0.5 text-[10px] font-medium text-secondary">
+              {orden.tipo.nombre}
+            </span>
           )}
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              orden.visibilidad === "publica"
+                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+                : "bg-primary/15 text-primary"
+            }`}
+          >
+            {orden.visibilidad === "publica" ? "Pública" : "Invitación"}
+          </span>
         </div>
-      </CardContent>
-    </Card>
+        {diasRest !== null && !cerrada && (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              urgente ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            <Clock className="h-2.5 w-2.5" />
+            {diasRest} {diasRest === 1 ? "día" : "días"}
+          </span>
+        )}
+        {cerrada && (
+          <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold text-destructive">
+            Cerrada
+          </span>
+        )}
+      </div>
+
+      <h3 className="text-sm font-semibold text-foreground">{orden.lote?.nombre_lote ?? "—"}</h3>
+      <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+        <MapPin className="h-2.5 w-2.5" />
+        {[orden.lote?.ciudad, orden.lote?.barrio].filter(Boolean).join(" · ") || "—"}
+      </p>
+
+      {orden.contrato && (
+        <div className="my-3 grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-2.5">
+          <div>
+            <div className="text-[9px] uppercase tracking-wide text-muted-foreground">Precio</div>
+            <div className="text-xs font-semibold text-foreground">
+              {formatCOPCompact(Number(orden.contrato.precio_min))} –{" "}
+              {formatCOPCompact(Number(orden.contrato.precio_max))}
+            </div>
+          </div>
+          <div className="border-l border-border pl-2.5">
+            <div className="text-[9px] uppercase tracking-wide text-muted-foreground">Plazo</div>
+            <div className="text-xs font-semibold text-foreground">
+              {orden.contrato.plazo_min_dias}–{orden.contrato.plazo_max_dias} días
+            </div>
+          </div>
+        </div>
+      )}
+
+      {yaPostulo ? (
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <Check className="h-2.5 w-2.5" />
+            Ya postulaste
+          </span>
+          <Button size="sm" variant="outline" onClick={onIrAMisPropuestas} className="h-7 text-[11px]">
+            Ver propuesta →
+          </Button>
+        </div>
+      ) : cerrada ? (
+        <Button size="sm" disabled className="w-full h-7 text-[11px]">
+          Cerrada
+        </Button>
+      ) : (
+        <Button size="sm" onClick={() => onPostular(orden)} className="w-full h-7 text-[11px]">
+          Postularme →
+        </Button>
+      )}
+    </div>
+  );
+};
+
+const OrdenFila = ({
+  orden,
+  onPostular,
+  onIrAMisPropuestas,
+}: {
+  orden: any;
+  onPostular: (o: any) => void;
+  onIrAMisPropuestas: () => void;
+}) => {
+  const { data: tengo } = useTengoPropuestaEnOrden(orden.id);
+  const fechaLimite = orden.fecha_limite_propuestas ? new Date(orden.fecha_limite_propuestas) : null;
+  const diasRest = fechaLimite
+    ? Math.ceil((fechaLimite.getTime() - Date.now()) / 86400000)
+    : null;
+  const cerrada = diasRest !== null && diasRest < 0;
+  const urgente = diasRest !== null && diasRest >= 0 && diasRest <= 3;
+  const yaPostulo = tengo && tengo.estado !== "retirada";
+
+  return (
+    <tr className={urgente ? "border-l-[3px] border-l-primary" : ""}>
+      <td className="px-3 py-2">
+        <div className="font-medium text-foreground text-xs">{orden.lote?.nombre_lote ?? "—"}</div>
+        <div className="text-[10px] text-muted-foreground">
+          {[orden.lote?.ciudad, orden.lote?.barrio].filter(Boolean).join(" · ") || "—"}
+        </div>
+      </td>
+      <td className="px-3 py-2 text-xs">{orden.tipo?.nombre ?? "—"}</td>
+      <td className="px-3 py-2 text-xs capitalize">{orden.visibilidad}</td>
+      <td className="px-3 py-2 text-right text-xs">
+        {orden.contrato
+          ? `${formatCOPCompact(Number(orden.contrato.precio_min))} – ${formatCOPCompact(Number(orden.contrato.precio_max))}`
+          : "—"}
+      </td>
+      <td className="px-3 py-2 text-right text-xs">
+        {orden.contrato ? `${orden.contrato.plazo_min_dias}–${orden.contrato.plazo_max_dias}d` : "—"}
+      </td>
+      <td className="px-3 py-2 text-right text-xs">
+        {cerrada ? (
+          <span className="text-destructive">Cerrada</span>
+        ) : diasRest !== null ? (
+          <span className={urgente ? "font-semibold text-primary" : "text-foreground"}>{diasRest}d</span>
+        ) : (
+          "—"
+        )}
+      </td>
+      <td className="px-3 py-2 text-right">
+        {yaPostulo ? (
+          <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={onIrAMisPropuestas}>
+            Ver
+          </Button>
+        ) : cerrada ? (
+          <Button size="sm" disabled className="h-7 text-[11px]">
+            —
+          </Button>
+        ) : (
+          <Button size="sm" className="h-7 text-[11px]" onClick={() => onPostular(orden)}>
+            Postular
+          </Button>
+        )}
+      </td>
+    </tr>
+  );
+};
+
+const OrdenesListaCompacta = ({
+  ordenes,
+  onPostular,
+  onIrAMisPropuestas,
+}: {
+  ordenes: any[];
+  onPostular: (o: any) => void;
+  onIrAMisPropuestas: () => void;
+}) => (
+  <div className="overflow-x-auto rounded-md border border-border">
+    <table className="w-full text-sm">
+      <thead className="bg-muted/50 text-[10px] uppercase tracking-wide text-muted-foreground">
+        <tr>
+          <th className="px-3 py-2 text-left">Lote</th>
+          <th className="px-3 py-2 text-left">Tipo</th>
+          <th className="px-3 py-2 text-left">Visibilidad</th>
+          <th className="px-3 py-2 text-right">Precio</th>
+          <th className="px-3 py-2 text-right">Plazo</th>
+          <th className="px-3 py-2 text-right">Días</th>
+          <th className="px-3 py-2"></th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-border bg-background">
+        {ordenes.map((o) => (
+          <OrdenFila key={o.id} orden={o} onPostular={onPostular} onIrAMisPropuestas={onIrAMisPropuestas} />
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const HeaderResultadosOrdenes = ({
+  total,
+  filtros,
+  setFiltros,
+  orden,
+  onOrdenChange,
+  vista,
+  onVistaChange,
+  tiposDisponibles,
+}: {
+  total: number;
+  filtros: FiltrosOrdenes;
+  setFiltros: (f: FiltrosOrdenes) => void;
+  orden: OrdenSort;
+  onOrdenChange: (o: OrdenSort) => void;
+  vista: VistaOrdenes;
+  onVistaChange: (v: VistaOrdenes) => void;
+  tiposDisponibles: { id: string; nombre: string; count: number }[];
+}) => {
+  const filtrosActivos: { key: string; label: string; onRemove: () => void }[] = [];
+  filtros.tipos.forEach((id) => {
+    const t = tiposDisponibles.find((x) => x.id === id);
+    if (t)
+      filtrosActivos.push({
+        key: `tipo-${id}`,
+        label: t.nombre,
+        onRemove: () => setFiltros({ ...filtros, tipos: filtros.tipos.filter((x) => x !== id) }),
+      });
+  });
+  if (filtros.visibilidad !== "todas") {
+    filtrosActivos.push({
+      key: "vis",
+      label: filtros.visibilidad === "publica" ? "Públicas" : "Por invitación",
+      onRemove: () => setFiltros({ ...filtros, visibilidad: "todas" }),
+    });
+  }
+  if (filtros.diasMaximo < 30) {
+    filtrosActivos.push({
+      key: "dias",
+      label: `≤ ${filtros.diasMaximo} días`,
+      onRemove: () => setFiltros({ ...filtros, diasMaximo: 30 }),
+    });
+  }
+  if (filtros.precioMinimo > 0) {
+    filtrosActivos.push({
+      key: "precio",
+      label: `≥ ${formatCOPCompact(filtros.precioMinimo)}`,
+      onRemove: () => setFiltros({ ...filtros, precioMinimo: 0 }),
+    });
+  }
+
+  return (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-background px-3 py-2">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">{total} órdenes</span>
+        {filtrosActivos.map((f) => (
+          <span
+            key={f.key}
+            className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary"
+          >
+            {f.label}
+            <button
+              type="button"
+              onClick={f.onRemove}
+              aria-label={`Quitar filtro ${f.label}`}
+              className="hover:text-primary/70"
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Select value={orden} onValueChange={(v) => onOrdenChange(v as OrdenSort)}>
+          <SelectTrigger className="h-7 w-auto text-[11px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="urgencia">Por urgencia</SelectItem>
+            <SelectItem value="precio-asc">Precio ascendente</SelectItem>
+            <SelectItem value="recientes">Recientes</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex overflow-hidden rounded-md border border-border">
+          <button
+            type="button"
+            onClick={() => onVistaChange("grid")}
+            className={`p-1.5 transition-colors ${
+              vista === "grid" ? "bg-secondary text-secondary-foreground" : "bg-background text-muted-foreground"
+            }`}
+            aria-label="Vista grid"
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onVistaChange("lista")}
+            className={`p-1.5 transition-colors ${
+              vista === "lista" ? "bg-secondary text-secondary-foreground" : "bg-background text-muted-foreground"
+            }`}
+            aria-label="Vista lista"
+          >
+            <List className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -182,7 +446,9 @@ const PropuestaItem = ({ propuesta }: { propuesta: any }) => {
           <Collapsible open={openMsg} onOpenChange={setOpenMsg}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                <ChevronDown className={`h-3 w-3 mr-1 transition-transform ${openMsg ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`h-3 w-3 mr-1 transition-transform ${openMsg ? "rotate-180" : ""}`}
+                />
                 {openMsg ? "Ocultar mensaje" : "Ver mensaje"}
               </Button>
             </CollapsibleTrigger>
@@ -317,6 +583,96 @@ const DashboardMisOrdenes = () => {
     user?.email?.split("@")[0] ??
     "Experto";
 
+  // Persisted state
+  const [filtros, setFiltros] = useState<FiltrosOrdenes>(() => {
+    try {
+      const raw = localStorage.getItem(KEY_FILTROS);
+      if (raw) return { ...defaultFiltrosOrdenes, ...JSON.parse(raw) };
+    } catch {}
+    return defaultFiltrosOrdenes;
+  });
+  const [orden, setOrden] = useState<OrdenSort>(() => {
+    try {
+      return (localStorage.getItem(KEY_ORDEN) as OrdenSort) || "urgencia";
+    } catch {
+      return "urgencia";
+    }
+  });
+  const [vista, setVista] = useState<VistaOrdenes>(() => {
+    try {
+      return (localStorage.getItem(KEY_VISTA) as VistaOrdenes) || "grid";
+    } catch {
+      return "grid";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_FILTROS, JSON.stringify(filtros));
+    } catch {}
+  }, [filtros]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_ORDEN, orden);
+    } catch {}
+  }, [orden]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(KEY_VISTA, vista);
+    } catch {}
+  }, [vista]);
+
+  // Tipos disponibles: derivar de las órdenes (keyed por nombre, ya que el hook no trae id)
+  const tiposDisponibles = useMemo(() => {
+    const map = new Map<string, { id: string; nombre: string; count: number }>();
+    (ordenes as any[]).forEach((o) => {
+      const nombre = o.tipo?.nombre;
+      if (!nombre) return;
+      const prev = map.get(nombre);
+      if (prev) prev.count += 1;
+      else map.set(nombre, { id: nombre, nombre, count: 1 });
+    });
+    return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [ordenes]);
+
+  const ordenesFiltradasYOrdenadas = useMemo(() => {
+    const filtradas = (ordenes as any[]).filter((o) => {
+      if (filtros.tipos.length > 0 && !filtros.tipos.includes(o.tipo?.nombre)) return false;
+      if (filtros.visibilidad !== "todas" && o.visibilidad !== filtros.visibilidad) return false;
+      if (o.fecha_limite_propuestas) {
+        const d = Math.ceil(
+          (new Date(o.fecha_limite_propuestas).getTime() - Date.now()) / 86400000
+        );
+        if (d > filtros.diasMaximo) return false;
+      }
+      if (
+        filtros.precioMinimo > 0 &&
+        Number(o.contrato?.precio_max ?? 0) < filtros.precioMinimo
+      )
+        return false;
+      return true;
+    });
+
+    filtradas.sort((a, b) => {
+      if (orden === "urgencia") {
+        const da = a.fecha_limite_propuestas
+          ? new Date(a.fecha_limite_propuestas).getTime()
+          : Infinity;
+        const db = b.fecha_limite_propuestas
+          ? new Date(b.fecha_limite_propuestas).getTime()
+          : Infinity;
+        return da - db;
+      }
+      if (orden === "precio-asc")
+        return Number(a.contrato?.precio_min ?? 0) - Number(b.contrato?.precio_min ?? 0);
+      if (orden === "recientes")
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return 0;
+    });
+
+    return filtradas;
+  }, [ordenes, filtros, orden]);
+
   const kpiLiqs = liquidaciones.reduce(
     (acc: { total: number; pendiente: number; pagado: number; pendCount: number }, l: any) => {
       const neto = Number(l.monto_neto) || 0;
@@ -330,6 +686,65 @@ const DashboardMisOrdenes = () => {
     },
     { total: 0, pendiente: 0, pagado: 0, pendCount: 0 }
   );
+
+  const numFiltrosActivos = contarFiltrosActivos(filtros);
+
+  const renderListado = () => {
+    if (loadingOrdenes) {
+      return (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-56 w-full" />
+          ))}
+        </div>
+      );
+    }
+    if ((ordenes as any[]).length === 0) {
+      return (
+        <Card>
+          <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
+            <Briefcase className="h-10 w-10" />
+            <p>No hay órdenes disponibles en este momento.</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    if (ordenesFiltradasYOrdenadas.length === 0) {
+      return (
+        <EmptyState
+          icon={Briefcase}
+          title="No hay órdenes que coincidan con tus filtros"
+          description="Ajusta los filtros o vuelve más tarde para ver nuevas órdenes."
+          action={
+            <Button size="sm" variant="outline" onClick={() => setFiltros(defaultFiltrosOrdenes)}>
+              Limpiar filtros
+            </Button>
+          }
+        />
+      );
+    }
+    if (vista === "grid") {
+      return (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {ordenesFiltradasYOrdenadas.map((o: any) => (
+            <OrdenDisponibleCard
+              key={o.id}
+              orden={o}
+              onPostular={setPostularOrden}
+              onIrAMisPropuestas={() => setTab("mis-propuestas")}
+            />
+          ))}
+        </div>
+      );
+    }
+    return (
+      <OrdenesListaCompacta
+        ordenes={ordenesFiltradasYOrdenadas}
+        onPostular={setPostularOrden}
+        onIrAMisPropuestas={() => setTab("mis-propuestas")}
+      />
+    );
+  };
 
   return (
     <DashboardLayout>
@@ -382,16 +797,16 @@ const DashboardMisOrdenes = () => {
           <TabsList>
             <TabsTrigger value="disponibles">
               Órdenes disponibles
-              {ordenes.length > 0 && (
-                <span className="ml-2 rounded-full bg-primary/15 px-1.5 text-xs">
-                  {ordenes.length}
+              {(ordenes as any[]).length > 0 && (
+                <span className="ml-1.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                  {(ordenes as any[]).length}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger value="mis-propuestas">
               Mis propuestas
               {propuestas.length > 0 && (
-                <span className="ml-2 rounded-full bg-primary/15 px-1.5 text-xs">
+                <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
                   {propuestas.length}
                 </span>
               )}
@@ -400,7 +815,7 @@ const DashboardMisOrdenes = () => {
             <TabsTrigger value="mis-pagos">
               Mis pagos
               {kpiLiqs.pendCount > 0 && (
-                <span className="ml-2 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 px-1.5 text-xs">
+                <span className="ml-1.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 text-[10px] font-bold">
                   {kpiLiqs.pendCount}
                 </span>
               )}
@@ -408,31 +823,48 @@ const DashboardMisOrdenes = () => {
           </TabsList>
 
           <TabsContent value="disponibles" className="mt-4">
-            {loadingOrdenes ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-56 w-full" />
-                ))}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
+              <div className="hidden lg:block">
+                <FiltrosOrdenesSticky
+                  filtros={filtros}
+                  onChange={setFiltros}
+                  tiposDisponibles={tiposDisponibles}
+                />
               </div>
-            ) : ordenes.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-                  <Briefcase className="h-10 w-10" />
-                  <p>No hay órdenes disponibles en este momento.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {ordenes.map((o: any) => (
-                  <OrdenDisponibleCard
-                    key={o.id}
-                    orden={o}
-                    onPostular={setPostularOrden}
-                    onIrAMisPropuestas={() => setTab("mis-propuestas")}
-                  />
-                ))}
+              <div className="lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filtros{numFiltrosActivos > 0 ? ` (${numFiltrosActivos})` : ""}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80 overflow-y-auto">
+                    <div className="mt-6">
+                      <FiltrosOrdenesSticky
+                        filtros={filtros}
+                        onChange={setFiltros}
+                        tiposDisponibles={tiposDisponibles}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
-            )}
+
+              <div>
+                <HeaderResultadosOrdenes
+                  total={ordenesFiltradasYOrdenadas.length}
+                  filtros={filtros}
+                  setFiltros={setFiltros}
+                  orden={orden}
+                  onOrdenChange={setOrden}
+                  vista={vista}
+                  onVistaChange={setVista}
+                  tiposDisponibles={tiposDisponibles}
+                />
+                {renderListado()}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="mis-propuestas" className="mt-4">
