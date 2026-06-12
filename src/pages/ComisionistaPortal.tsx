@@ -333,8 +333,8 @@ export default function ComisionistaPortal() {
             ) : (comisiones as any[]).length === 0 ? (
               <EmptyState
                 icon={Wallet}
-                title="Aún no tienes comisiones"
-                description="Se generan automáticamente al cerrar la venta de un lote que representas."
+                titulo="Aún no tienes comisiones registradas"
+                descripcion="Cuando uno de tus lotes representados se venda, las comisiones aparecerán aquí."
               />
             ) : (
               <Card className="overflow-hidden">
