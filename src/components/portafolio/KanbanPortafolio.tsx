@@ -253,12 +253,16 @@ const KanbanColumna = ({
   isDropTarget,
   isValidTarget,
   onOpen,
+  isAdmin,
+  mostrarCerrados,
 }: {
   col: (typeof COLUMNAS)[number];
   items: PortafolioVistaFila[];
   isDropTarget: boolean;
   isValidTarget: boolean | null;
   onOpen: (id: string) => void;
+  isAdmin: boolean;
+  mostrarCerrados: boolean;
 }) => {
   const { setNodeRef } = useDroppable({
     id: col.key,
@@ -272,6 +276,9 @@ const KanbanColumna = ({
         ? "ring-2 ring-destructive"
         : "";
 
+  const esTerminal = col.key === "cerrado" || col.key === "cancelado";
+  const ocultarCards = esTerminal && !mostrarCerrados;
+
   return (
     <div
       ref={setNodeRef}
@@ -282,19 +289,29 @@ const KanbanColumna = ({
           {col.label}
         </span>
         <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-          {items.length}
+          {ocultarCards ? 0 : items.length}
         </Badge>
       </div>
       <div className="space-y-2 max-h-[calc(100vh-360px)] overflow-y-auto pr-1">
-        {items.map((f) => (
-          <KanbanCard key={f.engagement_id} fila={f} onOpen={onOpen} />
-        ))}
-        {items.length === 0 && (
+        {ocultarCards ? (
+          <div className="rounded-md border border-dashed border-border/60 p-3 text-center text-[11px] text-muted-foreground">
+            Ocultos. Activa "Mostrar cerrados" para ver.
+          </div>
+        ) : items.length === 0 ? (
           <div className="rounded-md border border-dashed border-border/60 p-3 text-center text-[11px] text-muted-foreground">
             Sin engagements
           </div>
+        ) : (
+          items.map((f) => (
+            <KanbanCard
+              key={f.engagement_id}
+              fila={f}
+              onOpen={onOpen}
+              isAdmin={isAdmin}
+            />
+          ))
         )}
-        {items.length > 50 && (
+        {!ocultarCards && items.length > 50 && (
           <p className="text-[10px] text-warning px-1">
             {items.length} items — considera filtrar
           </p>
