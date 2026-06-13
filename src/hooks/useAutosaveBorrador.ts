@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 interface Options {
-  /** Clave única en localStorage. Ej: "borrador_lote_nuevo" o "borrador_lote_<id>" */
   storageKey: string;
-  /** Datos actuales del form a guardar */
   data: Record<string, any>;
-  /** Si false, no autoguarda (útil cuando el form aún no está "sucio") */
   enabled?: boolean;
-  /** ms de debounce. Default 3000. */
+  /** ms de debounce. Default 1000 (era 3000 antes, demasiado alto). */
   debounceMs?: number;
 }
 
@@ -20,30 +17,49 @@ export const useAutosaveBorrador = ({
   storageKey,
   data,
   enabled = true,
-  debounceMs = 3000,
+  debounceMs = 1000,
 }: Options) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dataRef = useRef(data);
+  const enabledRef = useRef(enabled);
+  const storageKeyRef = useRef(storageKey);
   const [ultimoGuardado, setUltimoGuardado] = useState<Date | null>(null);
+
+  // Mantener refs actualizadas sin disparar el effect principal
+  useEffect(() => {
+    dataRef.current = data;
+    enabledRef.current = enabled;
+    storageKeyRef.current = storageKey;
+  }, [data, enabled, storageKey]);
+
+  const guardar = useCallback(() => {
+    try {
+      localStorage.setItem(
+        storageKeyRef.current,
+        JSON.stringify({ data: dataRef.current, guardadoEn: new Date().toISOString() }),
+      );
+      setUltimoGuardado(new Date());
+    } catch (e) {
+      console.warn("Error guardando borrador:", e);
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      try {
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({ data, guardadoEn: new Date().toISOString() }),
-        );
-        setUltimoGuardado(new Date());
-      } catch (e) {
-        console.warn("Error guardando borrador en localStorage:", e);
-      }
-    }, debounceMs);
+    timeoutRef.current = setTimeout(guardar, debounceMs);
 
+    // CLEANUP: si había un timer pendiente, FORZAR el guardado en lugar de
+    // cancelarlo silenciosamente. Evita pérdida de datos al desmontar.
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        if (enabledRef.current) {
+          guardar();
+        }
+      }
     };
-  }, [data, storageKey, enabled, debounceMs]);
+  }, [data, storageKey, enabled, debounceMs, guardar]);
 
   const cargarBorrador = useCallback((): BorradorGuardado | null => {
     try {
@@ -64,5 +80,10 @@ export const useAutosaveBorrador = ({
     }
   }, [storageKey]);
 
-  return { ultimoGuardado, cargarBorrador, borrarBorrador };
+  const guardarAhora = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    guardar();
+  }, [guardar]);
+
+  return { ultimoGuardado, cargarBorrador, borrarBorrador, guardarAhora };
 };

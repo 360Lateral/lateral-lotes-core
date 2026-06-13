@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
-import { useAdvertenciaSalirSinGuardar } from "@/hooks/useAdvertenciaSalirSinGuardar";
+import { useBloqueoNavegacionSPA } from "@/hooks/useBloqueoNavegacionSPA";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useAuth } from "@/contexts/AuthContext";
@@ -122,10 +122,11 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [borradorPendiente, setBorradorPendiente] = useState<{ data: Record<string, any>; guardadoEn: string } | null>(null);
   const initialFormRef = useRef<LoteForm>(emptyForm);
 
-  const { ultimoGuardado, cargarBorrador, borrarBorrador } = useAutosaveBorrador({
+  const { ultimoGuardado, cargarBorrador, borrarBorrador, guardarAhora } = useAutosaveBorrador({
     storageKey,
     data: form as unknown as Record<string, any>,
     enabled: yaInicializado,
+    debounceMs: 1000,
   });
 
   // Verificar borrador existente al montar
@@ -144,7 +145,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     () => yaInicializado && JSON.stringify(form) !== JSON.stringify(initialFormRef.current),
     [form, yaInicializado],
   );
-  useAdvertenciaSalirSinGuardar(hayCambiosSinGuardar);
+
+  useBloqueoNavegacionSPA({
+    hayCambiosSinGuardar,
+    onSalirSinGuardar: () => {
+      if (yaInicializado) guardarAhora();
+    },
+    mensaje:
+      "Tienes cambios sin guardar en el lote. Si sales ahora, tu borrador se guardará automáticamente para recuperarlo después. ¿Continuar?",
+  });
 
 
 
@@ -815,10 +824,20 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           <Button type="button" variant="outline" size="lg" onClick={() => navigate("/dashboard/lotes")}>
             Cancelar
           </Button>
-          {ultimoGuardado && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Borrador guardado {formatRelativeDate(ultimoGuardado)}
-            </span>
+          {yaInicializado && (
+            <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+              {hayCambiosSinGuardar && !ultimoGuardado ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Guardando borrador…</span>
+                </>
+              ) : ultimoGuardado ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Borrador guardado {formatRelativeDate(ultimoGuardado)}</span>
+                </>
+              ) : null}
+            </div>
           )}
         </div>
       </form>
