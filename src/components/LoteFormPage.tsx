@@ -122,10 +122,11 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const [borradorPendiente, setBorradorPendiente] = useState<{ data: Record<string, any>; guardadoEn: string } | null>(null);
   const initialFormRef = useRef<LoteForm>(emptyForm);
 
-  const { ultimoGuardado, cargarBorrador, borrarBorrador } = useAutosaveBorrador({
+  const { ultimoGuardado, cargarBorrador, borrarBorrador, guardarAhora } = useAutosaveBorrador({
     storageKey,
     data: form as unknown as Record<string, any>,
     enabled: yaInicializado,
+    debounceMs: 1000,
   });
 
   // Verificar borrador existente al montar
@@ -144,7 +145,15 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
     () => yaInicializado && JSON.stringify(form) !== JSON.stringify(initialFormRef.current),
     [form, yaInicializado],
   );
-  useAdvertenciaSalirSinGuardar(hayCambiosSinGuardar);
+
+  useBloqueoNavegacionSPA({
+    hayCambiosSinGuardar,
+    onSalirSinGuardar: () => {
+      if (yaInicializado) guardarAhora();
+    },
+    mensaje:
+      "Tienes cambios sin guardar en el lote. Si sales ahora, tu borrador se guardará automáticamente para recuperarlo después. ¿Continuar?",
+  });
 
 
 
