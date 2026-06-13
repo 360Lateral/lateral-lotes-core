@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
-import { useAdvertenciaSalirSinGuardar } from "@/hooks/useAdvertenciaSalirSinGuardar";
+import { useBloqueoNavegacionSPA } from "@/hooks/useBloqueoNavegacionSPA";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { useAuth } from "@/contexts/AuthContext";
