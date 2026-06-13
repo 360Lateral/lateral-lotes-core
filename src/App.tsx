@@ -134,7 +134,7 @@ const App = () => (
             <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute requireAdmin><DashboardSolicitudesContacto /></ProtectedRoute>} />
             <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute requireAdmin><DashboardAcuerdosFirmados /></ProtectedRoute>} />
             <Route path="/dashboard/feedback" element={<ProtectedRoute requireAdmin><DashboardFeedback /></ProtectedRoute>} />
-            <Route path="/feedback/mis-tickets" element={<ProtectedRoute allowPropietario allowComisionista><MisFeedback /></ProtectedRoute>} />
+            <Route path="/feedback/mis-tickets" element={<MisFeedback />} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
