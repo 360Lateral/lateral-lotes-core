@@ -2151,6 +2151,145 @@ export type Database = {
           },
         ]
       }
+      feedback_comentarios: {
+        Row: {
+          autor_id: string
+          created_at: string
+          id: string
+          mensaje: string
+          ticket_id: string
+          visible_para_usuario: boolean
+        }
+        Insert: {
+          autor_id: string
+          created_at?: string
+          id?: string
+          mensaje: string
+          ticket_id: string
+          visible_para_usuario?: boolean
+        }
+        Update: {
+          autor_id?: string
+          created_at?: string
+          id?: string
+          mensaje?: string
+          ticket_id?: string
+          visible_para_usuario?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_comentarios_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_comentarios_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "feedback_comentarios_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback_tickets: {
+        Row: {
+          asignado_a: string | null
+          created_at: string
+          descripcion: string
+          duplicado_de: string | null
+          estado: Database["public"]["Enums"]["feedback_estado"]
+          id: string
+          info_tecnica: Json | null
+          razon_descarte: string | null
+          resuelto_en: string | null
+          severidad: Database["public"]["Enums"]["feedback_severidad"]
+          tipo: Database["public"]["Enums"]["feedback_tipo"]
+          titulo: string
+          updated_at: string
+          url_origen: string | null
+          usuario_id: string
+        }
+        Insert: {
+          asignado_a?: string | null
+          created_at?: string
+          descripcion: string
+          duplicado_de?: string | null
+          estado?: Database["public"]["Enums"]["feedback_estado"]
+          id?: string
+          info_tecnica?: Json | null
+          razon_descarte?: string | null
+          resuelto_en?: string | null
+          severidad?: Database["public"]["Enums"]["feedback_severidad"]
+          tipo?: Database["public"]["Enums"]["feedback_tipo"]
+          titulo: string
+          updated_at?: string
+          url_origen?: string | null
+          usuario_id: string
+        }
+        Update: {
+          asignado_a?: string | null
+          created_at?: string
+          descripcion?: string
+          duplicado_de?: string | null
+          estado?: Database["public"]["Enums"]["feedback_estado"]
+          id?: string
+          info_tecnica?: Json | null
+          razon_descarte?: string | null
+          resuelto_en?: string | null
+          severidad?: Database["public"]["Enums"]["feedback_severidad"]
+          tipo?: Database["public"]["Enums"]["feedback_tipo"]
+          titulo?: string
+          updated_at?: string
+          url_origen?: string | null
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_tickets_asignado_a_fkey"
+            columns: ["asignado_a"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_tickets_asignado_a_fkey"
+            columns: ["asignado_a"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+          {
+            foreignKeyName: "feedback_tickets_duplicado_de_fkey"
+            columns: ["duplicado_de"]
+            isOneToOne: false
+            referencedRelation: "feedback_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_tickets_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_tickets_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_metricas_experto"
+            referencedColumns: ["experto_id"]
+          },
+        ]
+      }
       fotos_lotes: {
         Row: {
           created_at: string
@@ -5265,6 +5404,16 @@ export type Database = {
         | "expirada"
         | "reembolsada"
         | "error"
+      feedback_estado:
+        | "nuevo"
+        | "en_revision"
+        | "planificado"
+        | "en_progreso"
+        | "resuelto"
+        | "descartado"
+        | "duplicado"
+      feedback_severidad: "baja" | "media" | "alta" | "critica"
+      feedback_tipo: "bug" | "mejora" | "pregunta" | "ux" | "otro"
       nivel_notificacion: "amarillo" | "rojo"
       nivel_suscripcion: "gratuito" | "basico" | "profesional" | "premium"
       tipo_entregable:
@@ -5481,6 +5630,17 @@ export const Constants = {
         "reembolsada",
         "error",
       ],
+      feedback_estado: [
+        "nuevo",
+        "en_revision",
+        "planificado",
+        "en_progreso",
+        "resuelto",
+        "descartado",
+        "duplicado",
+      ],
+      feedback_severidad: ["baja", "media", "alta", "critica"],
+      feedback_tipo: ["bug", "mejora", "pregunta", "ux", "otro"],
       nivel_notificacion: ["amarillo", "rojo"],
       nivel_suscripcion: ["gratuito", "basico", "profesional", "premium"],
       tipo_entregable: [
