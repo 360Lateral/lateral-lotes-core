@@ -22,8 +22,11 @@ import { formatRelativeDate } from "@/lib/formatRelativeDate";
 import { cn } from "@/lib/utils";
 
 const MisFeedback = () => {
+  const { user, loading } = useAuth();
   const { data: tickets = [], isLoading } = useMisFeedback();
   const [detalleId, setDetalleId] = useState<string | null>(null);
+
+  if (!loading && !user) return <Navigate to="/login" replace />;
 
   const stats = useMemo(() => {
     const total = tickets.length;
