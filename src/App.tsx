@@ -74,6 +74,9 @@ const MiCuentaDesarrollador = lazy(() => import("./pages/MiCuentaDesarrollador")
 const DashboardSuscripciones = lazy(() => import("./pages/DashboardSuscripciones"));
 const DashboardConfigSuscripciones = lazy(() => import("./pages/DashboardConfigSuscripciones"));
 const DashboardAcuerdosFirmados = lazy(() => import("./pages/DashboardAcuerdosFirmados"));
+const DashboardFeedback = lazy(() => import("./pages/DashboardFeedback"));
+const MisFeedback = lazy(() => import("./pages/MisFeedback"));
+import FeedbackWidget from "@/components/feedback/FeedbackWidget";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -101,6 +104,7 @@ const App = () => (
           <BrowserRouter>
             <DevRoleBanner />
             <HomeButton />
+            <FeedbackWidget />
             <Suspense fallback={<PageLoadingFallback />}>
             <Routes>
             {/* Rutas públicas */}
@@ -129,6 +133,8 @@ const App = () => (
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute requireAdmin><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
             <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute requireAdmin><DashboardSolicitudesContacto /></ProtectedRoute>} />
             <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute requireAdmin><DashboardAcuerdosFirmados /></ProtectedRoute>} />
+            <Route path="/dashboard/feedback" element={<ProtectedRoute requireAdmin><DashboardFeedback /></ProtectedRoute>} />
+            <Route path="/feedback/mis-tickets" element={<MisFeedback />} />
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
