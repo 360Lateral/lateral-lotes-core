@@ -824,10 +824,20 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
           <Button type="button" variant="outline" size="lg" onClick={() => navigate("/dashboard/lotes")}>
             Cancelar
           </Button>
-          {ultimoGuardado && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Borrador guardado {formatRelativeDate(ultimoGuardado)}
-            </span>
+          {yaInicializado && (
+            <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+              {hayCambiosSinGuardar && !ultimoGuardado ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Guardando borrador…</span>
+                </>
+              ) : ultimoGuardado ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Borrador guardado {formatRelativeDate(ultimoGuardado)}</span>
+                </>
+              ) : null}
+            </div>
           )}
         </div>
       </form>
