@@ -74,6 +74,9 @@ const MiCuentaDesarrollador = lazy(() => import("./pages/MiCuentaDesarrollador")
 const DashboardSuscripciones = lazy(() => import("./pages/DashboardSuscripciones"));
 const DashboardConfigSuscripciones = lazy(() => import("./pages/DashboardConfigSuscripciones"));
 const DashboardAcuerdosFirmados = lazy(() => import("./pages/DashboardAcuerdosFirmados"));
+const DashboardFeedback = lazy(() => import("./pages/DashboardFeedback"));
+const MisFeedback = lazy(() => import("./pages/MisFeedback"));
+import FeedbackWidget from "@/components/feedback/FeedbackWidget";
 
 const queryClient = new QueryClient({
   defaultOptions: {
