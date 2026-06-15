@@ -316,16 +316,48 @@ const DashboardLoteAnalisis = () => {
         </div>
       </div>
 
+      {/* Banner vínculo con engagement */}
+      {engagementVigente && (
+        <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 p-3">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p className="text-xs text-foreground">
+            Este lote tiene un engagement activo{" "}
+            <Link
+              to={`/dashboard/engagements/${engagementVigente.id}`}
+              className="font-semibold text-primary hover:underline"
+            >
+              #{engagementVigente.id.slice(0, 8)}
+            </Link>
+            . Los cambios aquí actualizan el progreso del engagement
+            automáticamente.
+          </p>
+        </div>
+      )}
+
+      {/* Vista unificada (mismas cards que en EngagementDetalle) */}
+      {dimensiones && dimensiones.length > 0 && (
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {dimensiones.map((d) => (
+            <AnalisisCard
+              key={d.tipo_codigo}
+              dimension={d}
+              onEditar={() => scrollToSection(d.tipo_codigo)}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
-        <NormativaSection loteId={id!} lat={lote?.lat} lng={lote?.lng} pdfProps={makePdfProps("normativo")} />
-        <JuridicoSection loteId={id!} pdfProps={makePdfProps("juridico")} />
-        <AmbientalSection loteId={id!} pdfProps={makePdfProps("ambiental")} />
-        <SSPPSection loteId={id!} pdfProps={makePdfProps("sspp")} />
-        <SuelosSection loteId={id!} pdfProps={makePdfProps("geotecnico")} />
-        <MercadoSection loteId={id!} pdfProps={makePdfProps("mercado")} />
-        <ArquitectonicoSection loteId={id!} pdfProps={makePdfProps("arquitectonico")} />
-        <FinancieroSection loteId={id!} pdfProps={makePdfProps("financiero")} />
+        <div id="section-normativo"><NormativaSection loteId={id!} lat={lote?.lat} lng={lote?.lng} pdfProps={makePdfProps("normativo")} /></div>
+        <div id="section-juridico"><JuridicoSection loteId={id!} pdfProps={makePdfProps("juridico")} /></div>
+        <div id="section-ambiental"><AmbientalSection loteId={id!} pdfProps={makePdfProps("ambiental")} /></div>
+        <div id="section-sspp"><SSPPSection loteId={id!} pdfProps={makePdfProps("sspp")} /></div>
+        <div id="section-geotecnico"><SuelosSection loteId={id!} pdfProps={makePdfProps("geotecnico")} /></div>
+        <div id="section-mercado"><MercadoSection loteId={id!} pdfProps={makePdfProps("mercado")} /></div>
+        <div id="section-arquitectonico"><ArquitectonicoSection loteId={id!} pdfProps={makePdfProps("arquitectonico")} /></div>
+        <div id="section-financiero"><FinancieroSection loteId={id!} pdfProps={makePdfProps("financiero")} /></div>
       </div>
+
 
       {extractedCount > 0 && (
         <div className="fixed bottom-6 right-6 z-50">
