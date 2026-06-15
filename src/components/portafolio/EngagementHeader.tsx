@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import EstadoEngagementBadge from "./EstadoEngagementBadge";
-import SemaforoSlaBadge from "./SemaforoSlaBadge";
+import { BadgeSla } from "./BadgeSla";
+import type { SlaEstado } from "@/lib/sla-helpers";
 import type { EngagementDetalle } from "@/hooks/useEngagementDetalle";
 
 const PLAN_STYLES: Record<string, string> = {
