@@ -24,6 +24,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import ExcelAnalisisImporter from "@/components/ExcelAnalisisImporter";
 import ExcelAnalisisExporter from "@/components/ExcelAnalisisExporter";
 import MapGISConsulta from "@/components/MapGISConsulta";
+import { AnalisisCard } from "@/components/analisis/AnalisisCard";
+import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
+import { useEngagementVigenteDeLote } from "@/hooks/useEngagementVigenteDeLote";
+import { Link as LinkIcon } from "lucide-react";
 
 /* ─── helpers ──────────────────────────────────── */
 
