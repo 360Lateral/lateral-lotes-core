@@ -51,6 +51,7 @@ import TablaPortafolio from "@/components/portafolio/TablaPortafolio";
 import KanbanPortafolio from "@/components/portafolio/KanbanPortafolio";
 import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { KPIEstado } from "@/components/ui/KPIEstado";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ESTADO_LABEL: Record<string, string> = {
