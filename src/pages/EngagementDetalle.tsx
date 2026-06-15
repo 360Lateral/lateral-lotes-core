@@ -224,22 +224,61 @@ const EngagementDetalle = () => {
 
             <Separator className="my-6" />
 
-            <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
-              Tareas de análisis
-            </h2>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <h2 className="font-display text-lg font-semibold text-foreground">
+                Análisis 360°
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {dimensiones?.filter(
+                  (d) => d.tarea_estado === "aprobado" || d.tarea_estado === "entregado",
+                ).length ?? 0}{" "}
+                de {dimensiones?.length ?? 7} completados
+              </p>
+            </div>
+
+            <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 p-3">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <p className="text-xs text-foreground">
+                Estos análisis son la misma información que aparece en el detalle
+                del lote. Editar aquí actualiza ambas vistas automáticamente.
+              </p>
+            </div>
+
             {loadingTareas ? (
-              <div className="space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-20 w-full" />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-48 w-full" />
                 ))}
               </div>
             ) : (
-              <TareasAnalisisList
-                tareas={tareas ?? []}
-                engagementId={id!}
-                ligadosPorAnalisis={ligadosPorAnalisis}
-                puedeSubir={puedeSubir}
-              />
+              <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {dimensiones?.map((d) => (
+                    <AnalisisCard
+                      key={d.tipo_codigo}
+                      dimension={d}
+                      onEditar={() =>
+                        navigate(
+                          `/dashboard/lotes/${engagement.lote_id}/analisis?tipo=${d.tipo_codigo}`,
+                        )
+                      }
+                    />
+                  ))}
+                </div>
+                <details className="mt-4 group">
+                  <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground select-none">
+                    Ver tareas detalladas y entregables por análisis
+                  </summary>
+                  <div className="mt-3">
+                    <TareasAnalisisList
+                      tareas={tareas ?? []}
+                      engagementId={id!}
+                      ligadosPorAnalisis={ligadosPorAnalisis}
+                      puedeSubir={puedeSubir}
+                    />
+                  </div>
+                </details>
+              </>
             )}
             <p className="mt-6 font-body text-xs text-muted-foreground">
               Cambiar el estado de una tarea actualiza automáticamente el avance del engagement.
