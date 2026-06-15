@@ -19,6 +19,7 @@ import {
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
+import { ChecklistEntrega } from "@/components/portafolio/ChecklistEntrega";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
