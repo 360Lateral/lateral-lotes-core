@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import EstadoEngagementBadge from "./EstadoEngagementBadge";
-import SemaforoSlaBadge from "./SemaforoSlaBadge";
+import { BadgeSla } from "./BadgeSla";
+import type { SlaEstado } from "@/lib/sla-helpers";
 import type { EngagementDetalle } from "@/hooks/useEngagementDetalle";
 
 const PLAN_STYLES: Record<string, string> = {
@@ -32,13 +33,21 @@ const EngagementHeader = ({ engagement }: Props) => {
   const plan = engagement.plan;
   const pct = Number(engagement.avance_pct ?? 0);
 
-  // SLA semáforo simple
-  let semaforo: "verde" | "amarillo" | "rojo" | null = null;
+  // SLA — considera estado entregado para mostrar "Cumplido"
+  let slaEstado: SlaEstado = null;
   let diasSla: number | null = null;
-  if (engagement.fecha_sla_objetivo) {
+  if (engagement.estado === "entregado") {
+    if (engagement.fecha_entrega && engagement.fecha_sla_objetivo) {
+      const entregaMs = new Date(engagement.fecha_entrega).getTime();
+      const objetivoMs = new Date(engagement.fecha_sla_objetivo).getTime();
+      slaEstado = entregaMs <= objetivoMs ? "cumplido_a_tiempo" : "cumplido_con_retraso";
+    } else {
+      slaEstado = "cumplido_a_tiempo";
+    }
+  } else if (engagement.fecha_sla_objetivo) {
     const ms = new Date(engagement.fecha_sla_objetivo).getTime() - Date.now();
     diasSla = Math.ceil(ms / (1000 * 60 * 60 * 24));
-    semaforo = diasSla < 0 ? "rojo" : diasSla <= 3 ? "amarillo" : "verde";
+    slaEstado = diasSla < 0 ? "atrasado" : diasSla <= 3 ? "riesgo_fecha" : "verde";
   }
 
   const inicio = engagement.fecha_inicio ?? engagement.fecha_solicitud ?? engagement.created_at;
@@ -164,7 +173,7 @@ const EngagementHeader = ({ engagement }: Props) => {
               SLA
             </p>
             <div className="mt-2">
-              <SemaforoSlaBadge semaforo={semaforo} diasParaSla={diasSla} />
+              <BadgeSla estado={slaEstado} diasParaSla={diasSla} />
             </div>
           </div>
           <div>

@@ -1,63 +1,22 @@
-## Problema
+## Diagnóstico
 
-La migración de seguridad anterior reescribió la policy SELECT de `public.lotes` para inlinear un `EXISTS … FROM engagements_lote` (con el filtro de `estado_activacion`). Pero `engagements_lote` tiene la policy `Dueño del lote ve sus engagements` que evalúa `EXISTS … FROM lotes WHERE l.owner_id = auth.uid()`. 
+El badge "Vencido · 155 días" lo pinta `EngagementHeader.tsx` (líneas 36-42), que calcula el semáforo SLA **localmente** comparando `fecha_sla_objetivo` contra `Date.now()` — sin considerar si el engagement ya está `entregado` o si tiene `fecha_entrega`.
 
-Resultado: al consultar `lotes`, Postgres evalúa la policy de lotes → consulta engagements_lote → evalúa policy de engagements_lote → consulta lotes → bucle. Postgres aborta con:
+Es el mismo bug operativo que ya se arregló en la tabla/kanban del portafolio (donde se usa `sla_estado` calculado en la vista de BD con estados `cumplido_a_tiempo` / `cumplido_con_retraso`), pero el header de detalle quedó con su lógica vieja "if dias < 0 → rojo".
 
-```
-42P17: infinite recursion detected in policy for relation "lotes"
-```
+Por eso el engagement aparece "Vencido" aunque ya se marcó como entregado.
 
-Todas las queries a `/rest/v1/lotes` están devolviendo HTTP 500 (visto en la red del preview con el JWT de Jorge). Afecta a todos los usuarios autenticados, no solo super_admin — el síntoma de "no aparecen los lotes" es consecuencia directa.
+## Fix
 
-## Fix (una sola migración SQL)
+1. **`src/hooks/useEngagementDetalle.ts`**: agregar `fecha_entrega` al `SELECT` y al tipo `EngagementDetalle`.
 
-Romper el ciclo moviendo la verificación de engagement a una función `SECURITY DEFINER` que no dispara RLS al leer `engagements_lote`. La función mantiene la misma semántica del fix de seguridad (excluye `borrador` y `pendiente_pago`).
+2. **`src/components/portafolio/EngagementHeader.tsx`**: reemplazar el bloque local de cálculo de semáforo por la lógica unificada:
+   - Si `engagement.estado === 'entregado'`: renderizar `<BadgeSla>` con `cumplido_a_tiempo` (si `fecha_entrega ≤ fecha_sla_objetivo`) o `cumplido_con_retraso` (si llegó tarde). Si no hay `fecha_entrega`, usar `cumplido_a_tiempo` por defecto.
+   - Si no está entregado: mantener semáforo verde/amarillo/rojo actual, pero usar `BadgeSla` para que el lenguaje sea consistente con el resto del portafolio (Atrasado / Por vencer / En tiempo).
+3. Eliminar `SemaforoSlaBadge` del header (queda obsoleto en este lugar; lo dejamos por si se usa en otro sitio — `rg` solo lo encontró aquí, así que también se puede borrar el archivo, pero lo dejo para no ampliar el scope).
 
-```sql
--- 1. Nueva función SECURITY DEFINER que evita la recursión
-CREATE OR REPLACE FUNCTION public.user_has_active_engagement_on_lote(
-  _user_id uuid,
-  _lote_id uuid
-) RETURNS boolean
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.engagements_lote e
-    WHERE e.lote_id = _lote_id
-      AND (
-        e.cliente_id = _user_id
-        OR e.asesor_asignado_id = _user_id
-        OR e.gerente_id = _user_id
-      )
-      AND e.estado_activacion NOT IN ('borrador', 'pendiente_pago')
-  );
-$$;
+## Resultado esperado
 
--- 2. Reemplazar la policy de lotes para usar la función (sin EXISTS recursivo)
-DROP POLICY IF EXISTS "Auth ven lotes propios y autorizados" ON public.lotes;
+En `/dashboard/engagements/332c941e-...`, donde el ChecklistEntrega ya muestra "Entregado al cliente", el KPI "SLA" del header pasará de `Vencido · 155 días` (rojo) a `Cumplido` (verde) — o `Cumplido` con reloj ámbar si la entrega fue posterior a la fecha SLA objetivo.
 
-CREATE POLICY "Auth ven lotes propios y autorizados"
-ON public.lotes
-FOR SELECT
-TO authenticated
-USING (
-  owner_id = auth.uid()
-  OR propietario_id = auth.uid()
-  OR is_admin_or_experto(auth.uid())
-  OR user_shares_owner_org(auth.uid(), owner_id)
-  OR user_has_active_engagement_on_lote(auth.uid(), id)
-  OR user_has_nda_on_lote(auth.uid(), id)
-);
-```
-
-## Verificación
-
-- Tras la migración, recargar `/dashboard/lotes` con el usuario super_admin (Jorge) — debe listar los 27 lotes.
-- Probar con un cliente que tenga engagement en estado `activo` → ve el lote.
-- Probar con un engagement en estado `borrador` → NO ve el lote (mantenemos el endurecimiento de seguridad anterior).
-- No se toca `engagements_lote`, ni `tareas_analisis`, ni el bucket `documentos-comisionistas` (los otros tres fixes del scan siguen válidos).
+Sin cambios de BD ni de otras vistas: el portafolio ya muestra correctamente "Cumplido" porque consume `sla_estado` de la vista; solo el header de detalle estaba desconectado.
