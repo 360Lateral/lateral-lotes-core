@@ -46,6 +46,7 @@ const EngagementDetalle = () => {
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
   const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
   const { data: entregables } = useEntregablesEngagement(id);
+  const { data: dimensiones } = useAnalisisUnificado(engagement?.lote_id, engagement?.id);
   const { isSuperAdmin, isAdminOrAsesor, roles } = useAuth();
   const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
   const activar = useActivarEngagement();
