@@ -7,6 +7,12 @@ import {
   LayoutGrid,
   Table as TableIcon,
   Inbox,
+  AlertTriangle,
+  Send,
+  CheckCircle2,
+  UserX,
+  Clock,
+
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -45,6 +51,7 @@ import TablaPortafolio from "@/components/portafolio/TablaPortafolio";
 import KanbanPortafolio from "@/components/portafolio/KanbanPortafolio";
 import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { KPIEstado } from "@/components/ui/KPIEstado";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ESTADO_LABEL: Record<string, string> = {
@@ -254,6 +261,25 @@ const PortafolioDashboard = () => {
     () => filas.filter((f) => !f.asesor_nombre).length,
     [filas],
   );
+  const pendientesPublicacion = useMemo(
+    () =>
+      filas.filter(
+        (f) => (f as any).tiene_entregables_borrador === true && !f.sla_cumplido,
+      ).length,
+    [filas],
+  );
+  const atrasadosAccionables = useMemo(
+    () =>
+      filas.filter(
+        (f) => f.sla_estado === "atrasado" && !f.sla_cumplido,
+      ).length,
+    [filas],
+  );
+  const enRiesgoFecha = useMemo(
+    () => filas.filter((f) => f.sla_estado === "riesgo_fecha").length,
+    [filas],
+  );
+
 
   if (loading) {
     return (
@@ -351,6 +377,47 @@ const PortafolioDashboard = () => {
       ) : (
         <>
           <PortafolioKpiCards kpis={kpis} isLoading={kpisLoading} />
+
+          {/* KPIs operativos basados en la vista del portafolio */}
+          <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            <KPIEstado
+              label="Atrasados accionables"
+              value={atrasadosAccionables}
+              icon={AlertTriangle}
+              colorClass={atrasadosAccionables > 0 ? "text-destructive" : "text-foreground"}
+              iconColorClass={atrasadosAccionables > 0 ? "text-destructive" : "text-muted-foreground"}
+              destacado={atrasadosAccionables > 0}
+            />
+            <KPIEstado
+              label="Pendientes de publicar"
+              value={pendientesPublicacion}
+              icon={Send}
+              colorClass={pendientesPublicacion > 0 ? "text-yellow-700" : "text-foreground"}
+              iconColorClass={pendientesPublicacion > 0 ? "text-yellow-700" : "text-muted-foreground"}
+              destacado={pendientesPublicacion > 0}
+              sublabel="Subidos en borrador"
+            />
+            <KPIEstado
+              label="En riesgo (fecha)"
+              value={enRiesgoFecha}
+              icon={Clock}
+              iconColorClass="text-primary"
+            />
+            <KPIEstado
+              label="Cumplidos"
+              value={cumplidos}
+              icon={CheckCircle2}
+              iconColorClass="text-green-700"
+              colorClass="text-green-700"
+            />
+            <KPIEstado
+              label="Sin asesor"
+              value={sinAsesor}
+              icon={UserX}
+              iconColorClass="text-muted-foreground"
+            />
+          </div>
+
 
           <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
             <DistribucionPlanesChart data={kpis?.engagements_por_plan ?? []} />

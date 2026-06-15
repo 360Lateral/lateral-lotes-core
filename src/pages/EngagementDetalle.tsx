@@ -19,6 +19,7 @@ import {
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
+import { ChecklistEntrega } from "@/components/portafolio/ChecklistEntrega";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
@@ -186,6 +187,26 @@ const EngagementDetalle = () => {
 
             <Separator className="my-6" />
 
+
+            <ChecklistEntrega
+              engagementId={id!}
+              estadoEngagement={engagement.estado}
+              diagnostico={diagnostico}
+              presentacion={presentacion}
+              tareasCompletadas={
+                (tareas ?? []).filter(
+                  (t) => t.estado === "entregado" || t.estado === "aprobado",
+                ).length
+              }
+              tareasTotal={
+                (tareas ?? []).filter((t) => t.estado !== "no_aplica").length
+              }
+              yaEntregado={engagement.estado === "entregado"}
+              puedeMarcar={puedeSubir}
+            />
+
+            <Separator className="my-6" />
+
             <h2 className="mb-3 font-display text-lg font-semibold text-foreground">
               Entregables maestros
             </h2>
@@ -195,6 +216,7 @@ const EngagementDetalle = () => {
               presentacion={presentacion}
               puedeSubir={puedeSubir}
             />
+
 
             <Separator className="my-6" />
 

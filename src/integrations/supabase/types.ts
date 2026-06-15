@@ -4874,6 +4874,7 @@ export type Database = {
           sla_cumplido: boolean | null
           sla_estado: string | null
           tiene_diagnostico: boolean | null
+          tiene_entregables_borrador: boolean | null
           tiene_presentacion: boolean | null
           ultima_actualizacion: string | null
         }
