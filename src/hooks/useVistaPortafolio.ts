@@ -35,6 +35,7 @@ export interface PortafolioVistaFila {
   dias_transcurridos: number;
   dias_totales_sla: number | null;
   fecha_entrega_real: string | null;
+  tiene_entregables_borrador: boolean;
 }
 
 export interface PortafolioFiltrosUI {
