@@ -24,6 +24,7 @@ export interface EngagementDetalle {
     direccion: string | null;
     ciudad: string | null;
     area_total_m2: number | null;
+    propietario: { id: string; nombre: string | null; email: string | null } | null;
   } | null;
   plan: {
     id: string;
