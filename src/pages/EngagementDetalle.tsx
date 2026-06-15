@@ -187,7 +187,6 @@ const EngagementDetalle = () => {
 
             <Separator className="my-6" />
 
-            <Separator className="my-6" />
 
             <ChecklistEntrega
               engagementId={id!}
