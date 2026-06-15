@@ -173,7 +173,7 @@ const EngagementHeader = ({ engagement }: Props) => {
               SLA
             </p>
             <div className="mt-2">
-              <SemaforoSlaBadge semaforo={semaforo} diasParaSla={diasSla} />
+              <BadgeSla estado={slaEstado} diasParaSla={diasSla} />
             </div>
           </div>
           <div>
