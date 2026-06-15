@@ -191,9 +191,9 @@ const TarjetasMaestros = ({
         puedeSubir={puedeSubir}
         tipo="presentacion_diagnostico"
         titulo="Presentación del Diagnóstico"
-        subtitulo="Slides del diagnóstico (Gamma)"
+        subtitulo="Página web con la presentación del activo (Gamma, Canva, Google Slides, etc.)"
         icono={<Presentation className="h-6 w-6" />}
-        ctaTexto="Agregar link Gamma"
+        ctaTexto="Agregar link de la presentación"
       />
     </div>
   );
