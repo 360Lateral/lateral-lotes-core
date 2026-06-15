@@ -56,11 +56,11 @@ import { useAsignarAsesorEngagement } from "@/hooks/useAsignarAsesorEngagement";
 import {
   MapPin,
   User,
-  Clock,
-  AlertTriangle,
   GripVertical,
   Check,
 } from "lucide-react";
+import { urgenciaClass, ajusteSinAsesor } from "@/lib/sla-helpers";
+import { BadgeSla } from "./BadgeSla";
 
 interface Props {
   filas: PortafolioVistaFila[];
@@ -78,15 +78,8 @@ const COLUMNAS: { key: EstadoEngagement; label: string; color: string }[] = [
 
 const COLUMNAS_KEYS = new Set<string>(COLUMNAS.map((c) => c.key));
 
-const urgenciaCardClass = (f: PortafolioVistaFila): string => {
-  const dias = f.dias_para_sla != null ? Number(f.dias_para_sla) : null;
-  if (dias != null && dias < 0) return "border-l-2 border-l-destructive";
-  if (f.semaforo_sla === "rojo") return "border-l-2 border-l-destructive";
-  if (f.semaforo_sla === "amarillo" || f.semaforo_sla === "ambar")
-    return "border-l-2 border-l-primary";
-  if (!f.asesor_nombre) return "border-l-2 border-l-muted-foreground opacity-90";
-  return "";
-};
+const urgenciaCardClass = (f: PortafolioVistaFila): string =>
+  `${urgenciaClass(f)} ${ajusteSinAsesor(f)}`.trim();
 
 // ============ Card draggable ============
 const KanbanCard = ({
@@ -109,8 +102,6 @@ const KanbanCard = ({
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const dias =
-    fila.dias_para_sla != null ? Number(fila.dias_para_sla) : null;
 
   const { data: asesores = [] } = useAsesoresList();
   const asignar = useAsignarAsesorEngagement();
@@ -223,23 +214,14 @@ const KanbanCard = ({
             </p>
           </div>
         )}
-        {dias != null && (
-          <p
-            className={`mt-1.5 flex items-center gap-1 text-[10px] font-medium ${
-              dias < 0 ? "text-destructive" : "text-muted-foreground"
-            }`}
-          >
-            {dias < 0 ? (
-              <>
-                <AlertTriangle className="h-3 w-3" /> Atrasado{" "}
-                {Math.abs(dias)}d
-              </>
-            ) : (
-              <>
-                <Clock className="h-3 w-3" /> {dias}d para SLA
-              </>
-            )}
-          </p>
+        {fila.sla_estado && (
+          <div className="mt-1.5">
+            <BadgeSla
+              estado={fila.sla_estado}
+              diasParaSla={fila.dias_para_sla}
+              size="xs"
+            />
+          </div>
         )}
       </button>
     </div>

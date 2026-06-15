@@ -234,21 +234,20 @@ const PortafolioDashboard = () => {
     [filasVisibles, page, pageSize],
   );
 
+  const atrasados = useMemo(
+    () => filas.filter((f) => f.sla_estado === "atrasado").length,
+    [filas],
+  );
   const enRiesgo = useMemo(
     () =>
       filas.filter(
         (f) =>
-          f.semaforo_sla === "rojo" ||
-          f.semaforo_sla === "amarillo" ||
-          f.semaforo_sla === "ambar",
+          f.sla_estado === "riesgo_fecha" || f.sla_estado === "riesgo_ritmo",
       ).length,
     [filas],
   );
-  const atrasados = useMemo(
-    () =>
-      filas.filter(
-        (f) => f.dias_para_sla != null && Number(f.dias_para_sla) < 0,
-      ).length,
+  const cumplidos = useMemo(
+    () => filas.filter((f) => f.sla_cumplido === true).length,
     [filas],
   );
   const sinAsesor = useMemo(
@@ -295,7 +294,15 @@ const PortafolioDashboard = () => {
               <>
                 {" · "}
                 <span className="font-medium text-primary">
-                  {enRiesgo} con SLA en riesgo
+                  {enRiesgo} en riesgo
+                </span>
+              </>
+            )}
+            {cumplidos > 0 && (
+              <>
+                {" · "}
+                <span className="font-medium text-green-700">
+                  {cumplidos} cumplidos
                 </span>
               </>
             )}

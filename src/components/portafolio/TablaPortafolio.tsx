@@ -171,8 +171,8 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <SemaforoSlaBadge
-                      semaforo={f.semaforo_sla}
+                    <BadgeSla
+                      estado={f.sla_estado}
                       diasParaSla={f.dias_para_sla}
                     />
                   </TableCell>
