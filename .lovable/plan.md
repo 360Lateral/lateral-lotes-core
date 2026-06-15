@@ -1,22 +1,32 @@
-## Diagnóstico
+## Problema
 
-El badge "Vencido · 155 días" lo pinta `EngagementHeader.tsx` (líneas 36-42), que calcula el semáforo SLA **localmente** comparando `fecha_sla_objetivo` contra `Date.now()` — sin considerar si el engagement ya está `entregado` o si tiene `fecha_entrega`.
+En `/dashboard/engagements/:id` el bloque "Cliente" muestra `engagements_lote.cliente_id → perfiles.nombre`. En este engagement aparece "Jorge Raigosa", que no es el cliente que solicitó el diagnóstico sino otra persona — la fuente correcta para ese espacio debe ser **el propietario del lote** (`lotes.propietario_id → perfiles.nombre`), no `cliente_id`.
 
-Es el mismo bug operativo que ya se arregló en la tabla/kanban del portafolio (donde se usa `sla_estado` calculado en la vista de BD con estados `cumplido_a_tiempo` / `cumplido_con_retraso`), pero el header de detalle quedó con su lógica vieja "if dias < 0 → rojo".
+## Cambios (solo UI, sin tocar lógica de negocio ni DB)
 
-Por eso el engagement aparece "Vencido" aunque ya se marcó como entregado.
+### 1. `src/hooks/useEngagementDetalle.ts`
+- Extender el JOIN de `lote` para traer también el propietario:
+  ```
+  lote:lotes!engagements_lote_lote_id_fkey (
+    id, nombre_lote, direccion, ciudad, area_total_m2,
+    propietario:perfiles!lotes_propietario_id_fkey ( id, nombre, email )
+  )
+  ```
+- Añadir `propietario` (mismo shape que `cliente`) al tipo `EngagementDetalle.lote`.
+- Mantener el JOIN actual de `cliente` intacto (se sigue usando en otras partes / lógica de permisos).
 
-## Fix
+### 2. `src/components/portafolio/EngagementHeader.tsx`
+- Renombrar la etiqueta `Cliente` → `Propietario del lote`.
+- Cambiar la fuente del nombre/email:
+  - de `engagement.cliente?.nombre / email`
+  - a `engagement.lote?.propietario?.nombre / email`.
+- Fallback: `"Sin propietario registrado"` cuando no haya.
 
-1. **`src/hooks/useEngagementDetalle.ts`**: agregar `fecha_entrega` al `SELECT` y al tipo `EngagementDetalle`.
-
-2. **`src/components/portafolio/EngagementHeader.tsx`**: reemplazar el bloque local de cálculo de semáforo por la lógica unificada:
-   - Si `engagement.estado === 'entregado'`: renderizar `<BadgeSla>` con `cumplido_a_tiempo` (si `fecha_entrega ≤ fecha_sla_objetivo`) o `cumplido_con_retraso` (si llegó tarde). Si no hay `fecha_entrega`, usar `cumplido_a_tiempo` por defecto.
-   - Si no está entregado: mantener semáforo verde/amarillo/rojo actual, pero usar `BadgeSla` para que el lenguaje sea consistente con el resto del portafolio (Atrasado / Por vencer / En tiempo).
-3. Eliminar `SemaforoSlaBadge` del header (queda obsoleto en este lugar; lo dejamos por si se usa en otro sitio — `rg` solo lo encontró aquí, así que también se puede borrar el archivo, pero lo dejo para no ampliar el scope).
+### Fuera de alcance
+- No se toca `cliente_id` en la base de datos, ni el JOIN de `cliente` en otros hooks/pantallas.
+- No se modifica `EngagementDetalle.tsx` ni ningún otro consumidor del hook (el campo `cliente` sigue disponible).
+- No se cambian permisos ni RLS — `lotes.propietario_id` ya es legible por quien puede ver el engagement.
 
 ## Resultado esperado
 
-En `/dashboard/engagements/332c941e-...`, donde el ChecklistEntrega ya muestra "Entregado al cliente", el KPI "SLA" del header pasará de `Vencido · 155 días` (rojo) a `Cumplido` (verde) — o `Cumplido` con reloj ámbar si la entrega fue posterior a la fecha SLA objetivo.
-
-Sin cambios de BD ni de otras vistas: el portafolio ya muestra correctamente "Cumplido" porque consume `sla_estado` de la vista; solo el header de detalle estaba desconectado.
+El header del engagement mostrará el propietario real del lote (coherente con `/dashboard/lotes/.../editar` y con "Solicitudes de contacto"), eliminando la incoherencia que viste con "Jorge Raigosa".

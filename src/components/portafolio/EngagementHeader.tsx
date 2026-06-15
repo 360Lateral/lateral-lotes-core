@@ -112,13 +112,13 @@ const EngagementHeader = ({ engagement }: Props) => {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <p className="font-body text-xs uppercase tracking-wide text-muted-foreground">
-                  Cliente
+                  Propietario del lote
                 </p>
                 <p className="font-body text-sm text-foreground">
-                  {engagement.cliente?.nombre ?? "Sin cliente registrado"}
+                  {engagement.lote?.propietario?.nombre ?? "Sin propietario registrado"}
                 </p>
-                {engagement.cliente?.email && (
-                  <p className="font-body text-xs text-muted-foreground">{engagement.cliente.email}</p>
+                {engagement.lote?.propietario?.email && (
+                  <p className="font-body text-xs text-muted-foreground">{engagement.lote.propietario.email}</p>
                 )}
               </div>
               <div>
