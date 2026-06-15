@@ -23,6 +23,18 @@ export interface PortafolioVistaFila {
   tiene_diagnostico: boolean;
   tiene_presentacion: boolean;
   ultima_actualizacion: string;
+  sla_estado:
+    | "cumplido_a_tiempo"
+    | "cumplido_con_retraso"
+    | "atrasado"
+    | "riesgo_fecha"
+    | "riesgo_ritmo"
+    | "verde"
+    | null;
+  sla_cumplido: boolean;
+  dias_transcurridos: number;
+  dias_totales_sla: number | null;
+  fecha_entrega_real: string | null;
 }
 
 export interface PortafolioFiltrosUI {
