@@ -1,0 +1,1 @@
+ALTER VIEW public.vw_portafolio_resumen SET (security_invoker = true);
