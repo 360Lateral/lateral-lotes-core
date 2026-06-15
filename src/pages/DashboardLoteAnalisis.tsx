@@ -779,6 +779,15 @@ function useAnalisisUpsert(table: string, loteId: string, qk: string[]) {
     onSuccess: () => {
       toast({ title: "Guardado correctamente" });
       qc.invalidateQueries({ queryKey: qk });
+      // Cross-cache: actualizar TODAS las vistas que muestran este dato
+      qc.invalidateQueries({ queryKey: ["analisis-unificado"] });
+      qc.invalidateQueries({ queryKey: ["tareas-engagement"] });
+      qc.invalidateQueries({ queryKey: ["engagement-detalle"] });
+      qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
+      qc.invalidateQueries({ queryKey: ["portafolio-vista"] });
+      qc.invalidateQueries({ queryKey: ["lote-detalle"] });
+      qc.invalidateQueries({ queryKey: ["ficha-lote"] });
+      qc.invalidateQueries({ queryKey: ["mercado-publico"] });
     },
     onError: (e: any) => {
       toast({ title: "Error al guardar", description: e.message, variant: "destructive" });
