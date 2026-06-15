@@ -261,6 +261,25 @@ const PortafolioDashboard = () => {
     () => filas.filter((f) => !f.asesor_nombre).length,
     [filas],
   );
+  const pendientesPublicacion = useMemo(
+    () =>
+      filas.filter(
+        (f) => (f as any).tiene_entregables_borrador === true && !f.sla_cumplido,
+      ).length,
+    [filas],
+  );
+  const atrasadosAccionables = useMemo(
+    () =>
+      filas.filter(
+        (f) => f.sla_estado === "atrasado" && !f.sla_cumplido,
+      ).length,
+    [filas],
+  );
+  const enRiesgoFecha = useMemo(
+    () => filas.filter((f) => f.sla_estado === "riesgo_fecha").length,
+    [filas],
+  );
+
 
   if (loading) {
     return (
