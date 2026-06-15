@@ -12,6 +12,7 @@ export interface EngagementDetalle {
   avance_pct: number;
   fecha_inicio: string | null;
   fecha_sla_objetivo: string | null;
+  fecha_entrega: string | null;
   fecha_solicitud: string;
   created_at: string;
   updated_at: string;
