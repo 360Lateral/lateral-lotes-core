@@ -4851,12 +4851,15 @@ export type Database = {
           cliente_nombre: string | null
           dias_en_gestion: number | null
           dias_para_sla: number | null
+          dias_totales_sla: number | null
+          dias_transcurridos: number | null
           engagement_id: string | null
           estado: Database["public"]["Enums"]["estado_engagement"] | null
           estado_activacion:
             | Database["public"]["Enums"]["estado_activacion"]
             | null
           estado_pago: string | null
+          fecha_entrega_real: string | null
           lote_barrio: string | null
           lote_ciudad: string | null
           lote_id: string | null
@@ -4868,6 +4871,8 @@ export type Database = {
           plan_nombre: string | null
           precio_cobrado: number | null
           semaforo_sla: string | null
+          sla_cumplido: boolean | null
+          sla_estado: string | null
           tiene_diagnostico: boolean | null
           tiene_presentacion: boolean | null
           ultima_actualizacion: string | null

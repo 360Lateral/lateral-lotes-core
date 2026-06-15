@@ -14,7 +14,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import EstadoEngagementBadge from "./EstadoEngagementBadge";
-import SemaforoSlaBadge from "./SemaforoSlaBadge";
+import { BadgeSla } from "./BadgeSla";
+import { urgenciaClass, ajusteSinAsesor } from "@/lib/sla-helpers";
 import type { PortafolioVistaFila } from "@/hooks/useVistaPortafolio";
 
 interface Props {
@@ -35,15 +36,8 @@ const progressColor = (pct: number) => {
   return "[&>div]:bg-success";
 };
 
-const urgenciaRowClass = (fila: PortafolioVistaFila): string => {
-  const dias = fila.dias_para_sla != null ? Number(fila.dias_para_sla) : null;
-  if (dias != null && dias < 0) return "bg-destructive/10 border-l-2 border-l-destructive";
-  if (fila.semaforo_sla === "rojo") return "bg-destructive/5 border-l-2 border-l-destructive";
-  if (fila.semaforo_sla === "amarillo" || fila.semaforo_sla === "ambar")
-    return "bg-primary/5 border-l-2 border-l-primary";
-  if (!fila.asesor_nombre) return "bg-muted/30 border-l-2 border-l-muted-foreground";
-  return "";
-};
+const urgenciaRowClass = (fila: PortafolioVistaFila): string =>
+  `${urgenciaClass(fila)} ${ajusteSinAsesor(fila)}`.trim();
 
 const EntregablePill = ({ label, done }: { label: string; done: boolean }) => (
   <span
@@ -177,8 +171,8 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <SemaforoSlaBadge
-                      semaforo={f.semaforo_sla}
+                    <BadgeSla
+                      estado={f.sla_estado}
                       diasParaSla={f.dias_para_sla}
                     />
                   </TableCell>
