@@ -20,6 +20,8 @@ import EngagementHeader from "@/components/portafolio/EngagementHeader";
 import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
 import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
 import { ChecklistEntrega } from "@/components/portafolio/ChecklistEntrega";
+import { AnalisisCard } from "@/components/analisis/AnalisisCard";
+import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
@@ -34,8 +36,9 @@ import GenerarLinkPagoDialog from "@/components/portafolio/GenerarLinkPagoDialog
 import FichaConfigDialog from "@/components/lotes/FichaConfigDialog";
 import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEngagement";
 
-import { ClipboardList, CreditCard, FileText } from "lucide-react";
+import { ClipboardList, CreditCard, FileText, Info } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
+
 
 const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
