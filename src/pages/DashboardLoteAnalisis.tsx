@@ -229,6 +229,29 @@ const DashboardLoteAnalisis = () => {
     enabled: !!id,
   });
 
+  const { data: engagementVigente } = useEngagementVigenteDeLote(id);
+  const { data: dimensiones } = useAnalisisUnificado(id, engagementVigente?.id);
+
+  const scrollToSection = (tipoCodigo: string) => {
+    const el = document.getElementById(`section-${tipoCodigo}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.classList.add("ring-2", "ring-primary", "ring-offset-2");
+      setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2"), 1800);
+    }
+  };
+
+  // Auto-scroll si llega con ?tipo=xxx
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tipo = params.get("tipo");
+    if (tipo && dimensiones && dimensiones.length > 0) {
+      setTimeout(() => scrollToSection(tipo), 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dimensiones]);
+
+
   // PDF extraction state
   const [pdfUrl, setPdfUrl] = useState("");
   const [extrayendo, setExtrayendo] = useState<string | null>(null);
