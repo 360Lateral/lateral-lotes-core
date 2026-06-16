@@ -151,7 +151,7 @@ const DashboardUsuarios = () => {
 
   const { data: lotesDelUsuario = [] } = useQuery({
     queryKey: ["user-lotes", editUser?.id],
-    enabled: !!editUser && (editUser.user_type === "dueno" || editUser.user_type === "comisionista"),
+    enabled: !!editUser && (editUser.user_type === "propietario" || editUser.user_type === "comisionista"),
     queryFn: async () => {
       const { data } = await supabase
         .from("lotes")
