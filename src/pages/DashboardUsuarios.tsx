@@ -90,7 +90,7 @@ const DashboardUsuarios = () => {
     },
   });
 
-  const owners = users.filter((u) => u.user_type === "dueno");
+  const owners = users.filter((u) => u.user_type === "propietario" || u.user_type === "dueno");
 
   const roleMutation = useMutation({
     mutationFn: async ({ user_id, role, action }: { user_id: string; role: string; action: "grant" | "revoke" }) => {
@@ -435,9 +435,9 @@ const DashboardUsuarios = () => {
 
               {/* Owner associations */}
               <div className="space-y-2">
-                <Label>Dueños asociados</Label>
+                <Label>Propietarios asociados</Label>
                 <p className="text-xs text-muted-foreground">
-                  Este usuario podrá ver los lotes privados de los dueños asociados.
+                  Este usuario podrá ver los lotes privados de los propietarios asociados.
                 </p>
 
                 {currentEditUser && currentEditUser.owner_ids.length > 0 && (
@@ -456,7 +456,7 @@ const DashboardUsuarios = () => {
 
                 <div className="flex gap-2">
                   <Select value={selectedOwnerId} onValueChange={setSelectedOwnerId}>
-                    <SelectTrigger className="flex-1"><SelectValue placeholder="Seleccionar dueño" /></SelectTrigger>
+                    <SelectTrigger className="flex-1"><SelectValue placeholder="Seleccionar propietario" /></SelectTrigger>
                     <SelectContent>
                       {owners
                         .filter((o) => !currentEditUser?.owner_ids.includes(o.id))

@@ -1,32 +1,32 @@
 ## Problema
 
-En `/dashboard/engagements/:id` el bloque "Cliente" muestra `engagements_lote.cliente_id → perfiles.nombre`. En este engagement aparece "Jorge Raigosa", que no es el cliente que solicitó el diagnóstico sino otra persona — la fuente correcta para ese espacio debe ser **el propietario del lote** (`lotes.propietario_id → perfiles.nombre`), no `cliente_id`.
+En `/dashboard/usuarios`, al editar un usuario, la sección **"Dueños asociados"** muestra un Select vacío. Causa raíz: el listado se construye filtrando `users.filter(u => u.user_type === "dueno")` (línea 93 de `DashboardUsuarios.tsx`), pero en este proyecto los propietarios reales tienen `user_type = "propietario"` (verificado en BD: 5 usuarios `propietario`, 0 usuarios `dueno`). Por eso el desplegable no trae nada.
 
-## Cambios (solo UI, sin tocar lógica de negocio ni DB)
+Además la etiqueta usa "Dueños", inconsistente con el resto del sistema que ya estandarizó "Propietario" (ver `AsignarPropietarioDialog`, `usePropietariosList`, header del engagement).
 
-### 1. `src/hooks/useEngagementDetalle.ts`
-- Extender el JOIN de `lote` para traer también el propietario:
-  ```
-  lote:lotes!engagements_lote_lote_id_fkey (
-    id, nombre_lote, direccion, ciudad, area_total_m2,
-    propietario:perfiles!lotes_propietario_id_fkey ( id, nombre, email )
-  )
-  ```
-- Añadir `propietario` (mismo shape que `cliente`) al tipo `EngagementDetalle.lote`.
-- Mantener el JOIN actual de `cliente` intacto (se sigue usando en otras partes / lógica de permisos).
+## Cambios (solo UI en `src/pages/DashboardUsuarios.tsx`)
 
-### 2. `src/components/portafolio/EngagementHeader.tsx`
-- Renombrar la etiqueta `Cliente` → `Propietario del lote`.
-- Cambiar la fuente del nombre/email:
-  - de `engagement.cliente?.nombre / email`
-  - a `engagement.lote?.propietario?.nombre / email`.
-- Fallback: `"Sin propietario registrado"` cuando no haya.
+1. **Línea 93** — Cambiar la fuente del Select para que considere a los propietarios reales:
+   ```ts
+   const owners = users.filter(
+     (u) => u.user_type === "propietario" || u.user_type === "dueno"
+   );
+   ```
+   (Se deja `"dueno"` como fallback por si quedaran registros legacy; los actuales son `"propietario"`.)
 
-### Fuera de alcance
-- No se toca `cliente_id` en la base de datos, ni el JOIN de `cliente` en otros hooks/pantallas.
-- No se modifica `EngagementDetalle.tsx` ni ningún otro consumidor del hook (el campo `cliente` sigue disponible).
-- No se cambian permisos ni RLS — `lotes.propietario_id` ya es legible por quien puede ver el engagement.
+2. **Líneas 438–440** — Renombrar la etiqueta y el texto auxiliar:
+   - `Label`: "Dueños asociados" → **"Propietarios asociados"**.
+   - Descripción: "podrá ver los lotes privados de los dueños asociados" → "…de los propietarios asociados".
+
+3. **Línea 459** — Placeholder del Select: "Seleccionar dueño" → **"Seleccionar propietario"**.
+
+## Fuera de alcance
+
+- No se tocan los nombres internos de la tabla `usuario_owner` ni el campo `owner_id` (es el nombre de la relación, no un label visible).
+- No se modifica `list-users` ni `manage-user` (siguen recibiendo `owner_id` correctamente).
+- No se cambia la consulta de "Lotes del propietario" (línea 148, `lotes.owner_id`) — esa columna sí existe en BD y aplica a usuarios tipo `dueno`/`comisionista`; está fuera del bug reportado.
+- No se renombra el `user_type` "dueno" del filtro superior (línea 245) para no romper datos existentes.
 
 ## Resultado esperado
 
-El header del engagement mostrará el propietario real del lote (coherente con `/dashboard/lotes/.../editar` y con "Solicitudes de contacto"), eliminando la incoherencia que viste con "Jorge Raigosa".
+El Select de "Propietarios asociados" listará los 5 usuarios con `user_type = 'propietario'`, permitiendo asociarlos al usuario que se edita. La terminología queda alineada con el resto de la plataforma.
