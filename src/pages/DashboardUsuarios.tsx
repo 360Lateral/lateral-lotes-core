@@ -24,28 +24,26 @@ import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/Cam
 import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
 import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
-const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "propietario", "desarrollador"] as const;
+const ALL_ROLES = ["super_admin", "admin", "experto", "comisionista", "propietario", "desarrollador"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin", admin: "Administrador", experto: "Experto",
-  dueno: "Dueño", comisionista: "Comisionista", propietario: "Propietario", desarrollador: "Desarrollador",
+  comisionista: "Comisionista", propietario: "Propietario", desarrollador: "Desarrollador",
 };
 
 const ROLE_COLORS: Record<string, string> = {
   super_admin: "bg-destructive text-destructive-foreground",
   admin: "bg-primary text-primary-foreground",
   experto: "bg-accent text-accent-foreground",
-  dueno: "bg-primary/80 text-primary-foreground",
   comisionista: "bg-accent/80 text-accent-foreground",
   propietario: "bg-muted text-muted-foreground",
   desarrollador: "bg-secondary text-secondary-foreground",
 };
 
 const USER_TYPES = [
-  { value: "dueno", label: "Dueño" },
+  { value: "propietario", label: "Propietario" },
   { value: "comisionista", label: "Comisionista" },
   { value: "desarrollador", label: "Desarrollador" },
-  { value: "propietario", label: "Propietario" },
 ];
 
 interface UserRecord {
