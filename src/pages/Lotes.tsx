@@ -143,8 +143,8 @@ const Lotes = () => {
   }, []);
 
   const handleClearFilters = useCallback(() => {
-    setFilters(defaultFilters);
-  }, []);
+    clearFiltersStorage();
+  }, [clearFiltersStorage]);
 
   return (
     <div className="flex h-screen flex-col">
