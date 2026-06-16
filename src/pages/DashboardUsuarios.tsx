@@ -101,7 +101,7 @@ const DashboardUsuarios = () => {
     retry: false,
   });
 
-  const owners = users.filter((u) => u.user_type === "propietario" || u.user_type === "dueno");
+  const owners = users.filter((u) => u.user_type === "propietario");
 
   const roleMutation = useMutation({
     mutationFn: async ({ user_id, role, action }: { user_id: string; role: string; action: "grant" | "revoke" }) => {
