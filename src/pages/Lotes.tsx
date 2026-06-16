@@ -11,6 +11,7 @@ import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
 import { List, Map as MapIcon, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
