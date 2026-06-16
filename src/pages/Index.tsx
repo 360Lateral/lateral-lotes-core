@@ -211,7 +211,7 @@ const TrustStat = ({
 
 const Index = () => {
   const { user, userType, isAdminOrAsesor, isDeveloper, roles, loading: authLoading } = useAuth();
-  const isDueno = userType === "dueno" || userType === "comisionista";
+  const isDueno = userType === "propietario" || userType === "comisionista";
 
   const displayName =
     user?.user_metadata?.full_name ||
