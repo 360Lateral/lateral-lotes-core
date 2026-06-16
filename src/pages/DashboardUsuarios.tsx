@@ -84,10 +84,23 @@ const DashboardUsuarios = () => {
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
     queryKey: ["admin-users"],
     queryFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        await supabase.auth.signOut({ scope: "local" });
+        window.location.href = "/login";
+        throw new Error("Sesión expirada");
+      }
       const { data, error } = await supabase.functions.invoke("list-users");
-      if (error) throw error;
+      if (error) {
+        if ((error as any).context?.status === 401) {
+          await supabase.auth.signOut({ scope: "local" });
+          window.location.href = "/login";
+        }
+        throw error;
+      }
       return data as UserRecord[];
     },
+    retry: false,
   });
 
   const owners = users.filter((u) => u.user_type === "propietario" || u.user_type === "dueno");
