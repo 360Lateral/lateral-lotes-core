@@ -23,6 +23,7 @@ import {
   type LoteMercado,
 } from "@/hooks/useMercadoPublico";
 import { useStatsMercado } from "@/hooks/useStatsMercado";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const ORDEN_KEY = "mercado_orden";
 const PAGE_SIZE = 12;
