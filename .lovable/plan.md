@@ -1,32 +1,27 @@
 ## Problema
 
-En `/dashboard/usuarios`, al editar un usuario, la sección **"Dueños asociados"** muestra un Select vacío. Causa raíz: el listado se construye filtrando `users.filter(u => u.user_type === "dueno")` (línea 93 de `DashboardUsuarios.tsx`), pero en este proyecto los propietarios reales tienen `user_type = "propietario"` (verificado en BD: 5 usuarios `propietario`, 0 usuarios `dueno`). Por eso el desplegable no trae nada.
+En `/portal` el usuario `jorgeraigosaroldan@gmail.com` ve "Lote Dorado Plaza" (cuyo `propietario_id` es su propio user id, registrado como "Sura Investments") pero no ve los 16 activos de "Fundación Organización VID" a los que está asociado mediante `usuario_owner`.
 
-Además la etiqueta usa "Dueños", inconsistente con el resto del sistema que ya estandarizó "Propietario" (ver `AsignarPropietarioDialog`, `usePropietariosList`, header del engagement).
+Causa: el hook `useMisActivos` filtra solo por `propietario_id = user.id` e ignora la tabla `usuario_owner`.
 
-## Cambios (solo UI en `src/pages/DashboardUsuarios.tsx`)
+## Cambio
 
-1. **Línea 93** — Cambiar la fuente del Select para que considere a los propietarios reales:
-   ```ts
-   const owners = users.filter(
-     (u) => u.user_type === "propietario" || u.user_type === "dueno"
-   );
-   ```
-   (Se deja `"dueno"` como fallback por si quedaran registros legacy; los actuales son `"propietario"`.)
+Ampliar `useMisActivos` para que retorne la **unión** de:
+1. Lotes cuyo `propietario_id` = `user.id` (su propio inventario, p. ej. Sura → Lote Dorado Plaza).
+2. Lotes cuyo `propietario_id` esté en los `owner_id` asociados al usuario en `usuario_owner` (p. ej. los lotes de Fundación VID).
 
-2. **Líneas 438–440** — Renombrar la etiqueta y el texto auxiliar:
-   - `Label`: "Dueños asociados" → **"Propietarios asociados"**.
-   - Descripción: "podrá ver los lotes privados de los dueños asociados" → "…de los propietarios asociados".
+## Pasos
 
-3. **Línea 459** — Placeholder del Select: "Seleccionar dueño" → **"Seleccionar propietario"**.
+1. En `src/hooks/useMisActivos.ts`:
+   - Consultar primero `usuario_owner` por `user_id = propietarioId` y obtener la lista de `owner_id`.
+   - Construir un arreglo `ids = [propietarioId, ...ownerIds]` (sin duplicados).
+   - Consultar `lotes` con `.in("propietario_id", ids)` en lugar de `.eq(...)`.
+   - Mantener el mismo `select`, ordenamiento y tipo de retorno.
 
-## Fuera de alcance
+2. Verificar visualmente en `/portal` que aparezcan tanto el lote propio como los 16 de Fundación VID, ordenados por `created_at` descendente.
 
-- No se tocan los nombres internos de la tabla `usuario_owner` ni el campo `owner_id` (es el nombre de la relación, no un label visible).
-- No se modifica `list-users` ni `manage-user` (siguen recibiendo `owner_id` correctamente).
-- No se cambia la consulta de "Lotes del propietario" (línea 148, `lotes.owner_id`) — esa columna sí existe en BD y aplica a usuarios tipo `dueno`/`comisionista`; está fuera del bug reportado.
-- No se renombra el `user_type` "dueno" del filtro superior (línea 245) para no romper datos existentes.
+## Notas técnicas
 
-## Resultado esperado
-
-El Select de "Propietarios asociados" listará los 5 usuarios con `user_type = 'propietario'`, permitiendo asociarlos al usuario que se edita. La terminología queda alineada con el resto de la plataforma.
+- RLS de `lotes` ya permite a un propietario leer lotes asociados vía `usuario_owner` (memoria User-Owner RLS), por lo tanto no se requiere migración de base de datos.
+- No se modifica el modelo de datos: el `propietario_id` del lote sigue apuntando a la entidad propietaria; el vínculo usuario↔organización vive en `usuario_owner`.
+- No se altera el comportamiento de otras vistas; el cambio es local al hook `useMisActivos`, que ya es el único consumidor de "Mis Activos" en el portal.
