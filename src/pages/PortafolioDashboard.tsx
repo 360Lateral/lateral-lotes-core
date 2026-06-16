@@ -136,8 +136,8 @@ const PortafolioDashboard = () => {
   const { data: kpis, isLoading: kpisLoading, error: kpisError, refetch } =
     usePortafolioKpis();
 
-  const [filtros, setFiltros] = useState<PortafolioFiltrosUI>({});
-  const [busqueda, setBusqueda] = useState("");
+  const [filtros, setFiltros] = usePersistedState<PortafolioFiltrosUI>("portafolio_filtros", {});
+  const [busqueda, setBusqueda] = usePersistedState<string>("portafolio_busqueda", "");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
