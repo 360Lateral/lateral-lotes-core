@@ -24,28 +24,26 @@ import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/Cam
 import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
 import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
-const ALL_ROLES = ["super_admin", "admin", "experto", "dueno", "comisionista", "propietario", "desarrollador"] as const;
+const ALL_ROLES = ["super_admin", "admin", "experto", "comisionista", "propietario", "desarrollador"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin", admin: "Administrador", experto: "Experto",
-  dueno: "Dueño", comisionista: "Comisionista", propietario: "Propietario", desarrollador: "Desarrollador",
+  comisionista: "Comisionista", propietario: "Propietario", desarrollador: "Desarrollador",
 };
 
 const ROLE_COLORS: Record<string, string> = {
   super_admin: "bg-destructive text-destructive-foreground",
   admin: "bg-primary text-primary-foreground",
   experto: "bg-accent text-accent-foreground",
-  dueno: "bg-primary/80 text-primary-foreground",
   comisionista: "bg-accent/80 text-accent-foreground",
   propietario: "bg-muted text-muted-foreground",
   desarrollador: "bg-secondary text-secondary-foreground",
 };
 
 const USER_TYPES = [
-  { value: "dueno", label: "Dueño" },
+  { value: "propietario", label: "Propietario" },
   { value: "comisionista", label: "Comisionista" },
   { value: "desarrollador", label: "Desarrollador" },
-  { value: "propietario", label: "Propietario" },
 ];
 
 interface UserRecord {
@@ -103,7 +101,7 @@ const DashboardUsuarios = () => {
     retry: false,
   });
 
-  const owners = users.filter((u) => u.user_type === "propietario" || u.user_type === "dueno");
+  const owners = users.filter((u) => u.user_type === "propietario");
 
   const roleMutation = useMutation({
     mutationFn: async ({ user_id, role, action }: { user_id: string; role: string; action: "grant" | "revoke" }) => {
@@ -153,7 +151,7 @@ const DashboardUsuarios = () => {
 
   const { data: lotesDelUsuario = [] } = useQuery({
     queryKey: ["user-lotes", editUser?.id],
-    enabled: !!editUser && (editUser.user_type === "dueno" || editUser.user_type === "comisionista"),
+    enabled: !!editUser && (editUser.user_type === "propietario" || editUser.user_type === "comisionista"),
     queryFn: async () => {
       const { data } = await supabase
         .from("lotes")
@@ -255,10 +253,9 @@ const DashboardUsuarios = () => {
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="dueno">Dueños de lote</SelectItem>
+                <SelectItem value="propietario">Propietarios</SelectItem>
                 <SelectItem value="comisionista">Comisionistas</SelectItem>
                 <SelectItem value="desarrollador">Desarrolladores</SelectItem>
-                <SelectItem value="propietario">Propietarios</SelectItem>
                 <SelectItem value="admin">Administradores</SelectItem>
               </SelectContent>
             </Select>
@@ -318,7 +315,7 @@ const DashboardUsuarios = () => {
                                 </Badge>
                               </div>
                             )}
-                            {(u.user_type === "dueno" || u.user_type === "comisionista") && (
+                            {(u.user_type === "propietario" || u.user_type === "comisionista") && (
                               <p className="text-[10px] text-muted-foreground mt-0.5">
                                 {u.owner_ids?.length ?? 0} lotes asociados
                               </p>
@@ -488,7 +485,7 @@ const DashboardUsuarios = () => {
               </div>
 
               {/* Lotes del propietario */}
-              {(currentEditUser?.user_type === "dueno" || currentEditUser?.user_type === "comisionista") && (
+              {(currentEditUser?.user_type === "propietario" || currentEditUser?.user_type === "comisionista") && (
                 <div className="space-y-2">
                   <Label>Lotes del propietario ({lotesDelUsuario.length})</Label>
                   {lotesDelUsuario.length === 0 ? (
