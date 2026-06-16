@@ -183,6 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     effectiveRoles.includes("comisionista") || effectiveUserType === "comisionista";
 
   const signOut = async () => {
+    const currentUserId = user?.id ?? null;
     try {
       await supabase.auth.signOut({ scope: 'global' });
     } catch (err) {
