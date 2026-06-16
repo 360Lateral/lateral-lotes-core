@@ -253,7 +253,7 @@ const DashboardUsuarios = () => {
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="dueno">Dueños de lote</SelectItem>
+                <SelectItem value="propietario">Propietarios</SelectItem>
                 <SelectItem value="comisionista">Comisionistas</SelectItem>
                 <SelectItem value="desarrollador">Desarrolladores</SelectItem>
                 <SelectItem value="propietario">Propietarios</SelectItem>
