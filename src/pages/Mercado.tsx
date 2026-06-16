@@ -23,6 +23,7 @@ import {
   type LoteMercado,
 } from "@/hooks/useMercadoPublico";
 import { useStatsMercado } from "@/hooks/useStatsMercado";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const ORDEN_KEY = "mercado_orden";
 const PAGE_SIZE = 12;
@@ -58,7 +59,7 @@ const StatInline = ({ value, label }: { value: number | string; label: string })
 );
 
 const Mercado = () => {
-  const [filtros, setFiltros] = useState<FiltrosType>({});
+  const [filtros, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [orden, setOrden] = useState<OrdenMercado>(() => {

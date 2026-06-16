@@ -11,6 +11,7 @@ import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
 import { List, Map as MapIcon, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
@@ -58,7 +59,7 @@ const Lotes = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [showList, setShowList] = useState(false);
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [filters, setFilters, clearFiltersStorage] = usePersistedState<Filters>("lotes", defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -142,8 +143,8 @@ const Lotes = () => {
   }, []);
 
   const handleClearFilters = useCallback(() => {
-    setFilters(defaultFilters);
-  }, []);
+    clearFiltersStorage();
+  }, [clearFiltersStorage]);
 
   return (
     <div className="flex h-screen flex-col">

@@ -53,6 +53,7 @@ import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KPIEstado } from "@/components/ui/KPIEstado";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const ESTADO_LABEL: Record<string, string> = {
   pendiente: "Pendiente",
@@ -135,8 +136,8 @@ const PortafolioDashboard = () => {
   const { data: kpis, isLoading: kpisLoading, error: kpisError, refetch } =
     usePortafolioKpis();
 
-  const [filtros, setFiltros] = useState<PortafolioFiltrosUI>({});
-  const [busqueda, setBusqueda] = useState("");
+  const [filtros, setFiltros] = usePersistedState<PortafolioFiltrosUI>("portafolio_filtros", {});
+  const [busqueda, setBusqueda] = usePersistedState<string>("portafolio_busqueda", "");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useRef, useC
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useDevRole } from "@/contexts/DevRoleContext";
+import { clearPersistedFiltersForUser } from "@/hooks/usePersistedState";
 
 type AppRole =
   | "super_admin"
@@ -182,6 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     effectiveRoles.includes("comisionista") || effectiveUserType === "comisionista";
 
   const signOut = async () => {
+    const currentUserId = user?.id ?? null;
     try {
       await supabase.auth.signOut({ scope: 'global' });
     } catch (err) {
@@ -197,6 +199,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRoles([]);
     setUserType(null);
     lastUserIdRef.current = null;
+    clearPersistedFiltersForUser(currentUserId);
   };
 
   return (

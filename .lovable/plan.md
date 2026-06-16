@@ -1,27 +1,44 @@
-## Problema
+## Objetivo
 
-En `/portal` el usuario `jorgeraigosaroldan@gmail.com` ve "Lote Dorado Plaza" (cuyo `propietario_id` es su propio user id, registrado como "Sura Investments") pero no ve los 16 activos de "Fundación Organización VID" a los que está asociado mediante `usuario_owner`.
+Que los filtros aplicados en los listados se mantengan al recargar, minimizar, cerrar pestaña o navegar a otra página y volver — en lugar de reiniciarse cada vez.
 
-Causa: el hook `useMisActivos` filtra solo por `propietario_id = user.id` e ignora la tabla `usuario_owner`.
+## Estrategia
 
-## Cambio
+Persistir los filtros en `localStorage` por usuario + listado, con una clave única por vista. Al montar cada listado, se hidratan los filtros desde `localStorage`; cada cambio se guarda automáticamente. Se limpian solo con el botón "Limpiar filtros" o al cerrar sesión.
 
-Ampliar `useMisActivos` para que retorne la **unión** de:
-1. Lotes cuyo `propietario_id` = `user.id` (su propio inventario, p. ej. Sura → Lote Dorado Plaza).
-2. Lotes cuyo `propietario_id` esté en los `owner_id` asociados al usuario en `usuario_owner` (p. ej. los lotes de Fundación VID).
+## Alcance (listados con filtros)
 
-## Pasos
+1. `/lotes` — Catálogo público (ciudad, uso, estado, área) → `LotesFilterPanel`
+2. `/mercado` — Mercado público (ciudad, barrio, uso, tamaño, rango precio) → `FiltrosMercado`
+3. `/dashboard/portafolio` — Portafolio admin (plan, estado, asesor, semáforo, búsqueda, activación) → `useVistaPortafolio`
+4. `/dashboard/ordenes-servicio` (o equivalente) — Órdenes (tipos, visibilidad, días, precio mínimo) → `FiltrosOrdenesSticky`
 
-1. En `src/hooks/useMisActivos.ts`:
-   - Consultar primero `usuario_owner` por `user_id = propietarioId` y obtener la lista de `owner_id`.
-   - Construir un arreglo `ids = [propietarioId, ...ownerIds]` (sin duplicados).
-   - Consultar `lotes` con `.in("propietario_id", ids)` en lugar de `.eq(...)`.
-   - Mantener el mismo `select`, ordenamiento y tipo de retorno.
+## Implementación técnica
 
-2. Verificar visualmente en `/portal` que aparezcan tanto el lote propio como los 16 de Fundación VID, ordenados por `created_at` descendente.
+1. **Nuevo hook `usePersistedState<T>(key, defaultValue)`** en `src/hooks/usePersistedState.ts`:
+   - Lee de `localStorage` al inicializar (con `JSON.parse` seguro y fallback al default si falla).
+   - Escribe en `localStorage` en cada cambio (`useEffect`).
+   - Namespace por usuario: `360l:filters:{userId|'anon'}:{key}` para que no se mezclen filtros entre cuentas.
 
-## Notas técnicas
+2. **Aplicar el hook en cada página/listado**:
+   - `src/pages/Lotes.tsx` → reemplazar `useState<Filters>` por `usePersistedState("lotes", defaultFilters)`.
+   - `src/pages/Mercado.tsx` → persistir `FiltrosMercado` y `orden` con clave `"mercado"`.
+   - `src/pages/PortafolioDashboard.tsx` → persistir `PortafolioFiltrosUI` con clave `"portafolio"`.
+   - Página de órdenes de servicio → persistir `FiltrosOrdenes` con clave `"ordenes"`.
 
-- RLS de `lotes` ya permite a un propietario leer lotes asociados vía `usuario_owner` (memoria User-Owner RLS), por lo tanto no se requiere migración de base de datos.
-- No se modifica el modelo de datos: el `propietario_id` del lote sigue apuntando a la entidad propietaria; el vínculo usuario↔organización vive en `usuario_owner`.
-- No se altera el comportamiento de otras vistas; el cambio es local al hook `useMisActivos`, que ya es el único consumidor de "Mis Activos" en el portal.
+3. **Botón "Limpiar filtros"** ya existente en cada panel: además de resetear el estado, borra la clave correspondiente del `localStorage`.
+
+4. **Logout**: en `AuthContext.signOut` agregar limpieza de claves `360l:filters:*` del usuario que cierra sesión, para no dejar residuos.
+
+## Lo que NO cambia
+
+- No se modifica RLS, esquemas, ni lógica de queries.
+- Las URLs no llevan los filtros en query string (decisión: `localStorage` es suficiente para el caso "minimizar/volver"); si más adelante se quiere compartir filtros por link, se evalúa aparte.
+- Los filtros se mantienen indefinidamente hasta que el usuario use "Limpiar" o cierre sesión.
+
+## Verificación
+
+- Aplicar filtros en `/lotes`, navegar a `/dashboard`, volver → filtros intactos.
+- Recargar (`F5`) en `/mercado` con filtros → siguen aplicados.
+- Cerrar sesión y entrar con otro usuario → no ve filtros del anterior.
+- Botón "Limpiar" → resetea estado y `localStorage`.
