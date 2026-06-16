@@ -485,7 +485,7 @@ const DashboardUsuarios = () => {
               </div>
 
               {/* Lotes del propietario */}
-              {(currentEditUser?.user_type === "dueno" || currentEditUser?.user_type === "comisionista") && (
+              {(currentEditUser?.user_type === "propietario" || currentEditUser?.user_type === "comisionista") && (
                 <div className="space-y-2">
                   <Label>Lotes del propietario ({lotesDelUsuario.length})</Label>
                   {lotesDelUsuario.length === 0 ? (
