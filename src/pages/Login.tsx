@@ -133,7 +133,7 @@ const Login = () => {
     setLoading(false);
   };
 
-  const perfilLabel = perfilParam === "propietario" || perfilParam === "dueno"
+  const perfilLabel = perfilParam === "propietario"
     ? "Propietario de Lote"
     : perfilParam === "desarrollador" || perfilParam === "developer"
       ? "Desarrollador"
