@@ -61,7 +61,7 @@ interface UserRecord {
 }
 
 const DashboardUsuarios = () => {
-  const { roles: myRoles } = useAuth();
+  const { roles: myRoles, user, session } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("todos");
@@ -80,19 +80,20 @@ const DashboardUsuarios = () => {
   const isAdmin = myRoles.includes("admin") || isSuperAdmin;
 
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users", user?.id],
+    enabled: !!user && !!session && isAdmin,
     queryFn: async () => {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
-        await supabase.auth.signOut({ scope: "local" });
-        window.location.href = "/login";
-        throw new Error("Sesión expirada");
+        return [];
       }
       const { data, error } = await supabase.functions.invoke("list-users");
       if (error) {
-        if ((error as any).context?.status === 401) {
+        const status = (error as any).context?.status;
+        if (status === 401) {
           await supabase.auth.signOut({ scope: "local" });
           window.location.href = "/login";
+          return [];
         }
         throw error;
       }
