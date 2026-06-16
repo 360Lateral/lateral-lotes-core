@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useRef, useC
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useDevRole } from "@/contexts/DevRoleContext";
+import { clearPersistedFiltersForUser } from "@/hooks/usePersistedState";
 
 type AppRole =
   | "super_admin"
