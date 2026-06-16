@@ -199,6 +199,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRoles([]);
     setUserType(null);
     lastUserIdRef.current = null;
+    clearPersistedFiltersForUser(currentUserId);
   };
 
   return (
