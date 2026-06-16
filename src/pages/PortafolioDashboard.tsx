@@ -53,6 +53,7 @@ import PaginacionControles from "@/components/portafolio/PaginacionControles";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { KPIEstado } from "@/components/ui/KPIEstado";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 const ESTADO_LABEL: Record<string, string> = {
   pendiente: "Pendiente",
