@@ -4,14 +4,11 @@
  */
 import React, { useEffect, useRef } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
   FileUp,
   Loader2,
   Sparkles,
   Info,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
