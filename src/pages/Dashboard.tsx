@@ -448,6 +448,19 @@ const Dashboard = () => {
           >
             <List className="h-3.5 w-3.5" />
           </button>
+          <button
+            type="button"
+            onClick={() => setVista("por_propietario")}
+            className={`rounded p-1 ${
+              vista === "por_propietario"
+                ? "bg-secondary text-white"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+            aria-label="Por propietario"
+            title="Por propietario"
+          >
+            <Building2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 
