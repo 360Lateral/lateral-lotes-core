@@ -239,8 +239,5 @@ export interface SeccionProps {
   loteId: string;
   qk?: any[];
   pdfProps: PdfProps;
-  defaultOpen?: boolean;
-  /** Fase 2: render sin <Collapsible> envolvente (modo Sheet). Por ahora no-op. */
-  hideCollapsible?: boolean;
   onSaved?: () => void;
 }
