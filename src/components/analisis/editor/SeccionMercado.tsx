@@ -13,9 +13,6 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Collapsible, CollapsibleContent, CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -29,14 +26,13 @@ import {
   FileUp, Loader2, Sparkles, MapPin, Info,
 } from "lucide-react";
 import {
-  SectionHeader, PdfExtractPanel, Sugerencia, Field, CheckField,
-  useAutoMergePdfData, POT_FIELDS,
+  PdfExtractToggle, PdfExtractPanel, Sugerencia, Field, CheckField,
+  useAutoMergePdfData,
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 6: Mercado ──────────────────────── */
-export default function SeccionMercado({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
+export default function SeccionMercado({ loteId, pdfProps, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const qk = qkProp ?? ["analisis-mercado", loteId];
   const { data } = useQuery({
     queryKey: qk,
@@ -53,12 +49,11 @@ export default function SeccionMercado({ loteId, pdfProps, defaultOpen, qk: qkPr
   useAutoMergePdfData("mercado", pdfProps, setForm);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <button className="w-full"><SectionHeader icon={TrendingUp} label="Mercado" completed={completed} open={open} areaKey="mercado" pdfProps={pdfProps} /></button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-background p-4 space-y-4">
-        <PdfExtractPanel pdfProps={pdfProps} />
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <PdfExtractToggle areaKey="mercado" pdfProps={pdfProps} />
+      </div>
+      <PdfExtractPanel pdfProps={pdfProps} />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Field label="Precio venta m² zona (COP)">
@@ -118,7 +113,6 @@ export default function SeccionMercado({ loteId, pdfProps, defaultOpen, qk: qkPr
         })} disabled={upsert.isPending}>
           {upsert.isPending ? "Guardando…" : "Guardar Mercado"}
         </Button>
-      </CollapsibleContent>
-    </Collapsible>
+    </div>
   );
 }

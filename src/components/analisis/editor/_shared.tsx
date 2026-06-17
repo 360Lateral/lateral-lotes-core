@@ -4,14 +4,11 @@
  */
 import React, { useEffect, useRef } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
   FileUp,
   Loader2,
   Sparkles,
   Info,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,51 +23,27 @@ import type { PdfProps } from "@/hooks/analisis/usePdfExtractAnalisis";
 
 export type { PdfProps };
 
-export const SectionHeader = ({
-  icon: Icon,
-  label,
-  completed,
-  open,
+export const PdfExtractToggle = ({
   areaKey,
   pdfProps,
 }: {
-  icon: any;
-  label: string;
-  completed: boolean;
-  open: boolean;
-  areaKey?: string;
-  pdfProps?: PdfProps;
-}) => (
-  <div className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-4 py-3">
-    <div className="flex items-center gap-3">
-      <Icon className="h-5 w-5 text-primary" />
-      <span className="font-body text-sm font-semibold text-foreground">{label}</span>
-      <Badge variant={completed ? "disponible" : "secondary"} className="text-[10px]">
-        {completed ? "Completado" : "Pendiente"}
-      </Badge>
-      {pdfProps && areaKey && (
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="h-7 px-2 text-xs text-orange-600 hover:bg-orange-50"
-          onClick={(e) => {
-            e.stopPropagation();
-            pdfProps.setShowPdfInput(pdfProps.showPdfInput === areaKey ? null : areaKey);
-          }}
-        >
-          <FileUp className="h-3 w-3 mr-1" />
-          PDF Drive
-        </Button>
-      )}
-    </div>
-    {open ? (
-      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-    ) : (
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-    )}
-  </div>
-);
+  areaKey: string;
+  pdfProps: PdfProps;
+}) => {
+  const isOpen = pdfProps.showPdfInput === areaKey;
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      className="h-8 px-3 text-xs text-orange-600 border-orange-200 hover:bg-orange-50"
+      onClick={() => pdfProps.setShowPdfInput(isOpen ? null : areaKey)}
+    >
+      <FileUp className="h-3.5 w-3.5 mr-1.5" />
+      {isOpen ? "Cerrar PDF" : "Extraer desde PDF"}
+    </Button>
+  );
+};
 
 export const PdfExtractPanel = ({ pdfProps }: { pdfProps: PdfProps }) => {
   if (pdfProps.showPdfInput !== pdfProps.areaKey) return null;
@@ -263,8 +236,5 @@ export interface SeccionProps {
   loteId: string;
   qk?: any[];
   pdfProps: PdfProps;
-  defaultOpen?: boolean;
-  /** Fase 2: render sin <Collapsible> envolvente (modo Sheet). Por ahora no-op. */
-  hideCollapsible?: boolean;
   onSaved?: () => void;
 }

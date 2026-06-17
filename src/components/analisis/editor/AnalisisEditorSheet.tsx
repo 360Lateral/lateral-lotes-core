@@ -92,7 +92,6 @@ export default function AnalisisEditorSheet({
             <Componente
               loteId={loteId}
               pdfProps={pdfBase.makePdfProps(codigoArea)}
-              defaultOpen
               onSaved={onSaved}
               {...seccionExtra}
             />

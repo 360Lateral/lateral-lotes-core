@@ -13,9 +13,6 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Collapsible, CollapsibleContent, CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -29,14 +26,13 @@ import {
   FileUp, Loader2, Sparkles, MapPin, Info,
 } from "lucide-react";
 import {
-  SectionHeader, PdfExtractPanel, Sugerencia, Field, CheckField,
-  useAutoMergePdfData, POT_FIELDS,
+  PdfExtractToggle, PdfExtractPanel, Sugerencia, Field, CheckField,
+  useAutoMergePdfData,
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 3: Ambiental ────────────────────── */
-export default function SeccionAmbiental({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
+export default function SeccionAmbiental({ loteId, pdfProps, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const qk = qkProp ?? ["analisis-ambiental", loteId];
   const { data } = useQuery({
     queryKey: qk,
@@ -53,12 +49,11 @@ export default function SeccionAmbiental({ loteId, pdfProps, defaultOpen, qk: qk
   useAutoMergePdfData("ambiental", pdfProps, setForm);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <button className="w-full"><SectionHeader icon={Leaf} label="Ambiental" completed={completed} open={open} areaKey="ambiental" pdfProps={pdfProps} /></button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-background p-4 space-y-4">
-        <PdfExtractPanel pdfProps={pdfProps} />
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <PdfExtractToggle areaKey="ambiental" pdfProps={pdfProps} />
+      </div>
+      <PdfExtractPanel pdfProps={pdfProps} />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <CheckField label="Ronda hídrica" checked={!!form.ronda_hidrica} onChange={(v) => set("ronda_hidrica", v)} />
@@ -129,7 +124,6 @@ export default function SeccionAmbiental({ loteId, pdfProps, defaultOpen, qk: qk
         })} disabled={upsert.isPending}>
           {upsert.isPending ? "Guardando…" : "Guardar Ambiental"}
         </Button>
-      </CollapsibleContent>
-    </Collapsible>
+    </div>
   );
 }
