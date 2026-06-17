@@ -43,9 +43,8 @@ const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
-  const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
+  const { data: tareas } = useTareasEngagement(id);
   const { data: entregables } = useEntregablesEngagement(id);
-  const { data: dimensiones } = useAnalisisUnificado(engagement?.lote_id, engagement?.id);
   const { isSuperAdmin, isAdminOrAsesor, roles } = useAuth();
   const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
   const activar = useActivarEngagement();
@@ -57,10 +56,11 @@ const EngagementDetalle = () => {
   const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
 
 
-  const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
+  const { diagnostico, presentacion, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
     [entregables],
   );
+
 
   const estadoAct = engagement?.estado_activacion ?? "activo";
   const enBorrador = estadoAct === "borrador";
