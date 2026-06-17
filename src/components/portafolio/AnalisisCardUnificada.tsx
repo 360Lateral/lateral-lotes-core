@@ -139,8 +139,67 @@ const AnalisisCardUnificada = ({
     mutation.isPending && mutation.variables?.tareaId === item.tarea_id;
   const fechaLimite = fmtFecha(item.fecha_objetivo);
   const tieneEditor = TIENE_EDITOR.has(item.tipo_codigo);
+  const esKpi = ES_KPI_CALCULADO.has(item.tipo_codigo);
 
-  if (!item.incluido_en_plan) {
+  // KPI calculado: tarjeta destacada, sin tarea/entregables/edición
+  if (esKpi) {
+    const esValoracion = item.tipo_codigo === "valoracion";
+    const valor = item.score;
+    return (
+      <Card className="flex flex-col gap-3 border-2 border-primary/30 bg-primary/5 p-4">
+        <div className="flex items-start gap-3">
+          <div className="shrink-0 rounded-md bg-primary/15 p-2">
+            <Icon className="h-4 w-4 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-body text-sm font-semibold text-foreground">
+              {item.tipo_nombre}
+            </p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <Sparkles className="mr-0.5 inline h-2.5 w-2.5" />
+              KPI calculado
+            </p>
+          </div>
+        </div>
+        <div className="flex items-end justify-center py-3">
+          {valor != null ? (
+            esValoracion ? (
+              <span className="font-display text-2xl font-bold text-primary">
+                {fmtCOP(valor)}
+              </span>
+            ) : (
+              <>
+                <span
+                  className={cn(
+                    "font-display text-4xl font-bold leading-none",
+                    scoreColor(valor),
+                  )}
+                >
+                  {valor.toFixed(1)}
+                </span>
+                <span className="ml-1 text-sm text-muted-foreground">/ 10</span>
+              </>
+            )
+          ) : (
+            <span className="font-body text-sm italic text-muted-foreground">
+              Sin datos suficientes
+            </span>
+          )}
+        </div>
+        {esValoracion ? (
+          <p className="text-center text-[11px] text-muted-foreground">
+            Estimado del análisis financiero
+          </p>
+        ) : (
+          <p className="text-center text-[11px] text-muted-foreground">
+            Promedio de las áreas con score
+          </p>
+        )}
+      </Card>
+    );
+  }
+
+  if (!item.incluido_en_plan && item.tipo_codigo !== "normativo") {
     return (
       <Card className="flex flex-col gap-2 p-4 opacity-60">
         <div className="flex items-center gap-3">
