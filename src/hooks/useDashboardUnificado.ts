@@ -75,6 +75,8 @@ export interface LoteUnificado {
   area_total_m2: number | null;
   precio_venta_estimado: number | null;
   foto_url: string | null;
+  lat: number | null;
+  lng: number | null;
   estado_publicacion: string;
   estado_disponibilidad: string | null;
   publicado_venta: boolean;
@@ -119,7 +121,7 @@ export const useLotesUnificados = (filtros: FiltrosUnificados) => {
           .from("lotes")
           .select(
             `id, nombre_lote, ciudad, barrio, tipo_lote, estrato, destacado,
-             area_total_m2, precio_venta_estimado, foto_url,
+             area_total_m2, precio_venta_estimado, foto_url, lat, lng,
              estado_publicacion, estado_disponibilidad, publicado_venta,
              propietario_id, es_publico,
              score_juridico, score_ambiental, score_arquitectonico, score_financiero,
@@ -183,6 +185,8 @@ export const useLotesUnificados = (filtros: FiltrosUnificados) => {
           precio_venta_estimado:
             lote.precio_venta_estimado != null ? Number(lote.precio_venta_estimado) : null,
           foto_url: lote.foto_url,
+          lat: lote.lat != null ? Number(lote.lat) : null,
+          lng: lote.lng != null ? Number(lote.lng) : null,
           estado_publicacion: lote.estado_publicacion,
           estado_disponibilidad: lote.estado_disponibilidad ?? null,
           publicado_venta: !!lote.publicado_venta,
