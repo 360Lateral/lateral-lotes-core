@@ -62,11 +62,37 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
       )}
 
       <div className="relative h-32 w-full overflow-hidden bg-muted">
-        <FotoLote
-          url={lote.foto_url}
-          alt={lote.nombre_lote}
-          className="h-full w-full object-cover"
-        />
+        {lote.foto_url ? (
+          <>
+            <FotoLote
+              url={lote.foto_url}
+              alt={lote.nombre_lote}
+              className="h-full w-full object-cover"
+            />
+            <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[9px] font-medium text-foreground/80 backdrop-blur-sm">
+              <ImageIcon className="h-2.5 w-2.5" /> Foto
+            </span>
+          </>
+        ) : lote.lat != null && lote.lng != null ? (
+          <>
+            <MapaEstaticoLote
+              lat={lote.lat}
+              lng={lote.lng}
+              nombre={lote.nombre_lote}
+              className="h-full w-full object-cover"
+            />
+            <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[9px] font-medium text-foreground/80 backdrop-blur-sm">
+              <MapPinned className="h-2.5 w-2.5" /> Ubicación
+            </span>
+          </>
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-muted to-muted/60 px-3 text-center text-muted-foreground">
+            <MapPin className="h-6 w-6 opacity-60" />
+            <span className="line-clamp-2 text-[10px]">
+              {[lote.ciudad, lote.barrio].filter(Boolean).join(" · ") || "Sin ubicación"}
+            </span>
+          </div>
+        )}
         <div className="absolute left-2 top-2 flex flex-col gap-1">
           {lote.score_360 != null && (
             <span className="rounded-full bg-background/95 px-1.5 py-0.5 text-[9px] font-semibold text-foreground shadow-sm">
