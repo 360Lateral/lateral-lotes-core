@@ -214,6 +214,14 @@ const Dashboard = () => {
 
   const panorama = useMemo(() => {
     const partes: string[] = [];
+    if (propietarioSeleccionado) {
+      partes.push(
+        `${lotes.length} ${lotes.length === 1 ? "lote" : "lotes"} de ${propietarioSeleccionado.nombre}`,
+      );
+      if (atrasados > 0) partes.push(`${atrasados} atrasados`);
+      if (pendientesPublicar > 0) partes.push(`${pendientesPublicar} pendientes de publicar`);
+      return partes.join(" · ");
+    }
     if (atrasados > 0)
       partes.push(
         `${atrasados} ${
@@ -224,7 +232,7 @@ const Dashboard = () => {
     if (resumenLeads?.nuevos)
       partes.push(`${resumenLeads.nuevos} leads sin asignar`);
     return partes.join(", ");
-  }, [atrasados, lotes.length, resumenLeads?.nuevos]);
+  }, [propietarioSeleccionado, atrasados, pendientesPublicar, lotes.length, resumenLeads?.nuevos]);
 
   const handleExportar = () =>
     toast({ title: "Exportar", description: "Próximamente disponible." });
