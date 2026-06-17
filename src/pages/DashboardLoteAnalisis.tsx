@@ -308,8 +308,9 @@ const DashboardLoteAnalisis = () => {
       </Link>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-body text-xl font-bold text-foreground">
-          Análisis 360° — {lote?.nombre_lote ?? "Lote"}
+          Editor de Análisis 360° — {lote?.nombre_lote ?? "Lote"}
         </h1>
+
         <div className="flex items-center gap-2">
           <ExcelAnalisisExporter loteId={id!} />
           <ExcelAnalisisImporter loteId={id!} loteName={lote?.nombre_lote} />
