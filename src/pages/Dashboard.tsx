@@ -17,12 +17,16 @@ import {
   List,
   SlidersHorizontal,
   X,
+  Building2,
 } from "lucide-react";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
 import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
 import { FiltrosAvanzadosLotesSheet } from "@/components/dashboard/FiltrosAvanzadosLotesSheet";
+import { DropdownPropietario } from "@/components/dashboard/DropdownPropietario";
+import { CardPropietario } from "@/components/dashboard/CardPropietario";
+import { usePropietariosConActivos } from "@/hooks/usePropietariosConActivos";
 import {
   useLotesUnificados,
   useResumenLeads,
@@ -80,7 +84,7 @@ const Dashboard = () => {
 
   const [filtros, setFiltros] = useState<FiltrosUnificados>(cargarFiltrosIniciales);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [vista, setVista] = useState<"grid" | "tabla">("grid");
+  const [vista, setVista] = useState<"grid" | "tabla" | "por_propietario">("grid");
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [drawerLote, setDrawerLote] = useState<LoteUnificado | null>(null);
 
@@ -101,6 +105,11 @@ const Dashboard = () => {
   const { data: opciones } = useFiltroOpcionesDisponibles();
   const { data: resumenLeads } = useResumenLeads();
   const { data: resumenEngagements } = useResumenEngagementsPorEstado();
+  const { data: propietarios = [] } = usePropietariosConActivos();
+
+  const propietarioSeleccionado = filtros.propietarioId
+    ? propietarios.find((p) => p.id === filtros.propietarioId) ?? null
+    : null;
 
   const filtrosAvanzadosActivos = useMemo(() => {
     let n = 0;
@@ -205,6 +214,14 @@ const Dashboard = () => {
 
   const panorama = useMemo(() => {
     const partes: string[] = [];
+    if (propietarioSeleccionado) {
+      partes.push(
+        `${lotes.length} ${lotes.length === 1 ? "lote" : "lotes"} de ${propietarioSeleccionado.nombre}`,
+      );
+      if (atrasados > 0) partes.push(`${atrasados} atrasados`);
+      if (pendientesPublicar > 0) partes.push(`${pendientesPublicar} pendientes de publicar`);
+      return partes.join(" · ");
+    }
     if (atrasados > 0)
       partes.push(
         `${atrasados} ${
@@ -215,7 +232,7 @@ const Dashboard = () => {
     if (resumenLeads?.nuevos)
       partes.push(`${resumenLeads.nuevos} leads sin asignar`);
     return partes.join(", ");
-  }, [atrasados, lotes.length, resumenLeads?.nuevos]);
+  }, [propietarioSeleccionado, atrasados, pendientesPublicar, lotes.length, resumenLeads?.nuevos]);
 
   const handleExportar = () =>
     toast({ title: "Exportar", description: "Próximamente disponible." });
@@ -315,8 +332,48 @@ const Dashboard = () => {
         </section>
       )}
 
+      {/* Banner Vista del propietario */}
+      {propietarioSeleccionado && (
+        <section
+          className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-blue-300 bg-blue-50 px-3 py-2"
+          style={{ borderLeftWidth: 3 }}
+        >
+          <Building2 className="h-4 w-4 shrink-0 text-blue-700" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-blue-900">
+              Vista del propietario: {propietarioSeleccionado.nombre}
+            </p>
+            <p className="text-[11px] text-blue-800">
+              {propietarioSeleccionado.total_lotes} lotes ·{" "}
+              {propietarioSeleccionado.lotes_con_engagement} en gestión ·{" "}
+              {propietarioSeleccionado.total_leads} leads
+              {propietarioSeleccionado.engagements_atrasados > 0 && (
+                <>
+                  {" "}· <span className="font-semibold text-destructive">
+                    {propietarioSeleccionado.engagements_atrasados} atrasados
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setFiltros({ ...filtros, propietarioId: undefined })}
+          >
+            Volver a todos
+          </Button>
+        </section>
+      )}
+
       {/* Toolbar */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
+        <DropdownPropietario
+          propietarioId={filtros.propietarioId ?? null}
+          onChange={(id) =>
+            setFiltros({ ...filtros, propietarioId: id ?? undefined })
+          }
+        />
         <div className="relative min-w-[200px] flex-1">
           <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -390,6 +447,19 @@ const Dashboard = () => {
             aria-label="Tabla"
           >
             <List className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setVista("por_propietario")}
+            className={`rounded p-1 ${
+              vista === "por_propietario"
+                ? "bg-secondary text-white"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+            aria-label="Por propietario"
+            title="Por propietario"
+          >
+            <Building2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
@@ -572,6 +642,25 @@ const Dashboard = () => {
         </Button>
       </BulkActionsBar>
 
+      {/* CTA bulk contextual al propietario */}
+      {seleccionados.size === 0 && propietarioSeleccionado && lotes.length > 0 && vista !== "por_propietario" && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-md border border-blue-200 bg-blue-50/60 px-3 py-2">
+          <Building2 className="h-3.5 w-3.5 text-blue-700" />
+          <p className="flex-1 text-[11px] text-blue-900">
+            ¿Quieres aplicar acciones a todos los lotes de{" "}
+            <span className="font-semibold">{propietarioSeleccionado.nombre}</span>?
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setSeleccionados(new Set(lotes.map((l) => l.id)))}
+            className="h-7 text-xs"
+          >
+            Seleccionar {lotes.length}
+          </Button>
+        </div>
+      )}
+
       {/* Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -579,6 +668,25 @@ const Dashboard = () => {
             <Skeleton key={i} className="h-56 w-full" />
           ))}
         </div>
+      ) : vista === "por_propietario" ? (
+        propietarios.length === 0 ? (
+          <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
+            No hay propietarios con activos.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {propietarios.map((p) => (
+              <CardPropietario
+                key={p.id}
+                propietario={p}
+                onClick={() => {
+                  setFiltros({ ...filtros, propietarioId: p.id });
+                  setVista("grid");
+                }}
+              />
+            ))}
+          </div>
+        )
       ) : lotes.length === 0 ? (
         <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
           No hay lotes que coincidan con tus filtros.
