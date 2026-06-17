@@ -334,6 +334,21 @@ const Dashboard = () => {
             </button>
           ))}
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setSheetOpen(true)}
+          className="relative h-8 gap-1 text-[11px]"
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+          Filtros avanzados
+          {filtrosAvanzadosActivos > 0 && (
+            <span className="ml-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-bold text-white">
+              {filtrosAvanzadosActivos}
+            </span>
+          )}
+        </Button>
         <div className="ml-auto flex gap-1 rounded-md border border-border bg-background p-0.5">
           <button
             type="button"
@@ -361,6 +376,149 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+
+      {/* Chips filtros activos */}
+      {filtrosAvanzadosActivos > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-1">
+          <span className="text-[10px] font-medium uppercase text-muted-foreground">
+            Filtros activos:
+          </span>
+          {filtros.ciudades?.map((c) => (
+            <ChipActivo key={`ciu-${c}`} onRemove={() => removerArrayItem("ciudades", c)}>
+              {c}
+            </ChipActivo>
+          ))}
+          {filtros.barrios?.map((b) => (
+            <ChipActivo key={`b-${b}`} onRemove={() => removerArrayItem("barrios", b)}>
+              {b}
+            </ChipActivo>
+          ))}
+          {filtros.tipos?.map((t) => (
+            <ChipActivo key={`t-${t}`} onRemove={() => removerArrayItem("tipos", t)}>
+              {t}
+            </ChipActivo>
+          ))}
+          {filtros.categoriaArea?.map((c) => (
+            <ChipActivo key={`ca-${c}`} onRemove={() => removerArrayItem("categoriaArea", c)}>
+              Área: {c.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.areaMin != null && (
+            <ChipActivo onRemove={() => removerCampo("areaMin")}>
+              ≥ {filtros.areaMin} m²
+            </ChipActivo>
+          )}
+          {filtros.areaMax != null && (
+            <ChipActivo onRemove={() => removerCampo("areaMax")}>
+              ≤ {filtros.areaMax} m²
+            </ChipActivo>
+          )}
+          {filtros.precioMin != null && (
+            <ChipActivo onRemove={() => removerCampo("precioMin")}>
+              ≥ ${filtros.precioMin.toLocaleString("es-CO")}
+            </ChipActivo>
+          )}
+          {filtros.precioMax != null && (
+            <ChipActivo onRemove={() => removerCampo("precioMax")}>
+              ≤ ${filtros.precioMax.toLocaleString("es-CO")}
+            </ChipActivo>
+          )}
+          {filtros.estratos?.map((e) => (
+            <ChipActivo key={`e-${e}`} onRemove={() => removerArrayItem("estratos", e)}>
+              Estrato {e}
+            </ChipActivo>
+          ))}
+          {filtros.estadosPublicacion?.map((s) => (
+            <ChipActivo key={`ep-${s}`} onRemove={() => removerArrayItem("estadosPublicacion", s)}>
+              {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.estadoDisponibilidad?.map((s) => (
+            <ChipActivo key={`ed-${s}`} onRemove={() => removerArrayItem("estadoDisponibilidad", s)}>
+              {s}
+            </ChipActivo>
+          ))}
+          {filtros.soloPublicos && (
+            <ChipActivo onRemove={() => removerCampo("soloPublicos")}>Públicos</ChipActivo>
+          )}
+          {filtros.soloDestacados && (
+            <ChipActivo onRemove={() => removerCampo("soloDestacados")}>Destacados</ChipActivo>
+          )}
+          {filtros.planesCodigos?.map((p) => (
+            <ChipActivo key={`pl-${p}`} onRemove={() => removerArrayItem("planesCodigos", p)}>
+              Plan: {nombrePlan(p)}
+            </ChipActivo>
+          ))}
+          {filtros.estadosEngagement?.map((s) => (
+            <ChipActivo key={`ee-${s}`} onRemove={() => removerArrayItem("estadosEngagement", s)}>
+              {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.asesoresIds?.map((a) => (
+            <ChipActivo key={`a-${a}`} onRemove={() => removerArrayItem("asesoresIds", a)}>
+              {nombreAsesor(a)}
+            </ChipActivo>
+          ))}
+          {filtros.slaEstados?.map((s) => (
+            <ChipActivo key={`sla-${s}`} onRemove={() => removerArrayItem("slaEstados", s)}>
+              SLA: {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.conEntregablesBorrador && (
+            <ChipActivo onRemove={() => removerCampo("conEntregablesBorrador")}>
+              Con entregables borrador
+            </ChipActivo>
+          )}
+          {filtros.scoreMin != null && filtros.scoreMin > 0 && (
+            <ChipActivo onRemove={() => removerCampo("scoreMin")}>
+              Score ≥ {filtros.scoreMin}
+            </ChipActivo>
+          )}
+          {filtros.conResolutoria && (
+            <ChipActivo onRemove={() => removerCampo("conResolutoria")}>
+              Con resolutoría
+            </ChipActivo>
+          )}
+          {filtros.propietarioId && (
+            <ChipActivo onRemove={() => removerCampo("propietarioId")}>
+              {nombrePropietario(filtros.propietarioId)}
+            </ChipActivo>
+          )}
+          {filtros.conLeadsActivos && (
+            <ChipActivo onRemove={() => removerCampo("conLeadsActivos")}>
+              Con leads
+            </ChipActivo>
+          )}
+          {filtros.leadsMinimo != null && (
+            <ChipActivo onRemove={() => removerCampo("leadsMinimo")}>
+              ≥ {filtros.leadsMinimo} leads
+            </ChipActivo>
+          )}
+          {filtros.creadoDesde && (
+            <ChipActivo onRemove={() => removerCampo("creadoDesde")}>
+              Desde {filtros.creadoDesde}
+            </ChipActivo>
+          )}
+          {filtros.creadoHasta && (
+            <ChipActivo onRemove={() => removerCampo("creadoHasta")}>
+              Hasta {filtros.creadoHasta}
+            </ChipActivo>
+          )}
+          {filtros.ultimaActividadDias != null && (
+            <ChipActivo onRemove={() => removerCampo("ultimaActividadDias")}>
+              Últimos {filtros.ultimaActividadDias}d
+            </ChipActivo>
+          )}
+          <button
+            type="button"
+            onClick={limpiarAvanzados}
+            className="ml-1 text-[10px] text-muted-foreground underline hover:text-foreground"
+          >
+            Limpiar todos
+          </button>
+        </div>
+      )}
+
 
       {/* Bulk actions */}
       <BulkActionsBar
