@@ -24,6 +24,9 @@ import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
 import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
 import { FiltrosAvanzadosLotesSheet } from "@/components/dashboard/FiltrosAvanzadosLotesSheet";
+import { DropdownPropietario } from "@/components/dashboard/DropdownPropietario";
+import { CardPropietario } from "@/components/dashboard/CardPropietario";
+import { usePropietariosConActivos } from "@/hooks/usePropietariosConActivos";
 import {
   useLotesUnificados,
   useResumenLeads,
