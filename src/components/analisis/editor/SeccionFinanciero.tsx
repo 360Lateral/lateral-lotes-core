@@ -165,3 +165,4 @@ export default function SeccionFinanciero({ loteId, pdfProps, defaultOpen, qk: q
       </CollapsibleContent>
     </Collapsible>
   );
+}
