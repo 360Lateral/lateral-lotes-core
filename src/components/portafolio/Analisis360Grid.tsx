@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, ChevronDown, MapPin } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 import { Card } from "@/components/ui/card";
 import {
   Collapsible,
@@ -37,8 +37,8 @@ const fmtCOP = (n: number | null) => {
 };
 
 const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
-  const navigate = useNavigate();
   const qc = useQueryClient();
+
   const [mapOpen, setMapOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [areaActiva, setAreaActiva] = useState<{ codigo: string; nombre: string } | null>(null);
@@ -143,16 +143,9 @@ const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
           <div className="flex flex-wrap items-center gap-2">
             <ExcelAnalisisImporter loteId={loteId} loteName={lote?.nombre_lote} />
             <ExcelAnalisisExporter loteId={loteId} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/dashboard/lotes/${loteId}/analisis`)}
-            >
-              Editor clásico
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
           </div>
         )}
+
       </Card>
 
       {/* MapGIS con apply real */}
