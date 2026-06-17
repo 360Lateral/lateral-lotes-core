@@ -84,7 +84,7 @@ const Dashboard = () => {
 
   const [filtros, setFiltros] = useState<FiltrosUnificados>(cargarFiltrosIniciales);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [vista, setVista] = useState<"grid" | "tabla">("grid");
+  const [vista, setVista] = useState<"grid" | "tabla" | "por_propietario">("grid");
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [drawerLote, setDrawerLote] = useState<LoteUnificado | null>(null);
 
