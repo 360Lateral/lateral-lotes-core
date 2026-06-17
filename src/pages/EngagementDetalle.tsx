@@ -17,11 +17,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
-import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
+import Analisis360Grid from "@/components/portafolio/Analisis360Grid";
 import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
 import { ChecklistEntrega } from "@/components/portafolio/ChecklistEntrega";
-import { AnalisisCard } from "@/components/analisis/AnalisisCard";
-import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
@@ -38,6 +36,7 @@ import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEnga
 
 import { ClipboardList, CreditCard, FileText, Info } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
+
 
 
 const EngagementDetalle = () => {
