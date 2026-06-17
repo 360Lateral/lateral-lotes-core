@@ -17,6 +17,7 @@ import {
   List,
   SlidersHorizontal,
   X,
+  Building2,
 } from "lucide-react";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
