@@ -13,9 +13,6 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Collapsible, CollapsibleContent, CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -29,8 +26,8 @@ import {
   FileUp, Loader2, Sparkles, MapPin, Info,
 } from "lucide-react";
 import {
-  SectionHeader, PdfExtractPanel, Sugerencia, Field, CheckField,
-  useAutoMergePdfData, POT_FIELDS,
+  PdfExtractToggle, PdfExtractPanel, Sugerencia, Field, CheckField,
+  useAutoMergePdfData,
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
@@ -38,8 +35,7 @@ import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 const formatCOP = (v: number) =>
   new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
-export default function SeccionFinanciero({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
+export default function SeccionFinanciero({ loteId, pdfProps, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const qk = qkProp ?? ["analisis-financiero", loteId];
   const { data } = useQuery({
     queryKey: qk,
@@ -66,12 +62,11 @@ export default function SeccionFinanciero({ loteId, pdfProps, defaultOpen, qk: q
   const precioPromedio = form.precio_estimado_promedio ? Number(form.precio_estimado_promedio) : 0;
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <button className="w-full"><SectionHeader icon={DollarSign} label="Financiero" completed={completed} open={open} areaKey="financiero" pdfProps={pdfProps} /></button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-background p-4 space-y-4">
-        <PdfExtractPanel pdfProps={pdfProps} />
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <PdfExtractToggle areaKey="financiero" pdfProps={pdfProps} />
+      </div>
+      <PdfExtractPanel pdfProps={pdfProps} />
         {/* Valoración estimada 360° */}
         <div className="rounded-lg border-l-4 border-primary bg-primary/5 p-4 space-y-3">
           <p className="font-body text-sm font-semibold text-foreground">Valoración estimada del lote (360°)</p>
@@ -162,7 +157,6 @@ export default function SeccionFinanciero({ loteId, pdfProps, defaultOpen, qk: q
         })} disabled={upsert.isPending}>
           {upsert.isPending ? "Guardando…" : "Guardar Financiero"}
         </Button>
-      </CollapsibleContent>
-    </Collapsible>
+    </div>
   );
 }

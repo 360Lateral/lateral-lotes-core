@@ -13,9 +13,6 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Collapsible, CollapsibleContent, CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -29,7 +26,7 @@ import {
   FileUp, Loader2, Sparkles, MapPin, Info,
 } from "lucide-react";
 import {
-  SectionHeader, PdfExtractPanel, Sugerencia, Field, CheckField,
+  PdfExtractToggle, PdfExtractPanel, Sugerencia, Field, CheckField,
   useAutoMergePdfData, POT_FIELDS,
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
@@ -37,9 +34,8 @@ import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 import MapGISConsulta from "@/components/MapGISConsulta";
 
 /* ─── Section 1: Normativa (read-only summary + PDF) ── */
-export default function SeccionNormativa({ loteId, lat, lng, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+export default function SeccionNormativa({ loteId, lat, lng, pdfProps, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const { toast } = useToast();
-  const [open, setOpen] = useState(defaultOpen ?? false);
   const qk = qkProp ?? ["analisis-normativa", loteId];
   const { data: n } = useQuery({
     queryKey: qk,
@@ -197,11 +193,10 @@ export default function SeccionNormativa({ loteId, lat, lng, pdfProps, defaultOp
 
   return (
     <>
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger asChild>
-          <button className="w-full"><SectionHeader icon={FileText} label="Normativo" completed={completed} open={open} areaKey="normativo" pdfProps={pdfProps} /></button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="rounded-b-lg border border-t-0 border-border bg-background p-4 space-y-4">
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <PdfExtractToggle areaKey="normativo" pdfProps={pdfProps} />
+        </div>
           {/* POT Button */}
           {lat && lng && (
             <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
@@ -348,8 +343,7 @@ export default function SeccionNormativa({ loteId, lat, lng, pdfProps, defaultOp
           })} disabled={upsert.isPending}>
             {upsert.isPending ? "Guardando…" : "Guardar Normativo"}
           </Button>
-        </CollapsibleContent>
-      </Collapsible>
+      </div>
 
       {/* POT Comparison Modal */}
       <Dialog open={showPotModal} onOpenChange={setShowPotModal}>
