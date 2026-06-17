@@ -737,6 +737,13 @@ const Dashboard = () => {
         open={!!drawerLote}
         onOpenChange={(open) => !open && setDrawerLote(null)}
       />
+
+      <FiltrosAvanzadosLotesSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        valor={filtros}
+        onAplicar={(f) => setFiltros(f)}
+      />
     </DashboardLayout>
   );
 };
