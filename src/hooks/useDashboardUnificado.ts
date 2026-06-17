@@ -10,22 +10,83 @@ export type FiltroLoteUnif =
   | "sin_asesor"
   | "atrasados";
 
+export type CategoriaArea = "pequeño" | "mediano" | "grande" | "extra_grande";
+
+export interface FiltrosUnificados {
+  busqueda?: string;
+  filtro?: FiltroLoteUnif;
+  // Ubicación
+  ciudades?: string[];
+  barrios?: string[];
+  // Características
+  tipos?: string[];
+  categoriaArea?: CategoriaArea[];
+  areaMin?: number;
+  areaMax?: number;
+  precioMin?: number;
+  precioMax?: number;
+  estratos?: number[];
+  // Estado publicación
+  estadosPublicacion?: ("borrador" | "pendiente_validacion" | "aprobado" | "rechazado")[];
+  estadoDisponibilidad?: ("Disponible" | "Reservado" | "Vendido")[];
+  soloPublicos?: boolean;
+  soloDestacados?: boolean;
+  // Engagement
+  planesCodigos?: string[];
+  estadosEngagement?: (
+    | "prospecto"
+    | "activo"
+    | "en_revision"
+    | "entregado"
+    | "cerrado"
+    | "cancelado"
+  )[];
+  asesoresIds?: string[];
+  slaEstados?: (
+    | "cumplido_a_tiempo"
+    | "cumplido_con_retraso"
+    | "atrasado"
+    | "riesgo_fecha"
+    | "riesgo_ritmo"
+    | "verde"
+  )[];
+  conEntregablesBorrador?: boolean;
+  // Análisis 360
+  scoreMin?: number;
+  conResolutoria?: boolean;
+  // Relaciones
+  propietarioId?: string | null;
+  conLeadsActivos?: boolean;
+  leadsMinimo?: number;
+  // Fechas
+  creadoDesde?: string;
+  creadoHasta?: string;
+  ultimaActividadDias?: number;
+}
+
 export interface LoteUnificado {
   id: string;
   nombre_lote: string;
   ciudad: string | null;
   barrio: string | null;
+  tipo_lote: string | null;
+  estrato: number | null;
+  destacado: boolean;
   area_total_m2: number | null;
+  precio_venta_estimado: number | null;
   foto_url: string | null;
   estado_publicacion: string;
+  estado_disponibilidad: string | null;
   publicado_venta: boolean;
   propietario_id: string | null;
   es_publico: boolean;
   score_360: number | null;
   has_resolutoria: boolean;
+  created_at: string | null;
   engagement_id: string | null;
   engagement_estado: string | null;
   engagement_avance_pct: number | null;
+  plan_codigo: string | null;
   sla_estado: string | null;
   sla_cumplido: boolean | null;
   dias_para_sla: number | null;
@@ -33,14 +94,20 @@ export interface LoteUnificado {
   asesor_nombre: string | null;
   plan_nombre: string | null;
   tiene_entregables_borrador: boolean | null;
+  ultima_actualizacion: string | null;
   leads_count: number;
   leads_nuevos_count: number;
 }
 
-export const useLotesUnificados = (filtros: {
-  busqueda?: string;
-  filtro?: FiltroLoteUnif;
-}) => {
+const categoriaArea = (a: number | null): CategoriaArea | null => {
+  if (a == null) return null;
+  if (a < 500) return "pequeño";
+  if (a < 1500) return "mediano";
+  if (a < 5000) return "grande";
+  return "extra_grande";
+};
+
+export const useLotesUnificados = (filtros: FiltrosUnificados) => {
   return useQuery({
     queryKey: ["lotes-unificados", filtros],
     staleTime: 30_000,
@@ -51,8 +118,10 @@ export const useLotesUnificados = (filtros: {
         sb
           .from("lotes")
           .select(
-            `id, nombre_lote, ciudad, barrio, area_total_m2, foto_url,
-             estado_publicacion, publicado_venta, propietario_id, es_publico,
+            `id, nombre_lote, ciudad, barrio, tipo_lote, estrato, destacado,
+             area_total_m2, precio_venta_estimado, foto_url,
+             estado_publicacion, estado_disponibilidad, publicado_venta,
+             propietario_id, es_publico,
              score_juridico, score_ambiental, score_arquitectonico, score_financiero,
              score_geotecnico, score_mercado, score_servicios, score_normativo,
              has_resolutoria, created_at`,
@@ -107,17 +176,25 @@ export const useLotesUnificados = (filtros: {
           nombre_lote: lote.nombre_lote,
           ciudad: lote.ciudad,
           barrio: lote.barrio,
+          tipo_lote: lote.tipo_lote ?? null,
+          estrato: lote.estrato != null ? Number(lote.estrato) : null,
+          destacado: !!lote.destacado,
           area_total_m2: lote.area_total_m2 != null ? Number(lote.area_total_m2) : null,
+          precio_venta_estimado:
+            lote.precio_venta_estimado != null ? Number(lote.precio_venta_estimado) : null,
           foto_url: lote.foto_url,
           estado_publicacion: lote.estado_publicacion,
+          estado_disponibilidad: lote.estado_disponibilidad ?? null,
           publicado_venta: !!lote.publicado_venta,
           propietario_id: lote.propietario_id,
           es_publico: !!lote.es_publico,
           score_360: score360,
           has_resolutoria: !!lote.has_resolutoria,
+          created_at: lote.created_at ?? null,
           engagement_id: eng?.engagement_id ?? null,
           engagement_estado: eng?.estado ?? null,
           engagement_avance_pct: eng?.avance_pct != null ? Number(eng.avance_pct) : null,
+          plan_codigo: eng?.plan_codigo ?? null,
           sla_estado: eng?.sla_estado ?? null,
           sla_cumplido: eng?.sla_cumplido ?? null,
           dias_para_sla: eng?.dias_para_sla != null ? Number(eng.dias_para_sla) : null,
@@ -125,12 +202,14 @@ export const useLotesUnificados = (filtros: {
           asesor_nombre: eng?.asesor_nombre ?? null,
           plan_nombre: eng?.plan_nombre ?? null,
           tiene_entregables_borrador: eng?.tiene_entregables_borrador ?? null,
+          ultima_actualizacion: eng?.ultima_actualizacion ?? null,
           leads_count: lc.total,
           leads_nuevos_count: lc.nuevos,
         };
       });
 
       let res = out;
+
       if (filtros.busqueda?.trim()) {
         const q = filtros.busqueda.toLowerCase();
         res = res.filter(
@@ -154,6 +233,101 @@ export const useLotesUnificados = (filtros: {
           return true;
         });
       }
+
+      // Ubicación
+      if (filtros.ciudades?.length)
+        res = res.filter((l) => filtros.ciudades!.includes(l.ciudad ?? ""));
+      if (filtros.barrios?.length)
+        res = res.filter((l) => filtros.barrios!.includes(l.barrio ?? ""));
+
+      // Características
+      if (filtros.tipos?.length)
+        res = res.filter((l) => l.tipo_lote && filtros.tipos!.includes(l.tipo_lote));
+      if (filtros.categoriaArea?.length)
+        res = res.filter((l) => {
+          const c = categoriaArea(l.area_total_m2);
+          return c != null && filtros.categoriaArea!.includes(c);
+        });
+      if (filtros.areaMin != null)
+        res = res.filter((l) => (l.area_total_m2 ?? 0) >= filtros.areaMin!);
+      if (filtros.areaMax != null)
+        res = res.filter((l) => (l.area_total_m2 ?? 0) <= filtros.areaMax!);
+      if (filtros.precioMin != null)
+        res = res.filter((l) => (l.precio_venta_estimado ?? 0) >= filtros.precioMin!);
+      if (filtros.precioMax != null)
+        res = res.filter(
+          (l) =>
+            l.precio_venta_estimado != null && l.precio_venta_estimado <= filtros.precioMax!,
+        );
+      if (filtros.estratos?.length)
+        res = res.filter((l) => l.estrato != null && filtros.estratos!.includes(l.estrato));
+
+      // Estado publicación
+      if (filtros.estadosPublicacion?.length)
+        res = res.filter((l) =>
+          filtros.estadosPublicacion!.includes(l.estado_publicacion as any),
+        );
+      if (filtros.estadoDisponibilidad?.length)
+        res = res.filter(
+          (l) =>
+            l.estado_disponibilidad &&
+            filtros.estadoDisponibilidad!.includes(l.estado_disponibilidad as any),
+        );
+      if (filtros.soloPublicos) res = res.filter((l) => l.es_publico);
+      if (filtros.soloDestacados) res = res.filter((l) => l.destacado);
+
+      // Engagement
+      if (filtros.planesCodigos?.length)
+        res = res.filter(
+          (l) => l.plan_codigo && filtros.planesCodigos!.includes(l.plan_codigo),
+        );
+      if (filtros.estadosEngagement?.length)
+        res = res.filter(
+          (l) =>
+            l.engagement_estado &&
+            filtros.estadosEngagement!.includes(l.engagement_estado as any),
+        );
+      if (filtros.asesoresIds?.length)
+        res = res.filter((l) => l.asesor_id && filtros.asesoresIds!.includes(l.asesor_id));
+      if (filtros.slaEstados?.length)
+        res = res.filter(
+          (l) => l.sla_estado && filtros.slaEstados!.includes(l.sla_estado as any),
+        );
+      if (filtros.conEntregablesBorrador)
+        res = res.filter((l) => !!l.tiene_entregables_borrador);
+
+      // Análisis
+      if (filtros.scoreMin != null && filtros.scoreMin > 0)
+        res = res.filter((l) => (l.score_360 ?? 0) >= filtros.scoreMin!);
+      if (filtros.conResolutoria) res = res.filter((l) => l.has_resolutoria);
+
+      // Relaciones
+      if (filtros.propietarioId) {
+        if (filtros.propietarioId === "__sin__")
+          res = res.filter((l) => !l.propietario_id);
+        else res = res.filter((l) => l.propietario_id === filtros.propietarioId);
+      }
+      if (filtros.conLeadsActivos) res = res.filter((l) => l.leads_count > 0);
+      if (filtros.leadsMinimo != null)
+        res = res.filter((l) => l.leads_count >= filtros.leadsMinimo!);
+
+      // Fechas
+      if (filtros.creadoDesde) {
+        const t = new Date(filtros.creadoDesde).getTime();
+        res = res.filter((l) => l.created_at && new Date(l.created_at).getTime() >= t);
+      }
+      if (filtros.creadoHasta) {
+        const t = new Date(filtros.creadoHasta).getTime() + 24 * 60 * 60 * 1000 - 1;
+        res = res.filter((l) => l.created_at && new Date(l.created_at).getTime() <= t);
+      }
+      if (filtros.ultimaActividadDias) {
+        const lim = Date.now() - filtros.ultimaActividadDias * 24 * 60 * 60 * 1000;
+        res = res.filter((l) => {
+          const ref = l.ultima_actualizacion ?? l.created_at;
+          return ref != null && new Date(ref).getTime() >= lim;
+        });
+      }
+
       return res;
     },
   });

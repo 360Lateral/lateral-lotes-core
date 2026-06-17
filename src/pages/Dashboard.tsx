@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -12,23 +12,26 @@ import {
   CheckCircle2,
   Send,
   Clock,
-  Briefcase,
   Users,
-  AlertCircle,
   LayoutGrid,
   List,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
 import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
+import { FiltrosAvanzadosLotesSheet } from "@/components/dashboard/FiltrosAvanzadosLotesSheet";
 import {
   useLotesUnificados,
   useResumenLeads,
   useResumenEngagementsPorEstado,
   type LoteUnificado,
   type FiltroLoteUnif,
+  type FiltrosUnificados,
 } from "@/hooks/useDashboardUnificado";
+import { useFiltroOpcionesDisponibles } from "@/hooks/useFiltroOpcionesDisponibles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatoRelativo } from "@/lib/format";
@@ -41,6 +44,33 @@ const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
   { v: "sin_asesor", label: "Sin asesor" },
 ];
 
+const STORAGE_KEY = "dashboard_filtros_avanzados";
+
+const ChipActivo = ({
+  children,
+  onRemove,
+}: {
+  children: React.ReactNode;
+  onRemove: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onRemove}
+    className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary hover:bg-primary/25"
+  >
+    {children}
+    <X className="h-2.5 w-2.5" />
+  </button>
+);
+
+const cargarFiltrosIniciales = (): FiltrosUnificados => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { filtro: "todos" };
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -48,15 +78,85 @@ const Dashboard = () => {
   const nombre =
     (user?.user_metadata as any)?.full_name?.split(" ")?.[0] ?? "admin";
 
-  const [busqueda, setBusqueda] = useState("");
-  const [filtro, setFiltro] = useState<FiltroLoteUnif>("todos");
+  const [filtros, setFiltros] = useState<FiltrosUnificados>(cargarFiltrosIniciales);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [vista, setVista] = useState<"grid" | "tabla">("grid");
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [drawerLote, setDrawerLote] = useState<LoteUnificado | null>(null);
 
-  const { data: lotes = [], isLoading } = useLotesUnificados({ busqueda, filtro });
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtros));
+    } catch {}
+  }, [filtros]);
+
+  const setBusqueda = (busqueda: string) =>
+    setFiltros((p) => ({ ...p, busqueda }));
+  const setFiltro = (filtro: FiltroLoteUnif) =>
+    setFiltros((p) => ({ ...p, filtro }));
+  const busqueda = filtros.busqueda ?? "";
+  const filtro = filtros.filtro ?? "todos";
+
+  const { data: lotes = [], isLoading } = useLotesUnificados(filtros);
+  const { data: opciones } = useFiltroOpcionesDisponibles();
   const { data: resumenLeads } = useResumenLeads();
   const { data: resumenEngagements } = useResumenEngagementsPorEstado();
+
+  const filtrosAvanzadosActivos = useMemo(() => {
+    let n = 0;
+    n += filtros.ciudades?.length ?? 0;
+    n += filtros.barrios?.length ?? 0;
+    n += filtros.tipos?.length ?? 0;
+    n += filtros.categoriaArea?.length ?? 0;
+    if (filtros.areaMin != null) n += 1;
+    if (filtros.areaMax != null) n += 1;
+    if (filtros.precioMin != null) n += 1;
+    if (filtros.precioMax != null) n += 1;
+    n += filtros.estratos?.length ?? 0;
+    n += filtros.estadosPublicacion?.length ?? 0;
+    n += filtros.estadoDisponibilidad?.length ?? 0;
+    if (filtros.soloPublicos) n += 1;
+    if (filtros.soloDestacados) n += 1;
+    n += filtros.planesCodigos?.length ?? 0;
+    n += filtros.estadosEngagement?.length ?? 0;
+    n += filtros.asesoresIds?.length ?? 0;
+    n += filtros.slaEstados?.length ?? 0;
+    if (filtros.conEntregablesBorrador) n += 1;
+    if (filtros.scoreMin != null && filtros.scoreMin > 0) n += 1;
+    if (filtros.conResolutoria) n += 1;
+    if (filtros.propietarioId) n += 1;
+    if (filtros.conLeadsActivos) n += 1;
+    if (filtros.leadsMinimo != null) n += 1;
+    if (filtros.creadoDesde) n += 1;
+    if (filtros.creadoHasta) n += 1;
+    if (filtros.ultimaActividadDias) n += 1;
+    return n;
+  }, [filtros]);
+
+  const limpiarAvanzados = () =>
+    setFiltros({ busqueda: filtros.busqueda, filtro: filtros.filtro });
+
+  const removerArrayItem = <K extends keyof FiltrosUnificados>(
+    key: K,
+    item: any,
+  ) =>
+    setFiltros((p) => {
+      const arr = (p[key] as any[] | undefined) ?? [];
+      const next = arr.filter((x) => x !== item);
+      return { ...p, [key]: next.length ? next : undefined };
+    });
+
+  const removerCampo = (key: keyof FiltrosUnificados) =>
+    setFiltros((p) => ({ ...p, [key]: undefined }));
+
+  const nombreAsesor = (id: string) =>
+    opciones?.asesores.find((a) => a.id === id)?.nombre ?? id.slice(0, 6);
+  const nombrePropietario = (id: string) =>
+    id === "__sin__"
+      ? "Sin propietario"
+      : opciones?.propietarios.find((p) => p.id === id)?.nombre ?? id.slice(0, 6);
+  const nombrePlan = (cod: string) =>
+    opciones?.planes.find((p) => p.codigo === cod)?.nombre ?? cod;
 
   const atrasados = useMemo(
     () => lotes.filter((l) => l.sla_estado === "atrasado" && !l.sla_cumplido).length,
@@ -251,6 +351,21 @@ const Dashboard = () => {
             </button>
           ))}
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setSheetOpen(true)}
+          className="relative h-8 gap-1 text-[11px]"
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+          Filtros avanzados
+          {filtrosAvanzadosActivos > 0 && (
+            <span className="ml-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-bold text-white">
+              {filtrosAvanzadosActivos}
+            </span>
+          )}
+        </Button>
         <div className="ml-auto flex gap-1 rounded-md border border-border bg-background p-0.5">
           <button
             type="button"
@@ -278,6 +393,149 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+
+      {/* Chips filtros activos */}
+      {filtrosAvanzadosActivos > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-1">
+          <span className="text-[10px] font-medium uppercase text-muted-foreground">
+            Filtros activos:
+          </span>
+          {filtros.ciudades?.map((c) => (
+            <ChipActivo key={`ciu-${c}`} onRemove={() => removerArrayItem("ciudades", c)}>
+              {c}
+            </ChipActivo>
+          ))}
+          {filtros.barrios?.map((b) => (
+            <ChipActivo key={`b-${b}`} onRemove={() => removerArrayItem("barrios", b)}>
+              {b}
+            </ChipActivo>
+          ))}
+          {filtros.tipos?.map((t) => (
+            <ChipActivo key={`t-${t}`} onRemove={() => removerArrayItem("tipos", t)}>
+              {t}
+            </ChipActivo>
+          ))}
+          {filtros.categoriaArea?.map((c) => (
+            <ChipActivo key={`ca-${c}`} onRemove={() => removerArrayItem("categoriaArea", c)}>
+              Área: {c.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.areaMin != null && (
+            <ChipActivo onRemove={() => removerCampo("areaMin")}>
+              ≥ {filtros.areaMin} m²
+            </ChipActivo>
+          )}
+          {filtros.areaMax != null && (
+            <ChipActivo onRemove={() => removerCampo("areaMax")}>
+              ≤ {filtros.areaMax} m²
+            </ChipActivo>
+          )}
+          {filtros.precioMin != null && (
+            <ChipActivo onRemove={() => removerCampo("precioMin")}>
+              ≥ ${filtros.precioMin.toLocaleString("es-CO")}
+            </ChipActivo>
+          )}
+          {filtros.precioMax != null && (
+            <ChipActivo onRemove={() => removerCampo("precioMax")}>
+              ≤ ${filtros.precioMax.toLocaleString("es-CO")}
+            </ChipActivo>
+          )}
+          {filtros.estratos?.map((e) => (
+            <ChipActivo key={`e-${e}`} onRemove={() => removerArrayItem("estratos", e)}>
+              Estrato {e}
+            </ChipActivo>
+          ))}
+          {filtros.estadosPublicacion?.map((s) => (
+            <ChipActivo key={`ep-${s}`} onRemove={() => removerArrayItem("estadosPublicacion", s)}>
+              {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.estadoDisponibilidad?.map((s) => (
+            <ChipActivo key={`ed-${s}`} onRemove={() => removerArrayItem("estadoDisponibilidad", s)}>
+              {s}
+            </ChipActivo>
+          ))}
+          {filtros.soloPublicos && (
+            <ChipActivo onRemove={() => removerCampo("soloPublicos")}>Públicos</ChipActivo>
+          )}
+          {filtros.soloDestacados && (
+            <ChipActivo onRemove={() => removerCampo("soloDestacados")}>Destacados</ChipActivo>
+          )}
+          {filtros.planesCodigos?.map((p) => (
+            <ChipActivo key={`pl-${p}`} onRemove={() => removerArrayItem("planesCodigos", p)}>
+              Plan: {nombrePlan(p)}
+            </ChipActivo>
+          ))}
+          {filtros.estadosEngagement?.map((s) => (
+            <ChipActivo key={`ee-${s}`} onRemove={() => removerArrayItem("estadosEngagement", s)}>
+              {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.asesoresIds?.map((a) => (
+            <ChipActivo key={`a-${a}`} onRemove={() => removerArrayItem("asesoresIds", a)}>
+              {nombreAsesor(a)}
+            </ChipActivo>
+          ))}
+          {filtros.slaEstados?.map((s) => (
+            <ChipActivo key={`sla-${s}`} onRemove={() => removerArrayItem("slaEstados", s)}>
+              SLA: {s.replace("_", " ")}
+            </ChipActivo>
+          ))}
+          {filtros.conEntregablesBorrador && (
+            <ChipActivo onRemove={() => removerCampo("conEntregablesBorrador")}>
+              Con entregables borrador
+            </ChipActivo>
+          )}
+          {filtros.scoreMin != null && filtros.scoreMin > 0 && (
+            <ChipActivo onRemove={() => removerCampo("scoreMin")}>
+              Score ≥ {filtros.scoreMin}
+            </ChipActivo>
+          )}
+          {filtros.conResolutoria && (
+            <ChipActivo onRemove={() => removerCampo("conResolutoria")}>
+              Con resolutoría
+            </ChipActivo>
+          )}
+          {filtros.propietarioId && (
+            <ChipActivo onRemove={() => removerCampo("propietarioId")}>
+              {nombrePropietario(filtros.propietarioId)}
+            </ChipActivo>
+          )}
+          {filtros.conLeadsActivos && (
+            <ChipActivo onRemove={() => removerCampo("conLeadsActivos")}>
+              Con leads
+            </ChipActivo>
+          )}
+          {filtros.leadsMinimo != null && (
+            <ChipActivo onRemove={() => removerCampo("leadsMinimo")}>
+              ≥ {filtros.leadsMinimo} leads
+            </ChipActivo>
+          )}
+          {filtros.creadoDesde && (
+            <ChipActivo onRemove={() => removerCampo("creadoDesde")}>
+              Desde {filtros.creadoDesde}
+            </ChipActivo>
+          )}
+          {filtros.creadoHasta && (
+            <ChipActivo onRemove={() => removerCampo("creadoHasta")}>
+              Hasta {filtros.creadoHasta}
+            </ChipActivo>
+          )}
+          {filtros.ultimaActividadDias != null && (
+            <ChipActivo onRemove={() => removerCampo("ultimaActividadDias")}>
+              Últimos {filtros.ultimaActividadDias}d
+            </ChipActivo>
+          )}
+          <button
+            type="button"
+            onClick={limpiarAvanzados}
+            className="ml-1 text-[10px] text-muted-foreground underline hover:text-foreground"
+          >
+            Limpiar todos
+          </button>
+        </div>
+      )}
+
 
       {/* Bulk actions */}
       <BulkActionsBar
@@ -478,6 +736,13 @@ const Dashboard = () => {
         lote={drawerLote}
         open={!!drawerLote}
         onOpenChange={(open) => !open && setDrawerLote(null)}
+      />
+
+      <FiltrosAvanzadosLotesSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        valor={filtros}
+        onAplicar={(f) => setFiltros(f)}
       />
     </DashboardLayout>
   );
