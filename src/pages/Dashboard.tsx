@@ -642,6 +642,25 @@ const Dashboard = () => {
         </Button>
       </BulkActionsBar>
 
+      {/* CTA bulk contextual al propietario */}
+      {seleccionados.size === 0 && propietarioSeleccionado && lotes.length > 0 && vista !== "por_propietario" && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-md border border-blue-200 bg-blue-50/60 px-3 py-2">
+          <Building2 className="h-3.5 w-3.5 text-blue-700" />
+          <p className="flex-1 text-[11px] text-blue-900">
+            ¿Quieres aplicar acciones a todos los lotes de{" "}
+            <span className="font-semibold">{propietarioSeleccionado.nombre}</span>?
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setSeleccionados(new Set(lotes.map((l) => l.id)))}
+            className="h-7 text-xs"
+          >
+            Seleccionar {lotes.length}
+          </Button>
+        </div>
+      )}
+
       {/* Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -649,6 +668,25 @@ const Dashboard = () => {
             <Skeleton key={i} className="h-56 w-full" />
           ))}
         </div>
+      ) : vista === "por_propietario" ? (
+        propietarios.length === 0 ? (
+          <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
+            No hay propietarios con activos.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {propietarios.map((p) => (
+              <CardPropietario
+                key={p.id}
+                propietario={p}
+                onClick={() => {
+                  setFiltros({ ...filtros, propietarioId: p.id });
+                  setVista("grid");
+                }}
+              />
+            ))}
+          </div>
+        )
       ) : lotes.length === 0 ? (
         <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
           No hay lotes que coincidan con tus filtros.
