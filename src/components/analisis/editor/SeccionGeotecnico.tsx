@@ -35,9 +35,9 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 5: Suelos (geotécnico) ──────────── */
-const SuelosSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-geotecnico", loteId];
+export default function SeccionGeotecnico({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-geotecnico", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -47,7 +47,7 @@ const SuelosSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProp
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_geotecnico", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_geotecnico", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("geotecnico", pdfProps, setForm);
@@ -132,6 +132,4 @@ const SuelosSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProp
       </CollapsibleContent>
     </Collapsible>
   );
-};
-
-export default
+}

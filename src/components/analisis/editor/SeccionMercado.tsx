@@ -35,9 +35,9 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 6: Mercado ──────────────────────── */
-const MercadoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-mercado", loteId];
+export default function SeccionMercado({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-mercado", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -47,7 +47,7 @@ const MercadoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPro
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_mercado", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_mercado", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("mercado", pdfProps, setForm);
@@ -121,6 +121,4 @@ const MercadoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPro
       </CollapsibleContent>
     </Collapsible>
   );
-};
-
-export default
+}

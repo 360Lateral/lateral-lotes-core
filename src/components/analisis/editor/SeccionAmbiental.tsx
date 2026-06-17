@@ -35,9 +35,9 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 3: Ambiental ────────────────────── */
-const AmbientalSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-ambiental", loteId];
+export default function SeccionAmbiental({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-ambiental", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -47,7 +47,7 @@ const AmbientalSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_ambiental", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_ambiental", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("ambiental", pdfProps, setForm);
@@ -132,6 +132,4 @@ const AmbientalSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfP
       </CollapsibleContent>
     </Collapsible>
   );
-};
-
-export default
+}

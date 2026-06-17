@@ -38,9 +38,9 @@ import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 const formatCOP = (v: number) =>
   new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
-const FinancieroSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-financiero", loteId];
+export default function SeccionFinanciero({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-financiero", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -57,7 +57,7 @@ const FinancieroSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: Pdf
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_financiero", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_financiero", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("financiero", pdfProps, setForm);
@@ -165,4 +165,3 @@ const FinancieroSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: Pdf
       </CollapsibleContent>
     </Collapsible>
   );
-export default

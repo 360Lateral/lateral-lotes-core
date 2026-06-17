@@ -35,9 +35,9 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 2: Jurídico ─────────────────────── */
-const JuridicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-juridico", loteId];
+export default function SeccionJuridico({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-juridico", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -47,7 +47,7 @@ const JuridicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPr
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_juridico", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_juridico", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("juridico", pdfProps, setForm);
@@ -118,6 +118,4 @@ const JuridicoSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfPr
       </CollapsibleContent>
     </Collapsible>
   );
-};
-
-export default
+}

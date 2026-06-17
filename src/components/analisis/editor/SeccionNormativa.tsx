@@ -35,10 +35,10 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 1: Normativa (read-only summary + PDF) ── */
-const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?: number | null; lng?: number | null; pdfProps: PdfProps }) => {
+export default function SeccionNormativa({ loteId, lat, lng, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-normativa", loteId];
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-normativa", loteId];
   const { data: n } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -48,7 +48,7 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (n) setForm(n); }, [n]);
-  const upsert = useAnalisisUpsert("normativa_urbana", loteId, qk);
+  const upsert = useAnalisisUpsert("normativa_urbana", loteId, qk, onSaved);
   const completed = !!n;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("normativo", pdfProps, setForm);
@@ -393,6 +393,4 @@ const NormativaSection = ({ loteId, lat, lng, pdfProps }: { loteId: string; lat?
       </Dialog>
     </>
   );
-};
-
-export default
+}

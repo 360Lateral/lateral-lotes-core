@@ -35,9 +35,9 @@ import {
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
 /* ─── Section 4: SSPP ─────────────────────────── */
-const SSPPSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps }) => {
-  const [open, setOpen] = useState(false);
-  const qk = ["analisis-sspp", loteId];
+export default function SeccionSspp({ loteId, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const qk = qkProp ?? ["analisis-sspp", loteId];
   const { data } = useQuery({
     queryKey: qk,
     queryFn: async () => {
@@ -47,7 +47,7 @@ const SSPPSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps 
   });
   const [form, setForm] = useState<any>({});
   useEffect(() => { if (data) setForm(data); }, [data]);
-  const upsert = useAnalisisUpsert("analisis_sspp", loteId, qk);
+  const upsert = useAnalisisUpsert("analisis_sspp", loteId, qk, onSaved);
   const completed = !!data;
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
   useAutoMergePdfData("sspp", pdfProps, setForm);
@@ -119,6 +119,4 @@ const SSPPSection = ({ loteId, pdfProps }: { loteId: string; pdfProps: PdfProps 
       </CollapsibleContent>
     </Collapsible>
   );
-};
-
-export default
+}
