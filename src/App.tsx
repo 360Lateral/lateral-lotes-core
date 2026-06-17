@@ -125,7 +125,7 @@ const App = () => (
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/lotes" element={<ProtectedRoute><DashboardLotes /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute requireAdmin><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute requireAdmin><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
@@ -136,7 +136,7 @@ const App = () => (
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
-            <Route path="/dashboard/leads" element={<ProtectedRoute requireAdmin><DashboardLeads /></ProtectedRoute>} />
+            <Route path="/dashboard/leads" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard/usuarios" element={<ProtectedRoute requireAdmin><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
             <Route path="/dashboard/contratos-marco" element={<ProtectedRoute requireSuperAdmin><DashboardContratosMarco /></ProtectedRoute>} />
