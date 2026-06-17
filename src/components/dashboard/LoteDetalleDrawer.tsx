@@ -80,6 +80,30 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
           </TabsList>
 
           <TabsContent value="info">
+            <div className="relative mb-3 h-40 w-full overflow-hidden rounded-md bg-muted">
+              {lote.foto_url ? (
+                <>
+                  <FotoLote url={lote.foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover" />
+                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px] font-medium text-foreground/80 backdrop-blur-sm">
+                    <ImageIcon className="h-3 w-3" /> Foto
+                  </span>
+                </>
+              ) : lote.lat != null && lote.lng != null ? (
+                <>
+                  <MapaEstaticoLote lat={lote.lat} lng={lote.lng} nombre={lote.nombre_lote} className="h-full w-full object-cover" />
+                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px] font-medium text-foreground/80 backdrop-blur-sm">
+                    <MapPinned className="h-3 w-3" /> Ubicación
+                  </span>
+                </>
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-muted to-muted/60 text-muted-foreground">
+                  <MapPin className="h-7 w-7 opacity-60" />
+                  <span className="text-xs">
+                    {[lote.ciudad, lote.barrio].filter(Boolean).join(" · ") || "Sin ubicación"}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="space-y-0.5">
               <Row
                 label="Área"
