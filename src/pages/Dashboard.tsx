@@ -1,454 +1,484 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ArrowUp,
-  ClipboardCheck,
-  CreditCard,
-  Download,
-  MessageCircle,
+  Search,
   Plus,
-  type LucideIcon,
+  Download,
+  AlertTriangle,
+  CheckCircle2,
+  Send,
+  Clock,
+  Briefcase,
+  Users,
+  AlertCircle,
+  LayoutGrid,
+  List,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import KPIEstado from "@/components/ui/KPIEstado";
+import BulkActionsBar from "@/components/ui/BulkActionsBar";
+import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
+import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
+import {
+  useLotesUnificados,
+  useResumenLeads,
+  useResumenEngagementsPorEstado,
+  type LoteUnificado,
+  type FiltroLoteUnif,
+} from "@/hooks/useDashboardUnificado";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
-import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
 import { useToast } from "@/hooks/use-toast";
-import { formatCOPCompact, formatoRelativo } from "@/lib/format";
+import { formatoRelativo } from "@/lib/format";
 
-const leadEstadoVariant = (e: string) => {
-  switch (e) {
-    case "nuevo": return "disponible" as const;
-    case "contactado": return "reservado" as const;
-    case "negociacion": return "default" as const;
-    case "cerrado": return "vendido" as const;
-    case "descartado": return "secondary" as const;
-    default: return "default" as const;
-  }
-};
-
-interface KPIAdminProps {
-  label: string;
-  value: string | number;
-  deltaLabel?: string;
-  deltaPositive?: boolean;
-  sublabel?: string;
-}
-
-const KPIAdmin = ({ label, value, deltaLabel, deltaPositive, sublabel }: KPIAdminProps) => (
-  <div className="rounded-md bg-muted/40 p-3">
-    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-    <div className="mt-1 flex items-baseline justify-between gap-2">
-      <span className="text-xl font-bold text-foreground">{value}</span>
-      {deltaLabel && (
-        <span className={`text-[10px] ${deltaPositive ? "text-emerald-600" : "text-muted-foreground"}`}>
-          {deltaPositive && <ArrowUp className="inline h-2.5 w-2.5" />}
-          {deltaLabel}
-        </span>
-      )}
-      {sublabel && !deltaLabel && (
-        <span className="text-[10px] text-muted-foreground">{sublabel}</span>
-      )}
-    </div>
-  </div>
-);
-
-interface AccionUrgenteProps {
-  icon: LucideIcon;
-  titulo: string;
-  count: number;
-  countLabel: string;
-  onClick: () => void;
-}
-
-const AccionUrgente = ({ icon: Icon, titulo, count, countLabel, onClick }: AccionUrgenteProps) => (
-  <button
-    onClick={onClick}
-    disabled={count === 0}
-    className="text-left rounded-md border border-border bg-background px-3 py-2 transition-colors hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-      <Icon className="h-3.5 w-3.5" />
-      {titulo}
-    </div>
-    <div className="mt-0.5 text-[11px] text-muted-foreground">{countLabel}</div>
-  </button>
-);
+const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
+  { v: "todos", label: "Todos" },
+  { v: "con_engagement", label: "Con engagement" },
+  { v: "por_validar", label: "Por validar" },
+  { v: "en_venta", label: "En venta" },
+  { v: "sin_asesor", label: "Sin asesor" },
+];
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const displayName =
-    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Admin";
-  const firstName = displayName.split(" ")[0];
+  const navigate = useNavigate();
+  const nombre =
+    (user?.user_metadata as any)?.full_name?.split(" ")?.[0] ?? "admin";
 
-  // Lotes totales
-  const { data: lotes = [] } = useQuery({
-    queryKey: ["dash-lotes"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("lotes")
-        .select("id, created_at, estado_disponibilidad");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  const [busqueda, setBusqueda] = useState("");
+  const [filtro, setFiltro] = useState<FiltroLoteUnif>("todos");
+  const [vista, setVista] = useState<"grid" | "tabla">("grid");
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
+  const [drawerLote, setDrawerLote] = useState<LoteUnificado | null>(null);
 
-  // Leads recientes
-  const { data: leads = [] } = useQuery({
-    queryKey: ["dash-leads"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("leads")
-        .select("id, created_at, nombre, email, estado, lote_id, lotes(nombre_lote)")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  const { data: lotes = [], isLoading } = useLotesUnificados({ busqueda, filtro });
+  const { data: resumenLeads } = useResumenLeads();
+  const { data: resumenEngagements } = useResumenEngagementsPorEstado();
 
-  // Negociaciones activas
-  const { data: negociaciones = [] } = useQuery({
-    queryKey: ["dash-neg-activas-count"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("negociaciones")
-        .select("id, estado")
-        .eq("estado", "activa");
-      return data ?? [];
-    },
-  });
+  const atrasados = useMemo(
+    () => lotes.filter((l) => l.sla_estado === "atrasado" && !l.sla_cumplido).length,
+    [lotes],
+  );
+  const pendientesPublicar = useMemo(
+    () => lotes.filter((l) => l.tiene_entregables_borrador && !l.sla_cumplido).length,
+    [lotes],
+  );
+  const enRiesgo = useMemo(
+    () =>
+      lotes.filter(
+        (l) => l.sla_estado === "riesgo_fecha" || l.sla_estado === "riesgo_ritmo",
+      ).length,
+    [lotes],
+  );
+  const cumplidos = useMemo(() => lotes.filter((l) => l.sla_cumplido).length, [lotes]);
+  const sinAsesor = useMemo(
+    () => lotes.filter((l) => l.engagement_id && !l.asesor_id).length,
+    [lotes],
+  );
 
-  // Usuarios
-  const { data: usuariosData = { total: 0, nuevos: 0 } } = useQuery({
-    queryKey: ["dash-usuarios"],
-    queryFn: async () => {
-      const desde = new Date();
-      desde.setDate(desde.getDate() - 30);
-      const [totalRes, nuevosRes] = await Promise.all([
-        supabase.from("perfiles").select("id", { count: "exact", head: true }),
-        supabase
-          .from("perfiles")
-          .select("id", { count: "exact", head: true })
-          .gte("created_at", desde.toISOString()),
-      ]);
-      return {
-        total: totalRes.count ?? 0,
-        nuevos: nuevosRes.count ?? 0,
-      };
-    },
-  });
+  const contadores = useMemo(
+    () => ({
+      todos: lotes.length,
+      con_engagement: lotes.filter((l) => !!l.engagement_id).length,
+      por_validar: lotes.filter((l) => l.estado_publicacion === "pendiente_validacion")
+        .length,
+      en_venta: lotes.filter(
+        (l) => l.publicado_venta && l.estado_publicacion === "aprobado",
+      ).length,
+      sin_asesor: sinAsesor,
+      atrasados,
+    }),
+    [lotes, sinAsesor, atrasados],
+  );
 
-  // Ingresos del mes (transacciones aprobadas)
-  const { data: ingresosMes = { actual: 0, anterior: 0 } } = useQuery({
-    queryKey: ["dash-ingresos-mes"],
-    queryFn: async () => {
-      const ahora = new Date();
-      const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-      const inicioMesAnt = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
-      const finMesAnt = new Date(ahora.getFullYear(), ahora.getMonth(), 0, 23, 59, 59);
+  const toggleSeleccion = (id: string) => {
+    setSeleccionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
-      const [actRes, antRes] = await Promise.all([
-        (supabase as any)
-          .from("transacciones")
-          .select("monto_cop")
-          .eq("estado", "aprobada")
-          .gte("fecha_aprobacion", inicioMes.toISOString()),
-        (supabase as any)
-          .from("transacciones")
-          .select("monto_cop")
-          .eq("estado", "aprobada")
-          .gte("fecha_aprobacion", inicioMesAnt.toISOString())
-          .lte("fecha_aprobacion", finMesAnt.toISOString()),
-      ]);
-      const sum = (rows: any[] | null | undefined) =>
-        (rows ?? []).reduce((s, r) => s + Number(r.monto_cop ?? 0), 0);
-      return { actual: sum(actRes.data), anterior: sum(antRes.data) };
-    },
-  });
-
-  // Hooks compartidos con sidebar para badges urgentes
-  const { data: lotesPendientes = [] } = useLotesPendientesValidacion();
-  const { data: solicitudesPendientes = [] } = useSolicitudesContacto("pendiente");
-  const { data: pagosPendientes = [] } = useQuery({
-    queryKey: ["dash-pagos-pendientes"],
-    queryFn: async () => {
-      const { data } = await (supabase as any)
-        .from("transacciones")
-        .select("id")
-        .eq("estado", "pendiente");
-      return data ?? [];
-    },
-  });
-
-  // Actividad reciente últimas 24h
-  const { data: actividad = [] } = useQuery({
-    queryKey: ["dash-actividad-24h"],
-    queryFn: async () => {
-      const desde = new Date();
-      desde.setDate(desde.getDate() - 1);
-      const desdeIso = desde.toISOString();
-      const [nuevosLotes, nuevosLeads, transAp, neg] = await Promise.all([
-        supabase
-          .from("lotes")
-          .select("id, nombre_lote, created_at")
-          .gte("created_at", desdeIso)
-          .order("created_at", { ascending: false })
-          .limit(5),
-        supabase
-          .from("leads")
-          .select("id, nombre, created_at")
-          .gte("created_at", desdeIso)
-          .order("created_at", { ascending: false })
-          .limit(5),
-        (supabase as any)
-          .from("transacciones")
-          .select("id, monto_cop, fecha_aprobacion")
-          .eq("estado", "aprobada")
-          .gte("fecha_aprobacion", desdeIso)
-          .order("fecha_aprobacion", { ascending: false })
-          .limit(5),
-        supabase
-          .from("negociaciones")
-          .select("id, created_at")
-          .gte("created_at", desdeIso)
-          .order("created_at", { ascending: false })
-          .limit(5),
-      ]);
-      type Item = { id: string; tipo: string; texto: string; fecha: string };
-      const items: Item[] = [];
-      (nuevosLotes.data ?? []).forEach((l: any) =>
-        items.push({ id: `lote-${l.id}`, tipo: "Lote", texto: `Nuevo lote: ${l.nombre_lote ?? "—"}`, fecha: l.created_at })
+  const panorama = useMemo(() => {
+    const partes: string[] = [];
+    if (atrasados > 0)
+      partes.push(
+        `${atrasados} ${
+          atrasados === 1 ? "engagement requiere" : "engagements requieren"
+        } atención`,
       );
-      (nuevosLeads.data ?? []).forEach((l: any) =>
-        items.push({ id: `lead-${l.id}`, tipo: "Lead", texto: `Nuevo lead: ${l.nombre ?? "—"}`, fecha: l.created_at })
-      );
-      ((transAp.data as any[]) ?? []).forEach((t: any) =>
-        items.push({
-          id: `tx-${t.id}`,
-          tipo: "Pago",
-          texto: `Pago aprobado: ${formatCOPCompact(Number(t.monto_cop ?? 0))}`,
-          fecha: t.fecha_aprobacion,
-        })
-      );
-      (neg.data ?? []).forEach((n: any) =>
-        items.push({ id: `neg-${n.id}`, tipo: "Negociación", texto: `Nueva negociación`, fecha: n.created_at })
-      );
-      return items
-        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
-        .slice(0, 8);
-    },
-  });
+    partes.push(`${lotes.length} lotes activos`);
+    if (resumenLeads?.nuevos)
+      partes.push(`${resumenLeads.nuevos} leads sin asignar`);
+    return partes.join(", ");
+  }, [atrasados, lotes.length, resumenLeads?.nuevos]);
 
-  const lotesPendientesCount = lotesPendientes.length;
-  const pagosPendientesCount = pagosPendientes.length;
-  const solicitudesCount = solicitudesPendientes.length;
-
-  // Lotes nuevos este mes
-  const inicioMes = new Date();
-  inicioMes.setDate(1);
-  inicioMes.setHours(0, 0, 0, 0);
-  const lotesNuevosEsteMes = lotes.filter(
-    (l: any) => l.created_at && new Date(l.created_at) >= inicioMes
-  ).length;
-
-  const ingresosDelta =
-    ingresosMes.anterior > 0
-      ? Math.round(((ingresosMes.actual - ingresosMes.anterior) / ingresosMes.anterior) * 100)
-      : null;
-
-  const tieneAccionesUrgentes =
-    lotesPendientesCount + pagosPendientesCount + solicitudesCount > 0;
-
-  const handleExportar = () => {
+  const handleExportar = () =>
     toast({ title: "Exportar", description: "Próximamente disponible." });
-  };
 
-  const tipoBadgeColor = (tipo: string) => {
-    switch (tipo) {
-      case "Pago": return "bg-emerald-100 text-emerald-700";
-      case "Lote": return "bg-primary/15 text-primary";
-      case "Lead": return "bg-blue-100 text-blue-700";
-      case "Negociación": return "bg-purple-100 text-purple-700";
-      default: return "bg-muted text-muted-foreground";
-    }
-  };
+  const tipoFiltroDestacado = (v: FiltroLoteUnif) => filtro === v;
 
   return (
     <DashboardLayout>
       {/* Header */}
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Dashboard</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Hola {firstName},{" "}
-            {lotesPendientesCount > 0 || pagosPendientesCount > 0 ? (
-              <>
-                tienes{" "}
-                <strong className="text-foreground">
-                  {lotesPendientesCount} {lotesPendientesCount === 1 ? "lote" : "lotes"} por validar
-                </strong>
-                {pagosPendientesCount > 0 && (
-                  <>
-                    {" "}y{" "}
-                    <strong className="text-foreground">
-                      {pagosPendientesCount} {pagosPendientesCount === 1 ? "pago pendiente" : "pagos pendientes"}
-                    </strong>{" "}
-                    de revisión
-                  </>
-                )}
-                .
-              </>
-            ) : (
-              <>no hay acciones urgentes por ahora.</>
-            )}
-          </p>
+      <header className="mb-4">
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+              Hola {nombre}, este es tu panorama
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">{panorama}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={() => navigate("/dashboard/lotes/nuevo")}>
+              <Plus className="mr-1.5 h-4 w-4" /> Nuevo lote
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportar}>
+              <Download className="mr-1.5 h-4 w-4" /> Reporte
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportar}>
-            <Download className="mr-1.5 h-4 w-4" /> Exportar
-          </Button>
-          <Button size="sm" onClick={() => navigate("/dashboard/lotes/nuevo")}>
-            <Plus className="mr-1.5 h-4 w-4" /> Nuevo lote
-          </Button>
-        </div>
+
+        <section className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          <KPIEstado
+            label="Atrasados"
+            value={atrasados}
+            icon={AlertTriangle}
+            colorClass="text-destructive"
+            destacado={atrasados > 0}
+            onClick={() => setFiltro("atrasados")}
+          />
+          <KPIEstado
+            label="Por publicar"
+            value={pendientesPublicar}
+            icon={Send}
+            colorClass="text-primary"
+            destacado={pendientesPublicar > 0}
+            onClick={() => setFiltro("con_engagement")}
+          />
+          <KPIEstado
+            label="En riesgo"
+            value={enRiesgo}
+            icon={Clock}
+            colorClass="text-amber-600"
+            onClick={() => setFiltro("con_engagement")}
+          />
+          <KPIEstado
+            label="Cumplidos"
+            value={cumplidos}
+            icon={CheckCircle2}
+            colorClass="text-green-600"
+          />
+          <KPIEstado
+            label="Sin asesor"
+            value={sinAsesor}
+            icon={Users}
+            colorClass="text-foreground"
+            destacado={sinAsesor > 0}
+            onClick={() => setFiltro("sin_asesor")}
+          />
+        </section>
       </header>
 
-      {/* KPIs */}
-      <section className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
-        <KPIAdmin
-          label="Lotes totales"
-          value={lotes.length}
-          deltaLabel={lotesNuevosEsteMes > 0 ? `+${lotesNuevosEsteMes} este mes` : undefined}
-          deltaPositive={lotesNuevosEsteMes > 0}
-        />
-        <KPIAdmin
-          label="Usuarios"
-          value={usuariosData.total}
-          deltaLabel={usuariosData.nuevos > 0 ? `+${usuariosData.nuevos} nuevos` : undefined}
-          deltaPositive={usuariosData.nuevos > 0}
-        />
-        <KPIAdmin
-          label="Negociaciones"
-          value={negociaciones.length}
-          sublabel="en curso"
-        />
-        <KPIAdmin
-          label="Ingresos del mes"
-          value={formatCOPCompact(ingresosMes.actual)}
-          deltaLabel={ingresosDelta != null ? `${ingresosDelta > 0 ? "+" : ""}${ingresosDelta}%` : undefined}
-          deltaPositive={ingresosDelta != null && ingresosDelta > 0}
-        />
-      </section>
-
-      {/* Banner acciones urgentes */}
-      {tieneAccionesUrgentes && (
+      {/* Banda de alertas */}
+      {atrasados + pendientesPublicar > 0 && (
         <section
-          className="mb-4 rounded-md border border-primary/40 bg-gradient-to-r from-primary/10 to-primary/[0.04] p-3"
-          style={{ borderLeftWidth: 3, borderLeftColor: "hsl(var(--primary))" }}
+          className="mb-3 flex items-center gap-3 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2"
+          style={{ borderLeftWidth: 3, borderLeftColor: "hsl(var(--destructive))" }}
         >
-          <h2 className="mb-2 text-xs font-semibold text-foreground">Acciones urgentes</h2>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <AccionUrgente
-              icon={ClipboardCheck}
-              titulo="Validar lotes"
-              count={lotesPendientesCount}
-              countLabel={
-                lotesPendientesCount === 0
-                  ? "Sin pendientes"
-                  : `${lotesPendientesCount} ${lotesPendientesCount === 1 ? "pendiente" : "pendientes"}`
-              }
-              onClick={() => navigate("/dashboard/lotes/pendientes-validacion")}
-            />
-            <AccionUrgente
-              icon={CreditCard}
-              titulo="Revisar pagos"
-              count={pagosPendientesCount}
-              countLabel={
-                pagosPendientesCount === 0
-                  ? "Sin pendientes"
-                  : `${pagosPendientesCount} ${pagosPendientesCount === 1 ? "transacción" : "transacciones"}`
-              }
-              onClick={() => navigate("/dashboard/pagos")}
-            />
-            <AccionUrgente
-              icon={MessageCircle}
-              titulo="Atender solicitudes"
-              count={solicitudesCount}
-              countLabel={
-                solicitudesCount === 0 ? "Sin pendientes" : `${solicitudesCount} sin asignar`
-              }
-              onClick={() => navigate("/dashboard/solicitudes-contacto")}
-            />
+          <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">
+              Acciones urgentes hoy
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              {atrasados > 0 &&
+                `${atrasados} ${
+                  atrasados === 1 ? "engagement atrasado" : "engagements atrasados"
+                }`}
+              {atrasados > 0 && pendientesPublicar > 0 && " · "}
+              {pendientesPublicar > 0 &&
+                `${pendientesPublicar} pendientes de publicar`}
+            </p>
           </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setFiltro(atrasados > 0 ? "atrasados" : "con_engagement")}
+          >
+            Ver
+          </Button>
         </section>
       )}
 
-      {/* Layout inferior 2 columnas */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {/* Leads recientes */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold">Leads recientes</CardTitle>
-            <Link to="/dashboard/leads" className="text-[10px] text-primary hover:underline">
-              Ver todos →
-            </Link>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {leads.length === 0 ? (
+      {/* Toolbar */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar lote, ciudad, asesor..."
+            className="h-8 pl-7 text-xs"
+          />
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {FILTROS.map((f) => (
+            <button
+              key={f.v}
+              type="button"
+              onClick={() => setFiltro(f.v)}
+              className={`inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] transition-colors ${
+                tipoFiltroDestacado(f.v)
+                  ? "border-secondary bg-secondary text-white"
+                  : "border-border bg-background text-foreground hover:bg-muted"
+              }`}
+            >
+              {f.label}
+              <span
+                className={`rounded-full px-1 text-[9px] font-bold ${
+                  tipoFiltroDestacado(f.v)
+                    ? "bg-white/20 text-white"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {(contadores as Record<string, number>)[f.v] ?? 0}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="ml-auto flex gap-1 rounded-md border border-border bg-background p-0.5">
+          <button
+            type="button"
+            onClick={() => setVista("grid")}
+            className={`rounded p-1 ${
+              vista === "grid"
+                ? "bg-secondary text-white"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+            aria-label="Grid"
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setVista("tabla")}
+            className={`rounded p-1 ${
+              vista === "tabla"
+                ? "bg-secondary text-white"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+            aria-label="Tabla"
+          >
+            <List className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Bulk actions */}
+      <BulkActionsBar
+        count={seleccionados.size}
+        onClear={() => setSeleccionados(new Set())}
+        itemLabel={{ singular: "lote seleccionado", plural: "lotes seleccionados" }}
+      >
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            toast({ title: "Validar", description: "Próximamente." })
+          }
+        >
+          <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Validar
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            toast({ title: "Publicar", description: "Próximamente." })
+          }
+        >
+          <Send className="mr-1 h-3.5 w-3.5" /> Publicar
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            toast({ title: "Asignar asesor", description: "Próximamente." })
+          }
+        >
+          <Users className="mr-1 h-3.5 w-3.5" /> Asignar asesor
+        </Button>
+      </BulkActionsBar>
+
+      {/* Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-56 w-full" />
+          ))}
+        </div>
+      ) : lotes.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
+          No hay lotes que coincidan con tus filtros.
+        </div>
+      ) : vista === "grid" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {lotes.map((l) => (
+            <LoteCardUnificada
+              key={l.id}
+              lote={l}
+              onClick={() => setDrawerLote(l)}
+              selected={seleccionados.has(l.id)}
+              onToggleSelect={() => toggleSeleccion(l.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-border bg-background">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40 text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-2 py-2 text-left">Lote</th>
+                <th className="px-2 py-2 text-left">Ubicación</th>
+                <th className="px-2 py-2 text-left">Estado</th>
+                <th className="px-2 py-2 text-left">Asesor</th>
+                <th className="px-2 py-2 text-right">Avance</th>
+                <th className="px-2 py-2 text-right">Leads</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lotes.map((l) => (
+                <tr
+                  key={l.id}
+                  className="cursor-pointer border-t border-border hover:bg-muted/30"
+                  onClick={() => setDrawerLote(l)}
+                >
+                  <td className="px-2 py-2 font-medium text-foreground">
+                    {l.nombre_lote}
+                  </td>
+                  <td className="px-2 py-2 text-muted-foreground">
+                    {[l.ciudad, l.barrio].filter(Boolean).join(" · ") || "—"}
+                  </td>
+                  <td className="px-2 py-2">
+                    {l.engagement_estado ?? l.estado_publicacion}
+                  </td>
+                  <td className="px-2 py-2 text-muted-foreground">
+                    {l.asesor_nombre ?? "—"}
+                  </td>
+                  <td className="px-2 py-2 text-right">
+                    {l.engagement_avance_pct != null
+                      ? `${Math.round(l.engagement_avance_pct)}%`
+                      : "—"}
+                  </td>
+                  <td className="px-2 py-2 text-right">{l.leads_count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Resumen inferior */}
+      <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+        {/* Leads */}
+        <div className="rounded-md border border-border bg-background p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold text-foreground">Leads recientes</h2>
+            <span className="text-[10px] text-muted-foreground">
+              {resumenLeads?.nuevos ?? 0} nuevos
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            {(resumenLeads?.leads ?? []).length === 0 ? (
               <p className="text-xs text-muted-foreground">Sin leads recientes.</p>
             ) : (
-              leads.map((l: any) => (
+              (resumenLeads?.leads ?? []).map((lead: any) => (
                 <div
-                  key={l.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-border/60 px-2.5 py-1.5"
+                  key={lead.id}
+                  className="flex items-center justify-between rounded-md border border-border/60 px-2 py-1.5"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-foreground">{l.nombre ?? "—"}</p>
+                    <p className="truncate text-xs font-medium text-foreground">
+                      {lead.nombre ?? "—"}
+                    </p>
                     <p className="truncate text-[10px] text-muted-foreground">
-                      {l.lotes?.nombre_lote ?? "Sin lote"} · {formatoRelativo(l.created_at)}
+                      {lead.lotes?.nombre_lote ?? "—"} ·{" "}
+                      {formatoRelativo(lead.created_at)}
                     </p>
                   </div>
-                  <Badge variant={leadEstadoVariant(l.estado)} className="text-[9px]">
-                    {l.estado}
-                  </Badge>
+                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                    {lead.estado}
+                  </span>
                 </div>
               ))
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Actividad de la plataforma */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold">Actividad de la plataforma</CardTitle>
-            <span className="text-[10px] text-muted-foreground">Últimas 24h</span>
-          </CardHeader>
-          <CardContent className="space-y-1.5">
-            {actividad.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sin actividad en las últimas 24h.</p>
-            ) : (
-              actividad.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 text-xs">
-                  <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${tipoBadgeColor(a.tipo)}`}>
-                    {a.tipo}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-foreground">{a.texto}</span>
-                  <span className="shrink-0 text-[10px] text-muted-foreground">
-                    {formatoRelativo(a.fecha)}
-                  </span>
-                </div>
-              ))
+        {/* Engagements */}
+        <div className="rounded-md border border-border bg-background p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold text-foreground">Engagements activos</h2>
+            <span className="text-[10px] text-muted-foreground">
+              {resumenEngagements?.total ?? 0} en curso
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {Object.entries(resumenEngagements?.porEstado ?? {}).map(
+              ([estado, count]) => (
+                <button
+                  key={estado}
+                  type="button"
+                  onClick={() =>
+                    navigate(`/dashboard/portafolio?estado=${estado}`)
+                  }
+                  className="rounded-md bg-muted/40 p-2 text-center transition-colors hover:bg-muted"
+                >
+                  <p className="text-base font-bold text-foreground">
+                    {count as number}
+                  </p>
+                  <p className="text-[9px] uppercase text-muted-foreground">
+                    {estado.replace(/_/g, " ")}
+                  </p>
+                </button>
+              ),
             )}
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-center">
+            <div className="rounded-md bg-muted/30 p-1.5">
+              <p className="text-[9px] uppercase text-muted-foreground">SLA cumplido</p>
+              <p className="text-sm font-bold text-foreground">
+                {resumenEngagements?.slaCumplidoPct ?? 0}%
+              </p>
+            </div>
+            <div className="rounded-md bg-muted/30 p-1.5">
+              <p className="text-[9px] uppercase text-muted-foreground">
+                Tiempo promedio
+              </p>
+              <p className="text-sm font-bold text-foreground">
+                {resumenEngagements?.tiempoPromedio ?? 0} días
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/portafolio")}
+            className="mt-3 text-xs text-primary hover:underline"
+          >
+            Ir al portafolio Kanban →
+          </button>
+        </div>
       </div>
+
+      <LoteDetalleDrawer
+        lote={drawerLote}
+        open={!!drawerLote}
+        onOpenChange={(open) => !open && setDrawerLote(null)}
+      />
     </DashboardLayout>
   );
 };

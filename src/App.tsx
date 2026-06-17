@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,12 +23,10 @@ const Lotes = lazy(() => import("./pages/Lotes"));
 const LoteDetalle = lazy(() => import("./pages/LoteDetalle"));
 const LoteFicha = lazy(() => import("./pages/LoteFicha"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const DashboardLotes = lazy(() => import("./pages/DashboardLotes"));
 const DashboardLoteNuevo = lazy(() => import("./pages/DashboardLoteNuevo"));
 const DashboardLotesImportar = lazy(() => import("./pages/DashboardLotesImportar"));
 const DashboardLoteEditar = lazy(() => import("./pages/DashboardLoteEditar"));
 const DashboardLoteDocs = lazy(() => import("./pages/DashboardLoteDocs"));
-const DashboardLeads = lazy(() => import("./pages/DashboardLeads"));
 const DashboardDeveloper = lazy(() => import("./pages/DashboardDeveloper"));
 const DashboardNotificaciones = lazy(() => import("./pages/DashboardNotificaciones"));
 const DashboardNegociaciones = lazy(() => import("./pages/DashboardNegociaciones"));
@@ -127,7 +125,7 @@ const App = () => (
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/lotes" element={<ProtectedRoute><DashboardLotes /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute requireAdmin><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute requireAdmin><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
@@ -138,7 +136,7 @@ const App = () => (
             <Route path="/dashboard/lotes/:id/editar" element={<ProtectedRoute><DashboardLoteEditar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/docs" element={<ProtectedRoute><DashboardLoteDocs /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><DashboardLoteAnalisis /></ProtectedRoute>} />
-            <Route path="/dashboard/leads" element={<ProtectedRoute requireAdmin><DashboardLeads /></ProtectedRoute>} />
+            <Route path="/dashboard/leads" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard/usuarios" element={<ProtectedRoute requireAdmin><DashboardUsuarios /></ProtectedRoute>} />
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
             <Route path="/dashboard/contratos-marco" element={<ProtectedRoute requireSuperAdmin><DashboardContratosMarco /></ProtectedRoute>} />

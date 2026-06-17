@@ -218,10 +218,6 @@ const DashboardLayout = ({ children }: Props) => {
     // Diagnósticos
     const diagItems: NavItem[] = [];
     if (isAdminOrExperto) diagItems.push({ label: "Portafolio", href: "/dashboard/portafolio", icon: BarChart3 });
-    if (isAdmin) {
-      diagItems.push({ label: "Lotes", href: "/dashboard/lotes", icon: MapPin });
-      diagItems.push({ label: "Leads", href: "/dashboard/leads", icon: Users });
-    }
     if (diagItems.length) g.push({ key: "diagnosticos", title: "Diagnósticos", items: diagItems });
 
     // Marketplace (admin only)
