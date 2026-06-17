@@ -185,6 +185,8 @@ export const useLotesUnificados = (filtros: FiltrosUnificados) => {
           precio_venta_estimado:
             lote.precio_venta_estimado != null ? Number(lote.precio_venta_estimado) : null,
           foto_url: lote.foto_url,
+          lat: lote.lat != null ? Number(lote.lat) : null,
+          lng: lote.lng != null ? Number(lote.lng) : null,
           estado_publicacion: lote.estado_publicacion,
           estado_disponibilidad: lote.estado_disponibilidad ?? null,
           publicado_venta: !!lote.publicado_venta,
