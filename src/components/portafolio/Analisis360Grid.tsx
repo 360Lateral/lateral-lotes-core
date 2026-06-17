@@ -37,8 +37,8 @@ const fmtCOP = (n: number | null) => {
 };
 
 const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
-  const navigate = useNavigate();
   const qc = useQueryClient();
+
   const [mapOpen, setMapOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [areaActiva, setAreaActiva] = useState<{ codigo: string; nombre: string } | null>(null);
