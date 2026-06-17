@@ -143,16 +143,9 @@ const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
           <div className="flex flex-wrap items-center gap-2">
             <ExcelAnalisisImporter loteId={loteId} loteName={lote?.nombre_lote} />
             <ExcelAnalisisExporter loteId={loteId} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/dashboard/lotes/${loteId}/analisis`)}
-            >
-              Editor clásico
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
           </div>
         )}
+
       </Card>
 
       {/* MapGIS con apply real */}
