@@ -1,5 +1,6 @@
-import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send } from "lucide-react";
+import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send, ImageIcon, MapPinned } from "lucide-react";
 import { FotoLote } from "@/components/lotes/FotoLote";
+import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { BadgeSla } from "@/components/portafolio/BadgeSla";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
