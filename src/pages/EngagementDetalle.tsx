@@ -17,11 +17,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import EngagementHeader from "@/components/portafolio/EngagementHeader";
-import TareasAnalisisList from "@/components/portafolio/TareasAnalisisList";
+import Analisis360Grid from "@/components/portafolio/Analisis360Grid";
 import TarjetasMaestros from "@/components/portafolio/TarjetasMaestros";
 import { ChecklistEntrega } from "@/components/portafolio/ChecklistEntrega";
-import { AnalisisCard } from "@/components/analisis/AnalisisCard";
-import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
 import { useEngagementDetalle } from "@/hooks/useEngagementDetalle";
 import { useTareasEngagement } from "@/hooks/useTareasEngagement";
 import { useActivarEngagement } from "@/hooks/useEngagements";
@@ -40,13 +38,13 @@ import { ClipboardList, CreditCard, FileText, Info } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
 
 
+
 const EngagementDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: engagement, isLoading, error } = useEngagementDetalle(id);
-  const { data: tareas, isLoading: loadingTareas } = useTareasEngagement(id);
+  const { data: tareas } = useTareasEngagement(id);
   const { data: entregables } = useEntregablesEngagement(id);
-  const { data: dimensiones } = useAnalisisUnificado(engagement?.lote_id, engagement?.id);
   const { isSuperAdmin, isAdminOrAsesor, roles } = useAuth();
   const isAdmin = isSuperAdmin || roles.some((r) => r === "admin");
   const activar = useActivarEngagement();
@@ -58,10 +56,11 @@ const EngagementDetalle = () => {
   const [fichaConfigOpen, setFichaConfigOpen] = useState(false);
 
 
-  const { diagnostico, presentacion, ligadosPorAnalisis, sueltos } = useMemo(
+  const { diagnostico, presentacion, sueltos } = useMemo(
     () => separarEntregables(entregables ?? []),
     [entregables],
   );
+
 
   const estadoAct = engagement?.estado_activacion ?? "activo";
   const enBorrador = estadoAct === "borrador";
@@ -228,61 +227,23 @@ const EngagementDetalle = () => {
               <h2 className="font-display text-lg font-semibold text-foreground">
                 Análisis 360°
               </h2>
-              <p className="text-xs text-muted-foreground">
-                {dimensiones?.filter(
-                  (d) => d.tarea_estado === "aprobado" || d.tarea_estado === "entregado",
-                ).length ?? 0}{" "}
-                de {dimensiones?.length ?? 7} completados
-              </p>
             </div>
 
             <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 p-3">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <p className="text-xs text-foreground">
-                Estos análisis son la misma información que aparece en el detalle
-                del lote. Editar aquí actualiza ambas vistas automáticamente.
+                Vista unificada del engagement. Estado, scores, asesor y entregables
+                en un solo lugar. Para capturar datos estructurados usa el
+                <strong> Editor completo</strong>.
               </p>
             </div>
 
-            {loadingTareas ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-48 w-full" />
-                ))}
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {dimensiones?.map((d) => (
-                    <AnalisisCard
-                      key={d.tipo_codigo}
-                      dimension={d}
-                      onEditar={() =>
-                        navigate(
-                          `/dashboard/lotes/${engagement.lote_id}/analisis?tipo=${d.tipo_codigo}`,
-                        )
-                      }
-                    />
-                  ))}
-                </div>
-                <details className="mt-4 group">
-                  <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground select-none">
-                    Ver tareas detalladas y entregables por análisis
-                  </summary>
-                  <div className="mt-3">
-                    <TareasAnalisisList
-                      tareas={tareas ?? []}
-                      engagementId={id!}
-                      ligadosPorAnalisis={ligadosPorAnalisis}
-                      puedeSubir={puedeSubir}
-                    />
-                  </div>
-                </details>
-              </>
-            )}
-            <p className="mt-6 font-body text-xs text-muted-foreground">
-              Cambiar el estado de una tarea actualiza automáticamente el avance del engagement.
-            </p>
+            <Analisis360Grid
+              engagementId={engagement.id}
+              loteId={engagement.lote_id}
+              puedeGestionar={puedeSubir}
+            />
+
 
             <Separator className="my-6" />
 
