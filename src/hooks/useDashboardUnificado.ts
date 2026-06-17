@@ -75,6 +75,8 @@ export interface LoteUnificado {
   area_total_m2: number | null;
   precio_venta_estimado: number | null;
   foto_url: string | null;
+  lat: number | null;
+  lng: number | null;
   estado_publicacion: string;
   estado_disponibilidad: string | null;
   publicado_venta: boolean;
