@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Building,
   Coins,
-  ExternalLink,
+  Edit3,
   Leaf,
   Loader2,
   Mountain,
@@ -40,6 +39,8 @@ interface Props {
   engagementId: string;
   loteId: string;
   puedeGestionar: boolean;
+  /** Si se provee, muestra "Editar datos →" y delega al contenedor abrir un Sheet/editor */
+  onEditar?: (codigo: string, nombre: string) => void;
 }
 
 const ICON_MAP: Record<TipoAnalisisCodigo, any> = {
@@ -51,6 +52,18 @@ const ICON_MAP: Record<TipoAnalisisCodigo, any> = {
   mercado: TrendingUp,
   sspp: Settings,
 };
+
+/** Códigos que tienen editor estructurado (Seccion*.tsx) */
+const TIENE_EDITOR = new Set<string>([
+  "juridico",
+  "ambiental",
+  "arquitectonico",
+  "financiero",
+  "geotecnico",
+  "mercado",
+  "sspp",
+  "normativo",
+]);
 
 const ESTADO_LABELS: Record<EstadoTareaUnif, string> = {
   no_aplica: "No aplica",
@@ -98,14 +111,15 @@ const AnalisisCardUnificada = ({
   engagementId,
   loteId,
   puedeGestionar,
+  onEditar,
 }: Props) => {
   const Icon = ICON_MAP[item.tipo_codigo] ?? Settings;
-  const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const mutation = useActualizarTareaEstado(engagementId);
   const isUpdating =
     mutation.isPending && mutation.variables?.tareaId === item.tarea_id;
   const fechaLimite = fmtFecha(item.fecha_objetivo);
+  const tieneEditor = TIENE_EDITOR.has(item.tipo_codigo);
 
   if (!item.incluido_en_plan) {
     return (
@@ -127,7 +141,6 @@ const AnalisisCardUnificada = ({
 
   return (
     <Card className="flex flex-col gap-3 p-4">
-      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="shrink-0 rounded-md bg-primary/10 p-2">
@@ -160,7 +173,6 @@ const AnalisisCardUnificada = ({
         )}
       </div>
 
-      {/* Avance */}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
           <span>Avance</span>
@@ -169,18 +181,14 @@ const AnalisisCardUnificada = ({
         <Progress value={item.factor_avance} className="h-1.5" />
       </div>
 
-      {/* Meta info */}
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <UserIcon className="h-3 w-3" />
-          {item.responsable_nombre ?? (
-            <span className="italic">Sin asignar</span>
-          )}
+          {item.responsable_nombre ?? <span className="italic">Sin asignar</span>}
         </span>
         {fechaLimite && <span>Vence: {fechaLimite}</span>}
       </div>
 
-      {/* Entregables */}
       {item.entregables.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-2">
           <Paperclip className="h-3 w-3 text-muted-foreground" />
@@ -195,7 +203,6 @@ const AnalisisCardUnificada = ({
         </div>
       )}
 
-      {/* Acciones */}
       {puedeGestionar && (
         <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-border pt-3">
           {item.tarea_id && (
@@ -213,7 +220,7 @@ const AnalisisCardUnificada = ({
                   })
                 }
               >
-                <SelectTrigger className="h-8 w-[140px] font-body text-xs">
+                <SelectTrigger className="h-9 min-h-[44px] w-[150px] font-body text-xs sm:h-8 sm:min-h-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -229,25 +236,23 @@ const AnalisisCardUnificada = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 px-2 text-xs"
+            className="h-9 min-h-[44px] px-2 text-xs sm:h-8 sm:min-h-0"
             onClick={() => setDialogOpen(true)}
           >
             <Plus className="mr-1 h-3 w-3" />
             Entregable
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-auto h-8 px-2 text-xs"
-            onClick={() =>
-              navigate(
-                `/dashboard/lotes/${loteId}/analisis?tipo=${item.tipo_codigo}`,
-              )
-            }
-          >
-            Editar datos
-            <ExternalLink className="ml-1 h-3 w-3" />
-          </Button>
+          {tieneEditor && onEditar && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-auto h-9 min-h-[44px] px-3 text-xs sm:h-8 sm:min-h-0"
+              onClick={() => onEditar(item.tipo_codigo, item.tipo_nombre)}
+            >
+              <Edit3 className="mr-1 h-3 w-3" />
+              Editar datos →
+            </Button>
+          )}
         </div>
       )}
 
