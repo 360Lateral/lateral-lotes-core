@@ -105,6 +105,11 @@ const Dashboard = () => {
   const { data: opciones } = useFiltroOpcionesDisponibles();
   const { data: resumenLeads } = useResumenLeads();
   const { data: resumenEngagements } = useResumenEngagementsPorEstado();
+  const { data: propietarios = [] } = usePropietariosConActivos();
+
+  const propietarioSeleccionado = filtros.propietarioId
+    ? propietarios.find((p) => p.id === filtros.propietarioId) ?? null
+    : null;
 
   const filtrosAvanzadosActivos = useMemo(() => {
     let n = 0;
