@@ -332,8 +332,48 @@ const Dashboard = () => {
         </section>
       )}
 
+      {/* Banner Vista del propietario */}
+      {propietarioSeleccionado && (
+        <section
+          className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-blue-300 bg-blue-50 px-3 py-2"
+          style={{ borderLeftWidth: 3 }}
+        >
+          <Building2 className="h-4 w-4 shrink-0 text-blue-700" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-blue-900">
+              Vista del propietario: {propietarioSeleccionado.nombre}
+            </p>
+            <p className="text-[11px] text-blue-800">
+              {propietarioSeleccionado.total_lotes} lotes ·{" "}
+              {propietarioSeleccionado.lotes_con_engagement} en gestión ·{" "}
+              {propietarioSeleccionado.total_leads} leads
+              {propietarioSeleccionado.engagements_atrasados > 0 && (
+                <>
+                  {" "}· <span className="font-semibold text-destructive">
+                    {propietarioSeleccionado.engagements_atrasados} atrasados
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setFiltros({ ...filtros, propietarioId: undefined })}
+          >
+            Volver a todos
+          </Button>
+        </section>
+      )}
+
       {/* Toolbar */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
+        <DropdownPropietario
+          propietarioId={filtros.propietarioId ?? null}
+          onChange={(id) =>
+            setFiltros({ ...filtros, propietarioId: id ?? undefined })
+          }
+        />
         <div className="relative min-w-[200px] flex-1">
           <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
