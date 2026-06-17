@@ -4,11 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 export type TipoAnalisisCodigo =
   | "juridico"
   | "ambiental"
+  | "normativo"
   | "arquitectonico"
   | "financiero"
   | "geotecnico"
   | "mercado"
-  | "sspp";
+  | "sspp"
+  | "valoracion"
+  | "score_viabilidad";
 
 export type EstadoTareaUnif =
   | "no_aplica"
@@ -40,7 +43,15 @@ export interface AnalisisDimension {
 
 interface MapDim {
   codigo: TipoAnalisisCodigo;
-  tabla: "analisis_juridico" | "analisis_ambiental" | "analisis_arquitectonico" | "analisis_financiero" | "analisis_geotecnico" | "analisis_mercado" | "analisis_sspp";
+  tabla:
+    | "analisis_juridico"
+    | "analisis_ambiental"
+    | "analisis_arquitectonico"
+    | "analisis_financiero"
+    | "analisis_geotecnico"
+    | "analisis_mercado"
+    | "analisis_sspp"
+    | "normativa_urbana";
   score_col:
     | "score_juridico"
     | "score_ambiental"
@@ -48,13 +59,15 @@ interface MapDim {
     | "score_financiero"
     | "score_geotecnico"
     | "score_mercado"
-    | "score_servicios";
+    | "score_servicios"
+    | "score_normativo";
   nombre_default: string;
 }
 
 const TABLAS: MapDim[] = [
   { codigo: "juridico", tabla: "analisis_juridico", score_col: "score_juridico", nombre_default: "Jurídico" },
   { codigo: "ambiental", tabla: "analisis_ambiental", score_col: "score_ambiental", nombre_default: "Ambiental" },
+  { codigo: "normativo", tabla: "normativa_urbana", score_col: "score_normativo", nombre_default: "Normativa Urbana" },
   { codigo: "arquitectonico", tabla: "analisis_arquitectonico", score_col: "score_arquitectonico", nombre_default: "Arquitectónico" },
   { codigo: "financiero", tabla: "analisis_financiero", score_col: "score_financiero", nombre_default: "Financiero" },
   { codigo: "geotecnico", tabla: "analisis_geotecnico", score_col: "score_geotecnico", nombre_default: "Geotécnico" },
