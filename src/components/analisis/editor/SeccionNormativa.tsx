@@ -34,6 +34,8 @@ import {
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
+import MapGISConsulta from "@/components/MapGISConsulta";
+
 /* ─── Section 1: Normativa (read-only summary + PDF) ── */
 export default function SeccionNormativa({ loteId, lat, lng, pdfProps, defaultOpen, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const { toast } = useToast();
