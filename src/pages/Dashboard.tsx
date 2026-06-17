@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -12,23 +12,26 @@ import {
   CheckCircle2,
   Send,
   Clock,
-  Briefcase,
   Users,
-  AlertCircle,
   LayoutGrid,
   List,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
 import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
+import { FiltrosAvanzadosLotesSheet } from "@/components/dashboard/FiltrosAvanzadosLotesSheet";
 import {
   useLotesUnificados,
   useResumenLeads,
   useResumenEngagementsPorEstado,
   type LoteUnificado,
   type FiltroLoteUnif,
+  type FiltrosUnificados,
 } from "@/hooks/useDashboardUnificado";
+import { useFiltroOpcionesDisponibles } from "@/hooks/useFiltroOpcionesDisponibles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatoRelativo } from "@/lib/format";
@@ -41,6 +44,16 @@ const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
   { v: "sin_asesor", label: "Sin asesor" },
 ];
 
+const STORAGE_KEY = "dashboard_filtros_avanzados";
+
+const cargarFiltrosIniciales = (): FiltrosUnificados => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { filtro: "todos" };
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -48,15 +61,85 @@ const Dashboard = () => {
   const nombre =
     (user?.user_metadata as any)?.full_name?.split(" ")?.[0] ?? "admin";
 
-  const [busqueda, setBusqueda] = useState("");
-  const [filtro, setFiltro] = useState<FiltroLoteUnif>("todos");
+  const [filtros, setFiltros] = useState<FiltrosUnificados>(cargarFiltrosIniciales);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [vista, setVista] = useState<"grid" | "tabla">("grid");
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [drawerLote, setDrawerLote] = useState<LoteUnificado | null>(null);
 
-  const { data: lotes = [], isLoading } = useLotesUnificados({ busqueda, filtro });
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtros));
+    } catch {}
+  }, [filtros]);
+
+  const setBusqueda = (busqueda: string) =>
+    setFiltros((p) => ({ ...p, busqueda }));
+  const setFiltro = (filtro: FiltroLoteUnif) =>
+    setFiltros((p) => ({ ...p, filtro }));
+  const busqueda = filtros.busqueda ?? "";
+  const filtro = filtros.filtro ?? "todos";
+
+  const { data: lotes = [], isLoading } = useLotesUnificados(filtros);
+  const { data: opciones } = useFiltroOpcionesDisponibles();
   const { data: resumenLeads } = useResumenLeads();
   const { data: resumenEngagements } = useResumenEngagementsPorEstado();
+
+  const filtrosAvanzadosActivos = useMemo(() => {
+    let n = 0;
+    n += filtros.ciudades?.length ?? 0;
+    n += filtros.barrios?.length ?? 0;
+    n += filtros.tipos?.length ?? 0;
+    n += filtros.categoriaArea?.length ?? 0;
+    if (filtros.areaMin != null) n += 1;
+    if (filtros.areaMax != null) n += 1;
+    if (filtros.precioMin != null) n += 1;
+    if (filtros.precioMax != null) n += 1;
+    n += filtros.estratos?.length ?? 0;
+    n += filtros.estadosPublicacion?.length ?? 0;
+    n += filtros.estadoDisponibilidad?.length ?? 0;
+    if (filtros.soloPublicos) n += 1;
+    if (filtros.soloDestacados) n += 1;
+    n += filtros.planesCodigos?.length ?? 0;
+    n += filtros.estadosEngagement?.length ?? 0;
+    n += filtros.asesoresIds?.length ?? 0;
+    n += filtros.slaEstados?.length ?? 0;
+    if (filtros.conEntregablesBorrador) n += 1;
+    if (filtros.scoreMin != null && filtros.scoreMin > 0) n += 1;
+    if (filtros.conResolutoria) n += 1;
+    if (filtros.propietarioId) n += 1;
+    if (filtros.conLeadsActivos) n += 1;
+    if (filtros.leadsMinimo != null) n += 1;
+    if (filtros.creadoDesde) n += 1;
+    if (filtros.creadoHasta) n += 1;
+    if (filtros.ultimaActividadDias) n += 1;
+    return n;
+  }, [filtros]);
+
+  const limpiarAvanzados = () =>
+    setFiltros({ busqueda: filtros.busqueda, filtro: filtros.filtro });
+
+  const removerArrayItem = <K extends keyof FiltrosUnificados>(
+    key: K,
+    item: any,
+  ) =>
+    setFiltros((p) => {
+      const arr = (p[key] as any[] | undefined) ?? [];
+      const next = arr.filter((x) => x !== item);
+      return { ...p, [key]: next.length ? next : undefined };
+    });
+
+  const removerCampo = (key: keyof FiltrosUnificados) =>
+    setFiltros((p) => ({ ...p, [key]: undefined }));
+
+  const nombreAsesor = (id: string) =>
+    opciones?.asesores.find((a) => a.id === id)?.nombre ?? id.slice(0, 6);
+  const nombrePropietario = (id: string) =>
+    id === "__sin__"
+      ? "Sin propietario"
+      : opciones?.propietarios.find((p) => p.id === id)?.nombre ?? id.slice(0, 6);
+  const nombrePlan = (cod: string) =>
+    opciones?.planes.find((p) => p.codigo === cod)?.nombre ?? cod;
 
   const atrasados = useMemo(
     () => lotes.filter((l) => l.sla_estado === "atrasado" && !l.sla_cumplido).length,
