@@ -25,7 +25,7 @@ interface Props {
   size?: "sm" | "md";
 }
 
-const iconoPorTipo: Record<TipoAnalisisCodigo, any> = {
+const iconoPorTipo: Partial<Record<TipoAnalisisCodigo, any>> = {
   juridico: Scale,
   ambiental: Leaf,
   arquitectonico: Building,

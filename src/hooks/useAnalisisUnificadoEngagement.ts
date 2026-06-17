@@ -82,9 +82,13 @@ export const useAnalisisUnificadoEngagement = (
 
     const items: AnalisisItemUnificado[] = dims.map((d) => {
       const tipo_analisis_id = tipoIdPorCodigo.get(d.tipo_codigo) ?? null;
-      const incluido_en_plan = d.tarea_id != null;
+      // Normativo no tiene tarea operativa: es captura directa siempre incluida
+      const incluido_en_plan =
+        d.tipo_codigo === "normativo" ? true : d.tarea_id != null;
       const factor_avance = d.tarea_estado
         ? FACTOR[d.tarea_estado] ?? 0
+        : d.tipo_codigo === "normativo" && d.score != null
+        ? Math.min(100, Math.round((d.score / 10) * 100))
         : 0;
       const entregablesDeEsteTipo = tipo_analisis_id
         ? entregablesPorTipoId.get(tipo_analisis_id) ?? []
@@ -117,11 +121,44 @@ export const useAnalisisUnificadoEngagement = (
       (i) => i.tarea_estado === "aprobado" || i.tarea_estado === "entregado",
     ).length;
 
+    // KPIs calculados virtuales: valoración y score de viabilidad
+    const makeVirtual = (
+      codigo: "valoracion" | "score_viabilidad",
+      nombre: string,
+      score: number | null,
+    ): AnalisisItemUnificado => ({
+      tipo_codigo: codigo,
+      tipo_nombre: nombre,
+      analisis_id: null,
+      hallazgos: null,
+      score,
+      observaciones: null,
+      tarea_id: null,
+      tarea_estado: null,
+      tarea_avance_pct: 0,
+      responsable_id: null,
+      responsable_nombre: null,
+      fecha_objetivo: null,
+      fecha_completado: null,
+      ultima_edicion: null,
+      tipo_analisis_id: tipoIdPorCodigo.get(codigo) ?? null,
+      incluido_en_plan: true,
+      factor_avance: score != null ? Math.round((score / 10) * 100) : 0,
+      entregables: [],
+    });
+
+    items.push(makeVirtual("valoracion", "Valoración", valoracionEstimada));
+    items.push(
+      makeVirtual("score_viabilidad", "Score de Viabilidad", scorePromedio),
+    );
+
     return {
       items,
       valoracionEstimada,
       scorePromedio,
-      totalAnalisis: items.length,
+      totalAnalisis: items.filter(
+        (i) => i.tipo_codigo !== "valoracion" && i.tipo_codigo !== "score_viabilidad",
+      ).length,
       completados,
       isLoading: lDim || lTar || lEnt,
       isError: eDim || eTar || eEnt,
