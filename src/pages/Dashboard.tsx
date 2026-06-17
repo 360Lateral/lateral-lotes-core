@@ -46,6 +46,23 @@ const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
 
 const STORAGE_KEY = "dashboard_filtros_avanzados";
 
+const ChipActivo = ({
+  children,
+  onRemove,
+}: {
+  children: React.ReactNode;
+  onRemove: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onRemove}
+    className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary hover:bg-primary/25"
+  >
+    {children}
+    <X className="h-2.5 w-2.5" />
+  </button>
+);
+
 const cargarFiltrosIniciales = (): FiltrosUnificados => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
