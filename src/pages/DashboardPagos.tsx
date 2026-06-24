@@ -34,6 +34,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate as Redir } from "react-router-dom";
 import { useTransaccionesAdmin } from "@/hooks/useTransaccionesAdmin";
+import { useReintentarActivacion } from "@/hooks/useReintentarActivacion";
 import TransaccionDetalleDialog, {
   estadoBadgeVariant,
 } from "@/components/pagos/TransaccionDetalleDialog";
