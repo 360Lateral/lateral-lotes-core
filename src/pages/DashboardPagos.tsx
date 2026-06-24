@@ -47,7 +47,16 @@ import {
   TrendingUp,
   Eye,
   Download,
+  RefreshCw,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { KPIEstado } from "@/components/ui/KPIEstado";
 import { BulkActionsBar } from "@/components/ui/BulkActionsBar";
 import { EmptyState } from "@/components/ui/EmptyState";
