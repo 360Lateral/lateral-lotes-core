@@ -36,6 +36,7 @@ const DiagnosticoResultado = lazy(() => import("./pages/DiagnosticoResultado"));
 const Mercado = lazy(() => import("./pages/Mercado"));
 const Resolutoria = lazy(() => import("./pages/Resolutoria"));
 const Planes = lazy(() => import("./pages/Planes"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const DashboardOwner = lazy(() => import("./pages/DashboardOwner"));
 const DashboardOwnerLotes = lazy(() => import("./pages/DashboardOwnerLotes"));
 const DashboardOwnerDiagnosticos = lazy(() => import("./pages/DashboardOwnerDiagnosticos"));
