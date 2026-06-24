@@ -1,93 +1,93 @@
-# Plan — Unificar reporting de Análisis 360° en el engagement
+# Fase 1.A — Claridad de pricing (sin tocar Wompi)
 
-## Estado actual relevante (verificado)
+## Auditoría (Parte A · D.1 · E.1)
 
-- `useAnalisisUnificado(loteId, engagementId)` ya existe y combina las 7 tablas técnicas (`analisis_juridico`, `_ambiental`, `_arquitectonico`, `_financiero`, `_geotecnico`, `_mercado`, `_sspp`) + tareas + responsable. Devuelve `score`, `tarea_estado`, `responsable_nombre`, `fecha_objetivo`, `ultima_edicion`.
-- `EngagementDetalle.tsx` YA renderiza `<AnalisisCard>` grid usando ese hook, PERO debajo conserva un `<details>` con `<TareasAnalisisList>` — **esa es la duplicación de reporting a eliminar**.
-- `DashboardLoteAnalisis.tsx` (1486 líneas) es el editor estructurado real. Cada tabla técnica se lee/escribe ahí. Se preserva 100%.
-- `TareasAnalisisList` solo se usa en `EngagementDetalle.tsx` → tras el refactor queda huérfano y se elimina.
+**Rutas confirmadas:**
+- `/planes` → `src/pages/Planes.tsx` (público, propietario). Botón "Solicitar" → `Link to="/diagnostico"`. No invoca Wompi.
+- `/suscripcion` → `src/pages/Suscripcion.tsx` (protegido, desarrollador). Botón "Suscribirme" → `useGenerarPagoWompi` (✓ no tocar).
+- `/dashboard/config-suscripciones` → `src/pages/DashboardConfigSuscripciones.tsx` (super-admin). Hoy SOLO tiene precios desarrollador (3 niveles × 3 periodos) + Pay-per-view. **No existe pestaña Propietario** — la configuración de planes de propietario se hace vía `planes_diagnostico` + `planes_analisis` (hooks ya creados en `usePlanesConfig.ts`) pero **no hay UI admin** que los exponga. Hay que construirla.
 
-## Decisión de diseño
+**SMLMV:** ya existe tabla `salarios_minimos (anio, valor_cop, vigente_desde, vigente_hasta, decreto, notas)`. La vista `vw_planes_con_precio` ya devuelve `smlmv_referencia` y `smlmv_anio`. **No está hardcodeado**, ya es editable a nivel datos, pero **no hay UI admin** para mantenerla. Reutilizo esta tabla en vez de crear `configuracion_sistema`.
 
-En lugar de duplicar el agregador, **extender** `useAnalisisUnificado` para que también traiga: `entregables[]` por análisis, `incluido_en_plan`, `factor_avance` (mapeo FACTOR), `valoracionEstimada` y `scorePromedioPonderado`. La fuente única de verdad se mantiene.
+**Wompi (no tocar):** `useGenerarPagoWompi`, `Suscripcion.tsx` (handleSuscribirse), `PayPerViewCTA`, `GenerarLinkPagoDialog`, `SolicitarDiagnosticoDialog`.
 
-Si extender resulta intrusivo (cambia el shape consumido por `AnalisisCard`), se crea un wrapper `useAnalisisUnificadoEngagement` que llama al hook base + entregables + plan y agrega los campos derivados sin tocar el shape original.
+## Trabajo
 
-## Cambios
+### 1. Hook `useSmlmvVigente`
+Lee de `salarios_minimos` el registro con `vigente_hasta IS NULL` (o el de mayor `vigente_desde`). Devuelve `{ anio, monto, actualizado_en, decreto }`. Reutilizado en `/planes` y admin.
 
-### 1. `src/hooks/useAnalisisUnificadoEngagement.ts` (nuevo)
-Wrapper que compone:
-- `useAnalisisUnificado(loteId, engagementId)` (ya tiene scores + tareas + responsables).
-- `useEntregablesEngagement(engagementId)` → agrupa por `tipo_analisis_id`.
-- `useAnalisisPorPlan(engagementId)` → marca `incluido_en_plan`.
+### 2. `/planes` (Parte B) — refactor completo
+- Hero rediseñado: "¿Cuánto vale tu lote? ¿Qué puedes construir en él?" + bajada explicando pago por lote + SLA.
+- Bloque "¿Para quién es cada plan?" (4 cards cortas) ANTES de la tabla.
+- Tabla desktop: subtítulo por columna, badge "Más popular" con borde naranja prominente en Pro, features traducidas a lenguaje cliente, tooltip por feature mostrando el nombre técnico.
+- Pricing dinámico: lee SMLMV vigente con `useSmlmvVigente` y calcula `factor × monto`. Fallback a hardcode si el hook falla.
+- Mobile <768px: cards apiladas verticales + botón "Ver tabla comparativa" que abre Sheet/Dialog con la tabla scrollable horizontal.
+- Botones: "Solicitar" → "Comprar plan" (mismo `Link to="/diagnostico"` por ahora).
+- CTA secundaria: "Hablar con un asesor" (WhatsApp `https://wa.me/...` placeholder) + "Ver casos de éxito" (ancla a sección placeholder).
+- Sección FAQ con `Accordion` shadcn, respuestas marcadas con "[Confirmar con admin]" donde corresponde.
 
-Devuelve:
-```ts
-{ items: AnalisisItemUnificado[], valoracionEstimada, scorePromedioPonderado, totalAnalisis, completados }
+### 3. `/suscripcion` (Parte C) — refactor completo
+- Hero rediseñado.
+- Toggle Mensual / Trimestral (-X%) / Anual (-Y%) — descuentos calculados de los precios reales (vs precio mensual × N meses). Badge "Mejor valor" en el de mayor descuento.
+- Cards: subtítulo, features traducidas con tooltips técnicos, mini-disclaimer en Básico equilibrando altura ("Plan sin información identificable…").
+- Sección Pay-per-view destacada debajo: lee precio real de `useConfigPayPerView`, CTA "Buscar lote y pagar" → `/lotes`.
+- FAQ propio (cambio prorrateado, fin de suscripción, conteo de lotes placeholder, NDA).
+- Flujo Wompi (`handleSuscribirse`) **intacto**.
+
+### 4. Admin: pestaña Propietario (Parte D)
+Convertir `DashboardConfigSuscripciones` a layout con `Tabs` shadcn (3 tabs: **Propietario**, **Desarrollador**, **General**). La pestaña Desarrollador conserva el contenido actual sin cambios.
+
+**Tab Propietario (nuevo):** lista de planes desde `usePlanesDiagnostico` + matriz de análisis desde `usePlanesAnalisis` + `useTiposAnalisis`. Por plan editable:
+- Nombre
+- Factor SMLMV (numérico)
+- Análisis incluidos (checkboxes contra `tipos_analisis`, persiste vía `usePlanesAnalisis.upsertMany`)
+- Toggle "Recomendado" (único — al activar uno se desactiva el resto)
+- Descripción corta (100 char) + "Para quién es" (80 char)
+- Monto calculado: `factor × smlmv_vigente` (read-only)
+
+Las dos descripciones requieren columnas nuevas. Migración:
+```sql
+ALTER TABLE public.planes_diagnostico
+  ADD COLUMN IF NOT EXISTS descripcion_corta text,
+  ADD COLUMN IF NOT EXISTS para_quien text,
+  ADD COLUMN IF NOT EXISTS recomendado boolean NOT NULL DEFAULT false;
 ```
-La fórmula de valoración estimada y promedio ponderado se copia literal de `DashboardLoteAnalisis.tsx` (zona "Valoración estimada del lote (360°)").
+Sin cambios de RLS (la tabla ya las tiene). Actualizar `usePlanesConfig.ts` + `usePlanesConPrecio.ts` para incluir los nuevos campos y consumirlos en `/planes`.
 
-### 2. `src/hooks/useEngagementActivoDelLote.ts` (nuevo)
-Query simple sobre `engagements_lote` (nombre real de la tabla, no `engagements`) → devuelve `engagementId` del último engagement del lote.
+**Tab General (nuevo):** editor de SMLMV vigente.
+- Muestra el registro actual de `salarios_minimos` (año, monto, decreto, vigente desde).
+- Botón "Registrar nuevo SMLMV" → form (año, monto, decreto, fecha vigente desde). Al guardar: cierra el registro previo (`vigente_hasta = nuevo.vigente_desde`) e inserta el nuevo. Hook `useActualizarSmlmv` con `useMutation`.
+- Aviso visual: "Esto recalcula precios de planes de propietario automáticamente."
 
-### 3. `src/components/portafolio/AnalisisCardUnificada.tsx` (nuevo)
-Una card por análisis:
-- Header: icono (de `ICON_MAP` reutilizado), nombre, badge de estado con cromática verde/amarillo/naranja/rojo/gris.
-- Score grande (`text-2xl font-display`) + `<Progress>` con `factor_avance`.
-- Asesor + fecha límite.
-- Chips de entregables (reusa `ChipEntregable` extraído de `TareasAnalisisList`).
-- Acciones: Select de estado inline (lógica idéntica a la actual), botón `+ Entregable` (abre `SubirEntregableDialog` con `tipoAnalisisId`), botón **"Editar datos →"** que navega a `/dashboard/lotes/${loteId}/analisis#${codigo}`.
-- Si `!incluido_en_plan` → card deshabilitada con texto "No incluido en este plan".
-- Si `!puedeGestionar` → oculta Select de estado, botón "+ Entregable" y "Editar datos". Solo lectura + descarga.
+### 5. Validación
+- `bunx tsgo --noEmit` debe pasar.
+- Probar `/planes` (desktop + mobile), `/suscripcion`, admin tabs.
+- No tocar `useGenerarPagoWompi`, `Suscripcion.handleSuscribirse`, `PayPerViewCTA`.
 
-### 4. `src/components/portafolio/Analisis360Grid.tsx` (nuevo)
-- Llama `useAnalisisUnificadoEngagement`.
-- Card resumen: valoración estimada, score promedio, X de N completados.
-- Botones: **"Editor completo →"** (→ `/dashboard/lotes/:id/analisis`), `<ExcelAnalisisImporter loteId/>`, `<ExcelAnalisisExporter loteId/>`.
-- `<Collapsible>` con `<MapGISConsulta>` (onApply muestra toast "Para aplicar, abre el editor completo").
-- Grid responsive `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` de `AnalisisCardUnificada`.
-- Skeletons mientras carga.
-- Si `!puedeGestionar` → oculta "Editor completo", Importar, MapGIS.
+## Detalle técnico
 
-### 5. `src/pages/EngagementDetalle.tsx` (refactor mínimo)
-- Eliminar import y uso de `TareasAnalisisList`.
-- Eliminar el bloque `<details>` con "Ver tareas detalladas y entregables por análisis".
-- Reemplazar la sección entera "Análisis 360°" (header + grid `AnalisisCard` + `<details>`) por:
-  ```tsx
-  <Analisis360Grid engagementId={engagement.id} loteId={engagement.lote_id} puedeGestionar={puedeSubir} />
-  ```
-- Mantener `EngagementHeader`, `TarjetasMaestros`, `ChecklistEntrega`, `SeccionEntregables`, alerts de activación/pago, acciones admin.
+**Archivos nuevos:**
+- `src/hooks/useSmlmvVigente.ts`
+- `src/hooks/useActualizarSmlmv.ts`
+- `src/components/planes/ParaQuienGrid.tsx`
+- `src/components/planes/PlanesFAQ.tsx`
+- `src/components/planes/PlanesMobileCards.tsx`
+- `src/components/suscripcion/SuscripcionFAQ.tsx`
+- `src/components/suscripcion/PayPerViewBanner.tsx`
+- `src/components/admin/precios/TabPropietario.tsx`
+- `src/components/admin/precios/TabDesarrollador.tsx` (extracción del contenido actual)
+- `src/components/admin/precios/TabGeneral.tsx`
 
-### 6. `src/pages/DashboardLoteAnalisis.tsx` (cambios cosméticos únicamente)
-- **NO tocar lógica interna, hooks, formularios, PDF, POT, MapGIS, autosave.**
-- Cambiar título a `Editor de Análisis 360° — {lote.nombre_lote}`.
-- Agregar botón "← Volver al engagement" cerca del título, condicional al resultado de `useEngagementActivoDelLote(loteId)`.
-- Agregar `id={`analisis-${codigo}`}` al contenedor de cada sección de análisis (7 secciones técnicas).
-- `useEffect` al montar: si `window.location.hash`, hacer `scrollIntoView` con delay 300ms.
+**Archivos editados:**
+- `src/pages/Planes.tsx` (rewrite estructural)
+- `src/pages/Suscripcion.tsx` (header, toggle, cards, PPV, FAQ — handleSuscribirse intacto)
+- `src/pages/DashboardConfigSuscripciones.tsx` (envuelve en Tabs)
+- `src/hooks/usePlanesConfig.ts` (añade campos `descripcion_corta`, `para_quien`, `recomendado`)
+- `src/hooks/usePlanesConPrecio.ts` (añade mismos campos si la vista los expone)
 
-### 7. `src/components/portafolio/TareasAnalisisList.tsx`
-- Tras refactor verificar `rg TareasAnalisisList src/`. Hoy solo se usa en `EngagementDetalle.tsx`. Se elimina el archivo.
-- Antes de eliminar, extraer `ChipEntregable` a `src/components/entregables/ChipEntregable.tsx` para reutilizarlo en `AnalisisCardUnificada`.
+**Migración:** 1 migración con `ALTER TABLE planes_diagnostico` + posiblemente refrescar `vw_planes_con_precio` para incluir los nuevos campos.
 
-### 8. Portal cliente — `src/pages/portal/EngagementClienteDetalle.tsx`
-- Reusar `<Analisis360Grid puedeGestionar={false} />` si hoy renderiza algo equivalente. Si tiene su propia vista de análisis, se cambia a este componente. (Verificar primero en build mode antes de tocar.)
-
-### 9. Rutas y links — sin cambios
-- `/dashboard/lotes/:id/analisis` sigue apuntando a `DashboardLoteAnalisis`.
-- Los 5 enlaces existentes se conservan.
-
-## Notas técnicas
-
-- React Query: el wrapper invalida `["analisis-unificado", loteId, engagementId]` cuando hay mutación de tarea/entregable, para que al volver del editor el reporting refresque.
-- TypeScript estricto, cromática semántica del design system (sin colores hardcodeados).
-- Tabla real de engagements en este proyecto es `engagements_lote` (verificado en `<supabase-tables>`).
-
-## Validación post-implementación
-
-1. `Analisis360Grid` renderiza 7 tarjetas técnicas con score + estado + asesor + entregables + resumen + botones Excel/MapGIS.
-2. "Editor completo →" y "Editar datos →" (con anchor) navegan correctamente y el editor hace scroll a la sección.
-3. `DashboardLoteAnalisis` conserva PDF extract, POT, MapGIS apply, autosave, Excel.
-4. Botón "← Volver al engagement" aparece cuando el lote tiene engagement.
-5. Cliente en portal ve modo solo lectura.
-6. `TareasAnalisisList.tsx` eliminado; `ChipEntregable` reubicado.
-7. Build pasa.
+## Fuera de alcance (Fase 1.B)
+- Unificar checkout en `/planes` con Wompi.
+- Activar PPV real si no existe end-to-end.
+- Email/comms post-compra.
