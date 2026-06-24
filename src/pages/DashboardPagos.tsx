@@ -331,6 +331,7 @@ export default function DashboardPagos() {
                   <TableHead className="text-[10px] uppercase tracking-wide">Propietario</TableHead>
                   <TableHead className="text-right text-[10px] uppercase tracking-wide">Monto</TableHead>
                   <TableHead className="text-center text-[10px] uppercase tracking-wide">Estado</TableHead>
+                  <TableHead className="text-center text-[10px] uppercase tracking-wide">Activación</TableHead>
                   <TableHead className="text-right text-[10px] uppercase tracking-wide">Fecha</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
