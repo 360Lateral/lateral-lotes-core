@@ -3623,37 +3623,46 @@ export type Database = {
           activo: boolean
           codigo: string
           created_at: string
+          descripcion_corta: string | null
           dias_sla: number | null
           id: string
           moneda: string
           nombre: string
           orden: number | null
+          para_quien: string | null
           precio_cop: number | null
           precio_smlmv: number | null
+          recomendado: boolean
         }
         Insert: {
           activo?: boolean
           codigo: string
           created_at?: string
+          descripcion_corta?: string | null
           dias_sla?: number | null
           id?: string
           moneda?: string
           nombre: string
           orden?: number | null
+          para_quien?: string | null
           precio_cop?: number | null
           precio_smlmv?: number | null
+          recomendado?: boolean
         }
         Update: {
           activo?: boolean
           codigo?: string
           created_at?: string
+          descripcion_corta?: string | null
           dias_sla?: number | null
           id?: string
           moneda?: string
           nombre?: string
           orden?: number | null
+          para_quien?: string | null
           precio_cop?: number | null
           precio_smlmv?: number | null
+          recomendado?: boolean
         }
         Relationships: []
       }
@@ -4802,44 +4811,19 @@ export type Database = {
         Row: {
           activo: boolean | null
           codigo: string | null
+          descripcion_corta: string | null
           dias_sla: number | null
           id: string | null
           moneda: string | null
           nombre: string | null
           orden: number | null
+          para_quien: string | null
           precio_cop_actual: number | null
           precio_cop_legacy: number | null
           precio_smlmv: number | null
+          recomendado: boolean | null
           smlmv_anio: number | null
           smlmv_referencia: number | null
-        }
-        Insert: {
-          activo?: boolean | null
-          codigo?: string | null
-          dias_sla?: number | null
-          id?: string | null
-          moneda?: string | null
-          nombre?: string | null
-          orden?: number | null
-          precio_cop_actual?: never
-          precio_cop_legacy?: number | null
-          precio_smlmv?: number | null
-          smlmv_anio?: never
-          smlmv_referencia?: never
-        }
-        Update: {
-          activo?: boolean | null
-          codigo?: string | null
-          dias_sla?: number | null
-          id?: string | null
-          moneda?: string | null
-          nombre?: string | null
-          orden?: number | null
-          precio_cop_actual?: never
-          precio_cop_legacy?: number | null
-          precio_smlmv?: number | null
-          smlmv_anio?: never
-          smlmv_referencia?: never
         }
         Relationships: []
       }

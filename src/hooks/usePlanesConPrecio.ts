@@ -12,6 +12,9 @@ export interface PlanConPrecio {
   dias_sla: number;
   orden: number;
   activo: boolean;
+  descripcion_corta: string | null;
+  para_quien: string | null;
+  recomendado: boolean;
   smlmv_referencia: number;
   smlmv_anio: number;
 }
@@ -22,7 +25,8 @@ export const usePlanesConPrecio = () => {
     queryFn: async (): Promise<PlanConPrecio[]> => {
       const { data, error } = await (supabase as any)
         .from("vw_planes_con_precio")
-        .select("*");
+        .select("*")
+        .order("orden");
       if (error) throw error;
       return (data ?? []) as PlanConPrecio[];
     },

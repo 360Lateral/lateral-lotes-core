@@ -12,6 +12,9 @@ export interface PlanDiagnostico {
   dias_sla: number | null;
   orden: number | null;
   activo: boolean;
+  descripcion_corta: string | null;
+  para_quien: string | null;
+  recomendado: boolean;
   created_at?: string;
 }
 
@@ -50,6 +53,7 @@ export const usePlanesDiagnostico = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["planes_diagnostico"] });
+      qc.invalidateQueries({ queryKey: ["planes-con-precio"] });
       toast.success("Plan creado");
     },
     onError: (err: any) => toast.error(err.message || "Error al crear plan"),
@@ -69,6 +73,7 @@ export const usePlanesDiagnostico = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["planes_diagnostico"] });
       qc.invalidateQueries({ queryKey: ["planes_analisis"] });
+      qc.invalidateQueries({ queryKey: ["planes-con-precio"] });
       toast.success("Plan actualizado");
     },
     onError: (err: any) => toast.error(err.message || "Error al actualizar plan"),
@@ -81,6 +86,7 @@ export const usePlanesDiagnostico = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["planes_diagnostico"] });
+      qc.invalidateQueries({ queryKey: ["planes-con-precio"] });
       toast.success("Plan eliminado");
     },
     onError: (err: any) => toast.error(err.message || "Error al eliminar plan"),
