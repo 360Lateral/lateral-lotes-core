@@ -27,6 +27,8 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
     lote?.id,
     lote?.engagement_id ?? undefined,
   );
+  const { data: engagementActivoId, isLoading: loadingEngagement } =
+    useEngagementActivoDelLote(lote?.id);
 
   if (!lote) return null;
 
