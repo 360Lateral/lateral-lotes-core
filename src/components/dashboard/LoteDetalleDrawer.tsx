@@ -2,9 +2,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Info, Briefcase, Users, Activity, BarChart3, ExternalLink, MapPin, ImageIcon, MapPinned } from "lucide-react";
+import { Info, Briefcase, Users, Activity, BarChart3, ExternalLink, MapPin, ImageIcon, MapPinned, Plus, Loader2 } from "lucide-react";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
+import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 
