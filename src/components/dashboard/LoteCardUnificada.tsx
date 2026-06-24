@@ -42,6 +42,8 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   const tieneEngagement = !!lote.engagement_id;
   const tieneLeads = lote.leads_count > 0;
   const porValidar = lote.estado_publicacion === "pendiente_validacion";
+  const { data: engagementActivoId, isLoading: loadingEngagement } =
+    useEngagementActivoDelLote(lote.id);
 
   return (
     <article
