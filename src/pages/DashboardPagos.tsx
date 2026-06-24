@@ -145,7 +145,11 @@ export default function DashboardPagos() {
   // Filtrado + orden
   const filtradas = useMemo(() => {
     let arr = todas;
-    if (filtroEstado !== "todas") arr = arr.filter((t) => t.estado === filtroEstado);
+    if (filtroEstado === "con_error") {
+      arr = arr.filter((t) => !!t.error_msg);
+    } else if (filtroEstado !== "todas") {
+      arr = arr.filter((t) => t.estado === filtroEstado);
+    }
     if (busqueda) {
       const s = busqueda.toLowerCase();
       arr = arr.filter((t) => {
