@@ -69,6 +69,7 @@ const ESTADOS = [
   { value: "todas", label: "Todas" },
   { value: "pendiente", label: "Pendientes" },
   { value: "aprobada", label: "Aprobadas" },
+  { value: "con_error", label: "Con error de activación" },
   { value: "declinada", label: "Declinadas" },
   { value: "expirada", label: "Expiradas" },
   { value: "reembolsada", label: "Reembolsadas" },
