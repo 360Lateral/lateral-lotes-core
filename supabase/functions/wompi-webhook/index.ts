@@ -197,7 +197,21 @@ Deno.serve(async (req) => {
       const { error: rpcErr } = await admin.rpc(rpcName, {
         p_transaccion_id: transaccionLocalId,
       });
-      if (rpcErr) throw rpcErr;
+      if (rpcErr) {
+        // Persistir el error para visibilidad en el panel admin
+        await admin
+          .from("transacciones")
+          .update({ error_msg: rpcErr.message })
+          .eq("id", transaccionLocalId);
+        throw rpcErr;
+      }
+
+      // Enviar email de activación (best-effort; no rompe el webhook si falla)
+      try {
+        await enviarEmailActivacion(admin, transaccionLocalId, tipoPago);
+      } catch (emailErr) {
+        console.error("Email activación falló (no bloquea):", emailErr);
+      }
     } else if (
       wompiStatus === "DECLINED" ||
       wompiStatus === "VOIDED" ||
