@@ -66,6 +66,8 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
               </Link>
             </Button>
           )}
+        </div>
+
 
         <Tabs defaultValue="info">
           <TabsList className="grid grid-cols-5">
