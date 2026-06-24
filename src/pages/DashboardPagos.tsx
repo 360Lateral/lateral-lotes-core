@@ -91,6 +91,7 @@ export default function DashboardPagos() {
   const [confirmAction, setConfirmAction] = useState<"aprobar" | "declinar" | null>(null);
 
   const { data: todas = [], isLoading } = useTransaccionesAdmin();
+  const reintentar = useReintentarActivacion();
 
   const bulkMutation = useMutation({
     mutationFn: async ({ ids, nuevoEstado }: { ids: string[]; nuevoEstado: "aprobada" | "declinada" }) => {
