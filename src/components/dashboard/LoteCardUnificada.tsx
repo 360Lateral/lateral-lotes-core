@@ -1,7 +1,10 @@
-import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send, ImageIcon, MapPinned } from "lucide-react";
+import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send, ImageIcon, MapPinned, Plus, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { BadgeSla } from "@/components/portafolio/BadgeSla";
+import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
 
@@ -39,6 +42,8 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   const tieneEngagement = !!lote.engagement_id;
   const tieneLeads = lote.leads_count > 0;
   const porValidar = lote.estado_publicacion === "pendiente_validacion";
+  const { data: engagementActivoId, isLoading: loadingEngagement } =
+    useEngagementActivoDelLote(lote.id);
 
   return (
     <article
@@ -177,6 +182,26 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
             </div>
           </div>
         )}
+
+        <div className="pt-1.5" onClick={(e) => e.stopPropagation()}>
+          {loadingEngagement ? (
+            <Button size="sm" variant="outline" disabled className="h-7 w-full gap-1 text-[10px]">
+              <Loader2 className="h-3 w-3 animate-spin" />
+            </Button>
+          ) : engagementActivoId ? (
+            <Button asChild size="sm" variant="default" className="h-7 w-full gap-1 text-[10px]">
+              <Link to={`/dashboard/engagements/${engagementActivoId}`}>
+                <Briefcase className="h-3 w-3" /> Abrir engagement
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild size="sm" variant="outline" className="h-7 w-full gap-1 text-[10px]">
+              <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
+                <Plus className="h-3 w-3" /> Crear engagement
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
     </article>
   );

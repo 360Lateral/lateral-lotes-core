@@ -2,9 +2,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Info, Briefcase, Users, Activity, BarChart3, ExternalLink, MapPin, ImageIcon, MapPinned } from "lucide-react";
+import { Info, Briefcase, Users, Activity, BarChart3, ExternalLink, MapPin, ImageIcon, MapPinned, Plus, Loader2 } from "lucide-react";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
+import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 
@@ -26,6 +27,8 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
     lote?.id,
     lote?.engagement_id ?? undefined,
   );
+  const { data: engagementActivoId, isLoading: loadingEngagement } =
+    useEngagementActivoDelLote(lote?.id);
 
   if (!lote) return null;
 
@@ -46,19 +49,25 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
               Editar lote <ExternalLink className="ml-1 h-3 w-3" />
             </Link>
           </Button>
-          {lote.engagement_id && (
+          {loadingEngagement ? (
+            <Button size="sm" variant="outline" disabled>
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Engagement…
+            </Button>
+          ) : engagementActivoId ? (
+            <Button asChild size="sm" variant="default">
+              <Link to={`/dashboard/engagements/${engagementActivoId}`}>
+                <Briefcase className="mr-1 h-3 w-3" /> Abrir engagement
+              </Link>
+            </Button>
+          ) : (
             <Button asChild size="sm" variant="outline">
-              <Link to={`/dashboard/engagements/${lote.engagement_id}`}>
-                Ver engagement <ExternalLink className="ml-1 h-3 w-3" />
+              <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
+                <Plus className="mr-1 h-3 w-3" /> Crear engagement
               </Link>
             </Button>
           )}
-          <Button asChild size="sm" variant="outline">
-            <Link to={`/dashboard/lotes/${lote.id}/analisis`}>
-              Análisis 360° <ExternalLink className="ml-1 h-3 w-3" />
-            </Link>
-          </Button>
         </div>
+
 
         <Tabs defaultValue="info">
           <TabsList className="grid grid-cols-5">
