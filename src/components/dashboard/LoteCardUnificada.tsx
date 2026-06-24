@@ -182,6 +182,26 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
             </div>
           </div>
         )}
+
+        <div className="pt-1.5" onClick={(e) => e.stopPropagation()}>
+          {loadingEngagement ? (
+            <Button size="sm" variant="outline" disabled className="h-7 w-full gap-1 text-[10px]">
+              <Loader2 className="h-3 w-3 animate-spin" />
+            </Button>
+          ) : engagementActivoId ? (
+            <Button asChild size="sm" variant="default" className="h-7 w-full gap-1 text-[10px]">
+              <Link to={`/dashboard/engagements/${engagementActivoId}`}>
+                <Briefcase className="h-3 w-3" /> Abrir engagement
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild size="sm" variant="outline" className="h-7 w-full gap-1 text-[10px]">
+              <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
+                <Plus className="h-3 w-3" /> Crear engagement
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
     </article>
   );
