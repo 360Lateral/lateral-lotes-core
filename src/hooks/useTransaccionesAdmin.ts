@@ -8,6 +8,7 @@ export const useTransaccionesAdmin = (estado?: string) => {
     queryFn: async () => {
       let q = supabase.from("transacciones").select(`
         id, engagement_id, monto_cop, estado, wompi_reference, wompi_transaction_id,
+        wompi_status, tipo_pago, error_msg,
         fecha_creacion, fecha_aprobacion,
         plan:planes_diagnostico(nombre, codigo),
         propietario:perfiles!transacciones_propietario_id_fkey(id, nombre, email),

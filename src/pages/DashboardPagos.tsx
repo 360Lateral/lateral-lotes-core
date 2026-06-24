@@ -34,6 +34,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate as Redir } from "react-router-dom";
 import { useTransaccionesAdmin } from "@/hooks/useTransaccionesAdmin";
+import { useReintentarActivacion } from "@/hooks/useReintentarActivacion";
 import TransaccionDetalleDialog, {
   estadoBadgeVariant,
 } from "@/components/pagos/TransaccionDetalleDialog";
@@ -46,7 +47,16 @@ import {
   TrendingUp,
   Eye,
   Download,
+  RefreshCw,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { KPIEstado } from "@/components/ui/KPIEstado";
 import { BulkActionsBar } from "@/components/ui/BulkActionsBar";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -59,6 +69,7 @@ const ESTADOS = [
   { value: "todas", label: "Todas" },
   { value: "pendiente", label: "Pendientes" },
   { value: "aprobada", label: "Aprobadas" },
+  { value: "con_error", label: "Con error de activación" },
   { value: "declinada", label: "Declinadas" },
   { value: "expirada", label: "Expiradas" },
   { value: "reembolsada", label: "Reembolsadas" },
@@ -80,6 +91,7 @@ export default function DashboardPagos() {
   const [confirmAction, setConfirmAction] = useState<"aprobar" | "declinar" | null>(null);
 
   const { data: todas = [], isLoading } = useTransaccionesAdmin();
+  const reintentar = useReintentarActivacion();
 
   const bulkMutation = useMutation({
     mutationFn: async ({ ids, nuevoEstado }: { ids: string[]; nuevoEstado: "aprobada" | "declinada" }) => {
@@ -133,7 +145,11 @@ export default function DashboardPagos() {
   // Filtrado + orden
   const filtradas = useMemo(() => {
     let arr = todas;
-    if (filtroEstado !== "todas") arr = arr.filter((t) => t.estado === filtroEstado);
+    if (filtroEstado === "con_error") {
+      arr = arr.filter((t) => !!t.error_msg);
+    } else if (filtroEstado !== "todas") {
+      arr = arr.filter((t) => t.estado === filtroEstado);
+    }
     if (busqueda) {
       const s = busqueda.toLowerCase();
       arr = arr.filter((t) => {
@@ -315,6 +331,7 @@ export default function DashboardPagos() {
                   <TableHead className="text-[10px] uppercase tracking-wide">Propietario</TableHead>
                   <TableHead className="text-right text-[10px] uppercase tracking-wide">Monto</TableHead>
                   <TableHead className="text-center text-[10px] uppercase tracking-wide">Estado</TableHead>
+                  <TableHead className="text-center text-[10px] uppercase tracking-wide">Activación</TableHead>
                   <TableHead className="text-right text-[10px] uppercase tracking-wide">Fecha</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
@@ -348,13 +365,55 @@ export default function DashboardPagos() {
                       <TableCell className="text-center">
                         <Badge className={`${badge.className} text-[10px]`}>{badge.label}</Badge>
                       </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        {t.error_msg ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="destructive" className="text-[10px] cursor-help">
+                                  <AlertTriangle className="mr-1 h-2.5 w-2.5" /> Falló
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p className="text-[11px]">{t.error_msg}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : t.fecha_aprobacion && t.estado === "aprobada" ? (
+                          <Badge variant="outline" className="border-green-600/40 text-green-700 text-[10px]">
+                            Activada
+                          </Badge>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right text-[10px] text-muted-foreground whitespace-nowrap">
                         {formatFecha(t.fecha_aprobacion ?? t.fecha_creacion)}
                       </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDetalleId(t.id)}>
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          {(t.error_msg ||
+                            (t.wompi_status === "APPROVED" && !t.fecha_aprobacion)) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2 text-[10px]"
+                              disabled={reintentar.isPending}
+                              onClick={() => reintentar.mutate(t.id)}
+                              title="Reintentar activación"
+                            >
+                              {reintentar.isPending && reintentar.variables === t.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-3 w-3" />
+                              )}
+                              <span className="ml-1 hidden sm:inline">Reintentar</span>
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDetalleId(t.id)}>
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

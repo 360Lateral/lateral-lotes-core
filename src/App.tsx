@@ -36,6 +36,7 @@ const DiagnosticoResultado = lazy(() => import("./pages/DiagnosticoResultado"));
 const Mercado = lazy(() => import("./pages/Mercado"));
 const Resolutoria = lazy(() => import("./pages/Resolutoria"));
 const Planes = lazy(() => import("./pages/Planes"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const DashboardOwner = lazy(() => import("./pages/DashboardOwner"));
 const DashboardOwnerLotes = lazy(() => import("./pages/DashboardOwnerLotes"));
 const DashboardOwnerDiagnosticos = lazy(() => import("./pages/DashboardOwnerDiagnosticos"));
@@ -122,6 +123,7 @@ const App = () => (
             <Route path="/suscripcion" element={<ProtectedRoute requireDesarrollador><Suscripcion /></ProtectedRoute>} />
             <Route path="/mi-cuenta" element={<ProtectedRoute requireDesarrollador><MiCuentaDesarrollador /></ProtectedRoute>} />
             <Route path="/portal/pago-completado" element={<PagoCompletado />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
 
             {/* Rutas protegidas — solo admin/asesor/super_admin */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

@@ -5263,6 +5263,10 @@ export type Database = {
         Args: { p_alerta_id: string }
         Returns: undefined
       }
+      reintentar_activacion_transaccion: {
+        Args: { p_transaccion_id: string }
+        Returns: Json
+      }
       resumen_cuenta_desarrollador: {
         Args: { p_user_id: string }
         Returns: Json

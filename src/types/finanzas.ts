@@ -94,6 +94,9 @@ export interface TransaccionRow {
   fecha_creacion: string;
   fecha_aprobacion: string | null;
   fecha_expiracion?: string | null;
+  wompi_status?: string | null;
+  tipo_pago?: string | null;
+  error_msg?: string | null;
   plan?: PlanMini | null;
   propietario?: PerfilMini | null;
   engagement?: EngagementMini | null;
