@@ -365,13 +365,55 @@ export default function DashboardPagos() {
                       <TableCell className="text-center">
                         <Badge className={`${badge.className} text-[10px]`}>{badge.label}</Badge>
                       </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        {t.error_msg ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="destructive" className="text-[10px] cursor-help">
+                                  <AlertTriangle className="mr-1 h-2.5 w-2.5" /> Falló
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p className="text-[11px]">{t.error_msg}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : t.fecha_aprobacion && t.estado === "aprobada" ? (
+                          <Badge variant="outline" className="border-green-600/40 text-green-700 text-[10px]">
+                            Activada
+                          </Badge>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right text-[10px] text-muted-foreground whitespace-nowrap">
                         {formatFecha(t.fecha_aprobacion ?? t.fecha_creacion)}
                       </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDetalleId(t.id)}>
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          {(t.error_msg ||
+                            (t.wompi_status === "APPROVED" && !t.fecha_aprobacion)) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2 text-[10px]"
+                              disabled={reintentar.isPending}
+                              onClick={() => reintentar.mutate(t.id)}
+                              title="Reintentar activación"
+                            >
+                              {reintentar.isPending && reintentar.variables === t.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-3 w-3" />
+                              )}
+                              <span className="ml-1 hidden sm:inline">Reintentar</span>
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDetalleId(t.id)}>
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
