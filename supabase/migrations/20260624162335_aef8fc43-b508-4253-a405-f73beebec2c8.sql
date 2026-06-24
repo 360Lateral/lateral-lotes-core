@@ -1,0 +1,1 @@
+ALTER VIEW public.vw_planes_con_precio SET (security_invoker = on);
