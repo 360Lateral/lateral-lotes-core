@@ -183,58 +183,64 @@ const Lotes = () => {
               )}
             </div>
           </div>
-          <GoogleMapsGate
-            fallback={
-              <div className="flex h-full items-center justify-center bg-muted">
-                <p className="text-muted-foreground">Cargando mapa…</p>
-              </div>
-            }
-          >
-            <GoogleMap
-              mapContainerStyle={{ width: "100%", height: "100%" }}
-              center={mapCenter}
-              zoom={mapZoom}
-              options={mapOptions}
-              onLoad={(map) => { mapRef.current = map; initAutocomplete(); }}
-            >
-              {filteredLotes
-                .filter((l) => l.lat != null && l.lng != null)
-                .map((lote) => (
-                  <Marker
-                    key={lote.id}
-                    position={{ lat: lote.lat!, lng: lote.lng! }}
-                    icon={{
-                      path: 0, // google.maps.SymbolPath.CIRCLE
-                      fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
-                      fillOpacity: 1,
-                      strokeColor: "#FFFFFF",
-                      strokeWeight: 3,
-                      scale: hoveredLoteId === lote.id ? 12 : 8,
-                    }}
-                    onClick={() => setSelectedLote(lote)}
-                    zIndex={hoveredLoteId === lote.id ? 10 : 1}
-                  />
-                ))}
-              {selectedLote && selectedLote.lat && selectedLote.lng && (
-                <InfoWindow
-                  position={{ lat: selectedLote.lat, lng: selectedLote.lng }}
-                  onCloseClick={() => setSelectedLote(null)}
-                >
-                  <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
-                    <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
-                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {(selectedLote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
-                    <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>
-                    <a
-                      href={`/lotes/${selectedLote.id}`}
-                      style={{ display: "inline-block", background: "hsl(37,91%,52%)", color: "white", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
-                    >
-                      Ver ficha
-                    </a>
+          {mapsAuthFailed ? (
+            <MapFallback />
+          ) : (
+            <MapErrorBoundary>
+              <GoogleMapsGate
+                fallback={
+                  <div className="flex h-full items-center justify-center bg-muted">
+                    <p className="text-muted-foreground">Cargando mapa…</p>
                   </div>
-                </InfoWindow>
-              )}
-            </GoogleMap>
-          </GoogleMapsGate>
+                }
+              >
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={mapCenter}
+                  zoom={mapZoom}
+                  options={mapOptions}
+                  onLoad={(map) => { mapRef.current = map; initAutocomplete(); }}
+                >
+                  {filteredLotes
+                    .filter((l) => l.lat != null && l.lng != null)
+                    .map((lote) => (
+                      <Marker
+                        key={lote.id}
+                        position={{ lat: lote.lat!, lng: lote.lng! }}
+                        icon={{
+                          path: 0,
+                          fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
+                          fillOpacity: 1,
+                          strokeColor: "#FFFFFF",
+                          strokeWeight: 3,
+                          scale: hoveredLoteId === lote.id ? 12 : 8,
+                        }}
+                        onClick={() => setSelectedLote(lote)}
+                        zIndex={hoveredLoteId === lote.id ? 10 : 1}
+                      />
+                    ))}
+                  {selectedLote && selectedLote.lat && selectedLote.lng && (
+                    <InfoWindow
+                      position={{ lat: selectedLote.lat, lng: selectedLote.lng }}
+                      onCloseClick={() => setSelectedLote(null)}
+                    >
+                      <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
+                        <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
+                        <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {(selectedLote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
+                        <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>
+                        <a
+                          href={`/lotes/${selectedLote.id}`}
+                          style={{ display: "inline-block", background: "hsl(37,91%,52%)", color: "white", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                        >
+                          Ver ficha
+                        </a>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </GoogleMap>
+              </GoogleMapsGate>
+            </MapErrorBoundary>
+          )}
         </div>
 
         {/* Desktop panel */}
@@ -263,9 +269,25 @@ const Lotes = () => {
                     />
                   ))}
               {!isLoading && filteredLotes.length === 0 && (
-                <p className="py-8 text-center font-body text-sm text-muted-foreground">
-                  No se encontraron lotes con estos filtros.
-                </p>
+                <div className="py-10 text-center px-4">
+                  <FilterX className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+                  <p className="font-body text-sm font-semibold text-foreground">
+                    {allLotes.length === 0
+                      ? "Aún no hay lotes publicados en el marketplace."
+                      : `Ninguno de los ${allLotes.length} lotes disponibles coincide con tus filtros`}
+                  </p>
+                  {allLotes.length > 0 && (
+                    <>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Prueba con criterios menos específicos.
+                      </p>
+                      <Button variant="outline" size="sm" className="mt-4" onClick={handleClearFilters}>
+                        <FilterX className="h-4 w-4 mr-1.5" />
+                        Limpiar todos los filtros
+                      </Button>
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </div>
