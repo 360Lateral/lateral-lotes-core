@@ -353,13 +353,17 @@ const LoteFicha = () => {
       !!normativa.tratamiento);
 
   const seoTitle = `${data.nombre_lote ?? "Lote"} · 360Lateral`;
+  const unidadesSeo = enriquecida?.arquitectonico?.unidades_estimadas ?? null;
+  const tirSeo = enriquecida?.financiero?.tir_pct ?? null;
   const seoDesc = `${
     data.area_total_m2
       ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²`
       : "Lote"
   } en ${data.ciudad ?? "Colombia"}${
-    analisis.length > 0 ? ` · Análisis: ${analisis.map((a) => a.label).join(", ")}` : ""
-  }${valoracion ? ` · Valoración: ${formatCOP(Number(valoracion))}` : ""}`;
+    scorePromedio != null ? ` · Score ${scorePromedio.toFixed(1)}/10` : ""
+  }${valoracion ? ` · Valoración ${formatCOP(Number(valoracion))}` : ""}${
+    unidadesSeo != null ? ` · ~${unidadesSeo} unidades` : ""
+  }${tirSeo != null ? ` · TIR ${tirSeo.toFixed(1)}%` : ""}`;
   const seoUrl = `${PROD_BASE}/lotes/${id}/ficha`;
   const seoImage = data.foto_url ?? `${PROD_BASE}/og-default.png`;
 
