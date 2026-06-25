@@ -202,7 +202,7 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
 
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
-              <SlaPildora e={e} />
+              <SlaChip e={e} />
             </div>
 
             <div className="pt-3 border-t border-border flex flex-wrap items-center gap-2">
