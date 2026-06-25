@@ -1,0 +1,1 @@
+ALTER VIEW public.vw_lotes_huerfanos_agrupados SET (security_invoker = on);
