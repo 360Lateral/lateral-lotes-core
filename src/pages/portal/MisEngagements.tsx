@@ -563,13 +563,15 @@ const ProximoPasoCard = ({
 // ---------- Página ----------
 
 const PortalHomeInner = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: engagements } = useMisEngagementsCliente();
   const { data: activos = [] } = useMisActivos(user?.id);
   const { data: resumen } = useResumenPortafolio();
-  const [solicitarOpen, setSolicitarOpen] = useState(false);
   const [publicarOpen, setPublicarOpen] = useState(false);
   const generarPago = useGenerarPagoWompi();
+
+  const irAComprar = () => navigate("/planes");
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
