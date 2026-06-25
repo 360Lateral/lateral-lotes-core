@@ -233,7 +233,8 @@ const DocumentosRequeridosManager = () => {
   const { data: docs, isLoading } = useDocumentosRequeridos(
     filtroPlan === "all" ? undefined : filtroPlan,
   );
-  const { data: planes } = usePlanesConfig();
+  const { query: planesQuery } = usePlanesDiagnostico();
+  const planes = planesQuery.data;
   const { data: tipos } = useTiposAnalisis();
   const eliminar = useEliminarDocumentoRequerido();
 
