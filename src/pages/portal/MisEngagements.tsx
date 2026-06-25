@@ -173,9 +173,9 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
       <CardContent className="p-6 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-lg font-semibold truncate">
-              {e.lote_nombre || "Lote sin nombre"}
-            </h3>
+              <h3 className="text-lg font-semibold truncate">
+                {nombreLoteMostrable(e.lote_nombre, e.lote_direccion, e.lote_ciudad)}
+              </h3>
             <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">
@@ -209,6 +209,23 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
               <ChipMaestro label="Diagnóstico" ready={e.tiene_diagnostico} />
               <ChipMaestro label="Presentación" ready={e.tiene_presentacion} />
             </div>
+
+            {e.plan_codigo && e.plan_codigo.toLowerCase() !== "premium" && (
+              <div className="border-t pt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-xs h-7 gap-1 px-2"
+                  onClick={(ev) => ev.stopPropagation()}
+                >
+                  <Link to="/planes">
+                    <Sparkles className="h-3 w-3" />
+                    Mejorar plan para más análisis
+                  </Link>
+                </Button>
+              </div>
+            )}
           </>
         )}
       </CardContent>
