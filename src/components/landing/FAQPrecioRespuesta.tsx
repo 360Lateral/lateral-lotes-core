@@ -1,11 +1,6 @@
 import { usePlanesConPrecio } from "@/hooks/usePlanesConPrecio";
 import { usePreciosSuscripcion } from "@/hooks/usePreciosSuscripcion";
-
-const formatoCOP = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-  maximumFractionDigits: 0,
-});
+import { formatCOP } from "@/lib/format-moneda";
 
 const FAQPrecioRespuesta = () => {
   const { data: planes, isLoading: loadingPlanes, error: errPlanes } = usePlanesConPrecio();
@@ -43,7 +38,7 @@ const FAQPrecioRespuesta = () => {
       {planMin && (
         <p>
           <strong className="text-foreground">Para propietarios:</strong> diagnóstico {planMin.nombre.toLowerCase()} desde{" "}
-          <strong className="text-foreground">{formatoCOP.format(planMin.precio_cop_actual)}</strong>{" "}
+          <strong className="text-foreground">{formatCOP(planMin.precio_cop_actual)}</strong>{" "}
           ({planMin.precio_smlmv} SMLMV).
         </p>
       )}
@@ -51,7 +46,7 @@ const FAQPrecioRespuesta = () => {
         <p>
           <strong className="text-foreground">Para desarrolladores:</strong> suscripción desde{" "}
           <strong className="text-foreground">
-            {formatoCOP.format(Math.round(suscMin.precio_cop / suscMin.periodo_meses))}/mes
+            {formatCOP(Math.round(suscMin.precio_cop / suscMin.periodo_meses))}/mes
           </strong>
           {suscMin.periodo_meses > 1 && (
             <span> (facturada cada {suscMin.periodo_meses} meses)</span>
