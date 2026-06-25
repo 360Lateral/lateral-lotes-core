@@ -2780,6 +2780,7 @@ export type Database = {
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato: number | null
+          fecha_compra: string | null
           fondo_ml: number | null
           foto_url: string | null
           frente_ml: number | null
@@ -2788,11 +2789,13 @@ export type Database = {
           lat: number | null
           lng: number | null
           matricula_inmobiliaria: string | null
+          moneda_compra: string | null
           nombre_lote: string
           nombre_propietario: string | null
           notas: string | null
           notas_publicacion: string | null
           owner_id: string | null
+          precio_compra_original: number | null
           precio_venta_estimado: number | null
           problema_juridico: string | null
           propietario_id: string | null
@@ -2824,6 +2827,7 @@ export type Database = {
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato?: number | null
+          fecha_compra?: string | null
           fondo_ml?: number | null
           foto_url?: string | null
           frente_ml?: number | null
@@ -2832,11 +2836,13 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           matricula_inmobiliaria?: string | null
+          moneda_compra?: string | null
           nombre_lote: string
           nombre_propietario?: string | null
           notas?: string | null
           notas_publicacion?: string | null
           owner_id?: string | null
+          precio_compra_original?: number | null
           precio_venta_estimado?: number | null
           problema_juridico?: string | null
           propietario_id?: string | null
@@ -2868,6 +2874,7 @@ export type Database = {
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
           estrato?: number | null
+          fecha_compra?: string | null
           fondo_ml?: number | null
           foto_url?: string | null
           frente_ml?: number | null
@@ -2876,11 +2883,13 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           matricula_inmobiliaria?: string | null
+          moneda_compra?: string | null
           nombre_lote?: string
           nombre_propietario?: string | null
           notas?: string | null
           notas_publicacion?: string | null
           owner_id?: string | null
+          precio_compra_original?: number | null
           precio_venta_estimado?: number | null
           problema_juridico?: string | null
           propietario_id?: string | null
@@ -5342,6 +5351,10 @@ export type Database = {
       obtener_lote_para_usuario: { Args: { p_lote_id: string }; Returns: Json }
       obtener_metricas_clientes_ejecutivo: {
         Args: { p_rango?: string }
+        Returns: Json
+      }
+      obtener_portafolio_propietario: {
+        Args: { p_propietario_id: string }
         Returns: Json
       }
       obtener_ranking_asesores: {
