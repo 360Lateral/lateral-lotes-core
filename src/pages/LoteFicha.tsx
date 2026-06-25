@@ -547,6 +547,11 @@ const LoteFicha = () => {
             </section>
           )}
 
+          {/* Bloques enriquecidos: Arquitectónico, Análisis por área, Financiero, Perfil comprador */}
+          {enriquecida && (
+            <FichaBloquesExtra ficha={enriquecida} areaTotalM2={data.area_total_m2 ?? null} />
+          )}
+
           {notaCustom && (
             <section className="mb-6">
               <Card className="border-border bg-muted/40 p-4">
