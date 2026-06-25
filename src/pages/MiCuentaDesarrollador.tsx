@@ -53,6 +53,8 @@ const TarjetaLoteDesbloqueado = ({ acceso }: { acceso: AccesoConDatos }) => {
     [acceso.ciudad, acceso.barrio].filter(Boolean).join(" · ") ??
     "Lote";
 
+  const esCortesia = acceso.tipo === "manual_admin";
+
   return (
     <Card className="hover:border-primary/40 transition-colors h-full">
       <CardContent className="p-4 space-y-2">
@@ -69,18 +71,35 @@ const TarjetaLoteDesbloqueado = ({ acceso }: { acceso: AccesoConDatos }) => {
               {[acceso.ciudad, acceso.barrio].filter(Boolean).join(" · ") || "—"}
             </p>
           </div>
-          {diasRestantes != null && (
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {diasRestantes != null && (
+              <Badge
+                variant={expirado ? "destructive" : expiraPronto ? "outline" : "secondary"}
+                className={cn(
+                  "text-[10px]",
+                  expiraPronto && !expirado && "border-amber-500 text-amber-700 bg-amber-50",
+                )}
+              >
+                {expirado ? "Expirado" : `${diasRestantes}d restantes`}
+              </Badge>
+            )}
             <Badge
-              variant={expirado ? "destructive" : expiraPronto ? "outline" : "secondary"}
+              variant={esCortesia ? "secondary" : "outline"}
               className={cn(
-                "shrink-0 text-[10px]",
-                expiraPronto && !expirado && "border-amber-500 text-amber-700 bg-amber-50",
+                "text-[10px] gap-1",
+                esCortesia && "bg-primary/10 text-primary border-primary/30",
               )}
             >
-              {expirado ? "Expirado" : `${diasRestantes}d restantes`}
+              {esCortesia ? <Sparkles className="h-3 w-3" /> : <Key className="h-3 w-3" />}
+              {esCortesia ? "Cortesía 360Lateral" : "PPV"}
             </Badge>
-          )}
+          </div>
         </div>
+        {esCortesia && (
+          <p className="text-[11px] text-muted-foreground italic">
+            Acceso otorgado por el equipo.
+          </p>
+        )}
         <div className="text-xs text-muted-foreground">
           {acceso.area_total_m2
             ? `${formatMetros(acceso.area_total_m2)}`
