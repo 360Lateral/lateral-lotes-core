@@ -55,6 +55,7 @@ const Bienvenida = lazy(() => import("./pages/Bienvenida"));
 const PreferenciasUsuario = lazy(() => import("./pages/PreferenciasUsuario"));
 const MisEngagements = lazy(() => import("./pages/portal/MisEngagements"));
 const EngagementClienteDetalle = lazy(() => import("./pages/portal/EngagementClienteDetalle"));
+const PortafolioPropietario = lazy(() => import("./pages/portal/PortafolioPropietario"));
 const PortalProtectedRoute = lazy(() => import("@/components/portal/PortalProtectedRoute"));
 const RecuperarContrasena = lazy(() => import("./pages/RecuperarContrasena"));
 const RestablecerContrasena = lazy(() => import("./pages/RestablecerContrasena"));
@@ -175,6 +176,7 @@ const App = () => (
 
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
+            <Route path="/portal/portafolio" element={<PortalProtectedRoute><PortafolioPropietario /></PortalProtectedRoute>} />
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
 
             {/* Portal del comisionista */}
