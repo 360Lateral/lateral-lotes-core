@@ -148,7 +148,7 @@ const generarHtmlStandalone = (
   const filasDatos: string[] = [];
   if (mostrar("area"))
     filasDatos.push(
-      `<tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? NumberformatMetros(ficha.area_total_m2) : "—"}</td></tr>`,
+      `<tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? formatMetros(ficha.area_total_m2) : "—"}</td></tr>`,
     );
   if (mostrar("uso"))
     filasDatos.push(

@@ -225,7 +225,7 @@ export async function generarPdfFicha(
   // ---- Datos del activo ----
   const filas: [string, string][] = [];
   if (mostrar("area") && ficha.area_total_m2)
-    filas.push(["Área", NumberformatMetros(ficha.area_total_m2)]);
+    filas.push(["Área", formatMetros(ficha.area_total_m2)]);
   if (mostrar("uso") && ficha.tipo_lote) filas.push(["Uso / tipo", ficha.tipo_lote]);
   if (mostrar("sector")) {
     const s = [ficha.ciudad, ficha.barrio].filter(Boolean).join(" · ");
