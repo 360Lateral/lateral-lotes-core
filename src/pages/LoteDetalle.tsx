@@ -30,15 +30,7 @@ import { MapaHeroLote } from "@/components/lotes/MapaHeroLote";
 import { SidebarStickyLote } from "@/components/lotes/SidebarStickyLote";
 import { GaleriaFotosLote } from "@/components/lotes/GaleriaFotosLote";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
-
-const formatCOP = (n: number | undefined | null) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const MetricaKey = ({
   label,
