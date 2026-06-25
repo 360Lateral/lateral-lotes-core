@@ -11,8 +11,9 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/Logo";
-import { ChevronDown, LogOut, User as UserIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { BarChart3, Briefcase, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const obtenerIniciales = (email?: string | null) => {
   if (!email) return "C";
@@ -37,15 +38,40 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <header className="sticky top-0 z-40 border-b border-border bg-background">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-4 min-w-0">
             <Logo />
-            <div className="hidden sm:flex flex-col leading-tight">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                Portal
-              </span>
-              <span className="text-sm font-semibold">Portal de clientes</span>
-            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              <NavLink
+                to="/portal/portafolio"
+                className={({ isActive }) =>
+                  cn(
+                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  )
+                }
+              >
+                <BarChart3 className="h-4 w-4" />
+                Portafolio
+              </NavLink>
+              <NavLink
+                to="/portal"
+                end
+                className={({ isActive }) =>
+                  cn(
+                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  )
+                }
+              >
+                <Briefcase className="h-4 w-4" />
+                Mis engagements
+              </NavLink>
+            </nav>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
