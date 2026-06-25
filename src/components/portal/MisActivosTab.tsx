@@ -11,15 +11,7 @@ import PublicarActivoDialog from "./PublicarActivoDialog";
 import GestionarComisionistasDialog from "./GestionarComisionistasDialog";
 import SolicitarDiagnosticoDialog from "./SolicitarDiagnosticoDialog";
 import { FotoLote } from "@/components/lotes/FotoLote";
-
-const fmtCOP = (n: number | null) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const EstadoBadge = ({ estado }: { estado: string }) => {
   switch (estado) {
@@ -115,7 +107,7 @@ const MisActivosTab = () => {
                 <div className="text-sm">
                   <span className="text-muted-foreground">Precio sugerido: </span>
                   <span className="font-medium">
-                    {fmtCOP(a.precio_venta_estimado)}
+                    {formatCOP(a.precio_venta_estimado)}
                   </span>
                 </div>
 

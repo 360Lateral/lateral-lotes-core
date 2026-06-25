@@ -16,9 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, MapPin, User, Calendar, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
-
-const fmtCOP = (n: number | null) =>
-  n == null ? "—" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const fmtDate = (d: string) =>
   new Date(d).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
@@ -109,7 +107,7 @@ const DashboardLotesPendientesValidacion = () => {
                     <dl className="grid grid-cols-2 gap-x-4 gap-y-1 font-body text-sm">
                       <div>
                         <dt className="text-xs text-muted-foreground">Precio sugerido</dt>
-                        <dd className="text-foreground">{fmtCOP(lote.precio_venta_estimado)}</dd>
+                        <dd className="text-foreground">{formatCOP(lote.precio_venta_estimado)}</dd>
                       </div>
                       <div>
                         <dt className="text-xs text-muted-foreground flex items-center gap-1">

@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ContratoMarco, useContratosMarco } from "@/hooks/useContratosMarco";
 import { useToggleContratoActivo } from "@/hooks/useToggleContratoActivo";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   open: boolean;
@@ -35,9 +36,6 @@ interface Props {
   tipoAnalisisId: string;
   tipoAnalisisNombre: string;
 }
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const HistorialContratosDialog = ({
   open,
@@ -90,7 +88,7 @@ const HistorialContratosDialog = ({
                       )}
                     </TableCell>
                     <TableCell className="text-xs">
-                      {fmtCOP(c.precio_min)} – {fmtCOP(c.precio_max)}
+                      {formatCOP(c.precio_min)} – {formatCOP(c.precio_max)}
                     </TableCell>
                     <TableCell className="text-xs">
                       {c.plazo_min_dias} – {c.plazo_max_dias} días

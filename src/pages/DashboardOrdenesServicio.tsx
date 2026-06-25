@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClipboardList } from "lucide-react";
+import { formatCOP } from "@/lib/format-moneda";
 
 const TABS: { value: string; label: string }[] = [
   { value: "abierta", label: "Abiertas" },
@@ -18,9 +19,6 @@ const TABS: { value: string; label: string }[] = [
   { value: "completada", label: "Completadas" },
   { value: "cancelada", label: "Canceladas" },
 ];
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const usePropuestasCount = (ordenId: string) =>
   useQuery({
@@ -62,7 +60,7 @@ const OrdenCard = ({ orden }: { orden: any }) => {
         {orden.contrato && (
           <p className="text-xs text-muted-foreground">
             Contrato v{orden.contrato.version} ·{" "}
-            {fmtCOP(Number(orden.contrato.precio_min))}–{fmtCOP(Number(orden.contrato.precio_max))} ·{" "}
+            {formatCOP(Number(orden.contrato.precio_min))}–{formatCOP(Number(orden.contrato.precio_max))} ·{" "}
             {orden.contrato.plazo_min_dias}–{orden.contrato.plazo_max_dias} días
           </p>
         )}

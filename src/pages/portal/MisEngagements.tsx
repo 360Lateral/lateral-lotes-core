@@ -31,6 +31,7 @@ import MisActivosTab from "@/components/portal/MisActivosTab";
 
 import PublicarActivoDialog from "@/components/portal/PublicarActivoDialog";
 import {
+import { formatCOP } from "@/lib/format-moneda";
   Folder,
   MapPin,
   
@@ -120,14 +121,6 @@ const ChipMaestro = ({ label, ready }: { label: string; ready: boolean }) => {
     </span>
   );
 };
-
-const formatoCOPCompacto = (v: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 1,
-    notation: "compact",
-  }).format(v);
 
 const EngagementCard = ({
   e,
@@ -280,7 +273,7 @@ const EngagementCard = ({
                     <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Valoración</div>
                     <div className="text-sm font-semibold tabular-nums">
                       {resumen.valoracion_estimada != null
-                        ? formatoCOPCompacto(Number(resumen.valoracion_estimada))
+                        ? formatCOP(Number(resumen.valoracion_estimada))
                         : "—"}
                     </div>
                   </div>

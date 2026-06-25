@@ -36,13 +36,7 @@ import { usePropuestasDeOrden } from "@/hooks/usePropuestasDeOrden";
 import { useAdjudicarPropuesta } from "@/hooks/useAdjudicarPropuesta";
 import { useCancelarOrdenServicio } from "@/hooks/useCancelarOrdenServicio";
 import PropuestaComparativaCard from "@/components/ordenes/PropuestaComparativaCard";
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const fmtFecha = (d?: string | null) =>
   d ? new Date(d).toLocaleDateString("es-CO") : "—";
@@ -243,7 +237,7 @@ const DashboardOrdenServicioDetalle = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">Precio permitido</p>
                     <p className="font-semibold text-xs">
-                      {fmtCOP(Number(contrato.precio_min))}–{fmtCOP(Number(contrato.precio_max))}
+                      {formatCOP(Number(contrato.precio_min))}–{formatCOP(Number(contrato.precio_max))}
                     </p>
                   </div>
                   <div>

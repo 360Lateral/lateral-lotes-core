@@ -60,18 +60,12 @@ import { MetricaOverview } from "@/components/ui/MetricaOverview";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCOPCompact } from "@/lib/format";
 import {
+import { formatCOP } from "@/lib/format-moneda";
   FiltrosOrdenesSticky,
   defaultFiltrosOrdenes,
   contarFiltrosActivos,
   type FiltrosOrdenes,
 } from "@/components/ordenes/FiltrosOrdenesSticky";
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 const fmtFecha = (d: string) => new Date(d).toLocaleDateString("es-CO");
 
@@ -435,7 +429,7 @@ const PropuestaItem = ({ propuesta }: { propuesta: any }) => {
         <div className="text-sm grid grid-cols-2 gap-2">
           <p>
             <span className="text-muted-foreground">Precio: </span>
-            <strong>{fmtCOP(Number(propuesta.precio_propuesto))}</strong>
+            <strong>{formatCOP(Number(propuesta.precio_propuesto))}</strong>
           </p>
           <p>
             <span className="text-muted-foreground">Plazo: </span>
@@ -543,15 +537,15 @@ const LiquidacionItem = ({ liq }: { liq: any }) => {
         <div className="rounded-md bg-muted/40 p-3 space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tu precio</span>
-            <span>{fmtCOP(Number(liq.monto_bruto))}</span>
+            <span>{formatCOP(Number(liq.monto_bruto))}</span>
           </div>
           <div className="flex justify-between text-muted-foreground">
             <span>Fee 360Lateral ({Number(liq.fee_pct)}%)</span>
-            <span>−{fmtCOP(Number(liq.fee_monto))}</span>
+            <span>−{formatCOP(Number(liq.fee_monto))}</span>
           </div>
           <div className="border-t pt-1 mt-1 flex justify-between font-semibold text-emerald-700 dark:text-emerald-500">
             <span>Recibes</span>
-            <span>{fmtCOP(Number(liq.monto_neto))}</span>
+            <span>{formatCOP(Number(liq.monto_neto))}</span>
           </div>
         </div>
 
@@ -899,7 +893,7 @@ const DashboardMisOrdenes = () => {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Total ganado (neto)</p>
                   <p className="text-2xl font-semibold text-foreground mt-1">
-                    {fmtCOP(kpiLiqs.total)}
+                    {formatCOP(kpiLiqs.total)}
                   </p>
                 </CardContent>
               </Card>
@@ -907,7 +901,7 @@ const DashboardMisOrdenes = () => {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Pendiente de cobro</p>
                   <p className="text-2xl font-semibold text-amber-600 dark:text-amber-500 mt-1">
-                    {fmtCOP(kpiLiqs.pendiente)}
+                    {formatCOP(kpiLiqs.pendiente)}
                   </p>
                 </CardContent>
               </Card>
@@ -915,7 +909,7 @@ const DashboardMisOrdenes = () => {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Ya cobrado</p>
                   <p className="text-2xl font-semibold text-emerald-700 dark:text-emerald-500 mt-1">
-                    {fmtCOP(kpiLiqs.pagado)}
+                    {formatCOP(kpiLiqs.pagado)}
                   </p>
                 </CardContent>
               </Card>
