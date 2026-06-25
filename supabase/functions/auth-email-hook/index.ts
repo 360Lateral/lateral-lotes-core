@@ -35,11 +35,32 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   reauthentication: ReauthenticationEmail,
 }
 
-// Configuration
+/**
+ * Edge function que intercepta los emails de Supabase Auth (signup, password reset,
+ * magic link, invite, email change, reauthentication) para enviarlos vía el dispatcher
+ * compartido (process-email-queue).
+ *
+ * CONFIGURACIÓN (Lovable Cloud → Secrets):
+ *   - EMAIL_FROM_NAME      Nombre humano del remitente (default: "Notificaciones · 360Lateral").
+ *                          COMPARTIDO con send-transactional-email para consistencia.
+ *   - EMAIL_FROM_ADDRESS   Email técnico del remitente (default: "noreply@notify.360lateral.com").
+ *                          COMPARTIDO con send-transactional-email.
+ *
+ * Para cambiar el From de TODOS los emails (Auth + App) basta actualizar UN solo
+ * secret EMAIL_FROM_NAME en Lovable Cloud → Secrets.
+ *
+ * SITE_NAME se conserva para el branding visible dentro del HTML del email
+ * (subjects, templates). El From técnico se gobierna por FROM_NAME/FROM_ADDRESS.
+ */
+
+// Configuration — branding visible (HTML, subjects)
 const SITE_NAME = "360Lateral"
 const SENDER_DOMAIN = "notify.notify.360lateral.com"
 const ROOT_DOMAIN = "notify.360lateral.com"
-const FROM_DOMAIN = "notify.360lateral.com" // Domain shown in From address (may be root or sender subdomain)
+
+// Configuration — From header técnico (compartido con send-transactional-email)
+const FROM_NAME = Deno.env.get("EMAIL_FROM_NAME") ?? "Notificaciones · 360Lateral"
+const FROM_ADDRESS = Deno.env.get("EMAIL_FROM_ADDRESS") ?? "noreply@notify.360lateral.com"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
