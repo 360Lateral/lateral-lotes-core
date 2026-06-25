@@ -79,27 +79,24 @@ const formatoRelativo = (fechaISO: string): string => {
   return `Hace ${Math.floor(dias / 30)} m`;
 };
 
-const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
-  if (e.estado === "entregado") {
-    return <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white">Entregado</Badge>;
-  }
-  const dias = e.dias_para_sla;
-  if (dias === null || dias === undefined) {
-    return <Badge variant="outline">Sin fecha estimada</Badge>;
-  }
-  if (dias < 0) return <Badge variant="destructive">Entrega atrasada</Badge>;
-  if (dias <= 7) {
-    return (
-      <Badge className="bg-amber-500 hover:bg-amber-500 text-white">
-        Próxima entrega en {dias} {dias === 1 ? "día" : "días"}
-      </Badge>
-    );
-  }
+const SlaChip = ({ e }: { e: EngagementClienteResumen }) => {
+  const esEntregado = e.estado === "entregado" || e.estado === "cerrado";
+  const cfg = computeSlaConfig({
+    dias: e.dias_para_sla,
+    esEntregado,
+    fechaEntrega: e.fecha_sla,
+  });
   return (
-    <Badge variant="outline" className="gap-1">
-      <Calendar className="h-3 w-3" />
-      Estimada: {formatoFecha(e.fecha_sla)}
-    </Badge>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium",
+        cfg.bgClass,
+        cfg.textClass,
+      )}
+    >
+      <Clock className="h-3 w-3" />
+      {cfg.text}
+    </span>
   );
 };
 
