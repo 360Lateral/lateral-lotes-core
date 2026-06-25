@@ -18,6 +18,7 @@ import { useActividadEngagement } from "@/hooks/cliente/useActividadEngagement";
 import { useDescargarEntregable } from "@/hooks/cliente/useDescargarEntregable";
 import { useAnalisisPorPlan } from "@/hooks/useAnalisisPorPlan";
 import { useAnalisisUnificadoEngagement } from "@/hooks/useAnalisisUnificadoEngagement";
+import DocumentosRequeridosSection from "@/components/portal/DocumentosRequeridosSection";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -907,6 +908,12 @@ const EngagementClienteDetalleInner = () => {
               <TimelineProcesoEngagement pasos={pasos} />
             </CardContent>
           </Card>
+
+          {/* C.4 — Documentos requeridos del propietario */}
+          <DocumentosRequeridosSection
+            engagementId={engagement.id}
+            planId={plan?.id}
+          />
 
           {/* C.7 — Resumen de resultados (engagement entregado) */}
           {esEntregado && (

@@ -1716,6 +1716,134 @@ export type Database = {
           },
         ]
       }
+      documentos_requeridos_plan: {
+        Row: {
+          activo: boolean
+          created_at: string
+          descripcion: string | null
+          id: string
+          nombre: string
+          opcional: boolean
+          orden: number
+          plan_id: string | null
+          tipo_analisis_id: string | null
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          opcional?: boolean
+          orden?: number
+          plan_id?: string | null
+          tipo_analisis_id?: string | null
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          opcional?: boolean
+          orden?: number
+          plan_id?: string | null
+          tipo_analisis_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_requeridos_plan_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "planes_diagnostico"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_requeridos_plan_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vw_planes_con_precio"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_requeridos_plan_tipo_analisis_id_fkey"
+            columns: ["tipo_analisis_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_analisis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos_subidos_engagement: {
+        Row: {
+          archivo_mime: string | null
+          archivo_nombre: string
+          archivo_path: string
+          archivo_size_bytes: number | null
+          comentario_validacion: string | null
+          created_at: string
+          engagement_id: string
+          estado_validacion: string
+          id: string
+          requerido_id: string | null
+          subido_por: string
+          validado_en: string | null
+          validado_por: string | null
+        }
+        Insert: {
+          archivo_mime?: string | null
+          archivo_nombre: string
+          archivo_path: string
+          archivo_size_bytes?: number | null
+          comentario_validacion?: string | null
+          created_at?: string
+          engagement_id: string
+          estado_validacion?: string
+          id?: string
+          requerido_id?: string | null
+          subido_por: string
+          validado_en?: string | null
+          validado_por?: string | null
+        }
+        Update: {
+          archivo_mime?: string | null
+          archivo_nombre?: string
+          archivo_path?: string
+          archivo_size_bytes?: number | null
+          comentario_validacion?: string | null
+          created_at?: string
+          engagement_id?: string
+          estado_validacion?: string
+          id?: string
+          requerido_id?: string | null
+          subido_por?: string
+          validado_en?: string | null
+          validado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_subidos_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements_lote"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_subidos_engagement_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "vw_portafolio_resumen"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "documentos_subidos_engagement_requerido_id_fkey"
+            columns: ["requerido_id"]
+            isOneToOne: false
+            referencedRelation: "documentos_requeridos_plan"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -5220,6 +5348,38 @@ export type Database = {
           ingresos_generados_cop: number
           sla_cumplidos_pct: number
           tiempo_medio_cierre_dias: number
+        }[]
+      }
+      obtener_resumen_engagements_cliente: {
+        Args: never
+        Returns: {
+          analisis_completados: number
+          analisis_en_progreso: number
+          analisis_pendientes: number
+          analisis_totales_plan: number
+          avance_pct: number
+          dias_sla: number
+          documentos_pendientes_count: number
+          engagement_id: string
+          estado: string
+          estado_activacion: string
+          fecha_entrega: string
+          fecha_inicio: string
+          fecha_sla_objetivo: string
+          lote_ciudad: string
+          lote_direccion: string
+          lote_foto_url: string
+          lote_id: string
+          lote_lat: number
+          lote_lng: number
+          lote_nombre: string
+          plan_codigo: string
+          plan_id: string
+          plan_nombre: string
+          publicado_venta: boolean
+          score_promedio: number
+          score_viabilidad: number
+          valoracion_estimada: number
         }[]
       }
       obtener_resumen_financiero: {
