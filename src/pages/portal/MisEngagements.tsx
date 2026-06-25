@@ -30,8 +30,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import MisActivosTab from "@/components/portal/MisActivosTab";
 
 import PublicarActivoDialog from "@/components/portal/PublicarActivoDialog";
-import {
 import { formatCOP } from "@/lib/format-moneda";
+import {
   Folder,
   MapPin,
   
