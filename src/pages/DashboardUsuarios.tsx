@@ -78,9 +78,13 @@ const DashboardUsuarios = () => {
   const [invitarOpen, setInvitarOpen] = useState(false);
   const [nivelDialogUser, setNivelDialogUser] = useState<UserRecord | null>(null);
   const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
+  const [cortesiaDialogUser, setCortesiaDialogUser] = useState<UserRecord | null>(null);
+  const [otorgarCortesiaOpen, setOtorgarCortesiaOpen] = useState(false);
 
   const isSuperAdmin = myRoles.includes("super_admin");
   const isAdmin = myRoles.includes("admin") || isSuperAdmin;
+  const revocarAcceso = useRevocarAccesoManual();
+  const { data: accesosCortesia } = useAccesosManualesUsuario(cortesiaDialogUser?.id);
 
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
     queryKey: ["admin-users", user?.id],
