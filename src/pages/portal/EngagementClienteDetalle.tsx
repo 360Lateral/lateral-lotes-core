@@ -909,6 +909,12 @@ const EngagementClienteDetalleInner = () => {
             </CardContent>
           </Card>
 
+          {/* C.4 — Documentos requeridos del propietario */}
+          <DocumentosRequeridosSection
+            engagementId={engagement.id}
+            planId={plan?.id}
+          />
+
           {/* C.7 — Resumen de resultados (engagement entregado) */}
           {esEntregado && (
             <ResumenResultadosCard engagementId={engagement.id} loteId={lote?.id} />
