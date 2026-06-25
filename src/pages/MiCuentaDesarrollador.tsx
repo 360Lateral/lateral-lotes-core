@@ -393,18 +393,57 @@ const MiCuentaDesarrollador = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Historial reciente</CardTitle>
+                <CardTitle className="text-base">Historial de transacciones</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 {historial && historial.length > 0 ? (
-                  <div className="divide-y divide-border">
-                    {historial.map((h) => (
-                      <ItemHistorial key={h.id} item={h} />
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs h-8 px-2">Fecha</TableHead>
+                        <TableHead className="text-xs h-8 px-2">Concepto</TableHead>
+                        <TableHead className="text-xs h-8 px-2 text-right">Monto</TableHead>
+                        <TableHead className="text-xs h-8 px-2 w-[70px]">Estado</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {historial.map((t) => {
+                        const Icon =
+                          t.tipo_pago === "acceso_lote"
+                            ? Key
+                            : t.tipo_pago === "suscripcion"
+                            ? Receipt
+                            : FileSignature;
+                        return (
+                          <TableRow key={t.id}>
+                            <TableCell className="text-xs px-2 py-2 whitespace-nowrap text-muted-foreground">
+                              {formatFecha(t.fecha_aprobacion ?? t.fecha_creacion)}
+                            </TableCell>
+                            <TableCell className="text-xs px-2 py-2">
+                              <span className="inline-flex items-center gap-1.5 font-medium">
+                                <Icon className="h-3 w-3 text-muted-foreground" />
+                                {t.descripcion}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-xs px-2 py-2 text-right font-medium tabular-nums">
+                              {formatCOPCompact(t.monto_cop)}
+                            </TableCell>
+                            <TableCell className="px-2 py-2">
+                              <Badge
+                                variant={t.estado === "aprobada" ? "default" : "secondary"}
+                                className="text-[10px] capitalize"
+                              >
+                                {t.estado}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 ) : (
                   <p className="text-sm text-muted-foreground flex items-center gap-2 py-2">
-                    <Coins className="h-4 w-4" /> Sin transacciones aún.
+                    <Coins className="h-4 w-4" /> Aún no tienes transacciones. Cuando compres una suscripción o un lote, aparecerá aquí.
                   </p>
                 )}
               </CardContent>
