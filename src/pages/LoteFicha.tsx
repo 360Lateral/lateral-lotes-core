@@ -252,11 +252,56 @@ const LoteFicha = () => {
     if (!data) return;
     setGenerandoPdf(true);
     try {
-      await generarPdfFicha(data, {
-        secciones: seccionesActivas,
-        titulo: tituloCustom,
-        nota: notaCustom,
-      });
+      const perfilesPdf = enriquecida
+        ? (await import("@/lib/perfil-comprador")).derivarPerfilesCompradorIdeal({
+            areaTotalM2: data.area_total_m2 ?? null,
+            scorePromedio: enriquecida.scorePromedio,
+            scoreNormativo: enriquecida.scoresIndividuales.normativo,
+            normativa: enriquecida.normativa,
+            arquitectonico: enriquecida.arquitectonico,
+            financiero: enriquecida.financiero,
+            mercado: enriquecida.mercado,
+          }).map((p) => ({ titulo: p.titulo, razon: p.razon }))
+        : [];
+      await generarPdfFicha(
+        {
+          ...data,
+          enriquecida: enriquecida
+            ? {
+                scorePromedio: enriquecida.scorePromedio,
+                scoreViabilidad: enriquecida.scoreViabilidad,
+                scoresIndividuales: enriquecida.scoresIndividuales,
+                arquitectonico: enriquecida.arquitectonico,
+                financiero: enriquecida.financiero
+                  ? {
+                      valor_compra_lote: enriquecida.financiero.valor_compra_lote,
+                      tir_pct: enriquecida.financiero.tir_pct,
+                      vpn: enriquecida.financiero.vpn,
+                      punto_equilibrio_pct: enriquecida.financiero.punto_equilibrio_pct,
+                      margen_bruto_pct: enriquecida.financiero.margen_bruto_pct,
+                      observaciones: enriquecida.financiero.observaciones,
+                    }
+                  : null,
+                mercado: enriquecida.mercado
+                  ? {
+                      precio_venta_m2_zona: enriquecida.mercado.precio_venta_m2_zona,
+                      proyectos_competidores: enriquecida.mercado.proyectos_competidores,
+                      velocidad_absorcion_unidades_mes:
+                        enriquecida.mercado.velocidad_absorcion_unidades_mes,
+                      valorizacion_anual_pct: enriquecida.mercado.valorizacion_anual_pct,
+                      observaciones: enriquecida.mercado.observaciones,
+                    }
+                  : null,
+                perfiles: perfilesPdf,
+              }
+            : null,
+        },
+        {
+          secciones: seccionesActivas,
+          titulo: tituloCustom,
+          nota: notaCustom,
+        },
+      );
     } catch (e) {
       console.error("Error generando PDF:", e);
       toast({
