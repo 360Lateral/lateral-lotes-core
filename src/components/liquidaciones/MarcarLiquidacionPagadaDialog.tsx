@@ -21,15 +21,7 @@ import {
 import { AlertTriangle } from "lucide-react";
 import { useMarcarLiquidacionPagada } from "@/hooks/useMarcarLiquidacionPagada";
 import type { LiquidacionRow } from "@/types/finanzas";
-
-export const formatCOP = (n: number | null | undefined) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   open: boolean;
