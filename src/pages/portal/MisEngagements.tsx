@@ -737,7 +737,7 @@ const PortalHomeInner = () => {
             </TabsList>
 
             <TabsContent value="servicios" className="mt-6">
-              <ServiciosList onSolicitar={() => setSolicitarOpen(true)} />
+              <ServiciosList onComprar={irAComprar} />
             </TabsContent>
             <TabsContent value="activos" className="mt-6">
               <MisActivosTab />
@@ -747,17 +747,13 @@ const PortalHomeInner = () => {
 
         <aside className="space-y-4">
           <ProximoPasoCard
-            onSolicitar={() => setSolicitarOpen(true)}
+            onComprar={irAComprar}
             onPublicar={() => setPublicarOpen(true)}
           />
           <ActividadRecientePanel />
         </aside>
       </div>
 
-      <SolicitarDiagnosticoDialog
-        open={solicitarOpen}
-        onOpenChange={setSolicitarOpen}
-      />
       <PublicarActivoDialog open={publicarOpen} onOpenChange={setPublicarOpen} />
     </div>
   );
