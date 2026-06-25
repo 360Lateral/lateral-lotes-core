@@ -633,6 +633,24 @@ const LoteFicha = () => {
   );
 };
 
+const NormativaChip = ({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Building;
+  label: string;
+  value: string;
+}) => (
+  <div className="rounded-lg border border-border bg-card p-3">
+    <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
+      <Icon className="h-3.5 w-3.5" />
+      <p className="text-[10px] uppercase tracking-wider">{label}</p>
+    </div>
+    <p className="text-sm font-semibold text-foreground">{value}</p>
+  </div>
+);
+
 const DatoCard = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
   <div
     className={`rounded-lg border p-3 ${
