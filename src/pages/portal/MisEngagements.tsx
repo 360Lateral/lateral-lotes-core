@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
 import {
@@ -7,6 +7,8 @@ import {
   EngagementClienteResumen,
 } from "@/hooks/cliente/useMisEngagementsCliente";
 import { useMisActivos } from "@/hooks/useMisActivos";
+import { nombreLoteMostrable, computeSlaConfig } from "@/lib/portal-display";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { useResumenPortafolio } from "@/hooks/cliente/useResumenPortafolio";
