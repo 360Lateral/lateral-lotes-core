@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
 import {
@@ -7,6 +7,8 @@ import {
   EngagementClienteResumen,
 } from "@/hooks/cliente/useMisEngagementsCliente";
 import { useMisActivos } from "@/hooks/useMisActivos";
+import { nombreLoteMostrable, computeSlaConfig } from "@/lib/portal-display";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { useResumenPortafolio } from "@/hooks/cliente/useResumenPortafolio";
@@ -22,12 +24,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import MisActivosTab from "@/components/portal/MisActivosTab";
-import SolicitarDiagnosticoDialog from "@/components/portal/SolicitarDiagnosticoDialog";
+
 import PublicarActivoDialog from "@/components/portal/PublicarActivoDialog";
 import {
   Folder,
   MapPin,
-  Calendar,
+  
   CheckCircle2,
   Clock,
   Sparkles,
@@ -77,27 +79,24 @@ const formatoRelativo = (fechaISO: string): string => {
   return `Hace ${Math.floor(dias / 30)} m`;
 };
 
-const SlaPildora = ({ e }: { e: EngagementClienteResumen }) => {
-  if (e.estado === "entregado") {
-    return <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white">Entregado</Badge>;
-  }
-  const dias = e.dias_para_sla;
-  if (dias === null || dias === undefined) {
-    return <Badge variant="outline">Sin fecha estimada</Badge>;
-  }
-  if (dias < 0) return <Badge variant="destructive">Entrega atrasada</Badge>;
-  if (dias <= 7) {
-    return (
-      <Badge className="bg-amber-500 hover:bg-amber-500 text-white">
-        Próxima entrega en {dias} {dias === 1 ? "día" : "días"}
-      </Badge>
-    );
-  }
+const SlaChip = ({ e }: { e: EngagementClienteResumen }) => {
+  const esEntregado = e.estado === "entregado" || e.estado === "cerrado";
+  const cfg = computeSlaConfig({
+    dias: e.dias_para_sla,
+    esEntregado,
+    fechaEntrega: e.fecha_sla,
+  });
   return (
-    <Badge variant="outline" className="gap-1">
-      <Calendar className="h-3 w-3" />
-      Estimada: {formatoFecha(e.fecha_sla)}
-    </Badge>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium",
+        cfg.bgClass,
+        cfg.textClass,
+      )}
+    >
+      <Clock className="h-3 w-3" />
+      {cfg.text}
+    </span>
   );
 };
 
@@ -174,9 +173,9 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
       <CardContent className="p-6 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-lg font-semibold truncate">
-              {e.lote_nombre || "Lote sin nombre"}
-            </h3>
+              <h3 className="text-lg font-semibold truncate">
+                {nombreLoteMostrable(e.lote_nombre, e.lote_direccion, e.lote_ciudad)}
+              </h3>
             <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">
@@ -203,13 +202,30 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
 
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
-              <SlaPildora e={e} />
+              <SlaChip e={e} />
             </div>
 
             <div className="pt-3 border-t border-border flex flex-wrap items-center gap-2">
               <ChipMaestro label="Diagnóstico" ready={e.tiene_diagnostico} />
               <ChipMaestro label="Presentación" ready={e.tiene_presentacion} />
             </div>
+
+            {e.plan_codigo && e.plan_codigo.toLowerCase() !== "premium" && (
+              <div className="border-t pt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-xs h-7 gap-1 px-2"
+                  onClick={(ev) => ev.stopPropagation()}
+                >
+                  <Link to="/planes">
+                    <Sparkles className="h-3 w-3" />
+                    Mejorar plan para más análisis
+                  </Link>
+                </Button>
+              </div>
+            )}
           </>
         )}
       </CardContent>
@@ -229,7 +245,7 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
   );
 };
 
-const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
+const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
   const navigate = useNavigate();
   const { data, isLoading } = useMisEngagementsCliente();
 
@@ -239,8 +255,8 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
         <p className="text-sm text-muted-foreground">
           Diagnósticos contratados y solicitudes en curso.
         </p>
-        <Button onClick={onSolicitar} size="sm" variant="outline">
-          <Plus className="mr-1 h-4 w-4" /> Solicitar diagnóstico
+        <Button onClick={onComprar} size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
         </Button>
       </div>
 
@@ -257,11 +273,11 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
             <div className="space-y-1 max-w-md">
               <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
               <p className="text-sm text-muted-foreground">
-                Solicita uno con el botón "Solicitar diagnóstico" o contacta a tu asesor.
+                Compra uno desde "Planes" para empezar a analizar tu lote.
               </p>
             </div>
-            <Button onClick={onSolicitar}>
-              <Plus className="mr-1 h-4 w-4" /> Solicitar mi primer diagnóstico
+            <Button onClick={onComprar}>
+              <Plus className="mr-1 h-4 w-4" /> Comprar mi primer diagnóstico
             </Button>
           </CardContent>
         </Card>
@@ -376,9 +392,15 @@ const ActividadRecientePanel = () => {
             ))}
           </div>
         ) : !actividad || actividad.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Sin actividad reciente. Cuando alguien interactúe con tu portafolio, aparecerá aquí.
-          </p>
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>Aquí verás cuando:</p>
+            <ul className="space-y-1 text-xs list-disc pl-4">
+              <li>Tu asesor avance en un análisis</li>
+              <li>Se publique un nuevo entregable</li>
+              <li>Alguien vea tu lote publicado</li>
+              <li>Recibas un mensaje del equipo</li>
+            </ul>
+          </div>
         ) : (
           <ul className="space-y-3">
             {actividad.slice(0, 5).map((ev) => {
@@ -413,10 +435,10 @@ interface SugerenciaProximoPaso {
 }
 
 const useProximoPasoSugerencia = ({
-  onSolicitar,
+  onComprar,
   onPublicar,
 }: {
-  onSolicitar: () => void;
+  onComprar: () => void;
   onPublicar: () => void;
 }): SugerenciaProximoPaso | null => {
   const navigate = useNavigate();
@@ -431,25 +453,66 @@ const useProximoPasoSugerencia = ({
   if (sinNada) {
     return {
       descripcion:
-        "Solicita tu primer diagnóstico para conocer el potencial real de un lote.",
-      cta: "Solicitar diagnóstico",
-      onClick: onSolicitar,
+        "Compra tu primer diagnóstico para conocer el potencial real de un lote.",
+      cta: "Ver planes",
+      onClick: onComprar,
     };
   }
 
+  // 1. Engagement entregado sin publicar
   const entregadoSinPublicar = ev.find(
     (e) =>
       e.estado === "entregado" &&
       !ac.some((a) => a.nombre_lote === e.lote_nombre && a.publicado_venta)
   );
   if (entregadoSinPublicar) {
+    const nombre = nombreLoteMostrable(
+      entregadoSinPublicar.lote_nombre,
+      entregadoSinPublicar.lote_direccion,
+      entregadoSinPublicar.lote_ciudad,
+    );
     return {
-      descripcion: `Tu diagnóstico de "${entregadoSinPublicar.lote_nombre ?? "tu lote"}" está listo. Publícalo en el mercado para empezar a recibir interesados.`,
+      descripcion: `Tu diagnóstico de "${nombre}" está listo. Publícalo en el mercado para empezar a recibir interesados.`,
       cta: "Publicar al mercado",
       onClick: onPublicar,
     };
   }
 
+  // 2. Engagement atrasado
+  const atrasado = ev.find(
+    (e) => e.dias_para_sla != null && e.dias_para_sla < 0 && e.estado !== "entregado",
+  );
+  if (atrasado) {
+    const nombre = nombreLoteMostrable(
+      atrasado.lote_nombre,
+      atrasado.lote_direccion,
+      atrasado.lote_ciudad,
+    );
+    return {
+      descripcion: `Tu análisis de "${nombre}" lleva más tiempo del estimado. Contacta a tu asesor desde el detalle del engagement.`,
+      cta: "Ver engagement",
+      onClick: () => navigate(`/portal/engagement/${atrasado.engagement_id}`),
+    };
+  }
+
+  // 3. Engagement en borrador (pago pendiente)
+  const borrador = ev.find(
+    (e) => e.estado_activacion === "borrador" || e.estado_activacion === "pendiente_pago",
+  );
+  if (borrador) {
+    const nombre = nombreLoteMostrable(
+      borrador.lote_nombre,
+      borrador.lote_direccion,
+      borrador.lote_ciudad,
+    );
+    return {
+      descripcion: `Tu lote "${nombre}" espera el pago para que iniciemos el análisis.`,
+      cta: "Completar pago",
+      onClick: () => navigate(`/portal/engagement/${borrador.engagement_id}`),
+    };
+  }
+
+  // 4. Activo en revisión por equipo
   const pendienteAprobacion = ac.find(
     (a) => a.estado_publicacion === "pendiente_validacion"
   );
@@ -461,12 +524,13 @@ const useProximoPasoSugerencia = ({
     };
   }
 
+  // 5. Tiene activos pero ningún engagement
   if (ac.length > 0 && ev.length === 0) {
     return {
       descripcion:
         "Contrata un diagnóstico técnico para que tus activos publicados conviertan más rápido.",
-      cta: "Solicitar diagnóstico",
-      onClick: onSolicitar,
+      cta: "Ver planes",
+      onClick: onComprar,
     };
   }
 
@@ -474,13 +538,13 @@ const useProximoPasoSugerencia = ({
 };
 
 const ProximoPasoCard = ({
-  onSolicitar,
+  onComprar,
   onPublicar,
 }: {
-  onSolicitar: () => void;
+  onComprar: () => void;
   onPublicar: () => void;
 }) => {
-  const sugerencia = useProximoPasoSugerencia({ onSolicitar, onPublicar });
+  const sugerencia = useProximoPasoSugerencia({ onComprar, onPublicar });
   if (!sugerencia) return null;
 
   return (
@@ -505,13 +569,15 @@ const ProximoPasoCard = ({
 // ---------- Página ----------
 
 const PortalHomeInner = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: engagements } = useMisEngagementsCliente();
   const { data: activos = [] } = useMisActivos(user?.id);
   const { data: resumen } = useResumenPortafolio();
-  const [solicitarOpen, setSolicitarOpen] = useState(false);
   const [publicarOpen, setPublicarOpen] = useState(false);
   const generarPago = useGenerarPagoWompi();
+
+  const irAComprar = () => navigate("/planes");
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
@@ -582,9 +648,9 @@ const PortalHomeInner = () => {
             <Plus className="mr-1 h-4 w-4" />
             Publicar activo
           </Button>
-          <Button size="sm" onClick={() => setSolicitarOpen(true)}>
+          <Button size="sm" onClick={irAComprar}>
             <Plus className="mr-1 h-4 w-4" />
-            Solicitar diagnóstico
+            Comprar diagnóstico
           </Button>
         </div>
       </header>
@@ -677,7 +743,7 @@ const PortalHomeInner = () => {
             </TabsList>
 
             <TabsContent value="servicios" className="mt-6">
-              <ServiciosList onSolicitar={() => setSolicitarOpen(true)} />
+              <ServiciosList onComprar={irAComprar} />
             </TabsContent>
             <TabsContent value="activos" className="mt-6">
               <MisActivosTab />
@@ -687,17 +753,13 @@ const PortalHomeInner = () => {
 
         <aside className="space-y-4">
           <ProximoPasoCard
-            onSolicitar={() => setSolicitarOpen(true)}
+            onComprar={irAComprar}
             onPublicar={() => setPublicarOpen(true)}
           />
           <ActividadRecientePanel />
         </aside>
       </div>
 
-      <SolicitarDiagnosticoDialog
-        open={solicitarOpen}
-        onOpenChange={setSolicitarOpen}
-      />
       <PublicarActivoDialog open={publicarOpen} onOpenChange={setPublicarOpen} />
     </div>
   );
