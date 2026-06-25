@@ -32,6 +32,7 @@ import {
   Tag,
   ChevronDown,
   ChevronRight,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
