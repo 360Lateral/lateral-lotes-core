@@ -9,9 +9,11 @@ import Navbar from "@/components/Navbar";
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
 import { Button } from "@/components/ui/button";
-import { List, Map as MapIcon, Search, X } from "lucide-react";
+import { List, Map as MapIcon, Search, X, MapPin, FilterX } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePersistedState } from "@/hooks/usePersistedState";
+import MapErrorBoundary, { MapFallback } from "@/components/maps/MapErrorBoundary";
+import { useGoogleMapsAuthStatus } from "@/hooks/useGoogleMapsAuthStatus";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
@@ -45,7 +47,7 @@ export interface Filters {
 }
 
 const defaultFilters: Filters = {
-  ciudad: "Medellín",
+  ciudad: "Todos",
   usoSuelo: "Todos",
   estado: "Todos",
   areaMin: "",
