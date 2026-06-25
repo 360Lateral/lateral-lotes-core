@@ -340,6 +340,13 @@ const EngagementCard = ({
 const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
   const navigate = useNavigate();
   const { data, isLoading } = useMisEngagementsCliente();
+  const { data: resumenes } = useResumenEngagementsCliente();
+
+  const resumenMap = useMemo(() => {
+    const m = new Map<string, ResumenEngagementCliente>();
+    (resumenes ?? []).forEach((r) => m.set(r.engagement_id, r));
+    return m;
+  }, [resumenes]);
 
   return (
     <div className="space-y-4">
@@ -379,6 +386,7 @@ const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
             <EngagementCard
               key={e.engagement_id}
               e={e}
+              resumen={resumenMap.get(e.engagement_id)}
               onClick={() => navigate(`/portal/engagement/${e.engagement_id}`)}
             />
           ))}
