@@ -95,7 +95,7 @@ const CardsComparativas = ({ data }: Props) => {
         actual={engActual}
         anterior={engPrev}
         subtituloAnterior="vs mes anterior"
-        formato={formatNum}
+        formato={formatNumero}
       />
       <CompCard
         titulo="Ingresos este mes"
@@ -103,7 +103,7 @@ const CardsComparativas = ({ data }: Props) => {
         actual={ingActual}
         anterior={ingPrev}
         subtituloAnterior="vs mes anterior"
-        formato={formatCop}
+        formato={formatCOP}
       />
       <CompCard
         titulo="Engagements año en curso (YTD)"
@@ -111,7 +111,7 @@ const CardsComparativas = ({ data }: Props) => {
         actual={engYtdAct}
         anterior={engYtdAnt}
         subtituloAnterior="vs mismo periodo año anterior"
-        formato={formatNum}
+        formato={formatNumero}
       />
       <CompCard
         titulo="Ingresos año en curso (YTD)"
@@ -119,7 +119,7 @@ const CardsComparativas = ({ data }: Props) => {
         actual={ingYtdAct}
         anterior={ingYtdAnt}
         subtituloAnterior="vs mismo periodo año anterior"
-        formato={formatCop}
+        formato={formatCOP}
       />
     </div>
   );

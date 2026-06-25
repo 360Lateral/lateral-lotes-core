@@ -178,7 +178,7 @@ const DashboardFinanzas = () => {
                   <BarChart data={tendenciaData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPCompact} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
                       formatter={(v: number) => formatCOP(v)}
@@ -207,7 +207,7 @@ const DashboardFinanzas = () => {
                   <LineChart data={tendenciaData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPCompact} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
                       formatter={(v: number) => formatCOP(v)}
