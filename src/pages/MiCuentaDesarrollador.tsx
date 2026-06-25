@@ -45,6 +45,7 @@ const TarjetaLoteDesbloqueado = ({ acceso }: { acceso: AccesoConDatos }) => {
       )
     : null;
   const expiraPronto = diasRestantes != null && diasRestantes <= 7;
+  const expirado = diasRestantes != null && diasRestantes <= 0;
 
   const titulo =
     acceso.nombre_lote ??
@@ -52,45 +53,54 @@ const TarjetaLoteDesbloqueado = ({ acceso }: { acceso: AccesoConDatos }) => {
     "Lote";
 
   return (
-    <Link
-      to={`/lotes/${acceso.lote_id}`}
-      className="block group"
-    >
-      <Card className="hover:border-primary/40 transition-colors h-full">
-        <CardContent className="p-4 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold text-foreground truncate">{titulo}</p>
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
-                <MapPin className="h-3 w-3 shrink-0" />
-                {[acceso.ciudad, acceso.barrio].filter(Boolean).join(" · ") || "—"}
-              </p>
-            </div>
-            {diasRestantes != null && (
-              <Badge
-                variant={expiraPronto ? "destructive" : "secondary"}
-                className="shrink-0 text-[10px]"
-              >
-                {diasRestantes}d
-              </Badge>
-            )}
+    <Card className="hover:border-primary/40 transition-colors h-full">
+      <CardContent className="p-4 space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <Link
+              to={`/lotes/${acceso.lote_id}`}
+              className="font-semibold text-foreground hover:text-primary truncate block"
+            >
+              {titulo}
+            </Link>
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
+              <MapPin className="h-3 w-3 shrink-0" />
+              {[acceso.ciudad, acceso.barrio].filter(Boolean).join(" · ") || "—"}
+            </p>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {acceso.area_total_m2
-              ? `${acceso.area_total_m2.toLocaleString("es-CO")} m²`
-              : "—"}
-            {acceso.estrato != null && ` · Estrato ${acceso.estrato}`}
-            {acceso.tipo_lote && ` · ${acceso.tipo_lote}`}
-          </div>
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs text-primary inline-flex items-center gap-1">
-              <Key className="h-3 w-3" /> Acceso activo
-            </span>
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary" />
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+          {diasRestantes != null && (
+            <Badge
+              variant={expirado ? "destructive" : expiraPronto ? "outline" : "secondary"}
+              className={cn(
+                "shrink-0 text-[10px]",
+                expiraPronto && !expirado && "border-amber-500 text-amber-700 bg-amber-50",
+              )}
+            >
+              {expirado ? "Expirado" : `${diasRestantes}d restantes`}
+            </Badge>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {acceso.area_total_m2
+            ? `${acceso.area_total_m2.toLocaleString("es-CO")} m²`
+            : "—"}
+          {acceso.estrato != null && ` · Estrato ${acceso.estrato}`}
+          {acceso.tipo_lote && ` · ${acceso.tipo_lote}`}
+        </div>
+        <div className="flex items-center gap-2 pt-1">
+          <Button asChild size="sm" variant="default" className="h-7 text-xs">
+            <Link to={`/lotes/${acceso.lote_id}`}>
+              <Key className="h-3 w-3 mr-1" /> Ver lote
+            </Link>
+          </Button>
+          <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+            <Link to={`/lotes/${acceso.lote_id}/ficha`}>
+              <ExternalLink className="h-3 w-3 mr-1" /> Ficha técnica
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -120,74 +130,71 @@ const CardSuscripcionDestacada = ({
     );
   }
 
-  const totalDias = Math.max(1, suscripcion.periodo_meses * 30);
   const diasRestantes = resumen?.dias_restantes ?? 0;
-  const progresoUsado = Math.min(
-    100,
-    Math.max(0, ((totalDias - diasRestantes) / totalDias) * 100),
-  );
+  const expirada = diasRestantes <= 0;
+  const expiraPronto = diasRestantes > 0 && diasRestantes <= 7;
+  const esPremium = suscripcion.nivel === "premium";
 
   return (
-    <Card className="bg-gradient-to-br from-[#1a2744] to-[#0f1d36] text-white border-0">
-      <CardContent className="p-5 space-y-4">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-white/60">
-              Suscripción actual
-            </p>
-            <p className="text-lg font-semibold capitalize mt-0.5">
-              Plan {suscripcion.nivel} · {suscripcion.periodo_meses}{" "}
-              {suscripcion.periodo_meses === 1 ? "mes" : "meses"}
-            </p>
-          </div>
-          <Badge className="bg-emerald-500/20 text-emerald-200 border-emerald-400/30 hover:bg-emerald-500/20">
-            Activa
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base">Tu suscripción</CardTitle>
+          <Badge
+            variant={expirada ? "destructive" : expiraPronto ? "outline" : "default"}
+            className={cn(
+              "capitalize",
+              expiraPronto && !expirada && "border-amber-500 text-amber-700 bg-amber-50",
+            )}
+          >
+            Plan {suscripcion.nivel}
           </Badge>
         </div>
-
-        <p className="text-xs text-white/70">
-          Vence {formatFecha(suscripcion.fecha_fin)} · {diasRestantes} días restantes
-        </p>
-
-        <Progress value={progresoUsado} className="h-2 bg-white/10" />
-
-        <Button
-          asChild
-          variant="secondary"
-          className="w-full bg-white text-[#1a2744] hover:bg-white/90"
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div
+          className={cn(
+            "text-center p-4 rounded-md border",
+            expirada
+              ? "bg-red-50 border-red-200"
+              : expiraPronto
+              ? "bg-amber-50 border-amber-200"
+              : "bg-emerald-50 border-emerald-200",
+          )}
         >
-          <Link to="/suscripcion">Renovar suscripción</Link>
-        </Button>
+          <p
+            className={cn(
+              "font-display text-3xl font-bold",
+              expirada ? "text-red-700" : expiraPronto ? "text-amber-700" : "text-emerald-700",
+            )}
+          >
+            {expirada ? "Vencida" : `${diasRestantes} días`}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {expirada ? "Venció el" : "Vence el"} {formatFecha(suscripcion.fecha_fin)}
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Button asChild className="w-full" size="sm">
+            <Link to="/suscripcion">
+              {expirada ? "Reactivar" : "Renovar"} suscripción
+            </Link>
+          </Button>
+          {!esPremium && (
+            <Button asChild variant="outline" className="w-full" size="sm">
+              <Link to="/suscripcion">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Mejorar a plan superior
+              </Link>
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 };
 
-const ItemHistorial = ({ item }: { item: ItemHistorialDev }) => {
-  const cfg =
-    item.tipo_pago === "acceso_lote"
-      ? { Icon: Key, color: "text-emerald-700 bg-emerald-50" }
-      : item.tipo_pago === "suscripcion"
-      ? { Icon: Receipt, color: "text-secondary bg-secondary/10" }
-      : { Icon: FileSignature, color: "text-emerald-700 bg-emerald-50" };
 
-  return (
-    <div className="flex items-start gap-3 py-2">
-      <div
-        className={`h-8 w-8 rounded-full shrink-0 flex items-center justify-center ${cfg.color}`}
-      >
-        <cfg.Icon className="h-4 w-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm text-foreground truncate">{item.descripcion}</p>
-        <p className="text-xs text-muted-foreground">
-          {formatoRelativo(item.fecha_aprobacion ?? item.fecha_creacion)} ·{" "}
-          {formatCOPCompact(item.monto_cop)}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 // ---------- Page ----------
 
