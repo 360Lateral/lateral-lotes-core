@@ -121,7 +121,23 @@ const ChipMaestro = ({ label, ready }: { label: string; ready: boolean }) => {
   );
 };
 
-const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: () => void }) => {
+const formatoCOPCompacto = (v: number) =>
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 1,
+    notation: "compact",
+  }).format(v);
+
+const EngagementCard = ({
+  e,
+  resumen,
+  onClick,
+}: {
+  e: EngagementClienteResumen;
+  resumen?: ResumenEngagementCliente;
+  onClick: () => void;
+}) => {
   const plan = planVariant(e.plan_codigo);
   const ambosListos = e.tiene_diagnostico && e.tiene_presentacion;
   const generarPago = useGenerarPagoWompi();
