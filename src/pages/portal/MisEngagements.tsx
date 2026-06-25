@@ -8,6 +8,10 @@ import {
 } from "@/hooks/cliente/useMisEngagementsCliente";
 import { useMisActivos } from "@/hooks/useMisActivos";
 import { nombreLoteMostrable, computeSlaConfig } from "@/lib/portal-display";
+import {
+  useResumenEngagementsCliente,
+  type ResumenEngagementCliente,
+} from "@/hooks/portal/useResumenEngagementsCliente";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
