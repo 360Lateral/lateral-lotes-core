@@ -16,14 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, Handshake, Info } from "lucide-react";
 import { useCerrarVenta } from "@/hooks/useCerrarVenta";
 
-export const formatCOP = (n: number | null | undefined) =>
-  n == null || isNaN(Number(n))
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(Number(n));
+import { formatCOP } from "@/lib/format-moneda";
+
 
 interface Props {
   open: boolean;
