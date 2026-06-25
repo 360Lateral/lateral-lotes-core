@@ -5,10 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Lock, ShieldCheck, ExternalLink, Key, FileSignature, Receipt,
-  CalendarClock, Wallet, Sparkles, Coins, Search, MapPin,
+  CalendarClock, Wallet, Sparkles, Coins, Search, MapPin, FileText,
 } from "lucide-react";
 import { useMiSuscripcion, type Suscripcion } from "@/hooks/useMiSuscripcion";
 import {
@@ -22,12 +29,12 @@ import {
 import { useLotesRecomendados } from "@/hooks/desarrollador/useLotesRecomendados";
 import {
   useHistorialDesarrollador,
-  type ItemHistorialDev,
 } from "@/hooks/desarrollador/useHistorialDesarrollador";
 import { useAuth } from "@/contexts/AuthContext";
 import { MetricaOverview } from "@/components/ui/MetricaOverview";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatCOPCompact, formatFecha, formatoRelativo } from "@/lib/format";
+import { formatCOP, formatCOPCompact, formatFecha } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 // ---------- Subcomponents ----------
 
