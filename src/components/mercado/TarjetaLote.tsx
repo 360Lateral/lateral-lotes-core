@@ -6,6 +6,7 @@ import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { Badge } from "@/components/ui/badge";
 import type { LoteMercado } from "@/hooks/useMercadoPublico";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
+import { formatMetros } from "@/lib/format-moneda";
 
 interface Props {
   lote: LoteMercado;
@@ -122,7 +123,7 @@ const TarjetaLote = ({ lote }: Props) => {
           {lote.area_m2_redondeada > 0 && (
             <span className="inline-flex items-center gap-1">
               <Ruler className="h-3.5 w-3.5" />
-              {lote.area_m2_redondeada.toLocaleString("es-CO")} m²
+              {formatMetros(lote.area_m2_redondeada)}
             </span>
           )}
           <Badge variant="outline" className="text-xs">

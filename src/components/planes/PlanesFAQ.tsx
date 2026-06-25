@@ -5,13 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useSmlmvVigente } from "@/hooks/useSmlmvVigente";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const PlanesFAQ = () => {
   const { data: smlmv } = useSmlmvVigente();

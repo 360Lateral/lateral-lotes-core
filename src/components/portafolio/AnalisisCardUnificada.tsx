@@ -37,6 +37,7 @@ import type {
   TipoAnalisisCodigo,
 } from "@/hooks/useAnalisisUnificado";
 import type { AnalisisItemUnificado } from "@/hooks/useAnalisisUnificadoEngagement";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   item: AnalisisItemUnificado;
@@ -74,15 +75,6 @@ const TIENE_EDITOR = new Set<string>([
 
 /** Códigos que son KPI calculados (no editables, sin tarea/entregables) */
 const ES_KPI_CALCULADO = new Set<string>(["valoracion", "score_viabilidad"]);
-
-const fmtCOP = (n: number | null) => {
-  if (n == null) return "—";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
-};
 
 const ESTADO_LABELS: Record<EstadoTareaUnif, string> = {
   no_aplica: "No aplica",
@@ -165,7 +157,7 @@ const AnalisisCardUnificada = ({
           {valor != null ? (
             esValoracion ? (
               <span className="font-display text-2xl font-bold text-primary">
-                {fmtCOP(valor)}
+                {formatCOP(valor)}
               </span>
             ) : (
               <>

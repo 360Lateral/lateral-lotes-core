@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type {
+import { formatMetros } from "@/lib/format-moneda";
   ArquitectonicoLote,
   FinancieroLote,
   MercadoLote,
@@ -56,7 +57,7 @@ export function derivarPerfilesCompradorIdeal(
   if (area >= 1000 && tir != null && tir > 15) {
     perfiles.push({
       titulo: "Desarrollador inmobiliario profesional",
-      razon: `Lote de ${area.toLocaleString("es-CO")} m² con TIR proyectada de ${tir.toFixed(1)}%. Adecuado para proyectos multifamiliares o de uso mixto${unidades ? ` (~${unidades} unidades estimadas)` : ""}.`,
+      razon: `Lote de ${formatMetros(area)} con TIR proyectada de ${tir.toFixed(1)}%. Adecuado para proyectos multifamiliares o de uso mixto${unidades ? ` (~${unidades} unidades estimadas)` : ""}.`,
       icon: Building2,
     });
   }
@@ -74,7 +75,7 @@ export function derivarPerfilesCompradorIdeal(
   if (area > 0 && area < 500 && uso.includes("residencial")) {
     perfiles.push({
       titulo: "Inversionista individual o family office",
-      razon: `Lote de ${area.toLocaleString("es-CO")} m² con uso residencial. Ideal para vivienda unifamiliar de lujo o pequeño desarrollo.`,
+      razon: `Lote de ${formatMetros(area)} con uso residencial. Ideal para vivienda unifamiliar de lujo o pequeño desarrollo.`,
       icon: Home,
     });
   }

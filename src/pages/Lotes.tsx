@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import MapErrorBoundary, { MapFallback } from "@/components/maps/MapErrorBoundary";
 import { useGoogleMapsAuthStatus } from "@/hooks/useGoogleMapsAuthStatus";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
@@ -54,9 +55,6 @@ const defaultFilters: Filters = {
   areaMin: "",
   areaMax: "",
 };
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
 const Lotes = () => {
   const navigate = useNavigate();
@@ -227,7 +225,7 @@ const Lotes = () => {
                     >
                       <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
                         <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
-                        <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {(selectedLote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²</p>
+                        <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {formatMetros(selectedLote.area_total_m2 ?? 0)}</p>
                         <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>
                         <a
                           href={`/lotes/${selectedLote.id}`}

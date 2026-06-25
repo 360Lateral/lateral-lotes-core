@@ -3,14 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, Phone } from "lucide-react";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const DiagnosticoResultado = () => {
   const location = useLocation();
@@ -92,7 +85,7 @@ const DiagnosticoResultado = () => {
               <p className="text-lg">
                 Tu lote de{" "}
                 <span className="text-primary font-bold">
-                  {area.toLocaleString("es-CO")} m²
+                  {formatMetros(area)}
                 </span>{" "}
                 podría valer entre{" "}
                 <span className="text-primary font-bold">

@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { formatCOP } from "@/lib/format-moneda";
 
 const schema = z.object({
   plan_id: z.string().uuid({ message: "Selecciona un plan" }),
@@ -288,7 +289,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
                 {planes.map((p: any) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.nombre}
-                    {p.precio_cop ? ` · ${Number(p.precio_cop).toLocaleString("es-CO")} ${p.moneda}` : ""}
+                    {p.precio_cop ? ` · ${formatCOP(Number(p.precio_cop))} ${p.moneda}` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>

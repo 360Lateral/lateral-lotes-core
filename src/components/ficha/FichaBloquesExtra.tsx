@@ -45,6 +45,7 @@ import type {
   NormativaLote,
 } from "@/hooks/useFichaEnriquecida";
 import {
+import { formatNumero } from "@/lib/format-moneda";
   derivarPerfilesCompradorIdeal,
   type PerfilCompradorIdeal,
 } from "@/lib/perfil-comprador";
@@ -52,7 +53,7 @@ import {
 // ---------- helpers ----------
 
 const fmtNum = (v: number | null | undefined, decimales = 0): string =>
-  v == null ? "—" : Number(v).toLocaleString("es-CO", { maximumFractionDigits: decimales });
+  v == null ? "—" : formatNumero(Number(v), decimales);
 
 const fmtPct = (v: number | null | undefined): string =>
   v == null ? "—" : `${Number(v).toFixed(1)}%`;

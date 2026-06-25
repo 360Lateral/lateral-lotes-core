@@ -1,15 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import type { TendenciaMensualFila } from "@/hooks/useTendenciaMensual";
+import { formatCOP, formatNumero } from "@/lib/format-moneda";
 
 interface Props {
   data: TendenciaMensualFila[];
   mesesAtras: number;
 }
-
-const formatCop = (n: number) =>
-  `$ ${(n ?? 0).toLocaleString("es-CO", { maximumFractionDigits: 0 })} COP`;
-
-const formatNum = (n: number) => (n ?? 0).toLocaleString("es-CO");
 
 const Mini = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-1">
@@ -31,10 +27,10 @@ const ResumenPeriodo = ({ data, mesesAtras }: Props) => {
           Resumen últimos {mesesAtras} meses
         </p>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Mini label="Engagements creados" value={formatNum(totalCreados)} />
-          <Mini label="Engagements completados" value={formatNum(totalCompletados)} />
-          <Mini label="Ingresos totales" value={formatCop(totalIngresos)} />
-          <Mini label="Ticket promedio" value={formatCop(Math.round(ticket))} />
+          <Mini label="Engagements creados" value={formatNumero(totalCreados)} />
+          <Mini label="Engagements completados" value={formatNumero(totalCompletados)} />
+          <Mini label="Ingresos totales" value={formatCOP(totalIngresos)} />
+          <Mini label="Ticket promedio" value={formatCOP(Math.round(ticket))} />
         </div>
       </CardContent>
     </Card>

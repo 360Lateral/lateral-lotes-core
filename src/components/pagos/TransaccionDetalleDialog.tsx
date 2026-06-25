@@ -11,21 +11,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useTransaccionDetalle } from "@/hooks/useTransaccionDetalle";
 import { AlertCircle, CheckCircle2, Clock, ExternalLink, XCircle } from "lucide-react";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   transaccionId: string | undefined;
 }
-
-const formatCOP = (n: number | null | undefined) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(n);
 
 const formatFecha = (s: string | null | undefined) =>
   s ? new Date(s).toLocaleString("es-CO") : "—";

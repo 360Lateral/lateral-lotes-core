@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RankingAsesoresFila } from "@/hooks/useRankingAsesores";
 import { cn } from "@/lib/utils";
+import { formatCOP } from "@/lib/format-moneda";
 
 type SortKey =
   | "engagements_activos"
@@ -27,9 +28,6 @@ interface Props {
   data: RankingAsesoresFila[];
   isLoading: boolean;
 }
-
-const formatCOP = (n: number) =>
-  `$${Number(n ?? 0).toLocaleString("es-CO")} COP`;
 
 const slaBadgeVariant = (
   pct: number | null

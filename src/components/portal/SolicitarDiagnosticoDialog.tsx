@@ -23,19 +23,13 @@ import {
 } from "@/components/ui/select";
 import { CheckCircle2, Loader2, MapPin, PackageOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loteIdPreseleccionado?: string;
 }
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 const SolicitarDiagnosticoDialog = ({
   open,
@@ -193,7 +187,7 @@ const SolicitarDiagnosticoDialog = ({
                           <p className="text-lg font-bold">
                             {p.codigo === "gratuito"
                               ? "Gratis"
-                              : fmtCOP(p.precio_cop_actual)}
+                              : formatCOP(p.precio_cop_actual)}
                           </p>
                           {p.codigo !== "gratuito" && (
                             <p className="text-[11px] text-muted-foreground">
@@ -242,7 +236,7 @@ const SolicitarDiagnosticoDialog = ({
                     <span className="font-semibold">
                       {esGratuito
                         ? "Gratis"
-                        : fmtCOP(planSeleccionado.precio_cop_actual)}
+                        : formatCOP(planSeleccionado.precio_cop_actual)}
                     </span>
                   </p>
                   <p>

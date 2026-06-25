@@ -19,13 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Trophy, AlertTriangle, ChevronDown } from "lucide-react";
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const fechaRelativa = (iso: string) => {
   const d = new Date(iso);
@@ -102,7 +96,7 @@ const PropuestaComparativaCard = ({
           <div>
             <p className="text-xs text-muted-foreground">Precio</p>
             <p className="font-semibold text-foreground flex items-center gap-1">
-              {fmtCOP(precio)}
+              {formatCOP(precio)}
               {fueraRango && (
                 <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
               )}

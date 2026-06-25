@@ -45,6 +45,7 @@ import FiltrosLotesAvanzados, { FiltrosLotesState, FILTROS_INICIALES } from "@/c
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCOPCompact } from "@/lib/format";
+import { formatMetros } from "@/lib/format-moneda";
 
 const VISTA_STORAGE_KEY = "dash_lotes_vista";
 type Vista = "cards" | "tabla";
@@ -768,7 +769,7 @@ const DashboardLotes = () => {
                       {[l.ciudad, l.barrio].filter(Boolean).join(" · ") || "—"}
                     </TableCell>
                     <TableCell className="py-2 text-right text-xs text-foreground">
-                      {l.area_total_m2 ? `${Number(l.area_total_m2).toLocaleString("es-CO")} m²` : "—"}
+                      {l.area_total_m2 ? `${formatMetros(Number(l.area_total_m2))}` : "—"}
                     </TableCell>
                     <TableCell className="py-2 text-right text-xs font-semibold text-foreground">
                       {l.precio_venta_estimado != null ? formatCOPCompact(Number(l.precio_venta_estimado)) : "—"}

@@ -35,6 +35,7 @@ import { calculateLoteScore } from "@/lib/loteScore";
 import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import LoteScoreResult from "@/components/LoteScoreResult";
+import { formatCOP } from "@/lib/format-moneda";
 
 
 const STEPS = [
@@ -546,11 +547,12 @@ const LoteWizard = () => {
               />
               {form.precio_cop && (
                 <p className="mt-1 font-body text-xs text-muted-foreground">
-                  = ${parseInt(form.precio_cop).toLocaleString("es-CO")} COP
-                  {form.area_total_m2 && ` · $${Math.round(
+                  = {formatCOP(parseInt(form.precio_cop))} COP
+                  {form.area_total_m2 && ` · ${formatCOP(Math.round(
                     parseInt(form.precio_cop) / parseFloat(form.area_total_m2)
-                  ).toLocaleString("es-CO")}/m²`}
+                  ))}/m²`}
                 </p>
+
               )}
             </div>
             <div>

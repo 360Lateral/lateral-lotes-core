@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const DIAGNOSTICO_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85";
 
@@ -34,14 +35,6 @@ interface Estimacion {
   max: number;
   count: number;
 }
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
 
 const serviciosOptions = ["Agua", "Energía", "Gas", "Alcantarillado", "Ninguno"];
 
@@ -298,7 +291,7 @@ const Diagnostico = () => {
                       <p className="text-white text-lg">
                         Tu lote de{" "}
                         <span style={{ color: "#E8951A" }} className="font-bold">
-                          {areaNum.toLocaleString("es-CO")} m²
+                          {formatMetros(areaNum)}
                         </span>{" "}
                         podría valer entre{" "}
                         <span style={{ color: "#E8951A" }} className="font-bold">

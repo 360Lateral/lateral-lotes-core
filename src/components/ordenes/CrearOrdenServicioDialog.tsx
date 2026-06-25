@@ -31,6 +31,7 @@ import { useExpertosList } from "@/hooks/useExpertosList";
 import { useCrearOrdenServicio } from "@/hooks/useCrearOrdenServicio";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   open: boolean;
@@ -53,9 +54,6 @@ const today = new Date();
 const minDate = new Date(today.getTime() + 24 * 3600 * 1000).toISOString().slice(0, 10);
 const maxDate = new Date(today.getTime() + 60 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 const defaultDate = new Date(today.getTime() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const CrearOrdenServicioDialog = ({ open, onOpenChange, loteId, engagementId }: Props) => {
   const tiposQ = useTiposAnalisis();
@@ -185,7 +183,7 @@ const CrearOrdenServicioDialog = ({ open, onOpenChange, loteId, engagementId }: 
                 Contrato vigente: v{contratoActivo.version}
               </p>
               <p className="text-muted-foreground">
-                Precio: {fmtCOP(Number(contratoActivo.precio_min))} – {fmtCOP(Number(contratoActivo.precio_max))} · Plazo:{" "}
+                Precio: {formatCOP(Number(contratoActivo.precio_min))} – {formatCOP(Number(contratoActivo.precio_max))} · Plazo:{" "}
                 {contratoActivo.plazo_min_dias}–{contratoActivo.plazo_max_dias} días
               </p>
             </div>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { EmbudoFila } from "@/hooks/useEmbudoConversion";
 import { cn } from "@/lib/utils";
+import { formatNumero } from "@/lib/format-moneda";
 
 interface Props {
   data: EmbudoFila[];
@@ -68,7 +69,7 @@ const EmbudoConversion = ({ data, isLoading }: Props) => {
                         {etapa.etapa}
                       </p>
                       <p className="font-body text-xl font-bold text-foreground">
-                        {(etapa.cantidad ?? 0).toLocaleString("es-CO")}
+                        {formatNumero(etapa.cantidad ?? 0)}
                       </p>
                     </div>
                     {!isFirst && etapa.conversion_pct != null && (

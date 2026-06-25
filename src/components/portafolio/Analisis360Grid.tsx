@@ -20,21 +20,13 @@ import AnalisisEditorSheet from "@/components/analisis/editor/AnalisisEditorShee
 import { useAnalisisUnificadoEngagement } from "@/hooks/useAnalisisUnificadoEngagement";
 import { usePdfExtractAnalisis } from "@/hooks/analisis/usePdfExtractAnalisis";
 import { aplicarPotANormativa } from "@/lib/aplicarPotANormativa";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   engagementId: string;
   loteId: string;
   puedeGestionar: boolean;
 }
-
-const fmtCOP = (n: number | null) => {
-  if (n == null) return "—";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
-};
 
 const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
   const qc = useQueryClient();
@@ -121,7 +113,7 @@ const Analisis360Grid = ({ engagementId, loteId, puedeGestionar }: Props) => {
           <div>
             <p className="font-body text-xs text-muted-foreground">Valoración estimada</p>
             <p className="font-display text-lg font-bold text-foreground">
-              {fmtCOP(valoracionEstimada)}
+              {formatCOP(valoracionEstimada)}
             </p>
           </div>
           <div>

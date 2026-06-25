@@ -21,6 +21,7 @@ import { ArrowLeft, Send, MessageSquare, Info, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CerrarVentaDialog from "@/components/negociaciones/CerrarVentaDialog";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const estadoBadgeClass = (e: string) => {
   switch (e) {
@@ -41,9 +42,6 @@ const estadoLabel = (e: string) => {
     default: return e;
   }
 };
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
 const SalaNegociacion = () => {
   const { id } = useParams<{ id: string }>();
@@ -413,7 +411,7 @@ const SalaNegociacion = () => {
               {loteData?.nombre_lote ?? "Lote"}
             </h1>
             <p className="font-body text-xs text-secondary-foreground/70">
-              {loteData?.area_total_m2 ? `${Number(loteData.area_total_m2).toLocaleString("es-CO")} m²` : ""}
+              {loteData?.area_total_m2 ? `${formatMetros(Number(loteData.area_total_m2))}` : ""}
               {loteData?.ciudad ? ` · ${loteData.ciudad}` : ""}
               {precio?.precio_cop ? ` · ${formatCOP(Number(precio.precio_cop))}` : ""}
             </p>

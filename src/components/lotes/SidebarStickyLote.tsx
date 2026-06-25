@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, FileText, Check, X, TrendingUp } from "lucide-react";
 import type { NivelUsuario } from "@/hooks/useLoteDetalle";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   precioEstimado: number | null | undefined;
@@ -13,11 +14,6 @@ interface Props {
   puedeSolicitar: boolean;
   solicitudPendiente?: boolean;
 }
-
-const formatCOP = (n: number | null | undefined) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const labelNivel: Record<NivelUsuario, string> = {
   gratuito: "Gratuito",

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { formatNumero } from "@/lib/format-moneda";
 
 interface ParsedRow {
   nombre_lote: string;
@@ -399,7 +400,7 @@ const DashboardLotesImportar = () => {
                     <td className="px-3 py-2 text-muted-foreground">{r.direccion || "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.ciudad || "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.departamento || "—"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{r.area_total_m2?.toLocaleString("es-CO") || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.area_total_m2 != null ? formatNumero(r.area_total_m2) : "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.estrato ?? "—"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.barrio || "—"}</td>
                     <td className="px-3 py-2">

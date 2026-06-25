@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, MapPin, Loader2, Briefcase } from "lucide-react";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
 import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
+import { formatMetros } from "@/lib/format-moneda";
 
 const DashboardOwnerLotes = () => {
   const { user } = useAuth();
@@ -92,7 +93,7 @@ const DashboardOwnerLotes = () => {
                       {lote.ciudad}{lote.departamento ? `, ${lote.departamento}` : ""}
                     </p>
                     {lote.area_total_m2 && (
-                      <p className="text-sm">{lote.area_total_m2.toLocaleString("es-CO")} m²</p>
+                      <p className="text-sm">{formatMetros(lote.area_total_m2)}</p>
                     )}
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant={lote.es_publico ? "default" : "secondary"}>

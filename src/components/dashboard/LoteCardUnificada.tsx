@@ -7,6 +7,7 @@ import { BadgeSla } from "@/components/portafolio/BadgeSla";
 import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
+import { formatMetros } from "@/lib/format-moneda";
 
 interface Props {
   lote: LoteUnificado;
@@ -135,7 +136,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
           <span className="truncate">
             {[lote.ciudad, lote.barrio].filter(Boolean).join(" · ") || "—"}
             {lote.area_total_m2 && (
-              <> · {lote.area_total_m2.toLocaleString("es-CO")} m²</>
+              <> · {formatMetros(lote.area_total_m2)}</>
             )}
           </span>
         </div>

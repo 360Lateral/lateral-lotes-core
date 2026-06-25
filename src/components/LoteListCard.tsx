@@ -2,9 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import ScoreIndicator from "@/components/ScoreIndicator";
 import { Sparkles } from "lucide-react";
 import type { LoteWithPrecio } from "@/pages/Lotes";
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const estadoVariant = (e: string) => {
   switch (e) {
@@ -58,7 +56,7 @@ const LoteListCard = ({ lote, onMouseEnter, onMouseLeave, onClick }: Props) => (
 
     <div className="mt-2 flex items-end justify-between">
       <span className="font-body text-xs text-muted-foreground">
-        {(lote.area_total_m2 ?? 0).toLocaleString("es-CO")} m²
+        {formatMetros(lote.area_total_m2 ?? 0)}
       </span>
       <span className="font-body text-sm font-semibold text-primary">
         {formatCOP(lote.precio_m2)}/m²

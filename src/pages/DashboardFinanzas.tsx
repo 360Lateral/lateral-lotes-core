@@ -20,14 +20,9 @@ import {
 import { useResumenFinanciero } from "@/hooks/useResumenFinanciero";
 import { useTendenciaFinanciera } from "@/hooks/useTendenciaFinanciera";
 import { KPIFinanciero } from "@/components/ui/KPIEstado";
-import { formatCOP, formatCOPCompact } from "@/lib/format";
+import { formatCOP, formatCOPCompact } from "@/lib/format-moneda";
 
-const formatCOPShort = (n: number) => {
-  if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}MM`;
-  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
-};
+
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const firstOfMonthISO = () => {
@@ -183,7 +178,7 @@ const DashboardFinanzas = () => {
                   <BarChart data={tendenciaData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPCompact} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
                       formatter={(v: number) => formatCOP(v)}
@@ -212,7 +207,7 @@ const DashboardFinanzas = () => {
                   <LineChart data={tendenciaData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="mesLabel" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tickFormatter={formatCOPShort} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tickFormatter={formatCOPCompact} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
                       formatter={(v: number) => formatCOP(v)}

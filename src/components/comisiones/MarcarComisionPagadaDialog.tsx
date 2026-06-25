@@ -22,14 +22,8 @@ import { AlertTriangle } from "lucide-react";
 import { useMarcarComisionPagada } from "@/hooks/useMarcarComisionPagada";
 import type { ComisionRow } from "@/types/finanzas";
 
-export const formatCOP = (n: number | null | undefined) =>
-  n == null
-    ? "—"
-    : new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(Number(n));
+import { formatCOP } from "@/lib/format-moneda";
+
 
 interface Props {
   open: boolean;

@@ -9,6 +9,7 @@ import EstadoEngagementBadge from "./EstadoEngagementBadge";
 import { BadgeSla } from "./BadgeSla";
 import type { SlaEstado } from "@/lib/sla-helpers";
 import type { EngagementDetalle } from "@/hooks/useEngagementDetalle";
+import { formatMetros } from "@/lib/format-moneda";
 
 const PLAN_STYLES: Record<string, string> = {
   gratuito: "bg-muted text-muted-foreground",
@@ -21,7 +22,7 @@ const fmtDate = (d: string | null) =>
   d ? new Date(d).toLocaleDateString("es-CO", { year: "numeric", month: "short", day: "numeric" }) : "—";
 
 const fmtArea = (n: number | null) =>
-  n != null ? `${n.toLocaleString("es-CO")} m²` : "—";
+  formatMetros(n);
 
 interface Props {
   engagement: EngagementDetalle;

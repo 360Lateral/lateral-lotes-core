@@ -27,13 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCrearPropuesta } from "@/hooks/useCrearPropuesta";
-
-const fmtCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Contrato {
   version: string;
@@ -66,8 +60,8 @@ const PostularmeDialog = ({ open, onOpenChange, orden, contratoCompleto }: Props
     return z.object({
       precio_propuesto: z
         .number({ invalid_type_error: "Ingresa un precio" })
-        .min(pmin, `Mínimo ${fmtCOP(pmin)}`)
-        .max(pmax, `Máximo ${fmtCOP(pmax)}`),
+        .min(pmin, `Mínimo ${formatCOP(pmin)}`)
+        .max(pmax, `Máximo ${formatCOP(pmax)}`),
       plazo_propuesto_dias: z
         .number({ invalid_type_error: "Ingresa un plazo" })
         .int("Debe ser un número entero")
@@ -121,7 +115,7 @@ const PostularmeDialog = ({ open, onOpenChange, orden, contratoCompleto }: Props
               <p>
                 Precio permitido:{" "}
                 <strong>
-                  {fmtCOP(Number(contrato.precio_min ?? 0))} a {fmtCOP(Number(contrato.precio_max ?? 0))}
+                  {formatCOP(Number(contrato.precio_min ?? 0))} a {formatCOP(Number(contrato.precio_max ?? 0))}
                 </strong>{" "}
                 {contrato.moneda ?? "COP"}
               </p>
