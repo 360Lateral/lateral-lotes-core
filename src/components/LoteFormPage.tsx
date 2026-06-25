@@ -99,6 +99,11 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { isAdminOrAsesor, isSuperAdmin, roles } = useAuth();
   const isAdminRole = roles.includes("admin");
   const isExpertoOnly = roles.includes("experto") && !isAdminRole && !isSuperAdmin;
+  const canManageCortesia = isAdminRole || isSuperAdmin;
+  const [otorgarAccesoOpen, setOtorgarAccesoOpen] = useState(false);
+  const { data: accesosManuales } = useAccesosManualesLote(canManageCortesia && isEdit ? id : undefined);
+  const revocarAcceso = useRevocarAccesoManual();
+
 
   // Crear-nuevo propietario state
   const [propietarioTab, setPropietarioTab] = useState<"existente" | "nuevo">("existente");
