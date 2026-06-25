@@ -61,6 +61,7 @@ const Lotes = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [showList, setShowList] = useState(false);
+  const mapsAuthFailed = useGoogleMapsAuthStatus();
   const [filters, setFilters, clearFiltersStorage] = usePersistedState<Filters>("lotes", defaultFilters);
   const [hoveredLoteId, setHoveredLoteId] = useState<string | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteWithPrecio | null>(null);
