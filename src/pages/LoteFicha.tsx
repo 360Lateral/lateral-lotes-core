@@ -15,6 +15,7 @@ import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
 import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
+import FichaBloquesExtra from "@/components/ficha/FichaBloquesExtra";
 
 const PROD_BASE = "https://urbanix360.com";
 
