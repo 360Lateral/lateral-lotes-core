@@ -220,6 +220,34 @@ const EngagementCard = ({
               <Progress value={e.avance_pct ?? 0} />
             </div>
 
+            {/* B.3 — Chip "X de Y análisis listos" */}
+            {resumen && resumen.analisis_totales_plan > 0 && (
+              <div className="text-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Análisis</span>
+                  <span className="font-medium tabular-nums">
+                    {resumen.analisis_completados} de {resumen.analisis_totales_plan} listos
+                  </span>
+                </div>
+                {(resumen.analisis_en_progreso > 0 || resumen.analisis_pendientes > 0) && (
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    {resumen.analisis_en_progreso > 0 && (
+                      <span className="inline-flex items-center gap-1">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        {resumen.analisis_en_progreso} en progreso
+                      </span>
+                    )}
+                    {resumen.analisis_en_progreso > 0 && resumen.analisis_pendientes > 0 && (
+                      <span>·</span>
+                    )}
+                    {resumen.analisis_pendientes > 0 && (
+                      <span>{resumen.analisis_pendientes} pendientes</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
               <SlaChip e={e} />
@@ -229,6 +257,50 @@ const EngagementCard = ({
               <ChipMaestro label="Diagnóstico" ready={e.tiene_diagnostico} />
               <ChipMaestro label="Presentación" ready={e.tiene_presentacion} />
             </div>
+
+            {/* B.6 — Mini-preview KPIs en cards entregadas */}
+            {e.estado === "entregado" && resumen && resumen.score_promedio != null && (
+              <div className="pt-3 border-t border-border space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Score 360°</div>
+                    <div className="text-sm font-semibold tabular-nums">
+                      {resumen.score_promedio.toFixed(1)}/10
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Viabilidad</div>
+                    <div className="text-sm font-semibold tabular-nums">
+                      {resumen.score_viabilidad != null
+                        ? `${resumen.score_viabilidad.toFixed(1)}/10`
+                        : "—"}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Valoración</div>
+                    <div className="text-sm font-semibold tabular-nums">
+                      {resumen.valoracion_estimada != null
+                        ? formatoCOPCompacto(Number(resumen.valoracion_estimada))
+                        : "—"}
+                    </div>
+                  </div>
+                </div>
+                {resumen.lote_id && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="w-full h-7 text-xs gap-1"
+                    onClick={(ev) => ev.stopPropagation()}
+                  >
+                    <Link to={`/lotes/${resumen.lote_id}/ficha`}>
+                      Ver ficha técnica completa
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
 
             {e.plan_codigo && e.plan_codigo.toLowerCase() !== "premium" && (
               <div className="border-t pt-2">
