@@ -16,13 +16,11 @@ import {
 import { TrendingUp } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { TendenciaMensualFila } from "@/hooks/useTendenciaMensual";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   data: TendenciaMensualFila[];
 }
-
-const formatCop = (n: number) =>
-  `$ ${(n ?? 0).toLocaleString("es-CO", { maximumFractionDigits: 0 })} COP`;
 
 const formatMillones = (n: number) => {
   const millones = (n ?? 0) / 1_000_000;
@@ -118,7 +116,7 @@ const GraficoTendencia = ({ data }: Props) => {
                     <YAxis tick={tickAxis} tickFormatter={formatMillones} width={70} />
                     <Tooltip
                       contentStyle={tooltipStyle}
-                      formatter={(value: number) => [formatCop(value), "Ingresos"]}
+                      formatter={(value: number) => [formatCOP(value), "Ingresos"]}
                     />
                     <Area
                       type="monotone"

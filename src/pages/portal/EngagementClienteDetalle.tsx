@@ -67,6 +67,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { formatCOP, formatCOPCompact } from "@/lib/format-moneda";
 
 const TIPOS_MAESTROS = new Set([
   "diagnostico_inmobiliario",
@@ -80,22 +81,6 @@ const formatoFecha = (fecha?: string | null) => {
     month: "short",
     year: "numeric",
   });
-};
-
-const formatCOP = (n: number | null | undefined) => {
-  if (n == null || !Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
-};
-
-const formatCOPCompact = (n: number | null | undefined) => {
-  if (n == null || !Number.isFinite(n)) return "—";
-  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(0)}M`;
-  return formatCOP(n);
 };
 
 const iniciales = (nombre?: string | null, email?: string | null) => {

@@ -1,15 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
 import type { TendenciaMensualFila } from "@/hooks/useTendenciaMensual";
+import { formatCOP, formatNumero } from "@/lib/format-moneda";
 
 interface Props {
   data: TendenciaMensualFila[];
 }
-
-const formatCop = (n: number) =>
-  `$ ${(n ?? 0).toLocaleString("es-CO", { maximumFractionDigits: 0 })} COP`;
-
-const formatNum = (n: number) => (n ?? 0).toLocaleString("es-CO");
 
 const Delta = ({ actual, anterior }: { actual: number; anterior: number }) => {
   if (anterior === 0) {
@@ -95,7 +91,7 @@ const CardsComparativas = ({ data }: Props) => {
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <CompCard
         titulo="Engagements este mes"
-        valor={formatNum(engActual)}
+        valor={formatNumero(engActual)}
         actual={engActual}
         anterior={engPrev}
         subtituloAnterior="vs mes anterior"
@@ -103,7 +99,7 @@ const CardsComparativas = ({ data }: Props) => {
       />
       <CompCard
         titulo="Ingresos este mes"
-        valor={formatCop(ingActual)}
+        valor={formatCOP(ingActual)}
         actual={ingActual}
         anterior={ingPrev}
         subtituloAnterior="vs mes anterior"
@@ -111,7 +107,7 @@ const CardsComparativas = ({ data }: Props) => {
       />
       <CompCard
         titulo="Engagements año en curso (YTD)"
-        valor={formatNum(engYtdAct)}
+        valor={formatNumero(engYtdAct)}
         actual={engYtdAct}
         anterior={engYtdAnt}
         subtituloAnterior="vs mismo periodo año anterior"
@@ -119,7 +115,7 @@ const CardsComparativas = ({ data }: Props) => {
       />
       <CompCard
         titulo="Ingresos año en curso (YTD)"
-        valor={formatCop(ingYtdAct)}
+        valor={formatCOP(ingYtdAct)}
         actual={ingYtdAct}
         anterior={ingYtdAnt}
         subtituloAnterior="vs mismo periodo año anterior"
