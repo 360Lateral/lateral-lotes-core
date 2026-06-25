@@ -1,93 +1,53 @@
-# Fase 1.A — Claridad de pricing (sin tocar Wompi)
 
-## Auditoría (Parte A · D.1 · E.1)
+## Auditoría (Parte A) — Hallazgos
 
-**Rutas confirmadas:**
-- `/planes` → `src/pages/Planes.tsx` (público, propietario). Botón "Solicitar" → `Link to="/diagnostico"`. No invoca Wompi.
-- `/suscripcion` → `src/pages/Suscripcion.tsx` (protegido, desarrollador). Botón "Suscribirme" → `useGenerarPagoWompi` (✓ no tocar).
-- `/dashboard/config-suscripciones` → `src/pages/DashboardConfigSuscripciones.tsx` (super-admin). Hoy SOLO tiene precios desarrollador (3 niveles × 3 periodos) + Pay-per-view. **No existe pestaña Propietario** — la configuración de planes de propietario se hace vía `planes_diagnostico` + `planes_analisis` (hooks ya creados en `usePlanesConfig.ts`) pero **no hay UI admin** que los exponga. Hay que construirla.
+### 1. Estructura actual
 
-**SMLMV:** ya existe tabla `salarios_minimos (anio, valor_cop, vigente_desde, vigente_hasta, decreto, notas)`. La vista `vw_planes_con_precio` ya devuelve `smlmv_referencia` y `smlmv_anio`. **No está hardcodeado**, ya es editable a nivel datos, pero **no hay UI admin** para mantenerla. Reutilizo esta tabla en vez de crear `configuracion_sistema`.
+- **`src/pages/portal/MisEngagements.tsx`** (714 líneas): vista lista con tabs Servicios/Activos, KPI cards, `EngagementCard`, `ProximoPasoCard`, `ActividadRecientePanel`. Botón actual: **"Solicitar diagnóstico"** → abre `SolicitarDiagnosticoDialog`.
+- **`src/pages/portal/EngagementClienteDetalle.tsx`** (458 líneas): hero + timeline 4-pasos, tarjetas maestras (Diagnóstico/Presentación), `AnalisisPorAreaAcordeon`, sidebar sticky con asesor + actividad.
 
-**Wompi (no tocar):** `useGenerarPagoWompi`, `Suscripcion.tsx` (handleSuscribirse), `PayPerViewCTA`, `GenerarLinkPagoDialog`, `SolicitarDiagnosticoDialog`.
+### 2. Módulo de upload de documentos del propietario
 
-## Trabajo
+**No existe hoy un módulo de upload de documentos del propietario embebido en el portal.** Sólo existe `src/components/entregables/SubirEntregableDialog.tsx`, que es para que el **equipo interno (asesor/admin)** suba entregables al engagement. No hay tabla `documentos_propietario`, ni RPC, ni componente cliente-facing para que el propietario suba escrituras / planos / certificados.
 
-### 1. Hook `useSmlmvVigente`
-Lee de `salarios_minimos` el registro con `vigente_hasta IS NULL` (o el de mayor `vigente_desde`). Devuelve `{ anio, monto, actualizado_en, decreto }`. Reutilizado en `/planes` y admin.
+**Decisión necesaria del usuario** (ver pregunta abajo): la Parte C.4 y B.7 sub-CTA "Subir documentos" asumen este módulo. O lo construimos en este sprint (es un mini-feature completo: tabla + RLS + bucket + UI), o se difiere a sprint 2.A.bis.
 
-### 2. `/planes` (Parte B) — refactor completo
-- Hero rediseñado: "¿Cuánto vale tu lote? ¿Qué puedes construir en él?" + bajada explicando pago por lote + SLA.
-- Bloque "¿Para quién es cada plan?" (4 cards cortas) ANTES de la tabla.
-- Tabla desktop: subtítulo por columna, badge "Más popular" con borde naranja prominente en Pro, features traducidas a lenguaje cliente, tooltip por feature mostrando el nombre técnico.
-- Pricing dinámico: lee SMLMV vigente con `useSmlmvVigente` y calcula `factor × monto`. Fallback a hardcode si el hook falla.
-- Mobile <768px: cards apiladas verticales + botón "Ver tabla comparativa" que abre Sheet/Dialog con la tabla scrollable horizontal.
-- Botones: "Solicitar" → "Comprar plan" (mismo `Link to="/diagnostico"` por ahora).
-- CTA secundaria: "Hablar con un asesor" (WhatsApp `https://wa.me/...` placeholder) + "Ver casos de éxito" (ancla a sección placeholder).
-- Sección FAQ con `Accordion` shadcn, respuestas marcadas con "[Confirmar con admin]" donde corresponde.
+### 3. Análisis incluidos en un plan
 
-### 3. `/suscripcion` (Parte C) — refactor completo
-- Hero rediseñado.
-- Toggle Mensual / Trimestral (-X%) / Anual (-Y%) — descuentos calculados de los precios reales (vs precio mensual × N meses). Badge "Mejor valor" en el de mayor descuento.
-- Cards: subtítulo, features traducidas con tooltips técnicos, mini-disclaimer en Básico equilibrando altura ("Plan sin información identificable…").
-- Sección Pay-per-view destacada debajo: lee precio real de `useConfigPayPerView`, CTA "Buscar lote y pagar" → `/lotes`.
-- FAQ propio (cambio prorrateado, fin de suscripción, conteo de lotes placeholder, NDA).
-- Flujo Wompi (`handleSuscribirse`) **intacto**.
+`useAnalisisPorPlan()` ya existe y retorna `{ plan_id, tipo_analisis_id, codigo, nombre }[]` desde `planes_analisis` con `incluido=true`. Reusable para la sección C.3.
 
-### 4. Admin: pestaña Propietario (Parte D)
-Convertir `DashboardConfigSuscripciones` a layout con `Tabs` shadcn (3 tabs: **Propietario**, **Desarrollador**, **General**). La pestaña Desarrollador conserva el contenido actual sin cambios.
+### 4. SLA
 
-**Tab Propietario (nuevo):** lista de planes desde `usePlanesDiagnostico` + matriz de análisis desde `usePlanesAnalisis` + `useTiposAnalisis`. Por plan editable:
-- Nombre
-- Factor SMLMV (numérico)
-- Análisis incluidos (checkboxes contra `tipos_analisis`, persiste vía `usePlanesAnalisis.upsertMany`)
-- Toggle "Recomendado" (único — al activar uno se desactiva el resto)
-- Descripción corta (100 char) + "Para quién es" (80 char)
-- Monto calculado: `factor × smlmv_vigente` (read-only)
+Campo `engagements_lote.fecha_sla_objetivo`. El hook `useMisEngagementsCliente` ya expone `dias_para_sla` precalculado por el RPC `listar_mis_engagements_cliente`. En el detalle (`useEngagementCliente`) se expone `engagement.fecha_sla`, pero **no** `dias_para_sla` — habría que calcular client-side con `differenceInDays`.
 
-Las dos descripciones requieren columnas nuevas. Migración:
-```sql
-ALTER TABLE public.planes_diagnostico
-  ADD COLUMN IF NOT EXISTS descripcion_corta text,
-  ADD COLUMN IF NOT EXISTS para_quien text,
-  ADD COLUMN IF NOT EXISTS recomendado boolean NOT NULL DEFAULT false;
-```
-Sin cambios de RLS (la tabla ya las tiene). Actualizar `usePlanesConfig.ts` + `usePlanesConPrecio.ts` para incluir los nuevos campos y consumirlos en `/planes`.
+### 5. Resumen "X de Y análisis completados" a nivel engagement
 
-**Tab General (nuevo):** editor de SMLMV vigente.
-- Muestra el registro actual de `salarios_minimos` (año, monto, decreto, vigente desde).
-- Botón "Registrar nuevo SMLMV" → form (año, monto, decreto, fecha vigente desde). Al guardar: cierra el registro previo (`vigente_hasta = nuevo.vigente_desde`) e inserta el nuevo. Hook `useActualizarSmlmv` con `useMutation`.
-- Aviso visual: "Esto recalcula precios de planes de propietario automáticamente."
+`useAnalisisUnificado(loteId, engagementId)` retorna las dimensiones con `tarea_estado`. Permite contar `completados` y `totales`. Para la lista (`MisEngagements`), llamar este hook por cada engagement es costoso → mejor extender el RPC `listar_mis_engagements_cliente` para devolver `analisis_completados` + `analisis_totales`, o agregar columnas calculadas en una nueva RPC ligera.
 
-### 5. Validación
-- `bunx tsgo --noEmit` debe pasar.
-- Probar `/planes` (desktop + mobile), `/suscripcion`, admin tabs.
-- No tocar `useGenerarPagoWompi`, `Suscripcion.handleSuscribirse`, `PayPerViewCTA`.
+### 6. Datos de "preview de ficha técnica" (Score 360°, Valoración, Viabilidad)
 
-## Detalle técnico
+`useAnalisisUnificadoEngagement` ya computa `valoracionEstimada` y `scorePromedio`. Para la **lista** (B.6 mini-preview por card), de nuevo necesitamos un dato agregado del RPC para no hacer N llamadas por card.
 
-**Archivos nuevos:**
-- `src/hooks/useSmlmvVigente.ts`
-- `src/hooks/useActualizarSmlmv.ts`
-- `src/components/planes/ParaQuienGrid.tsx`
-- `src/components/planes/PlanesFAQ.tsx`
-- `src/components/planes/PlanesMobileCards.tsx`
-- `src/components/suscripcion/SuscripcionFAQ.tsx`
-- `src/components/suscripcion/PayPerViewBanner.tsx`
-- `src/components/admin/precios/TabPropietario.tsx`
-- `src/components/admin/precios/TabDesarrollador.tsx` (extracción del contenido actual)
-- `src/components/admin/precios/TabGeneral.tsx`
+---
 
-**Archivos editados:**
-- `src/pages/Planes.tsx` (rewrite estructural)
-- `src/pages/Suscripcion.tsx` (header, toggle, cards, PPV, FAQ — handleSuscribirse intacto)
-- `src/pages/DashboardConfigSuscripciones.tsx` (envuelve en Tabs)
-- `src/hooks/usePlanesConfig.ts` (añade campos `descripcion_corta`, `para_quien`, `recomendado`)
-- `src/hooks/usePlanesConPrecio.ts` (añade mismos campos si la vista los expone)
+## Decisiones que necesito antes de implementar
 
-**Migración:** 1 migración con `ALTER TABLE planes_diagnostico` + posiblemente refrescar `vw_planes_con_precio` para incluir los nuevos campos.
+Esta fase tiene 14 sub-tareas + nuevo módulo de upload + RPC backend nuevo + responsive. Para mantener calidad y un PR revisable, propongo dividir en 3 entregas. **¿Cuál ejecuto ahora?**
 
-## Fuera de alcance (Fase 1.B)
-- Unificar checkout en `/planes` con Wompi.
-- Activar PPV real si no existe end-to-end.
-- Email/comms post-compra.
+### Opción 1 — Solo frontend, datos existentes (1 turno)
+B.1 (fallback nombre lote), B.2 (renombrar botón a "Comprar diagnóstico" → `/planes`), B.4 (chip SLA universal en cards usando `dias_para_sla` ya existente), B.5 (CTA "Mejorar plan"), B.7 (sugerencias contextuales: borrador, atrasado, default), B.8 (actividad reciente vacía con contexto), C.1 (fallback nombre), C.2 (reconciliar stepper con avance_pct existente), C.3 (sección "Análisis incluidos en tu plan" usando `useAnalisisPorPlan` + `useAnalisisUnificado`), C.5 (SLA countdown sidebar), C.6 (CTA sidebar "Mejorar plan"), C.7 (banner entregado + KPIs resumen con `useAnalisisUnificadoEngagement`), C.8 (estados borrador/atrasado).
+
+**Excluye:** B.3 y B.6 (requieren RPC backend nuevo para no romper performance), C.4 (requiere construir módulo upload completo).
+
+### Opción 2 — Frontend + RPC backend para B.3/B.6
+Opción 1 + migración SQL que extiende `listar_mis_engagements_cliente` para devolver `analisis_completados`, `analisis_totales`, `score_promedio`, `valoracion_estimada`, `score_viabilidad`.
+
+### Opción 3 — Todo, incluido módulo de upload (2-3 turnos)
+Opción 2 + nuevo módulo `documentos_propietario`: tabla + RLS + bucket + componente `SubirDocumentoPropietarioDialog` + integración en C.4.
+
+### Pregunta complementaria
+**C.7 "Resumen de resultados" referencia `/lotes/:id/ficha`** (Sprint 4). ¿Esa ruta ya existe y muestra ficha completa, o el CTA debe ir a `/portal/engagement/:id` por ahora? Reviso: existe `src/pages/LoteFicha.tsx` — asumo que sí existe la ruta, confirmar.
+
+---
+
+Confirma **Opción 1 / 2 / 3** y respondo sobre la ficha técnica, y arranco la implementación en el siguiente turno.
