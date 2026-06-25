@@ -55,6 +55,10 @@ interface WizardForm {
   fondo_ml: string;
   precio_cop: string;
   notas: string;
+  // Adquisición (opcional)
+  precio_compra_original: string;
+  fecha_compra: string;
+  moneda_compra: string;
   // Step 2
   departamento: string;
   ciudad: string;
@@ -81,6 +85,9 @@ const emptyWizard: WizardForm = {
   fondo_ml: "",
   precio_cop: "",
   notas: "",
+  precio_compra_original: "",
+  fecha_compra: "",
+  moneda_compra: "COP",
   departamento: "",
   ciudad: "",
   barrio: "",
@@ -218,6 +225,11 @@ const LoteWizard = () => {
           frente_ml: form.frente_ml ? parseFloat(form.frente_ml) : null,
           fondo_ml: form.fondo_ml ? parseFloat(form.fondo_ml) : null,
           notas: form.notas || null,
+          precio_compra_original: form.precio_compra_original
+            ? parseFloat(form.precio_compra_original)
+            : null,
+          fecha_compra: form.fecha_compra || null,
+          moneda_compra: form.precio_compra_original ? form.moneda_compra : null,
           departamento: form.departamento || null,
           ciudad: form.ciudad || null,
           barrio: form.barrio || null,
@@ -563,6 +575,56 @@ const LoteWizard = () => {
                 placeholder="Describe las características principales del lote..."
                 rows={3}
               />
+            </div>
+
+            {/* Adquisición (opcional) */}
+            <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
+              <h4 className="text-sm font-semibold mb-1">
+                Información de adquisición{" "}
+                <span className="text-muted-foreground font-normal">
+                  (opcional)
+                </span>
+              </h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                Estos datos solo los ves tú y se usan para calcular la plusvalía
+                de tu portafolio.
+              </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div>
+                  <Label className="text-xs">Precio de compra original</Label>
+                  <Input
+                    type="number"
+                    value={form.precio_compra_original}
+                    onChange={(e) =>
+                      update("precio_compra_original", e.target.value)
+                    }
+                    placeholder="Ej: 500000000"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Fecha de compra</Label>
+                  <Input
+                    type="date"
+                    value={form.fecha_compra}
+                    onChange={(e) => update("fecha_compra", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Moneda</Label>
+                  <Select
+                    value={form.moneda_compra}
+                    onValueChange={(v) => update("moneda_compra", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="COP">COP</SelectItem>
+                      <SelectItem value="USD">USD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
