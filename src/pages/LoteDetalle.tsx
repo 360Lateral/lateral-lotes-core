@@ -256,6 +256,13 @@ const LoteDetalle = () => {
                   highlight={!scoresBloqueados && (data.score_360_promedio ?? 0) >= 8}
                 />
               </div>
+
+              <Button asChild variant="outline" className="w-full sm:w-auto">
+                <Link to={`/lotes/${id}/ficha`}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Ver ficha técnica completa
+                </Link>
+              </Button>
             </Card>
 
             {/* Galería */}
