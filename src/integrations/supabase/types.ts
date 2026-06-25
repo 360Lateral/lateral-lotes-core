@@ -4771,6 +4771,19 @@ export type Database = {
         }
         Relationships: []
       }
+      vw_lotes_huerfanos_agrupados: {
+        Row: {
+          area_total_m2: number | null
+          cantidad_lotes: number | null
+          lote_ids: string[] | null
+          nombre_propietario: string | null
+          nombres_lotes: string[] | null
+          primer_lote_creado: string | null
+          ultimo_lote_creado: string | null
+          valoracion_total: number | null
+        }
+        Relationships: []
+      }
       vw_lotes_publicos: {
         Row: {
           area_total_m2: number | null
@@ -5078,6 +5091,10 @@ export type Database = {
       adjudicar_propuesta: {
         Args: { p_orden_id: string; p_propuesta_id: string }
         Returns: undefined
+      }
+      asignar_lotes_masivo_a_usuario: {
+        Args: { p_lote_ids: string[]; p_usuario_destino_id: string }
+        Returns: Json
       }
       calcular_match_score: {
         Args: { p_alerta_id: string; p_lote_id: string }
