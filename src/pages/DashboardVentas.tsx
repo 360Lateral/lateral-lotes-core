@@ -17,9 +17,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useVentasCerradas } from "@/hooks/useVentasCerradas";
 import { useComisionesAdmin } from "@/hooks/useComisionesAdmin";
-import MarcarComisionPagadaDialog, {
-  formatCOP,
-} from "@/components/comisiones/MarcarComisionPagadaDialog";
+import MarcarComisionPagadaDialog from "@/components/comisiones/MarcarComisionPagadaDialog";
+import { formatCOP } from "@/lib/format-moneda";
 import { Handshake, TrendingUp, Wallet, Calendar } from "lucide-react";
 import type { ComisionRow } from "@/types/finanzas";
 
