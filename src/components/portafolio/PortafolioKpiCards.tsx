@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KPIEstado, KPIFinanciero } from "@/components/ui/KPIEstado";
-import { formatCOPCompact } from "@/lib/format";
+import { formatCOPCompact, formatUSD } from "@/lib/format-moneda";
 import type { PortafolioKpis } from "@/hooks/usePortafolioKpis";
 
 interface Props {
@@ -58,7 +58,7 @@ const PortafolioKpiCards = ({ kpis, isLoading }: Props) => {
         label="Ingresos del mes"
         value={formatCOPCompact(kpis.ingresos_mes_cop)}
         icon={DollarSign}
-        sublabel={`≈ USD ${(kpis.ingresos_mes_usd ?? 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+        sublabel={`≈ ${formatUSD(kpis.ingresos_mes_usd ?? 0)}`}
       />
       <KPIFinanciero
         label="Ticket promedio"
