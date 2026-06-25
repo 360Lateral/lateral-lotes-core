@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import MisActivosTab from "@/components/portal/MisActivosTab";
-import SolicitarDiagnosticoDialog from "@/components/portal/SolicitarDiagnosticoDialog";
+
 import PublicarActivoDialog from "@/components/portal/PublicarActivoDialog";
 import {
   Folder,
