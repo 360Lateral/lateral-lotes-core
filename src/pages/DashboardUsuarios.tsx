@@ -557,6 +557,106 @@ const DashboardUsuarios = () => {
             email: historialDialogUser.email,
           } : null}
         />
+
+        {/* Cortesía: accesos manuales del desarrollador */}
+        <Dialog
+          open={!!cortesiaDialogUser}
+          onOpenChange={(v) => !v && setCortesiaDialogUser(null)}
+        >
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Accesos de cortesía otorgados
+              </DialogTitle>
+              <DialogDescription>
+                {cortesiaDialogUser?.full_name || cortesiaDialogUser?.email}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <Button size="sm" onClick={() => setOtorgarCortesiaOpen(true)}>
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Otorgar acceso a lote
+                </Button>
+              </div>
+
+              {!accesosCortesia || accesosCortesia.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-6 text-center">
+                  Este desarrollador no tiene accesos manuales activos.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Lote</TableHead>
+                        <TableHead>Otorgado</TableHead>
+                        <TableHead>Vence</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Motivo</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {accesosCortesia.map((a) => {
+                        const activo = a.estado === "activa"
+                          && a.fecha_expiracion
+                          && new Date(a.fecha_expiracion).getTime() > Date.now();
+                        return (
+                          <TableRow key={a.id}>
+                            <TableCell className="text-sm">
+                              {a.lote?.nombre_lote ?? a.lote_id.slice(0, 8)}
+                              {a.lote?.ciudad && (
+                                <p className="text-[10px] text-muted-foreground">{a.lote.ciudad}</p>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {a.fecha_compra ? new Date(a.fecha_compra).toLocaleDateString("es-CO") : "—"}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {a.fecha_expiracion ? new Date(a.fecha_expiracion).toLocaleDateString("es-CO") : "—"}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={activo ? "secondary" : "outline"} className="text-[10px]">
+                                {activo ? "Activo" : a.estado === "cancelada" ? "Revocado" : "Expirado"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs max-w-[200px] truncate" title={a.motivo ?? ""}>
+                              {a.motivo ?? "—"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {activo && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => revocarAcceso.mutate(a.id)}
+                                  disabled={revocarAcceso.isPending}
+                                >
+                                  Revocar
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <OtorgarAccesoLoteDialog
+          open={otorgarCortesiaOpen}
+          onOpenChange={setOtorgarCortesiaOpen}
+          desarrolladorIdPredefinido={cortesiaDialogUser?.id}
+          desarrolladorLabelPredefinido={
+            cortesiaDialogUser?.full_name || cortesiaDialogUser?.email || undefined
+          }
+        />
       </div>
     </DashboardLayout>
   );
