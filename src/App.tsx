@@ -50,6 +50,7 @@ const DashboardImportarEngagement = lazy(() => import("./pages/DashboardImportar
 const DashboardLotesPendientesValidacion = lazy(() => import("./pages/DashboardLotesPendientesValidacion"));
 const DashboardSolicitudesContacto = lazy(() => import("./pages/DashboardSolicitudesContacto"));
 const MetricasEjecutivas = lazy(() => import("./pages/MetricasEjecutivas"));
+const AnalisisClientesDashboard = lazy(() => import("./pages/AnalisisClientesDashboard"));
 const Bienvenida = lazy(() => import("./pages/Bienvenida"));
 const PreferenciasUsuario = lazy(() => import("./pages/PreferenciasUsuario"));
 const MisEngagements = lazy(() => import("./pages/portal/MisEngagements"));
@@ -156,6 +157,7 @@ const App = () => (
             <Route path="/dashboard/suscripciones" element={<ProtectedRoute requireAdmin><DashboardSuscripciones /></ProtectedRoute>} />
             <Route path="/dashboard/config-suscripciones" element={<ProtectedRoute requireSuperAdmin><DashboardConfigSuscripciones /></ProtectedRoute>} />
             <Route path="/dashboard/metricas" element={<ProtectedRoute requireAdmin><MetricasEjecutivas /></ProtectedRoute>} />
+            <Route path="/dashboard/analisis-clientes" element={<ProtectedRoute requireAdmin><AnalisisClientesDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/preferencias" element={<ProtectedRoute allowPropietario><PreferenciasUsuario /></ProtectedRoute>} />
 
             {/* Rutas developer */}
