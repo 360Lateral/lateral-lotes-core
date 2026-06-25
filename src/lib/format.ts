@@ -1,18 +1,16 @@
-export const formatCOP = (n: number): string =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
-
-export const formatCOPCompact = (n: number): string => {
-  if (!n && n !== 0) return "—";
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000_000) return `$ ${(n / 1_000_000_000).toFixed(1)}B`;
-  if (abs >= 1_000_000) return `$ ${(n / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `$ ${Math.round(n / 1_000)}K`;
-  return `$ ${n.toLocaleString("es-CO")}`;
-};
+/**
+ * Compatibilidad: re-exporta los helpers canónicos desde `format-moneda.ts`.
+ * NO añadir nuevos formateadores aquí. Usar `@/lib/format-moneda`.
+ */
+export {
+  formatCOP,
+  formatCOPCompact,
+  formatNumero,
+  formatMetros,
+  formatPorcentaje,
+  formatNumeroCompact,
+  formatUSD,
+} from "./format-moneda";
 
 export const formatoRelativo = (date: Date | string | null | undefined): string => {
   if (!date) return "—";
