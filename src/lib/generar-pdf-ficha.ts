@@ -322,6 +322,119 @@ export async function generarPdfFicha(
     }
   }
 
+  // ---- Bloques enriquecidos (sprint 4) ----
+  const enr = ficha.enriquecida;
+  if (enr && (enr.arquitectonico || enr.financiero || enr.mercado || enr.scoresIndividuales)) {
+    doc.addPage();
+    y = margin;
+
+    const sectionTitle = (txt: string) => {
+      ensureSpace(28);
+      doc.setFontSize(14);
+      doc.setTextColor(17, 24, 39);
+      doc.setFont("helvetica", "bold");
+      doc.text(txt, margin, y);
+      y += 6;
+      doc.setDrawColor(245, 166, 35);
+      doc.setLineWidth(1);
+      doc.line(margin, y, margin + 60, y);
+      y += 14;
+    };
+
+    const kv = (label: string, val: string) => {
+      ensureSpace(16);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(107, 114, 128);
+      doc.text(label, margin, y);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(17, 24, 39);
+      const lines = doc.splitTextToSize(val, pageW - margin - (margin + 180));
+      doc.text(lines, margin + 180, y);
+      y += Math.max(16, lines.length * 13);
+    };
+
+    const fmtCOP = (n: number | null | undefined) =>
+      n == null ? "—" : "$" + Number(n).toLocaleString("es-CO") + " COP";
+    const fmtPct = (n: number | null | undefined) =>
+      n == null ? "—" : `${Number(n).toFixed(1)}%`;
+    const fmtN = (n: number | null | undefined) =>
+      n == null ? "—" : Number(n).toLocaleString("es-CO");
+
+    if (enr.arquitectonico) {
+      sectionTitle("Aprovechamiento arquitectónico");
+      const a = enr.arquitectonico;
+      kv("Área construible", a.m2_construibles_total != null ? `${fmtN(a.m2_construibles_total)} m²` : "—");
+      kv("Unidades estimadas", String(a.unidades_estimadas ?? "—"));
+      kv("Área vendible", fmtPct(a.area_vendible_pct));
+      kv("Eficiencia del lote", fmtPct(a.eficiencia_lote_pct));
+      if (a.tipologias) kv("Tipologías", a.tipologias);
+      if (a.forma_lote) kv("Forma del lote", a.forma_lote);
+      if (a.permite_sotano != null) kv("Sótano", a.permite_sotano ? "Permitido" : "No permitido");
+      if (a.observaciones) kv("Notas", a.observaciones);
+      y += 8;
+    }
+
+    if (enr.scoresIndividuales) {
+      sectionTitle("Análisis técnico por área");
+      const labels: Record<string, string> = {
+        juridico: "Jurídico",
+        normativo: "Normativo",
+        ambiental: "Ambiental",
+        sspp: "Servicios públicos",
+        geotecnico: "Suelos",
+        mercado: "Mercado",
+        arquitectonico: "Arquitectónico",
+        financiero: "Financiero",
+      };
+      for (const [k, v] of Object.entries(enr.scoresIndividuales)) {
+        if (v == null) continue;
+        const nivel = v >= 7 ? "[OK]" : v >= 4 ? "[!]" : "[X]";
+        kv(labels[k] ?? k, `${nivel} ${Number(v).toFixed(1)}/10`);
+      }
+      y += 8;
+    }
+
+    if (enr.financiero || enr.mercado) {
+      sectionTitle("Financiero y mercado");
+      const f = enr.financiero;
+      const m = enr.mercado;
+      if (f) {
+        kv("Valor compra estimado", fmtCOP(f.valor_compra_lote));
+        kv("TIR proyectada", fmtPct(f.tir_pct));
+        kv("VPN", fmtCOP(f.vpn));
+        kv("Margen bruto", fmtPct(f.margen_bruto_pct));
+        kv("Punto de equilibrio", fmtPct(f.punto_equilibrio_pct));
+      }
+      if (m) {
+        kv("Valor m² zona", fmtCOP(m.precio_venta_m2_zona));
+        if (m.proyectos_competidores != null) kv("Proyectos competidores", String(m.proyectos_competidores));
+        if (m.velocidad_absorcion_unidades_mes != null)
+          kv("Absorción", `${m.velocidad_absorcion_unidades_mes} und/mes`);
+        if (m.valorizacion_anual_pct != null) kv("Valorización anual", fmtPct(m.valorizacion_anual_pct));
+      }
+      y += 8;
+    }
+
+    if (enr.perfiles && enr.perfiles.length > 0) {
+      sectionTitle("¿Para quién es ideal este lote?");
+      for (const p of enr.perfiles) {
+        ensureSpace(40);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(17, 24, 39);
+        doc.text("• " + p.titulo, margin, y);
+        y += 14;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(75, 85, 99);
+        const lines = doc.splitTextToSize(p.razon, pageW - margin * 2 - 14);
+        doc.text(lines, margin + 14, y);
+        y += lines.length * 13 + 6;
+      }
+    }
+  }
+
   // ---- Footer / contacto ----
   if (mostrar("contacto")) {
     const footerY = pageH - 50;
