@@ -2,6 +2,41 @@ import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
 
+export interface FichaPdfEnriquecida {
+  scorePromedio?: number | null;
+  scoreViabilidad?: number | null;
+  scoresIndividuales?: Partial<Record<
+    "juridico" | "normativo" | "ambiental" | "sspp" | "geotecnico" | "mercado" | "arquitectonico" | "financiero",
+    number | null
+  >>;
+  arquitectonico?: {
+    m2_construibles_total: number | null;
+    unidades_estimadas: number | null;
+    area_vendible_pct: number | null;
+    tipologias: string | null;
+    eficiencia_lote_pct: number | null;
+    forma_lote: string | null;
+    permite_sotano: boolean | null;
+    observaciones: string | null;
+  } | null;
+  financiero?: {
+    valor_compra_lote: number | null;
+    tir_pct: number | null;
+    vpn: number | null;
+    punto_equilibrio_pct: number | null;
+    margen_bruto_pct: number | null;
+    observaciones: string | null;
+  } | null;
+  mercado?: {
+    precio_venta_m2_zona: number | null;
+    proyectos_competidores: number | null;
+    velocidad_absorcion_unidades_mes: number | null;
+    valorizacion_anual_pct: number | null;
+    observaciones: string | null;
+  } | null;
+  perfiles?: { titulo: string; razon: string }[];
+}
+
 export interface FichaPdfData {
   nombre_lote?: string;
   ciudad?: string | null;
@@ -23,6 +58,7 @@ export interface FichaPdfData {
   tiene_analisis_geotecnico?: boolean;
   tiene_analisis_mercado?: boolean;
   tiene_analisis_sspp?: boolean;
+  enriquecida?: FichaPdfEnriquecida | null;
 }
 
 export interface OpcionesFichaPdf {
