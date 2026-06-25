@@ -367,6 +367,15 @@ const DashboardUsuarios = () => {
                                     >
                                       <Clock className="h-3.5 w-3.5" />
                                     </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Accesos de cortesía"
+                                      onClick={() => setCortesiaDialogUser(u)}
+                                    >
+                                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                                    </Button>
                                   </>
                                 )}
                               </div>
