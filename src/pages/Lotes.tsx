@@ -36,6 +36,7 @@ export interface LoteWithPrecio {
   score_juridico: number | null;
   score_normativo: number | null;
   score_servicios: number | null;
+  created_at: string | null;
 }
 
 export interface Filters {
