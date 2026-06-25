@@ -17,11 +17,14 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
 import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
+import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog";
+import { useAccesosManualesUsuario } from "@/hooks/admin/useAccesosManualesUsuario";
+import { useRevocarAccesoManual } from "@/hooks/admin/useRevocarAccesoManual";
 import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
 const ALL_ROLES = ["super_admin", "admin", "experto", "comisionista", "propietario", "desarrollador"] as const;
@@ -75,9 +78,13 @@ const DashboardUsuarios = () => {
   const [invitarOpen, setInvitarOpen] = useState(false);
   const [nivelDialogUser, setNivelDialogUser] = useState<UserRecord | null>(null);
   const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
+  const [cortesiaDialogUser, setCortesiaDialogUser] = useState<UserRecord | null>(null);
+  const [otorgarCortesiaOpen, setOtorgarCortesiaOpen] = useState(false);
 
   const isSuperAdmin = myRoles.includes("super_admin");
   const isAdmin = myRoles.includes("admin") || isSuperAdmin;
+  const revocarAcceso = useRevocarAccesoManual();
+  const { data: accesosCortesia } = useAccesosManualesUsuario(cortesiaDialogUser?.id);
 
   const { data: users = [], isLoading } = useQuery<UserRecord[]>({
     queryKey: ["admin-users", user?.id],
@@ -360,6 +367,15 @@ const DashboardUsuarios = () => {
                                     >
                                       <Clock className="h-3.5 w-3.5" />
                                     </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      title="Accesos de cortesía"
+                                      onClick={() => setCortesiaDialogUser(u)}
+                                    >
+                                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                                    </Button>
                                   </>
                                 )}
                               </div>
@@ -540,6 +556,106 @@ const DashboardUsuarios = () => {
             nombre: historialDialogUser.full_name,
             email: historialDialogUser.email,
           } : null}
+        />
+
+        {/* Cortesía: accesos manuales del desarrollador */}
+        <Dialog
+          open={!!cortesiaDialogUser}
+          onOpenChange={(v) => !v && setCortesiaDialogUser(null)}
+        >
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Accesos de cortesía otorgados
+              </DialogTitle>
+              <DialogDescription>
+                {cortesiaDialogUser?.full_name || cortesiaDialogUser?.email}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <Button size="sm" onClick={() => setOtorgarCortesiaOpen(true)}>
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Otorgar acceso a lote
+                </Button>
+              </div>
+
+              {!accesosCortesia || accesosCortesia.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-6 text-center">
+                  Este desarrollador no tiene accesos manuales activos.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Lote</TableHead>
+                        <TableHead>Otorgado</TableHead>
+                        <TableHead>Vence</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Motivo</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {accesosCortesia.map((a) => {
+                        const activo = a.estado === "activa"
+                          && a.fecha_expiracion
+                          && new Date(a.fecha_expiracion).getTime() > Date.now();
+                        return (
+                          <TableRow key={a.id}>
+                            <TableCell className="text-sm">
+                              {a.lote?.nombre_lote ?? a.lote_id.slice(0, 8)}
+                              {a.lote?.ciudad && (
+                                <p className="text-[10px] text-muted-foreground">{a.lote.ciudad}</p>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {a.fecha_compra ? new Date(a.fecha_compra).toLocaleDateString("es-CO") : "—"}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {a.fecha_expiracion ? new Date(a.fecha_expiracion).toLocaleDateString("es-CO") : "—"}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={activo ? "secondary" : "outline"} className="text-[10px]">
+                                {activo ? "Activo" : a.estado === "cancelada" ? "Revocado" : "Expirado"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs max-w-[200px] truncate" title={a.motivo ?? ""}>
+                              {a.motivo ?? "—"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {activo && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => revocarAcceso.mutate(a.id)}
+                                  disabled={revocarAcceso.isPending}
+                                >
+                                  Revocar
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <OtorgarAccesoLoteDialog
+          open={otorgarCortesiaOpen}
+          onOpenChange={setOtorgarCortesiaOpen}
+          desarrolladorIdPredefinido={cortesiaDialogUser?.id}
+          desarrolladorLabelPredefinido={
+            cortesiaDialogUser?.full_name || cortesiaDialogUser?.email || undefined
+          }
         />
       </div>
     </DashboardLayout>

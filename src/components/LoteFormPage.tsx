@@ -38,8 +38,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, Loader2, Lock } from "lucide-react";
+import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, Loader2, Lock, Sparkles, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog";
+import { useAccesosManualesLote } from "@/hooks/admin/useAccesosManualesLote";
+import { useRevocarAccesoManual } from "@/hooks/admin/useRevocarAccesoManual";
+import { Badge } from "@/components/ui/badge";
 
 const SIN_ASIGNAR = "__SIN_ASIGNAR__";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -95,6 +99,11 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { isAdminOrAsesor, isSuperAdmin, roles } = useAuth();
   const isAdminRole = roles.includes("admin");
   const isExpertoOnly = roles.includes("experto") && !isAdminRole && !isSuperAdmin;
+  const canManageCortesia = isAdminRole || isSuperAdmin;
+  const [otorgarAccesoOpen, setOtorgarAccesoOpen] = useState(false);
+  const { data: accesosManuales } = useAccesosManualesLote(canManageCortesia && isEdit ? id : undefined);
+  const revocarAcceso = useRevocarAccesoManual();
+
 
   // Crear-nuevo propietario state
   const [propietarioTab, setPropietarioTab] = useState<"existente" | "nuevo">("existente");
@@ -815,6 +824,102 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
             </CardContent>
           </Card>
         )}
+
+        {/* Accesos de cortesía (solo admin/super_admin, en modo edición) */}
+        {canManageCortesia && isEdit && id && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Accesos de cortesía
+              </CardTitle>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setOtorgarAccesoOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Otorgar acceso
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {!accesosManuales || accesosManuales.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aún no has otorgado accesos manuales a este lote.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {accesosManuales.map((a) => {
+                    const dias = a.fecha_expiracion
+                      ? Math.ceil((new Date(a.fecha_expiracion).getTime() - Date.now()) / 86400000)
+                      : null;
+                    const activo = a.estado === "activa" && dias !== null && dias > 0;
+                    return (
+                      <div
+                        key={a.id}
+                        className="flex items-start justify-between gap-3 rounded-md border border-border bg-background p-2.5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {a.desarrollador?.nombre ?? a.desarrollador?.email ?? a.desarrollador_id.slice(0, 8)}
+                          </p>
+                          {a.desarrollador?.email && a.desarrollador?.nombre && (
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {a.desarrollador.email}
+                            </p>
+                          )}
+                          {a.motivo && (
+                            <p className="text-xs text-muted-foreground italic mt-0.5 line-clamp-2">
+                              "{a.motivo}"
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge
+                              variant={activo ? "secondary" : "outline"}
+                              className="text-[10px]"
+                            >
+                              {activo
+                                ? `${dias}d restantes`
+                                : a.estado === "cancelada"
+                                ? "Revocado"
+                                : "Expirado"}
+                            </Badge>
+                            {a.fecha_expiracion && (
+                              <span className="text-[10px] text-muted-foreground">
+                                hasta {new Date(a.fecha_expiracion).toLocaleDateString("es-CO")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {activo && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => revocarAcceso.mutate(a.id)}
+                            disabled={revocarAcceso.isPending}
+                            title="Revocar acceso"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <OtorgarAccesoLoteDialog
+          open={otorgarAccesoOpen}
+          onOpenChange={setOtorgarAccesoOpen}
+          loteIdPredefinido={id}
+        />
+
+
 
         {/* Actions */}
         <div className="flex items-center gap-3">

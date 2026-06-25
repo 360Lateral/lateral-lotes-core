@@ -23,7 +23,10 @@ export type Database = {
           fecha_expiracion: string | null
           id: string
           lote_id: string
+          motivo: string | null
+          otorgado_por: string | null
           precio_cop: number
+          tipo: string
           updated_at: string
         }
         Insert: {
@@ -34,7 +37,10 @@ export type Database = {
           fecha_expiracion?: string | null
           id?: string
           lote_id: string
+          motivo?: string | null
+          otorgado_por?: string | null
           precio_cop: number
+          tipo?: string
           updated_at?: string
         }
         Update: {
@@ -45,7 +51,10 @@ export type Database = {
           fecha_expiracion?: string | null
           id?: string
           lote_id?: string
+          motivo?: string | null
+          otorgado_por?: string | null
           precio_cop?: number
+          tipo?: string
           updated_at?: string
         }
         Relationships: [
@@ -5427,6 +5436,15 @@ export type Database = {
         Args: { p_reference: string }
         Returns: Json
       }
+      otorgar_acceso_manual_lote: {
+        Args: {
+          p_desarrollador_id: string
+          p_dias?: number
+          p_lote_id: string
+          p_motivo: string
+        }
+        Returns: Json
+      }
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
@@ -5460,6 +5478,10 @@ export type Database = {
           vistas_semana_anterior: number
           vistas_ultima_semana: number
         }[]
+      }
+      revocar_acceso_manual_lote: {
+        Args: { p_acceso_id: string }
+        Returns: Json
       }
       revocar_autorizacion_comisionista: {
         Args: { p_autorizacion_id: string; p_motivo?: string }

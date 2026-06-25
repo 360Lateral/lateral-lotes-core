@@ -6,6 +6,8 @@ export interface AccesoConDatos {
   id: string;
   lote_id: string;
   estado: "pendiente_pago" | "activa" | "vencida" | "cancelada";
+  tipo: "ppv" | "manual_admin";
+  motivo: string | null;
   fecha_compra: string | null;
   fecha_expiracion: string | null;
   ciudad: string | null;
@@ -25,7 +27,7 @@ export const useMisAccesosConDatos = () => {
       const { data, error } = await supabase
         .from("accesos_lote")
         .select(`
-          id, lote_id, estado, fecha_compra, fecha_expiracion,
+          id, lote_id, estado, tipo, motivo, fecha_compra, fecha_expiracion,
           lote:lotes(nombre_lote, ciudad, barrio, area_total_m2, estrato, tipo_lote)
         `)
         .eq("desarrollador_id", user!.id)
@@ -35,6 +37,8 @@ export const useMisAccesosConDatos = () => {
         id: a.id,
         lote_id: a.lote_id,
         estado: a.estado,
+        tipo: (a.tipo ?? "ppv") as AccesoConDatos["tipo"],
+        motivo: a.motivo ?? null,
         fecha_compra: a.fecha_compra,
         fecha_expiracion: a.fecha_expiracion,
         nombre_lote: a.lote?.nombre_lote ?? null,

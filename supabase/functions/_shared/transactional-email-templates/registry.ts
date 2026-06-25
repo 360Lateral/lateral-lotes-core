@@ -4,6 +4,7 @@ import * as React from 'npm:react@18.3.1'
 import { template as engagementActivado } from './engagement-activado.tsx'
 import { template as suscripcionActivada } from './suscripcion-activada.tsx'
 import { template as accesoLoteActivado } from './acceso-lote-activado.tsx'
+import { template as accesoManualOtorgado } from './acceso-manual-otorgado.tsx'
 
 // Entry shape required by send-transactional-email and preview-transactional-email.
 export interface TemplateEntry {
@@ -18,4 +19,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'engagement-activado': engagementActivado,
   'suscripcion-activada': suscripcionActivada,
   'acceso-lote-activado': accesoLoteActivado,
+  'acceso-manual-otorgado': accesoManualOtorgado,
 }
