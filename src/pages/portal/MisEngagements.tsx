@@ -642,9 +642,9 @@ const PortalHomeInner = () => {
             <Plus className="mr-1 h-4 w-4" />
             Publicar activo
           </Button>
-          <Button size="sm" onClick={() => setSolicitarOpen(true)}>
+          <Button size="sm" onClick={irAComprar}>
             <Plus className="mr-1 h-4 w-4" />
-            Solicitar diagnóstico
+            Comprar diagnóstico
           </Button>
         </div>
       </header>
