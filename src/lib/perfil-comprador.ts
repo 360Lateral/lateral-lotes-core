@@ -6,8 +6,8 @@ import {
   MessageCircle,
   type LucideIcon,
 } from "lucide-react";
-import type {
 import { formatMetros } from "@/lib/format-moneda";
+import type {
   ArquitectonicoLote,
   FinancieroLote,
   MercadoLote,
