@@ -218,6 +218,7 @@ const LoteFicha = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const { data, isLoading, error } = useFichaLote(id);
+  const { data: enriquecida } = useFichaEnriquecida(id);
   const { data: mapsKey } = useGoogleMapsKey();
 
   const seccionesActivas = useMemo(
