@@ -49,7 +49,7 @@ import {
   type DocRequeridoAdmin,
   type DocRequeridoInput,
 } from "@/hooks/admin/useDocumentosRequeridos";
-import { usePlanesConfig } from "@/hooks/usePlanesConfig";
+import { usePlanesDiagnostico } from "@/hooks/usePlanesConfig";
 import { useTiposAnalisis } from "@/hooks/useTiposAnalisis";
 
 interface FormDialogProps {
