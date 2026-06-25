@@ -1,5 +1,6 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { Building, Check, Construction, Copy, Home, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2, Square } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import Logo from "@/components/ui/Logo";
 import { useFichaLote, type FichaLoteData } from "@/hooks/useFichaLote";
+import { useFichaEnriquecida } from "@/hooks/useFichaEnriquecida";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
