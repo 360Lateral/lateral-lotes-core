@@ -392,9 +392,15 @@ const ActividadRecientePanel = () => {
             ))}
           </div>
         ) : !actividad || actividad.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Sin actividad reciente. Cuando alguien interactúe con tu portafolio, aparecerá aquí.
-          </p>
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>Aquí verás cuando:</p>
+            <ul className="space-y-1 text-xs list-disc pl-4">
+              <li>Tu asesor avance en un análisis</li>
+              <li>Se publique un nuevo entregable</li>
+              <li>Alguien vea tu lote publicado</li>
+              <li>Recibas un mensaje del equipo</li>
+            </ul>
+          </div>
         ) : (
           <ul className="space-y-3">
             {actividad.slice(0, 5).map((ev) => {
