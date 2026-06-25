@@ -245,7 +245,7 @@ const EngagementCard = ({ e, onClick }: { e: EngagementClienteResumen; onClick: 
   );
 };
 
-const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
+const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
   const navigate = useNavigate();
   const { data, isLoading } = useMisEngagementsCliente();
 
@@ -255,8 +255,8 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
         <p className="text-sm text-muted-foreground">
           Diagnósticos contratados y solicitudes en curso.
         </p>
-        <Button onClick={onSolicitar} size="sm" variant="outline">
-          <Plus className="mr-1 h-4 w-4" /> Solicitar diagnóstico
+        <Button onClick={onComprar} size="sm" variant="outline">
+          <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
         </Button>
       </div>
 
@@ -273,11 +273,11 @@ const ServiciosList = ({ onSolicitar }: { onSolicitar: () => void }) => {
             <div className="space-y-1 max-w-md">
               <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
               <p className="text-sm text-muted-foreground">
-                Solicita uno con el botón "Solicitar diagnóstico" o contacta a tu asesor.
+                Compra uno desde "Planes" para empezar a analizar tu lote.
               </p>
             </div>
-            <Button onClick={onSolicitar}>
-              <Plus className="mr-1 h-4 w-4" /> Solicitar mi primer diagnóstico
+            <Button onClick={onComprar}>
+              <Plus className="mr-1 h-4 w-4" /> Comprar mi primer diagnóstico
             </Button>
           </CardContent>
         </Card>
