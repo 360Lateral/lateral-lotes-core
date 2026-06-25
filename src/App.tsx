@@ -48,6 +48,7 @@ const PortafolioDashboard = lazy(() => import("./pages/PortafolioDashboard"));
 const EngagementDetalle = lazy(() => import("./pages/EngagementDetalle"));
 const DashboardImportarEngagement = lazy(() => import("./pages/DashboardImportarEngagement"));
 const DashboardLotesPendientesValidacion = lazy(() => import("./pages/DashboardLotesPendientesValidacion"));
+const DashboardLotesSinPropietario = lazy(() => import("./pages/DashboardLotesSinPropietario"));
 const DashboardSolicitudesContacto = lazy(() => import("./pages/DashboardSolicitudesContacto"));
 const MetricasEjecutivas = lazy(() => import("./pages/MetricasEjecutivas"));
 const AnalisisClientesDashboard = lazy(() => import("./pages/AnalisisClientesDashboard"));
@@ -133,6 +134,7 @@ const App = () => (
             <Route path="/dashboard/lotes/nuevo" element={<ProtectedRoute allowPropietario><DashboardLoteNuevo /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/importar" element={<ProtectedRoute requireAdmin><DashboardLotesImportar /></ProtectedRoute>} />
             <Route path="/dashboard/lotes/pendientes-validacion" element={<ProtectedRoute requireAdmin><DashboardLotesPendientesValidacion /></ProtectedRoute>} />
+            <Route path="/dashboard/lotes/sin-propietario" element={<ProtectedRoute requireAdmin><DashboardLotesSinPropietario /></ProtectedRoute>} />
             <Route path="/dashboard/solicitudes-contacto" element={<ProtectedRoute requireAdmin><DashboardSolicitudesContacto /></ProtectedRoute>} />
             <Route path="/dashboard/acuerdos-firmados" element={<ProtectedRoute requireAdmin><DashboardAcuerdosFirmados /></ProtectedRoute>} />
             <Route path="/dashboard/feedback" element={<ProtectedRoute requireAdmin><DashboardFeedback /></ProtectedRoute>} />
