@@ -36,6 +36,7 @@ export interface LoteWithPrecio {
   score_juridico: number | null;
   score_normativo: number | null;
   score_servicios: number | null;
+  created_at: string | null;
 }
 
 export interface Filters {
@@ -104,7 +105,7 @@ const Lotes = () => {
     queryFn: async () => {
       const { data: lotesData, error } = await (supabase as any)
         .from("vw_lotes_publicos")
-        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios, es_publico");
+        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios, es_publico, created_at");
       if (error) throw error;
 
       const ids = lotesData.map((l) => l.id);

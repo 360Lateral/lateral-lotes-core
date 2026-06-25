@@ -1,5 +1,6 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Check, Copy, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { Building, Check, Construction, Copy, Home, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2, Square } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import Logo from "@/components/ui/Logo";
 import { useFichaLote, type FichaLoteData } from "@/hooks/useFichaLote";
+import { useFichaEnriquecida } from "@/hooks/useFichaEnriquecida";
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
 import { toast } from "@/hooks/use-toast";
 import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
@@ -216,6 +218,7 @@ const LoteFicha = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const { data, isLoading, error } = useFichaLote(id);
+  const { data: enriquecida } = useFichaEnriquecida(id);
   const { data: mapsKey } = useGoogleMapsKey();
 
   const seccionesActivas = useMemo(
@@ -336,8 +339,46 @@ const LoteFicha = () => {
     (mostrar("precio") && data.publicado_venta && data.precio_venta_estimado != null) ||
     (mostrar("propietario") && !!data.propietario_nombre);
 
+  const scorePromedio = enriquecida?.scorePromedio ?? null;
+  const scoreViabilidad = enriquecida?.scoreViabilidad ?? null;
+  const valoracion = enriquecida?.scores?.precio_venta_estimado ?? data.precio_venta_estimado ?? null;
+  const normativa = enriquecida?.normativa ?? null;
+  const tieneAlgunNormativo =
+    !!normativa &&
+    (normativa.indice_construccion != null ||
+      normativa.indice_ocupacion != null ||
+      normativa.altura_max_pisos != null ||
+      normativa.densidad_max != null ||
+      !!normativa.tratamiento);
+
+  const seoTitle = `${data.nombre_lote ?? "Lote"} · 360Lateral`;
+  const seoDesc = `${
+    data.area_total_m2
+      ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²`
+      : "Lote"
+  } en ${data.ciudad ?? "Colombia"}${
+    analisis.length > 0 ? ` · Análisis: ${analisis.map((a) => a.label).join(", ")}` : ""
+  }${valoracion ? ` · Valoración: ${formatCOP(Number(valoracion))}` : ""}`;
+  const seoUrl = `${PROD_BASE}/lotes/${id}/ficha`;
+  const seoImage = data.foto_url ?? `${PROD_BASE}/og-default.png`;
+
   return (
     <div className="min-h-screen bg-muted/30 print:bg-background">
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDesc} />
+        <link rel="canonical" href={seoUrl} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDesc} />
+        <meta property="og:image" content={seoImage} />
+        <meta property="og:url" content={seoUrl} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDesc} />
+        <meta name="twitter:image" content={seoImage} />
+      </Helmet>
+
       <div className="no-print sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-2 px-4 py-3">
           <Logo />
@@ -397,6 +438,110 @@ const LoteFicha = () => {
             )}
           </section>
 
+          {/* Resumen ejecutivo: Score 360° + Valoración + Viabilidad */}
+          {(scorePromedio != null || valoracion != null || scoreViabilidad != null) && (
+            <section className="mb-6">
+              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 md:p-6">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6 text-center">
+                  <div>
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Score 360°</p>
+                    {scorePromedio != null ? (
+                      <>
+                        <p className="font-display text-3xl font-bold text-emerald-900 md:text-4xl">
+                          {scorePromedio.toFixed(1)}
+                          <span className="text-xl text-emerald-600 md:text-2xl">/10</span>
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-emerald-700">
+                          Promedio de {enriquecida?.analisisCompletados ?? 0} análisis
+                        </p>
+                      </>
+                    ) : (
+                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                    )}
+                  </div>
+                  <div className="border-t border-emerald-200 pt-4 md:border-l md:border-r md:border-t-0 md:pt-0">
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Valoración estimada</p>
+                    {valoracion != null ? (
+                      <>
+                        <p className="font-display text-2xl font-bold text-emerald-900 md:text-3xl">
+                          {formatCOP(Number(valoracion))}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-emerald-700">Basado en análisis financiero</p>
+                      </>
+                    ) : (
+                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                    )}
+                  </div>
+                  <div className="border-t border-emerald-200 pt-4 md:border-t-0 md:pt-0">
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Score de viabilidad</p>
+                    {scoreViabilidad != null ? (
+                      <>
+                        <p className="font-display text-3xl font-bold text-emerald-900 md:text-4xl">
+                          {scoreViabilidad.toFixed(1)}
+                          <span className="text-xl text-emerald-600 md:text-2xl">/10</span>
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-emerald-700">Indicador de potencial</p>
+                      </>
+                    ) : (
+                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </section>
+          )}
+
+          {/* Lo que puedes construir: índices normativos */}
+          {tieneAlgunNormativo && (
+            <section className="mb-8">
+              <h2 className="mb-3 text-lg font-semibold text-foreground">Lo que puedes construir</h2>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <NormativaChip
+                  icon={Construction}
+                  label="Índice construcción"
+                  value={normativa?.indice_construccion != null ? Number(normativa.indice_construccion).toFixed(2) : "—"}
+                />
+                <NormativaChip
+                  icon={Building}
+                  label="Altura máxima"
+                  value={
+                    normativa?.altura_max_pisos
+                      ? `${normativa.altura_max_pisos} pisos`
+                      : normativa?.altura_max_metros
+                      ? `${normativa.altura_max_metros} m`
+                      : normativa?.altura_texto ?? "—"
+                  }
+                />
+                <NormativaChip
+                  icon={Square}
+                  label="Índice ocupación"
+                  value={normativa?.indice_ocupacion != null ? Number(normativa.indice_ocupacion).toFixed(2) : "—"}
+                />
+                <NormativaChip
+                  icon={Home}
+                  label="Densidad"
+                  value={normativa?.densidad_max ? `${normativa.densidad_max} viv/ha` : "—"}
+                />
+              </div>
+              {(normativa?.tratamiento || normativa?.zona_pot) && (
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-3 text-sm">
+                  {normativa?.tratamiento && (
+                    <p>
+                      <span className="text-muted-foreground">Tratamiento POT:</span>{" "}
+                      <span className="font-medium">{normativa.tratamiento}</span>
+                    </p>
+                  )}
+                  {normativa?.zona_pot && (
+                    <p>
+                      <span className="text-muted-foreground">Zona POT:</span>{" "}
+                      <span className="font-medium">{normativa.zona_pot}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
+
           {notaCustom && (
             <section className="mb-6">
               <Card className="border-border bg-muted/40 p-4">
@@ -404,6 +549,8 @@ const LoteFicha = () => {
               </Card>
             </section>
           )}
+
+
 
           {(mostrar("fotos") || mostrar("ubicacion")) && (
             <section className={`mb-8 grid grid-cols-1 gap-4 ${mostrar("fotos") && mostrar("ubicacion") ? "md:grid-cols-2 print:grid-cols-2" : ""}`}>
@@ -485,6 +632,24 @@ const LoteFicha = () => {
     </div>
   );
 };
+
+const NormativaChip = ({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Building;
+  label: string;
+  value: string;
+}) => (
+  <div className="rounded-lg border border-border bg-card p-3">
+    <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
+      <Icon className="h-3.5 w-3.5" />
+      <p className="text-[10px] uppercase tracking-wider">{label}</p>
+    </div>
+    <p className="text-sm font-semibold text-foreground">{value}</p>
+  </div>
+);
 
 const DatoCard = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
   <div
