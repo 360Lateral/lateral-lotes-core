@@ -4,6 +4,7 @@ import { AlertCircle, Settings2 } from "lucide-react";
 import TabPropietario from "@/components/admin/precios/TabPropietario";
 import TabDesarrollador from "@/components/admin/precios/TabDesarrollador";
 import TabGeneral from "@/components/admin/precios/TabGeneral";
+import DocumentosRequeridosManager from "@/components/admin/DocumentosRequeridosManager";
 
 const DashboardConfigSuscripciones = () => {
   return (
@@ -28,6 +29,7 @@ const DashboardConfigSuscripciones = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="propietario">Propietario</TabsTrigger>
             <TabsTrigger value="desarrollador">Desarrollador</TabsTrigger>
+            <TabsTrigger value="docs-requeridos">Documentos requeridos</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
           </TabsList>
 
@@ -36,6 +38,9 @@ const DashboardConfigSuscripciones = () => {
           </TabsContent>
           <TabsContent value="desarrollador">
             <TabDesarrollador />
+          </TabsContent>
+          <TabsContent value="docs-requeridos">
+            <DocumentosRequeridosManager />
           </TabsContent>
           <TabsContent value="general">
             <TabGeneral />
