@@ -15,6 +15,7 @@ import { decodificarSecciones, decodeNotaB64 } from "@/lib/ficha-config";
 import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
+import FichaBloquesExtra from "@/components/ficha/FichaBloquesExtra";
 
 const PROD_BASE = "https://urbanix360.com";
 
@@ -251,11 +252,56 @@ const LoteFicha = () => {
     if (!data) return;
     setGenerandoPdf(true);
     try {
-      await generarPdfFicha(data, {
-        secciones: seccionesActivas,
-        titulo: tituloCustom,
-        nota: notaCustom,
-      });
+      const perfilesPdf = enriquecida
+        ? (await import("@/lib/perfil-comprador")).derivarPerfilesCompradorIdeal({
+            areaTotalM2: data.area_total_m2 ?? null,
+            scorePromedio: enriquecida.scorePromedio,
+            scoreNormativo: enriquecida.scoresIndividuales.normativo,
+            normativa: enriquecida.normativa,
+            arquitectonico: enriquecida.arquitectonico,
+            financiero: enriquecida.financiero,
+            mercado: enriquecida.mercado,
+          }).map((p) => ({ titulo: p.titulo, razon: p.razon }))
+        : [];
+      await generarPdfFicha(
+        {
+          ...data,
+          enriquecida: enriquecida
+            ? {
+                scorePromedio: enriquecida.scorePromedio,
+                scoreViabilidad: enriquecida.scoreViabilidad,
+                scoresIndividuales: enriquecida.scoresIndividuales,
+                arquitectonico: enriquecida.arquitectonico,
+                financiero: enriquecida.financiero
+                  ? {
+                      valor_compra_lote: enriquecida.financiero.valor_compra_lote,
+                      tir_pct: enriquecida.financiero.tir_pct,
+                      vpn: enriquecida.financiero.vpn,
+                      punto_equilibrio_pct: enriquecida.financiero.punto_equilibrio_pct,
+                      margen_bruto_pct: enriquecida.financiero.margen_bruto_pct,
+                      observaciones: enriquecida.financiero.observaciones,
+                    }
+                  : null,
+                mercado: enriquecida.mercado
+                  ? {
+                      precio_venta_m2_zona: enriquecida.mercado.precio_venta_m2_zona,
+                      proyectos_competidores: enriquecida.mercado.proyectos_competidores,
+                      velocidad_absorcion_unidades_mes:
+                        enriquecida.mercado.velocidad_absorcion_unidades_mes,
+                      valorizacion_anual_pct: enriquecida.mercado.valorizacion_anual_pct,
+                      observaciones: enriquecida.mercado.observaciones,
+                    }
+                  : null,
+                perfiles: perfilesPdf,
+              }
+            : null,
+        },
+        {
+          secciones: seccionesActivas,
+          titulo: tituloCustom,
+          nota: notaCustom,
+        },
+      );
     } catch (e) {
       console.error("Error generando PDF:", e);
       toast({
@@ -352,13 +398,17 @@ const LoteFicha = () => {
       !!normativa.tratamiento);
 
   const seoTitle = `${data.nombre_lote ?? "Lote"} · 360Lateral`;
+  const unidadesSeo = enriquecida?.arquitectonico?.unidades_estimadas ?? null;
+  const tirSeo = enriquecida?.financiero?.tir_pct ?? null;
   const seoDesc = `${
     data.area_total_m2
       ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²`
       : "Lote"
   } en ${data.ciudad ?? "Colombia"}${
-    analisis.length > 0 ? ` · Análisis: ${analisis.map((a) => a.label).join(", ")}` : ""
-  }${valoracion ? ` · Valoración: ${formatCOP(Number(valoracion))}` : ""}`;
+    scorePromedio != null ? ` · Score ${scorePromedio.toFixed(1)}/10` : ""
+  }${valoracion ? ` · Valoración ${formatCOP(Number(valoracion))}` : ""}${
+    unidadesSeo != null ? ` · ~${unidadesSeo} unidades` : ""
+  }${tirSeo != null ? ` · TIR ${tirSeo.toFixed(1)}%` : ""}`;
   const seoUrl = `${PROD_BASE}/lotes/${id}/ficha`;
   const seoImage = data.foto_url ?? `${PROD_BASE}/og-default.png`;
 
@@ -540,6 +590,11 @@ const LoteFicha = () => {
                 </div>
               )}
             </section>
+          )}
+
+          {/* Bloques enriquecidos: Arquitectónico, Análisis por área, Financiero, Perfil comprador */}
+          {enriquecida && (
+            <FichaBloquesExtra ficha={enriquecida} areaTotalM2={data.area_total_m2 ?? null} />
           )}
 
           {notaCustom && (

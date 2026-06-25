@@ -5334,6 +5334,10 @@ export type Database = {
         Returns: Json
       }
       obtener_ficha_lote: { Args: { p_lote_id: string }; Returns: Json }
+      obtener_ficha_publica_enriquecida: {
+        Args: { p_lote_id: string }
+        Returns: Json
+      }
       obtener_kpis_portafolio: { Args: never; Returns: Json }
       obtener_lote_para_usuario: { Args: { p_lote_id: string }; Returns: Json }
       obtener_metricas_clientes_ejecutivo: {
