@@ -429,10 +429,10 @@ interface SugerenciaProximoPaso {
 }
 
 const useProximoPasoSugerencia = ({
-  onSolicitar,
+  onComprar,
   onPublicar,
 }: {
-  onSolicitar: () => void;
+  onComprar: () => void;
   onPublicar: () => void;
 }): SugerenciaProximoPaso | null => {
   const navigate = useNavigate();
@@ -447,25 +447,66 @@ const useProximoPasoSugerencia = ({
   if (sinNada) {
     return {
       descripcion:
-        "Solicita tu primer diagnóstico para conocer el potencial real de un lote.",
-      cta: "Solicitar diagnóstico",
-      onClick: onSolicitar,
+        "Compra tu primer diagnóstico para conocer el potencial real de un lote.",
+      cta: "Ver planes",
+      onClick: onComprar,
     };
   }
 
+  // 1. Engagement entregado sin publicar
   const entregadoSinPublicar = ev.find(
     (e) =>
       e.estado === "entregado" &&
       !ac.some((a) => a.nombre_lote === e.lote_nombre && a.publicado_venta)
   );
   if (entregadoSinPublicar) {
+    const nombre = nombreLoteMostrable(
+      entregadoSinPublicar.lote_nombre,
+      entregadoSinPublicar.lote_direccion,
+      entregadoSinPublicar.lote_ciudad,
+    );
     return {
-      descripcion: `Tu diagnóstico de "${entregadoSinPublicar.lote_nombre ?? "tu lote"}" está listo. Publícalo en el mercado para empezar a recibir interesados.`,
+      descripcion: `Tu diagnóstico de "${nombre}" está listo. Publícalo en el mercado para empezar a recibir interesados.`,
       cta: "Publicar al mercado",
       onClick: onPublicar,
     };
   }
 
+  // 2. Engagement atrasado
+  const atrasado = ev.find(
+    (e) => e.dias_para_sla != null && e.dias_para_sla < 0 && e.estado !== "entregado",
+  );
+  if (atrasado) {
+    const nombre = nombreLoteMostrable(
+      atrasado.lote_nombre,
+      atrasado.lote_direccion,
+      atrasado.lote_ciudad,
+    );
+    return {
+      descripcion: `Tu análisis de "${nombre}" lleva más tiempo del estimado. Contacta a tu asesor desde el detalle del engagement.`,
+      cta: "Ver engagement",
+      onClick: () => navigate(`/portal/engagement/${atrasado.engagement_id}`),
+    };
+  }
+
+  // 3. Engagement en borrador (pago pendiente)
+  const borrador = ev.find(
+    (e) => e.estado_activacion === "borrador" || e.estado_activacion === "pendiente_pago",
+  );
+  if (borrador) {
+    const nombre = nombreLoteMostrable(
+      borrador.lote_nombre,
+      borrador.lote_direccion,
+      borrador.lote_ciudad,
+    );
+    return {
+      descripcion: `Tu lote "${nombre}" espera el pago para que iniciemos el análisis.`,
+      cta: "Completar pago",
+      onClick: () => navigate(`/portal/engagement/${borrador.engagement_id}`),
+    };
+  }
+
+  // 4. Activo en revisión por equipo
   const pendienteAprobacion = ac.find(
     (a) => a.estado_publicacion === "pendiente_validacion"
   );
@@ -477,12 +518,13 @@ const useProximoPasoSugerencia = ({
     };
   }
 
+  // 5. Tiene activos pero ningún engagement
   if (ac.length > 0 && ev.length === 0) {
     return {
       descripcion:
         "Contrata un diagnóstico técnico para que tus activos publicados conviertan más rápido.",
-      cta: "Solicitar diagnóstico",
-      onClick: onSolicitar,
+      cta: "Ver planes",
+      onClick: onComprar,
     };
   }
 
@@ -490,13 +532,13 @@ const useProximoPasoSugerencia = ({
 };
 
 const ProximoPasoCard = ({
-  onSolicitar,
+  onComprar,
   onPublicar,
 }: {
-  onSolicitar: () => void;
+  onComprar: () => void;
   onPublicar: () => void;
 }) => {
-  const sugerencia = useProximoPasoSugerencia({ onSolicitar, onPublicar });
+  const sugerencia = useProximoPasoSugerencia({ onComprar, onPublicar });
   if (!sugerencia) return null;
 
   return (
