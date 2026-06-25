@@ -2,9 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import ScoreIndicator from "@/components/ScoreIndicator";
 import { Sparkles } from "lucide-react";
 import type { LoteWithPrecio } from "@/pages/Lotes";
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
+import { formatCOP } from "@/lib/format-moneda";
 
 const estadoVariant = (e: string) => {
   switch (e) {

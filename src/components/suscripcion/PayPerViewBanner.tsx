@@ -3,13 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useConfigPayPerView } from "@/hooks/useConfigPayPerView";
 import { Eye } from "lucide-react";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const PayPerViewBanner = () => {
   const { data: config } = useConfigPayPerView();

@@ -14,6 +14,7 @@ import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { usePlanesConPrecio } from "@/hooks/usePlanesConPrecio";
 import { toast } from "sonner";
 import { Copy, ExternalLink, Info, Loader2, CheckCircle2 } from "lucide-react";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface EngagementLike {
   id: string;
@@ -28,13 +29,6 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   engagement: EngagementLike;
 }
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 export default function GenerarLinkPagoDialog({ open, onOpenChange, engagement }: Props) {
   const { data: planes } = usePlanesConPrecio();

@@ -20,13 +20,7 @@ import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 import PayPerViewBanner from "@/components/suscripcion/PayPerViewBanner";
 import SuscripcionFAQ from "@/components/suscripcion/SuscripcionFAQ";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 interface FeatureItem {
   label: string;

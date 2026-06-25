@@ -8,6 +8,7 @@ import { FotoLote } from "@/components/lotes/FotoLote";
 import { extractFotoPath } from "@/lib/foto-storage";
 
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface LoteCardProps {
   id: string;
@@ -25,14 +26,6 @@ interface LoteCardProps {
   has_resolutoria?: boolean | null;
   foto_url?: string | null;
 }
-
-const formatCOP = (value: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
 
 const estadoBadgeVariant = (estado: string) => {
   switch (estado) {

@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { formatCOP } from "@/lib/format-moneda";
 
 const DIAGNOSTICO_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85";
 
@@ -34,14 +35,6 @@ interface Estimacion {
   max: number;
   count: number;
 }
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
 
 const serviciosOptions = ["Agua", "Energía", "Gas", "Alcantarillado", "Ninguno"];
 

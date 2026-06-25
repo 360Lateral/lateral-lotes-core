@@ -22,6 +22,7 @@ import { Check, HelpCircle, MessageCircle, Table as TableIcon, X } from "lucide-
 import { usePlanesConPrecio, type PlanConPrecio } from "@/hooks/usePlanesConPrecio";
 import { useSmlmvVigente } from "@/hooks/useSmlmvVigente";
 import PlanesFAQ from "@/components/planes/PlanesFAQ";
+import { formatCOP } from "@/lib/format-moneda";
 
 const PLANES_IMG =
   "https://images.unsplash.com/photo-1448630360428-65456885c650?w=1600&q=85";
@@ -96,13 +97,6 @@ const FEATURES: {
     fallback: [false, false, false, true],
   },
 ];
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 interface PlanRow {
   id: string;

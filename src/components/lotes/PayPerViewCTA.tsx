@@ -6,14 +6,12 @@ import { KeyRound, Loader2, ShieldCheck } from "lucide-react";
 import { useConfigPayPerView } from "@/hooks/useConfigPayPerView";
 import { useGenerarPagoWompi } from "@/hooks/useGenerarPagoWompi";
 import { useAuth } from "@/contexts/AuthContext";
+import { formatCOP } from "@/lib/format-moneda";
 
 interface Props {
   loteId: string;
   accesoActivoExpira?: string | null;
 }
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 const formatDate = (s?: string | null) =>
   s

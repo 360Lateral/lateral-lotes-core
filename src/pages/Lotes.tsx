@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import MapErrorBoundary, { MapFallback } from "@/components/maps/MapErrorBoundary";
 import { useGoogleMapsAuthStatus } from "@/hooks/useGoogleMapsAuthStatus";
+import { formatCOP } from "@/lib/format-moneda";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
@@ -54,9 +55,6 @@ const defaultFilters: Filters = {
   areaMin: "",
   areaMax: "",
 };
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
 
 const Lotes = () => {
   const navigate = useNavigate();

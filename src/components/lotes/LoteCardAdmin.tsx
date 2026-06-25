@@ -17,6 +17,7 @@ import MapaEstaticoLote from "./MapaEstaticoLote";
 import FichaConfigDialog from "./FichaConfigDialog";
 import { FotoLote } from "./FotoLote";
 import { cn } from "@/lib/utils";
+import { formatCOP } from "@/lib/format-moneda";
 
 export interface LoteCardData {
   id: string;
@@ -65,9 +66,6 @@ const planBadgeClass = (codigo?: string | null) => {
       return "bg-background text-muted-foreground border border-border";
   }
 };
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(v);
 
 const LoteCardAdmin = ({
   lote, onAsignarPropietario, onTogglePublico, onPublicarMercado,

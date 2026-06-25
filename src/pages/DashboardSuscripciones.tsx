@@ -9,9 +9,7 @@ import { Link } from "react-router-dom";
 import { useSuscripcionesAdmin } from "@/hooks/useSuscripcionesAdmin";
 import { useAccesosAdmin } from "@/hooks/useAccesosAdmin";
 import { CalendarClock, CreditCard, KeyRound, Users } from "lucide-react";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const formatDate = (s?: string | null) =>
   s ? new Date(s).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" }) : "—";

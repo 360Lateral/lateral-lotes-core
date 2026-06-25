@@ -31,10 +31,8 @@ import {
   type SeccionProps,
 } from "@/components/analisis/editor/_shared";
 import { useAnalisisUpsert } from "@/hooks/analisis/useAnalisisUpsert";
+import { formatCOP } from "@/lib/format-moneda";
 /* ─── Section 8: Financiero ───────────────────── */
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
-
 export default function SeccionFinanciero({ loteId, pdfProps, qk: qkProp, onSaved }: SeccionProps & { lat?: number | null; lng?: number | null }) {
   const qk = qkProp ?? ["analisis-financiero", loteId];
   const { data } = useQuery({

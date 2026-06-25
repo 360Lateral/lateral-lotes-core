@@ -3,14 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, Phone } from "lucide-react";
-
-const formatCOP = (n: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
+import { formatCOP } from "@/lib/format-moneda";
 
 const DiagnosticoResultado = () => {
   const location = useLocation();

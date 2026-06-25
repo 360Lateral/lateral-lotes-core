@@ -16,15 +16,9 @@ import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
 import FichaBloquesExtra from "@/components/ficha/FichaBloquesExtra";
+import { formatCOP } from "@/lib/format-moneda";
 
 const PROD_BASE = "https://urbanix360.com";
-
-const formatCOP = (v: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(v);
 
 const FechaHoy = () =>
   new Date().toLocaleDateString("es-CO", {
