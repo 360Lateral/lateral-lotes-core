@@ -44,8 +44,8 @@ import type {
   NivelHallazgo,
   NormativaLote,
 } from "@/hooks/useFichaEnriquecida";
-import {
 import { formatNumero } from "@/lib/format-moneda";
+import {
   derivarPerfilesCompradorIdeal,
   type PerfilCompradorIdeal,
 } from "@/lib/perfil-comprador";
