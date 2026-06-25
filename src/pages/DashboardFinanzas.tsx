@@ -20,15 +20,9 @@ import {
 import { useResumenFinanciero } from "@/hooks/useResumenFinanciero";
 import { useTendenciaFinanciera } from "@/hooks/useTendenciaFinanciera";
 import { KPIFinanciero } from "@/components/ui/KPIEstado";
-import { formatCOP, formatCOPCompact } from "@/lib/format";
-import { formatCOPCompact } from "@/lib/format-moneda";
+import { formatCOP, formatCOPCompact } from "@/lib/format-moneda";
 
-const formatCOPShort = (n: number) => {
-  if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}MM`;
-  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
-};
+
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const firstOfMonthISO = () => {
