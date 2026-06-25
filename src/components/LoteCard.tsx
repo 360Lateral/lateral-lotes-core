@@ -8,7 +8,7 @@ import { FotoLote } from "@/components/lotes/FotoLote";
 import { extractFotoPath } from "@/lib/foto-storage";
 
 import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
-import { formatCOP } from "@/lib/format-moneda";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 interface LoteCardProps {
   id: string;
@@ -89,7 +89,7 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
         <div>
           <p className="font-body text-xs text-muted-foreground">Área</p>
           <p className="font-body text-sm font-semibold text-carbon">
-            {area_m2.toLocaleString("es-CO")} m²
+            {formatMetros(area_m2)}
           </p>
         </div>
         <div className="text-right">

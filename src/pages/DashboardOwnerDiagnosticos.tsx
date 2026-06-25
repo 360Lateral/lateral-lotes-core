@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileSearch, Loader2 } from "lucide-react";
+import { formatMetros } from "@/lib/format-moneda";
 
 const DashboardOwnerDiagnosticos = () => {
   const { user } = useAuth();
@@ -64,7 +65,7 @@ const DashboardOwnerDiagnosticos = () => {
                   </p>
                   {d.area_m2 && (
                     <p className="text-sm text-muted-foreground">
-                      {d.area_m2.toLocaleString("es-CO")} m²
+                      {formatMetros(d.area_m2)}
                     </p>
                   )}
                   <div className="flex items-center gap-2">

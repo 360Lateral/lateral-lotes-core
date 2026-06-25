@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
-import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { formatCOP, formatMetros, formatNumero } from "@/lib/format-moneda";
 
 export interface FichaPdfEnriquecida {
   scorePromedio?: number | null;
@@ -360,7 +360,7 @@ export async function generarPdfFicha(
     const fmtPct = (n: number | null | undefined) =>
       n == null ? "—" : `${Number(n).toFixed(1)}%`;
     const fmtN = (n: number | null | undefined) =>
-      n == null ? "—" : Number(n).toLocaleString("es-CO");
+      n == null ? "—" : formatNumero(Number(n));
 
     if (enr.arquitectonico) {
       sectionTitle("Aprovechamiento arquitectónico");
