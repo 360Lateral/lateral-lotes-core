@@ -17,11 +17,14 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X } from "lucide-react";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus } from "lucide-react";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
 import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
+import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog";
+import { useAccesosManualesUsuario } from "@/hooks/admin/useAccesosManualesUsuario";
+import { useRevocarAccesoManual } from "@/hooks/admin/useRevocarAccesoManual";
 import type { NivelSuscripcion } from "@/hooks/useNivelSuscripcion";
 
 const ALL_ROLES = ["super_admin", "admin", "experto", "comisionista", "propietario", "desarrollador"] as const;
