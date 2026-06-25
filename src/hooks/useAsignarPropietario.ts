@@ -8,15 +8,21 @@ export interface PropietarioOption {
   email: string | null;
 }
 
-export const usePropietariosList = () => {
+export type FiltroRolPropietario = "propietario" | "desarrollador" | "todos";
+
+export const usePropietariosList = (filtroRol: FiltroRolPropietario = "propietario") => {
   return useQuery({
-    queryKey: ["propietarios-list"],
+    queryKey: ["propietarios-list", filtroRol],
     queryFn: async (): Promise<PropietarioOption[]> => {
-      const { data: roles, error: rolesErr } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "propietario");
+      let rolesQuery = supabase.from("user_roles").select("user_id, role");
+      if (filtroRol === "todos") {
+        rolesQuery = rolesQuery.in("role", ["propietario", "desarrollador"]);
+      } else {
+        rolesQuery = rolesQuery.eq("role", filtroRol);
+      }
+      const { data: roles, error: rolesErr } = await rolesQuery;
       if (rolesErr) throw rolesErr;
+
       const ids = Array.from(new Set((roles ?? []).map((r) => r.user_id))).filter(Boolean);
       if (ids.length === 0) return [];
 
