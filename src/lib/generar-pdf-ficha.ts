@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 export interface FichaPdfEnriquecida {
   scorePromedio?: number | null;
@@ -224,7 +225,7 @@ export async function generarPdfFicha(
   // ---- Datos del activo ----
   const filas: [string, string][] = [];
   if (mostrar("area") && ficha.area_total_m2)
-    filas.push(["Área", Number(ficha.area_total_m2).toLocaleString("es-CO") + " m²"]);
+    filas.push(["Área", NumberformatMetros(ficha.area_total_m2)]);
   if (mostrar("uso") && ficha.tipo_lote) filas.push(["Uso / tipo", ficha.tipo_lote]);
   if (mostrar("sector")) {
     const s = [ficha.ciudad, ficha.barrio].filter(Boolean).join(" · ");
@@ -233,7 +234,7 @@ export async function generarPdfFicha(
   if (mostrar("precio") && ficha.precio_venta_estimado)
     filas.push([
       "Precio",
-      "$" + Number(ficha.precio_venta_estimado).toLocaleString("es-CO") + " COP",
+      formatCOP(Number(ficha.precio_venta_estimado)),
     ]);
   if (mostrar("propietario") && ficha.propietario_nombre)
     filas.push(["Propietario", ficha.propietario_nombre]);
@@ -355,7 +356,7 @@ export async function generarPdfFicha(
     };
 
     const fmtCOP = (n: number | null | undefined) =>
-      n == null ? "—" : "$" + Number(n).toLocaleString("es-CO") + " COP";
+      n == null ? "—" : formatCOP(Number(n));
     const fmtPct = (n: number | null | undefined) =>
       n == null ? "—" : `${Number(n).toFixed(1)}%`;
     const fmtN = (n: number | null | undefined) =>

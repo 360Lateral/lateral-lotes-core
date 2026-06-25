@@ -35,6 +35,7 @@ import { MetricaOverview } from "@/components/ui/MetricaOverview";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCOP, formatCOPCompact, formatFecha } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { formatMetros } from "@/lib/format-moneda";
 
 // ---------- Subcomponents ----------
 
@@ -82,7 +83,7 @@ const TarjetaLoteDesbloqueado = ({ acceso }: { acceso: AccesoConDatos }) => {
         </div>
         <div className="text-xs text-muted-foreground">
           {acceso.area_total_m2
-            ? `${acceso.area_total_m2.toLocaleString("es-CO")} m²`
+            ? `${formatMetros(acceso.area_total_m2)}`
             : "—"}
           {acceso.estrato != null && ` · Estrato ${acceso.estrato}`}
           {acceso.tipo_lote && ` · ${acceso.tipo_lote}`}
@@ -366,7 +367,7 @@ const MiCuentaDesarrollador = () => {
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {l.area_total_m2
-                                ? `${l.area_total_m2.toLocaleString("es-CO")} m²`
+                                ? `${formatMetros(l.area_total_m2)}`
                                 : "—"}
                               {l.estrato != null && ` · Estrato ${l.estrato}`}
                             </p>

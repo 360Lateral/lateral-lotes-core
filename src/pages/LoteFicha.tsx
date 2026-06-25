@@ -16,7 +16,7 @@ import { generarPdfFicha } from "@/lib/generar-pdf-ficha";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
 import FichaBloquesExtra from "@/components/ficha/FichaBloquesExtra";
-import { formatCOP } from "@/lib/format-moneda";
+import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const PROD_BASE = "https://urbanix360.com";
 
@@ -148,7 +148,7 @@ const generarHtmlStandalone = (
   const filasDatos: string[] = [];
   if (mostrar("area"))
     filasDatos.push(
-      `<tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? Number(ficha.area_total_m2).toLocaleString("es-CO") + " m²" : "—"}</td></tr>`,
+      `<tr><td style="padding:8px 0;color:#6b7280;width:40%;">Área</td><td style="padding:8px 0;font-weight:600;">${ficha.area_total_m2 ? NumberformatMetros(ficha.area_total_m2) : "—"}</td></tr>`,
     );
   if (mostrar("uso"))
     filasDatos.push(
@@ -160,7 +160,7 @@ const generarHtmlStandalone = (
     );
   if (mostrar("precio") && ficha.precio_venta_estimado)
     filasDatos.push(
-      `<tr><td style="padding:8px 0;color:#6b7280;">Precio</td><td style="padding:8px 0;font-weight:600;">$${Number(ficha.precio_venta_estimado).toLocaleString("es-CO")} COP</td></tr>`,
+      `<tr><td style="padding:8px 0;color:#6b7280;">Precio</td><td style="padding:8px 0;font-weight:600;">${formatCOP(Number(ficha.precio_venta_estimado))}</td></tr>`,
     );
   if (mostrar("propietario") && ficha.propietario_nombre)
     filasDatos.push(
@@ -396,7 +396,7 @@ const LoteFicha = () => {
   const tirSeo = enriquecida?.financiero?.tir_pct ?? null;
   const seoDesc = `${
     data.area_total_m2
-      ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²`
+      ? `${formatMetros(Number(data.area_total_m2))}`
       : "Lote"
   } en ${data.ciudad ?? "Colombia"}${
     scorePromedio != null ? ` · Score ${scorePromedio.toFixed(1)}/10` : ""
@@ -632,7 +632,7 @@ const LoteFicha = () => {
               <h2 className="mb-3 text-lg font-semibold text-foreground">Datos del activo</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {mostrar("area") && (
-                  <DatoCard label="Área total" value={data.area_total_m2 ? `${Number(data.area_total_m2).toLocaleString("es-CO")} m²` : "—"} />
+                  <DatoCard label="Área total" value={data.area_total_m2 ? `${formatMetros(Number(data.area_total_m2))}` : "—"} />
                 )}
                 {mostrar("uso") && <DatoCard label="Uso / tipo" value={data.tipo_lote ?? "—"} />}
                 {mostrar("sector") && data.ciudad && <DatoCard label="Ciudad" value={data.ciudad} />}

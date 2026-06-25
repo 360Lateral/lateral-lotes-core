@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { formatCOP, formatNumero } from "@/lib/format-moneda";
 
 // ─── Opciones ──────────────────────────────────────────────────────────────
 const usosOptions = ["Cualquiera", "Residencial", "Comercial", "Industrial", "Rural"];
@@ -539,10 +540,10 @@ const DashboardDeveloper = () => {
                     Área: {a.area_min ? `${a.area_min} m²` : "—"} – {a.area_max ? `${a.area_max} m²` : "Sin límite"}
                   </p>
                   {a.precio_max_m2 && (
-                    <p>Precio máx/m²: ${Number(a.precio_max_m2).toLocaleString("es-CO")}</p>
+                    <p>Precio máx/m²: ${formatNumero(Number(a.precio_max_m2))}</p>
                   )}
                   {a.presupuesto_max && (
-                    <p>Presupuesto: {a.presupuesto_min ? `$${Number(a.presupuesto_min).toLocaleString("es-CO")} – ` : "Hasta "}${Number(a.presupuesto_max).toLocaleString("es-CO")}</p>
+                    <p>Presupuesto: {a.presupuesto_min ? `${formatCOP(Number(a.presupuesto_min))} – ` : "Hasta "}${formatNumero(Number(a.presupuesto_max))}</p>
                   )}
                   {a.estratos?.length > 0 && (
                     <p>Estratos: {a.estratos.join(", ")}</p>

@@ -8,6 +8,7 @@ import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
 import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
+import { formatMetros } from "@/lib/format-moneda";
 
 interface Props {
   lote: LoteUnificado | null;
@@ -118,7 +119,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
                 label="Área"
                 value={
                   lote.area_total_m2
-                    ? `${lote.area_total_m2.toLocaleString("es-CO")} m²`
+                    ? `${formatMetros(lote.area_total_m2)}`
                     : "—"
                 }
               />

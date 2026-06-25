@@ -39,6 +39,7 @@ import { useFiltroOpcionesDisponibles } from "@/hooks/useFiltroOpcionesDisponibl
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatoRelativo } from "@/lib/format";
+import { formatNumero } from "@/lib/format-moneda";
 
 const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
   { v: "todos", label: "Todos" },
@@ -502,12 +503,12 @@ const Dashboard = () => {
           )}
           {filtros.precioMin != null && (
             <ChipActivo onRemove={() => removerCampo("precioMin")}>
-              ≥ ${filtros.precioMin.toLocaleString("es-CO")}
+              ≥ ${formatNumero(filtros.precioMin)}
             </ChipActivo>
           )}
           {filtros.precioMax != null && (
             <ChipActivo onRemove={() => removerCampo("precioMax")}>
-              ≤ ${filtros.precioMax.toLocaleString("es-CO")}
+              ≤ ${formatNumero(filtros.precioMax)}
             </ChipActivo>
           )}
           {filtros.estratos?.map((e) => (
