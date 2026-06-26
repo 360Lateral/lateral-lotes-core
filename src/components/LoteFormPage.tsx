@@ -1,15 +1,5 @@
 import { useState, useEffect, ChangeEvent, useCallback, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useAutosaveBorrador } from "@/hooks/useAutosaveBorrador";
 import { useBloqueoNavegacionSPA } from "@/hooks/useBloqueoNavegacionSPA";
 import { FotoLote } from "@/components/lotes/FotoLote";
