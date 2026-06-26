@@ -10,6 +10,7 @@ import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import EngagementBannerLote from "@/components/lotes/EngagementBannerLote";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
