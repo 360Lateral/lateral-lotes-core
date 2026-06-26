@@ -50,11 +50,12 @@ interface Props {
   loteId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: (engagementId: string) => void;
 }
 
 const ESTADOS_VIGENTES = ["prospecto", "activo", "en_revision", "entregado"];
 
-const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
+const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props) => {
   const { user, roles } = useAuth();
   const isAsesor = roles.some((r) => ["experto", "admin", "super_admin"].includes(r));
   const [confirmDup, setConfirmDup] = useState(false);
@@ -223,6 +224,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange }: Props) => {
           "Pendiente de activación por un Super Admin. Las tareas se generarán al activarlo.",
       });
       onOpenChange(false);
+      if (result?.id) onCreated?.(result.id);
     } catch {
       /* handled in hook */
     }

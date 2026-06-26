@@ -10,6 +10,7 @@ import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import EngagementBannerLote from "@/components/lotes/EngagementBannerLote";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -418,6 +419,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
         {isEdit ? "Editar lote" : "Nuevo lote"}
       </h1>
+
+      <EngagementBannerLote loteId={isEdit ? id : undefined} canCreate={isAdminOrAsesor} />
+
+
 
       {mostrarDialogoRecuperar && borradorPendiente && (
         <Card className="mb-6 border-warning bg-warning/10">
