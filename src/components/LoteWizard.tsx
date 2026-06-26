@@ -495,6 +495,35 @@ const LoteWizard = () => {
         Publicar mi lote
       </h1>
 
+      {mostrarBannerDraft && draftInicial && (
+        <Card className="mb-6 border-warning bg-warning/10">
+          <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start">
+            <AlertCircle className="h-5 w-5 shrink-0 text-warning" />
+            <div className="flex-1">
+              <p className="font-body text-sm font-semibold text-foreground">
+                Tienes un borrador sin terminar
+              </p>
+              <p className="mt-1 font-body text-xs text-muted-foreground">
+                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Step{" "}
+                {draftInicial.step} de 4
+              </p>
+              <p className="mt-1 font-body text-xs text-muted-foreground">
+                Los archivos (fotos, video, documentos) NO se conservan — solo los datos digitados.
+              </p>
+            </div>
+            <div className="flex gap-2 sm:shrink-0">
+              <Button size="sm" onClick={continuarBorrador}>
+                Continuar borrador
+              </Button>
+              <Button size="sm" variant="outline" onClick={descartarBorrador}>
+                Empezar nuevo
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
