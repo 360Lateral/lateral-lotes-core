@@ -415,50 +415,71 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
   return (
     <DashboardLayout>
-      <AlertDialog open={mostrarDialogoRecuperar}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Tienes un borrador sin guardar</AlertDialogTitle>
-            <AlertDialogDescription>
-              Encontramos un borrador de este formulario guardado{" "}
-              {borradorPendiente?.guardadoEn
-                ? formatRelativeDate(borradorPendiente.guardadoEn)
-                : "recientemente"}
-              . ¿Quieres recuperarlo o empezar de cero?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                borrarBorrador();
-                setBorradorPendiente(null);
-                setMostrarDialogoRecuperar(false);
-                setYaInicializado(true);
-              }}
-            >
-              Empezar de cero
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (borradorPendiente?.data) {
-                  const recovered = { ...emptyForm, ...(borradorPendiente.data as Partial<LoteForm>) } as LoteForm;
-                  setForm(recovered);
-                  initialFormRef.current = emptyForm; // marcar como dirty para que se note que hay cambios sin guardar
-                }
-                setBorradorPendiente(null);
-                setMostrarDialogoRecuperar(false);
-                setYaInicializado(true);
-              }}
-            >
-              Recuperar borrador
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <h1 className="mb-6 font-body text-xl font-bold text-foreground">
         {isEdit ? "Editar lote" : "Nuevo lote"}
       </h1>
+
+      {mostrarDialogoRecuperar && borradorPendiente && (
+        <Card className="mb-6 border-warning bg-warning/10">
+          <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start">
+            <AlertCircle className="h-5 w-5 shrink-0 text-warning" />
+            <div className="flex-1">
+              <p className="font-body text-sm font-semibold text-foreground">
+                Tienes un borrador sin terminar
+              </p>
+              <p className="mt-1 font-body text-xs text-muted-foreground">
+                Encontramos un borrador de este formulario guardado{" "}
+                {borradorPendiente.guardadoEn
+                  ? formatRelativeDate(borradorPendiente.guardadoEn)
+                  : "recientemente"}
+                . ¿Quieres recuperarlo o empezar de cero?
+              </p>
+            </div>
+            <div className="flex items-start gap-2 sm:shrink-0">
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (borradorPendiente.data) {
+                    const recovered = { ...emptyForm, ...(borradorPendiente.data as Partial<LoteForm>) } as LoteForm;
+                    setForm(recovered);
+                    initialFormRef.current = emptyForm;
+                  }
+                  setBorradorPendiente(null);
+                  setMostrarDialogoRecuperar(false);
+                  setYaInicializado(true);
+                }}
+              >
+                Recuperar borrador
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  borrarBorrador();
+                  setBorradorPendiente(null);
+                  setMostrarDialogoRecuperar(false);
+                  setYaInicializado(true);
+                }}
+              >
+                Descartar borrador
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                title="Cerrar (mantiene el borrador para más tarde)"
+                onClick={() => {
+                  setMostrarDialogoRecuperar(false);
+                  setYaInicializado(true);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
 
       <form
         className="flex flex-col gap-6"
