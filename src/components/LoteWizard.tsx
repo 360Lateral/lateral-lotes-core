@@ -413,7 +413,10 @@ const LoteWizard = () => {
 
       return loteId;
     },
-    onSuccess: () => setPublished(true),
+    onSuccess: () => {
+      limpiarDraft();
+      setPublished(true);
+    },
     onError: (err: any) =>
       toast({
         title: "Error al publicar",
