@@ -47,7 +47,7 @@ const STEPS = [
   { num: 4, label: "Fotos y documentos" },
 ];
 
-interface WizardForm {
+export interface WizardForm {
   // Step 1
   nombre_lote: string;
   nombre_propietario: string;
