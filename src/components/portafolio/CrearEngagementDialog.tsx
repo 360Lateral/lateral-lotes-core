@@ -50,6 +50,7 @@ interface Props {
   loteId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: (engagementId: string) => void;
 }
 
 const ESTADOS_VIGENTES = ["prospecto", "activo", "en_revision", "entregado"];
