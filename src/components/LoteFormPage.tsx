@@ -419,6 +419,10 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
         {isEdit ? "Editar lote" : "Nuevo lote"}
       </h1>
 
+      <EngagementBannerLote loteId={isEdit ? id : undefined} canCreate={isAdminOrAsesor} />
+
+
+
       {mostrarDialogoRecuperar && borradorPendiente && (
         <Card className="mb-6 border-warning bg-warning/10">
           <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start">
