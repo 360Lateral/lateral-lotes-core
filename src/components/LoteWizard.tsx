@@ -116,9 +116,28 @@ interface DocFile {
 }
 
 const LoteWizard = () => {
+/**
+ * Wizard de creación de lotes.
+ *
+ * PERSISTENCIA:
+ *   El form se guarda automáticamente en localStorage (debounce 400ms) por usuario.
+ *   Si el usuario sale a otra ruta y vuelve, encuentra el draft con un banner
+ *   "Continuar borrador / Empezar nuevo".
+ *
+ *   IMPORTANTE: los archivos (fotos, video, documentos) NO se persisten porque
+ *   los File objects no son serializables a JSON. El usuario debe re-seleccionarlos.
+ *
+ *   El draft se limpia automáticamente al crear el lote exitosamente o al click
+ *   "Empezar nuevo".
+ *
+ *   Key de localStorage: `lote-wizard-draft-{userId}` (per-user para evitar
+ *   mezclas en navegadores compartidos).
+ */
+const LoteWizard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { draftInicial, draftCargado, guardarDraft, limpiarDraft } = useLoteWizardDraft();
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<WizardForm>(emptyWizard);
@@ -130,7 +149,58 @@ const LoteWizard = () => {
   const [videoMode, setVideoMode] = useState<"upload" | "link">("upload");
   const [docs, setDocs] = useState<DocFile[]>([]);
   const [published, setPublished] = useState(false);
+  const [mostrarBannerDraft, setMostrarBannerDraft] = useState(false);
 
+  // Mostrar banner si encontramos un draft al montar
+  useEffect(() => {
+    if (draftCargado && draftInicial) setMostrarBannerDraft(true);
+  }, [draftCargado, draftInicial]);
+
+  const continuarBorrador = () => {
+    if (draftInicial) {
+      setStep(draftInicial.step);
+      setForm(draftInicial.form);
+      setPublished(draftInicial.published);
+      setVideoMode(draftInicial.videoMode);
+      setVideoUrl(draftInicial.videoUrl);
+    }
+    setMostrarBannerDraft(false);
+  };
+
+  const descartarBorrador = () => {
+    limpiarDraft();
+    setMostrarBannerDraft(false);
+  };
+
+  // Autosave (debounced en el hook). No guardar antes de cargar ni mientras
+  // el banner está visible (el usuario aún no decidió).
+  useEffect(() => {
+    if (!draftCargado || mostrarBannerDraft || published) return;
+    guardarDraft({ step, form, published, videoMode, videoUrl });
+  }, [
+    step,
+    form,
+    published,
+    videoMode,
+    videoUrl,
+    draftCargado,
+    mostrarBannerDraft,
+    guardarDraft,
+  ]);
+
+  // Aviso defensivo al cerrar pestaña si hay datos digitados
+  useEffect(() => {
+    const hayDatos = Boolean(
+      form.nombre_lote || form.area_total_m2 || form.departamento
+    );
+    if (!hayDatos || published) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [form, published]);
 
   const update = (key: keyof WizardForm, value: any) =>
     setForm((p) => ({ ...p, [key]: value }));
