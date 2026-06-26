@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, Loader2, Lock, Sparkles, Plus, X } from "lucide-react";
+import { ImagePlus, Trash2, FileText, Scale, Leaf, Zap, Mountain, TrendingUp, Building2, Calculator, CheckCircle2, Clock, ExternalLink, Loader2, Lock, Sparkles, Plus, X, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog";
 import { useAccesosManualesLote } from "@/hooks/admin/useAccesosManualesLote";
