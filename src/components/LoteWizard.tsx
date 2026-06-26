@@ -1,4 +1,6 @@
-import { useState, useMemo, ChangeEvent, useCallback } from "react";
+import { useState, useMemo, useEffect, ChangeEvent, useCallback } from "react";
+import { useLoteWizardDraft, formatRelativoDraft } from "@/hooks/wizard/useLoteWizardDraft";
+import { AlertCircle } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
