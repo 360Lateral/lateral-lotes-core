@@ -224,6 +224,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
           "Pendiente de activación por un Super Admin. Las tareas se generarán al activarlo.",
       });
       onOpenChange(false);
+      if (result?.id) onCreated?.(result.id);
     } catch {
       /* handled in hook */
     }
