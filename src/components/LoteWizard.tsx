@@ -115,7 +115,6 @@ interface DocFile {
   categoria: string;
 }
 
-const LoteWizard = () => {
 /**
  * Wizard de creación de lotes.
  *
