@@ -7,7 +7,7 @@ import { Landmark } from "lucide-react";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { extractFotoPath } from "@/lib/foto-storage";
 
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 interface LoteCardProps {
@@ -41,19 +41,17 @@ const estadoBadgeVariant = (estado: string) => {
 };
 
 const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, score_juridico, score_normativo, score_servicios, uso_principal, has_resolutoria, foto_url }: LoteCardProps) => {
-  const { data: mapsKey } = useGoogleMapsKey();
   const hasCoords = lat != null && lng != null;
-  const staticMapUrl = hasCoords && mapsKey
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=400x176&scale=2&maptype=hybrid&markers=color:0x1D3461%7C${lat},${lng}&key=${mapsKey}`
-    : null;
   const isBucketFoto = !!foto_url && !!extractFotoPath(foto_url) && foto_url.includes("fotos-lotes");
 
   return (
   <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
     {isBucketFoto ? (
       <FotoLote url={foto_url} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" fallbackClassName="h-24 w-full" />
-    ) : foto_url || staticMapUrl ? (
-      <img src={(foto_url || staticMapUrl)!} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" />
+    ) : foto_url ? (
+      <img src={foto_url} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" />
+    ) : hasCoords ? (
+      <MapaEstaticoLote lat={lat} lng={lng} nombre={nombre} className="h-24 w-full object-cover" />
     ) : (
       <div className="flex h-24 items-center justify-center bg-secondary">
         <Logo variant="on-navy" className="opacity-40" />
