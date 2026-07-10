@@ -11,7 +11,7 @@ const Footer = () => {
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="mx-auto w-full max-w-6xl px-4 py-14">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Columna marca */}
           <div className="lg:col-span-1">
             <Logo variant="on-navy" />
