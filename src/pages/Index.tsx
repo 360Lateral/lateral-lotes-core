@@ -470,15 +470,39 @@ const Index = () => {
 
       {renderHero()}
 
-      {/* Trust bar */}
-      <section className="border-b border-border bg-background py-10">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
-          <TrustStat icon={MapPin} value={trustStats[0]?.value ?? "—"} label={trustStats[0]?.label ?? "Lotes disponibles"} />
-          <TrustStat icon={Building2} value={trustStats[1]?.value ?? "—"} label={trustStats[1]?.label ?? "Municipios"} />
-          <TrustStat icon={FileCheck} value={trustStats[2]?.value ?? "—"} label={trustStats[2]?.label ?? "Diagnósticos"} />
-          <TrustStat icon={Award} value={trustStats[3]?.value ?? "—"} label={trustStats[3]?.label ?? "Resolutorías"} />
-        </div>
-      </section>
+      {/* Trust bar — hidden until real numbers exist */}
+      {(() => {
+        const hasRealData = trustStats.some((s) => {
+          const n = parseInt(s.value, 10);
+          return !isNaN(n) && n > 0;
+        });
+        if (hasRealData) {
+          return (
+            <section className="border-b border-border bg-background py-10">
+              <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
+                <TrustStat icon={MapPin} value={trustStats[0]?.value ?? "—"} label={trustStats[0]?.label ?? "Lotes disponibles"} />
+                <TrustStat icon={Building2} value={trustStats[1]?.value ?? "—"} label={trustStats[1]?.label ?? "Municipios"} />
+                <TrustStat icon={FileCheck} value={trustStats[2]?.value ?? "—"} label={trustStats[2]?.label ?? "Diagnósticos"} />
+                <TrustStat icon={Award} value={trustStats[3]?.value ?? "—"} label={trustStats[3]?.label ?? "Resolutorías"} />
+              </div>
+            </section>
+          );
+        }
+        if (user) return null;
+        return (
+          <section className="border-b border-border bg-gradient-to-r from-secondary/[0.04] via-primary/[0.06] to-secondary/[0.04] py-8">
+            <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-3 px-4 text-center sm:flex-row sm:gap-4">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-1 font-body text-[11px] font-bold uppercase tracking-wider text-primary">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                Plataforma en lanzamiento
+              </span>
+              <p className="font-body text-sm text-foreground/80 sm:text-base">
+                Sé de los primeros en publicar tu lote y conectarte con desarrolladores calificados.
+              </p>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Cómo funciona — only for non-logged users */}
       {!user && (
