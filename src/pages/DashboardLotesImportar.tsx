@@ -92,6 +92,10 @@ const DashboardLotesImportar = () => {
   const [dragOver, setDragOver] = useState(false);
 
   const processFile = useCallback(async (file: File) => {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("El archivo supera el tamaño máximo permitido (10 MB)");
+      return;
+    }
     setFileName(file.name);
     setResult(null);
 
