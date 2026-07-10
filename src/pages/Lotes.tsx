@@ -161,6 +161,7 @@ const Lotes = () => {
               <input
                 id="google-places-search"
                 type="text"
+                aria-label="Buscar por ubicación"
                 placeholder="Buscar por dirección, barrio o municipio..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
@@ -168,6 +169,7 @@ const Lotes = () => {
               />
               {searchText && (
                 <button
+                  aria-label="Limpiar búsqueda"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   onClick={() => {
                     setSearchText("");

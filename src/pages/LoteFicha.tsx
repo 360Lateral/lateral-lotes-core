@@ -485,49 +485,49 @@ const LoteFicha = () => {
           {/* Resumen ejecutivo: Score 360° + Valoración + Viabilidad */}
           {(scorePromedio != null || valoracion != null || scoreViabilidad != null) && (
             <section className="mb-6">
-              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 md:p-6">
+              <Card className="border-success/30 bg-success/10 p-5 md:p-6">
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6 text-center">
                   <div>
-                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Score 360°</p>
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-success">Score 360°</p>
                     {scorePromedio != null ? (
                       <>
-                        <p className="font-display text-3xl font-bold text-emerald-900 md:text-4xl">
+                        <p className="font-display text-3xl font-bold text-foreground md:text-4xl">
                           {scorePromedio.toFixed(1)}
-                          <span className="text-xl text-emerald-600 md:text-2xl">/10</span>
+                          <span className="text-xl text-success md:text-2xl">/10</span>
                         </p>
-                        <p className="mt-0.5 text-[11px] text-emerald-700">
+                        <p className="mt-0.5 text-[11px] text-success">
                           Promedio de {enriquecida?.analisisCompletados ?? 0} análisis
                         </p>
                       </>
                     ) : (
-                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                      <p className="font-display text-3xl font-bold text-muted-foreground/40">—</p>
                     )}
                   </div>
-                  <div className="border-t border-emerald-200 pt-4 md:border-l md:border-r md:border-t-0 md:pt-0">
-                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Valoración estimada</p>
+                  <div className="border-t border-success/30 pt-4 md:border-l md:border-r md:border-t-0 md:pt-0">
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-success">Valoración estimada</p>
                     {valoracion != null ? (
                       <>
-                        <p className="font-display text-2xl font-bold text-emerald-900 md:text-3xl">
+                        <p className="font-display text-2xl font-bold text-foreground md:text-3xl">
                           {formatCOP(Number(valoracion))}
                         </p>
-                        <p className="mt-0.5 text-[11px] text-emerald-700">Basado en análisis financiero</p>
+                        <p className="mt-0.5 text-[11px] text-success">Basado en análisis financiero</p>
                       </>
                     ) : (
-                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                      <p className="font-display text-3xl font-bold text-muted-foreground/40">—</p>
                     )}
                   </div>
-                  <div className="border-t border-emerald-200 pt-4 md:border-t-0 md:pt-0">
-                    <p className="mb-1 text-[10px] uppercase tracking-wide text-emerald-700">Score de viabilidad</p>
+                  <div className="border-t border-success/30 pt-4 md:border-t-0 md:pt-0">
+                    <p className="mb-1 text-[10px] uppercase tracking-wide text-success">Score de viabilidad</p>
                     {scoreViabilidad != null ? (
                       <>
-                        <p className="font-display text-3xl font-bold text-emerald-900 md:text-4xl">
+                        <p className="font-display text-3xl font-bold text-foreground md:text-4xl">
                           {scoreViabilidad.toFixed(1)}
-                          <span className="text-xl text-emerald-600 md:text-2xl">/10</span>
+                          <span className="text-xl text-success md:text-2xl">/10</span>
                         </p>
-                        <p className="mt-0.5 text-[11px] text-emerald-700">Indicador de potencial</p>
+                        <p className="mt-0.5 text-[11px] text-success">Indicador de potencial</p>
                       </>
                     ) : (
-                      <p className="font-display text-3xl font-bold text-emerald-900/40">—</p>
+                      <p className="font-display text-3xl font-bold text-muted-foreground/40">—</p>
                     )}
                   </div>
                 </div>
@@ -669,7 +669,7 @@ const LoteFicha = () => {
                 Para más información sobre este activo, contacta a 360Lateral.
               </p>
               <p className="text-xs text-muted-foreground">
-                contacto@urbanix360.com · urbanix360.com
+                contacto@360lateral.com · urbanix360.com
               </p>
               <div className="mt-3 flex justify-center">
                 <Logo />

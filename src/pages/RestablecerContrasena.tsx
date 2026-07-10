@@ -136,6 +136,7 @@ const RestablecerContrasena = () => {
                 <Input
                   id="new-password"
                   type="password"
+                  autoComplete="new-password"
                   placeholder="Mínimo 8 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -151,6 +152,7 @@ const RestablecerContrasena = () => {
                 <Input
                   id="confirm-password"
                   type="password"
+                  autoComplete="new-password"
                   placeholder="Repite la contraseña"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}

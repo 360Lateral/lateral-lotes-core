@@ -34,8 +34,7 @@ class ErrorBoundary extends Component<Props, State> {
             </button>
             <a
               href="/"
-              className="rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
-              style={{ backgroundColor: "#E8951A", color: "#0f1d3a" }}
+              className="rounded-lg px-5 py-2.5 text-sm font-medium bg-orange text-navy transition-colors"
             >
               Ir al inicio
             </a>

@@ -403,7 +403,7 @@ const Planes = () => {
               <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild variant="default">
                   <a
-                    href="https://wa.me/573000000000"
+                    href="https://wa.me/573103931112"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

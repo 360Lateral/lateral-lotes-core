@@ -5,13 +5,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const SCORE_CONFIG: Record<number, { color: string; text: string }> = {
-  1: { color: "#2ecc71", text: "Favorable" },
-  2: { color: "#f39c12", text: "Requiere revisión" },
-  3: { color: "#e74c3c", text: "Tiene observaciones" },
+const SCORE_CONFIG: Record<
+  number,
+  { dotClass: string; textClass: string; text: string }
+> = {
+  1: { dotClass: "bg-success", textClass: "text-success", text: "Favorable" },
+  2: { dotClass: "bg-warning", textClass: "text-warning", text: "Requiere revisión" },
+  3: { dotClass: "bg-destructive", textClass: "text-destructive", text: "Tiene observaciones" },
 };
 
-const NULL_CONFIG = { color: "#9ca3af", text: "Sin información aún" };
+const NULL_CONFIG = {
+  dotClass: "bg-muted-foreground",
+  textClass: "text-muted-foreground",
+  text: "Sin información aún",
+};
 
 interface ScoreIndicatorProps {
   score: number | null;
@@ -27,19 +34,13 @@ const ScoreIndicator = ({ score, label, emoji, size = "sm" }: ScoreIndicatorProp
   const content = (
     <div className={`flex items-center gap-1.5 ${size === "lg" ? "gap-2" : ""}`}>
       <span className="text-xs">{emoji}</span>
-      <span
-        className={`shrink-0 rounded-full ${dotSize}`}
-        style={{ backgroundColor: config.color }}
-      />
+      <span className={`shrink-0 rounded-full ${dotSize} ${config.dotClass}`} />
       <div className={size === "lg" ? "flex flex-col" : ""}>
         <span className={`font-body ${size === "sm" ? "text-[10px]" : "text-xs font-semibold"} text-muted-foreground`}>
           {label}
         </span>
         {size === "lg" && (
-          <span
-            className="font-body text-xs"
-            style={{ color: config.color }}
-          >
+          <span className={`font-body text-xs ${config.textClass}`}>
             {config.text}
           </span>
         )}

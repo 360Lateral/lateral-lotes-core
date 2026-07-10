@@ -187,6 +187,7 @@ const DashboardLotes = () => {
            tipo_lote, lat, lng, foto_url, precio_venta_estimado, created_at,
            fotos_lotes(url, orden)`
         )
+        .neq("estado_publicacion", "retirado")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as LoteRow[];
@@ -226,16 +227,19 @@ const DashboardLotes = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("lotes").delete().eq("id", id);
+      const { error } = await supabase
+        .from("lotes")
+        .update({ estado_publicacion: "retirado" })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: "Lote eliminado correctamente" });
+      toast({ title: "Lote archivado correctamente" });
       queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
       setDeleteId(null);
     },
     onError: (err: any) => {
-      toast({ title: "Error al eliminar", description: err.message, variant: "destructive" });
+      toast({ title: "Error al archivar", description: err.message, variant: "destructive" });
       setDeleteId(null);
     },
   });
@@ -419,7 +423,10 @@ const DashboardLotes = () => {
   const handleArchivarMultipleConfirm = async () => {
     const ids = Array.from(seleccionados);
     try {
-      const { error } = await supabase.from("lotes").delete().in("id", ids);
+      const { error } = await supabase
+        .from("lotes")
+        .update({ estado_publicacion: "retirado" })
+        .in("id", ids);
       if (error) throw error;
       toast({ title: `${ids.length} lote${ids.length === 1 ? "" : "s"} archivado${ids.length === 1 ? "" : "s"}` });
       setSeleccionados(new Set());
@@ -875,7 +882,7 @@ const DashboardLotes = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar lote?</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás a punto de archivar <strong>{deleteName}</strong>. Esta acción no se puede deshacer y eliminará también sus datos asociados.
+              Vas a archivar <strong>{deleteName}</strong>. El lote dejará de estar visible en tus listados activos y en el catálogo público. Podrás recuperarlo más adelante cambiando su estado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -896,7 +903,7 @@ const DashboardLotes = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar {seleccionados.size} lote{seleccionados.size === 1 ? "" : "s"}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará los lotes seleccionados junto con sus datos asociados. No se puede deshacer.
+              Los lotes seleccionados dejarán de estar visibles en tus listados activos y en el catálogo público. Podrás recuperarlos más adelante cambiando su estado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -16,9 +16,6 @@ const perfiles: {
   titulo: string;
   descripcion: string;
   beneficios: string[];
-  accentClass: string;
-  borderClass: string;
-  checkClass: string;
 }[] = [
   {
     id: "propietario",
@@ -30,9 +27,6 @@ const perfiles: {
       "Conexión con desarrolladores calificados",
       "Resultoría 360° para viabilizar tu predio",
     ],
-    accentClass: "border-orange text-orange",
-    borderClass: "hover:border-orange",
-    checkClass: "text-orange",
   },
   {
     id: "comisionista",
@@ -44,9 +38,6 @@ const perfiles: {
       "Deberás subir un documento de autorización",
       "Conecta con compradores calificados",
     ],
-    accentClass: "border-emerald-500 text-emerald-500",
-    borderClass: "hover:border-emerald-500",
-    checkClass: "text-emerald-500",
   },
   {
     id: "desarrollador",
@@ -58,9 +49,6 @@ const perfiles: {
       "Score de viabilidad jurídica y técnica",
       "Alertas cuando aparezcan lotes de mi interés",
     ],
-    accentClass: "border-blue-500 text-blue-500",
-    borderClass: "hover:border-blue-500",
-    checkClass: "text-blue-500",
   },
 ];
 
@@ -105,7 +93,7 @@ const Bienvenida = () => {
       <h1 className="mb-2 text-center font-body text-3xl font-bold text-white md:text-4xl">
         ¿Cómo quieres usar 360 Lateral?
       </h1>
-      <p className="mb-10 text-center font-body text-base text-gray-300">
+      <p className="mb-10 text-center font-body text-base text-white/70">
         Elige tu perfil para personalizar tu experiencia
       </p>
 
@@ -119,21 +107,20 @@ const Bienvenida = () => {
             <button
               key={perfil.id}
               onClick={() => setSelected(perfil.id)}
-              className={`group flex cursor-pointer flex-col items-start rounded-xl border-2 bg-white/5 p-6 text-left backdrop-blur-sm transition-all ${
+              className={`group relative flex cursor-pointer flex-col items-start rounded-xl border-2 bg-white/5 p-6 text-left backdrop-blur-sm transition-all ${
                 isSelected
-                  ? perfil.accentClass
-                  : `border-white/10 ${perfil.borderClass}`
+                  ? "border-orange text-orange"
+                  : "border-white/10 hover:border-orange"
               }`}
             >
+              {isSelected && (
+                <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-orange px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <Check size={12} /> Seleccionado
+                </span>
+              )}
               <div
                 className={`mb-4 flex h-14 w-14 items-center justify-center rounded-lg ${
-                  isSelected
-                    ? perfil.id === "propietario"
-                      ? "bg-orange/20 text-orange"
-                      : perfil.id === "comisionista"
-                      ? "bg-emerald-500/20 text-emerald-500"
-                      : "bg-blue-500/20 text-blue-500"
-                    : "bg-white/10 text-white/60"
+                  isSelected ? "bg-orange/20 text-orange" : "bg-white/10 text-white/60"
                 }`}
               >
                 <Icon size={28} />
@@ -142,17 +129,14 @@ const Bienvenida = () => {
               <h2 className="mb-1 font-body text-xl font-bold text-white">
                 {perfil.titulo}
               </h2>
-              <p className="mb-4 font-body text-sm text-gray-300">
+              <p className="mb-4 font-body text-sm text-white/70">
                 {perfil.descripcion}
               </p>
 
               <ul className="space-y-2">
                 {perfil.beneficios.map((b) => (
-                  <li key={b} className="flex items-start gap-2 font-body text-sm text-gray-200">
-                    <Check
-                      size={16}
-                      className={`mt-0.5 shrink-0 ${perfil.checkClass}`}
-                    />
+                  <li key={b} className="flex items-start gap-2 font-body text-sm text-white/80">
+                    <Check size={16} className="mt-0.5 shrink-0 text-orange" />
                     {b}
                   </li>
                 ))}
@@ -176,7 +160,7 @@ const Bienvenida = () => {
       {/* Back link */}
       <a
         href="/"
-        className="mt-6 font-body text-sm text-gray-400 underline transition-colors hover:text-white"
+        className="mt-6 font-body text-sm text-white/60 underline transition-colors hover:text-white"
       >
         ← Volver al inicio
       </a>

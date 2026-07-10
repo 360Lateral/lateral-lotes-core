@@ -214,6 +214,7 @@ const Login = () => {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 placeholder="tu@correo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -228,6 +229,7 @@ const Login = () => {
               <Input
                 id="password"
                 type="password"
+                autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -273,6 +275,7 @@ const Login = () => {
               <Input
                 id="reg-email"
                 type="email"
+                autoComplete="email"
                 placeholder="tu@correo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -287,6 +290,7 @@ const Login = () => {
               <Input
                 id="reg-password"
                 type="password"
+                autoComplete="new-password"
                 placeholder="Mínimo 6 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

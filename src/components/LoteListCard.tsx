@@ -40,7 +40,7 @@ const LoteListCard = ({ lote, onMouseEnter, onMouseLeave, onClick }: Props) => (
             {lote.nombre_lote}
           </p>
           {esReciente(lote.created_at) && (
-            <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4 gap-0.5">
+            <Badge className="bg-success hover:bg-success text-primary-foreground text-[9px] px-1.5 py-0 h-4 gap-0.5">
               <Sparkles className="h-2.5 w-2.5" /> Nuevo
             </Badge>
           )}
