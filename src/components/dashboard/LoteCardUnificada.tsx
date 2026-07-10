@@ -49,7 +49,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   return (
     <article
       onClick={onClick}
-      className={`group relative cursor-pointer overflow-hidden rounded-md border border-border border-l-4 bg-background transition-shadow hover:shadow-md ${colorBordeIzq(
+      className={`group relative cursor-pointer overflow-hidden rounded-lg border border-border border-l-4 bg-background transition-shadow hover:shadow-md ${colorBordeIzq(
         lote,
       )} ${selected ? "ring-2 ring-primary" : ""}`}
     >
