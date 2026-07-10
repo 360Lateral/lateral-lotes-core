@@ -189,7 +189,7 @@ async function consultarCapa(
   campos: string,
   cookies: string,
 ): Promise<any> {
-  const url = `${EP.consultas}?cbml=${cbml}&consulta=${consulta}&campos=${encodeURIComponent(campos)}`;
+  const url = `${EP.consultas}?cbml=${encodeURIComponent(cbml)}&consulta=${consulta}&campos=${encodeURIComponent(campos)}`;
   try {
     const resp = await fetch(url, {
       method: "POST",
