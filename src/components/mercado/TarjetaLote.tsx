@@ -95,7 +95,7 @@ const TarjetaLote = ({ lote }: Props) => {
               </Badge>
             )}
             {lote.score_360 != null && (
-              <Badge className="bg-emerald-600 text-white gap-1 text-xs">
+              <Badge className="bg-success text-primary-foreground gap-1 text-xs">
                 <Star className="h-3 w-3" />
                 Score {Number(lote.score_360).toFixed(1)}
               </Badge>
