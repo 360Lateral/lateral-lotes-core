@@ -50,7 +50,7 @@ const AsistenteChat = ({ loteId }: Props) => {
 
     try {
       const { data, error } = await supabase.functions.invoke("chat-lote", {
-        body: { messages: updated, loteContext },
+        body: { messages: updated, lote_id: loteId },
       });
 
       if (error) throw error;
