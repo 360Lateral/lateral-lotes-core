@@ -53,9 +53,31 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const { messages, loteContext } = await req.json();
+    const { messages, lote_id } = await req.json();
+    if (!lote_id || typeof lote_id !== "string") {
+      return new Response(JSON.stringify({ error: "lote_id requerido" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    const systemPrompt = `Eres el Asistente 360°, especialista en análisis de lotes en Colombia. Responde siempre en español, de forma clara y concisa. Tienes acceso a esta información del lote: ${JSON.stringify(loteContext)}. Responde solo sobre este lote. Si te preguntan algo que no está en los datos, sugiere solicitar la Resolutoría 360° completa. No inventes información. Máximo 3 párrafos cortos por respuesta.`;
+    // Fetch lote using caller's JWT so RLS decides access
+    const supabaseUser = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } },
+    );
+    const { data: lote, error: loteErr } = await supabaseUser
+      .from("lotes")
+      .select("nombre_lote, ciudad, departamento, area_total_m2, notas, score_juridico, score_normativo, score_servicios")
+      .eq("id", lote_id)
+      .maybeSingle();
+    if (loteErr || !lote) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const systemPrompt = `Eres el Asistente 360°, especialista en análisis de lotes en Colombia. Responde siempre en español, de forma clara y concisa. Tienes acceso a esta información del lote: ${JSON.stringify(lote)}. Responde solo sobre este lote. Si te preguntan algo que no está en los datos, sugiere solicitar la Resolutoría 360° completa. No inventes información. Máximo 3 párrafos cortos por respuesta.`;
 
     const aiMessages = messages.map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "assistant" : "user",
