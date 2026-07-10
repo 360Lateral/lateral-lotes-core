@@ -18,7 +18,9 @@ import {
   SlidersHorizontal,
   X,
   Building2,
+  MapPin,
 } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
@@ -671,9 +673,14 @@ const Dashboard = () => {
         </div>
       ) : vista === "por_propietario" ? (
         propietarios.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
-            No hay propietarios con activos.
-          </div>
+          <EmptyState
+            icon={Users}
+            titulo="Sin propietarios con activos"
+            descripcion="Aún no hay propietarios asociados a lotes. Crea o asigna lotes para verlos agrupados aquí."
+            ctaLabel="Nuevo lote"
+            ctaTo="/dashboard/lotes/nuevo"
+            ctaVariant="default"
+          />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {propietarios.map((p) => (
@@ -689,9 +696,14 @@ const Dashboard = () => {
           </div>
         )
       ) : lotes.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border bg-background py-12 text-center text-sm text-muted-foreground">
-          No hay lotes que coincidan con tus filtros.
-        </div>
+        <EmptyState
+          icon={MapPin}
+          titulo="No hay lotes que coincidan"
+          descripcion="Ajusta o limpia los filtros para ver más resultados, o crea un nuevo lote."
+          ctaLabel="Nuevo lote"
+          ctaTo="/dashboard/lotes/nuevo"
+          ctaVariant="default"
+        />
       ) : vista === "grid" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {lotes.map((l) => (

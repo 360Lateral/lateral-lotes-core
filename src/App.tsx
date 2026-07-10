@@ -32,7 +32,7 @@ const DashboardNotificaciones = lazy(() => import("./pages/DashboardNotificacion
 const DashboardNegociaciones = lazy(() => import("./pages/DashboardNegociaciones"));
 const SalaNegociacion = lazy(() => import("./pages/SalaNegociacion"));
 const Diagnostico = lazy(() => import("./pages/Diagnostico"));
-const DiagnosticoResultado = lazy(() => import("./pages/DiagnosticoResultado"));
+
 const Mercado = lazy(() => import("./pages/Mercado"));
 const Resolutoria = lazy(() => import("./pages/Resolutoria"));
 const Planes = lazy(() => import("./pages/Planes"));
@@ -119,7 +119,7 @@ const App = () => (
             <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
             <Route path="/bienvenida" element={<Bienvenida />} />
             <Route path="/diagnostico" element={<Diagnostico />} />
-            <Route path="/diagnostico/resultado" element={<DiagnosticoResultado />} />
+            
             <Route path="/mercado" element={<Mercado />} />
             <Route path="/resolutoria" element={<Resolutoria />} />
             <Route path="/planes" element={<Planes />} />

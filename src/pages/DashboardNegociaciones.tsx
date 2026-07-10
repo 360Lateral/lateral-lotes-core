@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Handshake } from "lucide-react";
+import { Handshake, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -84,6 +84,8 @@ const DashboardNegociaciones = () => {
                 <th className="pb-2">Fecha</th>
                 <th className="pb-2">Estado</th>
                 <th className="pb-2">Contacto</th>
+                <th className="pb-2 w-8" aria-label="Abrir" />
+
               </tr>
             </thead>
             <tbody>
@@ -118,6 +120,9 @@ const DashboardNegociaciones = () => {
                       checked={n.contacto_visible}
                       onCheckedChange={(val) => updateNeg.mutate({ negId: n.id, updates: { contacto_visible: val } })}
                     />
+                  </td>
+                  <td className="py-3 text-right text-muted-foreground">
+                    <ChevronRight className="ml-auto h-4 w-4" aria-hidden="true" />
                   </td>
                 </tr>
               ))}

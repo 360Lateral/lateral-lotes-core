@@ -130,6 +130,11 @@ const Diagnostico = () => {
       setEstimacion({ min, avg, max, count: values.length });
     } catch {
       setEstimacion(null);
+      toast({
+        title: "No pudimos calcular la estimación",
+        description: "Intenta de nuevo en unos segundos.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

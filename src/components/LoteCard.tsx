@@ -49,7 +49,7 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
   const isBucketFoto = !!foto_url && !!extractFotoPath(foto_url) && foto_url.includes("fotos-lotes");
 
   return (
-  <div className="flex flex-col overflow-hidden rounded-lg border border-gray-light bg-card">
+  <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
     {isBucketFoto ? (
       <FotoLote url={foto_url} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" fallbackClassName="h-24 w-full" />
     ) : foto_url || staticMapUrl ? (
@@ -79,7 +79,7 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
           </span>
         )}
         {has_resolutoria && (
-          <span className="inline-flex items-center gap-1 rounded bg-[#2ecc71]/15 px-2 py-0.5 font-body text-xs font-medium text-[#2ecc71]">
+          <span className="inline-flex items-center gap-1 rounded bg-success/15 px-2 py-0.5 font-body text-xs font-medium text-success">
             ✓ Norma 360° Verificada
           </span>
         )}
