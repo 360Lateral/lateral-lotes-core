@@ -74,7 +74,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop nav links */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -87,7 +87,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop right side */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           {loading ? null : user ? (
             <>
               <span className="font-body text-sm text-secondary-foreground">
@@ -121,7 +121,7 @@ const Navbar = () => {
 
         {/* Mobile hamburger */}
         <button
-          className="text-secondary-foreground md:hidden"
+          className="text-secondary-foreground lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Menú"
         >
