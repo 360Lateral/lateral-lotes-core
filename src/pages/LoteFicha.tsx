@@ -20,6 +20,15 @@ import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const PROD_BASE = "https://urbanix360.com";
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const FechaHoy = () =>
   new Date().toLocaleDateString("es-CO", {
     year: "numeric",
@@ -177,11 +186,11 @@ const generarHtmlStandalone = (
     : "";
 
   const tituloBloque = titulo
-    ? `<div style="background:#fff7ed;border-left:4px solid #F5A623;padding:10px 14px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;font-size:15px;font-weight:600;color:#1a2744;">${titulo}</p></div>`
+    ? `<div style="background:#fff7ed;border-left:4px solid #F5A623;padding:10px 14px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;font-size:15px;font-weight:600;color:#1a2744;">${escapeHtml(titulo)}</p></div>`
     : "";
 
   const notaBloque = nota
-    ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:12px 14px;margin-bottom:20px;border-radius:8px;"><p style="margin:0;font-size:14px;color:#374151;white-space:pre-wrap;">${nota}</p></div>`
+    ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:12px 14px;margin-bottom:20px;border-radius:8px;"><p style="margin:0;font-size:14px;color:#374151;white-space:pre-wrap;">${escapeHtml(nota)}</p></div>`
     : "";
 
   const contactoBloque = mostrar("contacto")

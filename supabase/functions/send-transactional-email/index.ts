@@ -23,6 +23,23 @@ const SENDER_DOMAIN = "notify.notify.360lateral.com"
 const FROM_NAME: string = Deno.env.get("EMAIL_FROM_NAME") ?? "Notificaciones · 360Lateral"
 const FROM_ADDRESS: string = Deno.env.get("EMAIL_FROM_ADDRESS") ?? "noreply@notify.360lateral.com"
 
+// Parse a JWT and return its claims, or null if unparseable.
+function parseJwtClaims(token: string): Record<string, unknown> | null {
+  const parts = token.split('.')
+  if (parts.length < 2) {
+    return null
+  }
+  try {
+    const payload = parts[1]
+      .replaceAll('-', '+')
+      .replaceAll('_', '/')
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=')
+    return JSON.parse(atob(payload)) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
   const bytes = new Uint8Array(32)
@@ -32,15 +49,78 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// verify_jwt = true only checks that a JWT is well-formed; the public anon
+// key is a valid JWT, so any caller with the anon key would otherwise be
+// able to trigger email sends. Enforce explicit authorization below.
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
+
+  // ---- Authorization ---------------------------------------------------
+  // Allowed callers:
+  //   1. Server-to-server invocations using the service_role JWT.
+  //   2. Authenticated admin / super_admin users from the frontend.
+  const authHeader = req.headers.get('Authorization') ?? ''
+  const bearer = authHeader.toLowerCase().startsWith('bearer ')
+    ? authHeader.slice(7).trim()
+    : ''
+  if (!bearer) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+  const claims = parseJwtClaims(bearer)
+  if (!claims) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  const callerRole = typeof claims.role === 'string' ? claims.role : null
+  if (callerRole !== 'service_role') {
+    const callerSub = typeof claims.sub === 'string' ? claims.sub : null
+    if (!callerSub) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    const adminUrl = Deno.env.get('SUPABASE_URL')
+    const adminKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    if (!adminUrl || !adminKey) {
+      console.error('Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY for authz check')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    const authzClient = createClient(adminUrl, adminKey)
+    const { data: roleRows, error: roleErr } = await authzClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', callerSub)
+    if (roleErr) {
+      console.error('Failed to verify caller role', { error: roleErr })
+      return new Response(
+        JSON.stringify({ error: 'Failed to verify authorization' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role)
+    if (!roles.includes('admin') && !roles.includes('super_admin')) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+  // ---------------------------------------------------------------------
+
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')

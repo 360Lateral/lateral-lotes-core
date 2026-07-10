@@ -240,6 +240,14 @@ const ExcelAnalisisImporter = ({ loteId: currentLoteId, loteName: currentLoteNam
   const [resultOpen, setResultOpen] = useState(false);
 
   const handleFile = useCallback(async (file: File) => {
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "Archivo demasiado grande",
+        description: "El archivo supera el tamaño máximo permitido (10 MB)",
+        variant: "destructive",
+      });
+      return;
+    }
     const data = new Uint8Array(await file.arrayBuffer());
     const wb = XLSX.read(data, { type: "array" });
     if (!currentLoteId) {
