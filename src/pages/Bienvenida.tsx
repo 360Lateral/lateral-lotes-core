@@ -160,7 +160,7 @@ const Bienvenida = () => {
       {/* Back link */}
       <a
         href="/"
-        className="mt-6 font-body text-sm text-gray-400 underline transition-colors hover:text-white"
+        className="mt-6 font-body text-sm text-white/60 underline transition-colors hover:text-white"
       >
         ← Volver al inicio
       </a>
