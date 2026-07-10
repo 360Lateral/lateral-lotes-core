@@ -114,7 +114,8 @@ async function resolverCBML(
   const headers = { ...BASE_HEADERS, Cookie: cookies };
 
   if (tipo === "cbml") {
-    return valor.trim();
+    const v = valor.trim();
+    return /^\d{11}$/.test(v) ? v : null;
   }
 
   if (tipo === "matricula") {
@@ -172,7 +173,7 @@ async function establecerContextoCBML(cbml: string, cookies: string): Promise<vo
     await fetch(EP.porCBML, {
       method: "POST",
       headers: { ...BASE_HEADERS, Cookie: cookies },
-      body: `cbml=${cbml}`,
+      body: `cbml=${encodeURIComponent(cbml)}`,
     });
     // Pausa mínima para que MapGIS procese
     await new Promise((r) => setTimeout(r, 300));
@@ -188,7 +189,7 @@ async function consultarCapa(
   campos: string,
   cookies: string,
 ): Promise<any> {
-  const url = `${EP.consultas}?cbml=${cbml}&consulta=${consulta}&campos=${encodeURIComponent(campos)}`;
+  const url = `${EP.consultas}?cbml=${encodeURIComponent(cbml)}&consulta=${consulta}&campos=${encodeURIComponent(campos)}`;
   try {
     const resp = await fetch(url, {
       method: "POST",
