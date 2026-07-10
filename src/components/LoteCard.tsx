@@ -79,7 +79,7 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
           </span>
         )}
         {has_resolutoria && (
-          <span className="inline-flex items-center gap-1 rounded bg-[#2ecc71]/15 px-2 py-0.5 font-body text-xs font-medium text-[#2ecc71]">
+          <span className="inline-flex items-center gap-1 rounded bg-success/15 px-2 py-0.5 font-body text-xs font-medium text-success">
             ✓ Norma 360° Verificada
           </span>
         )}
