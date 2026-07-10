@@ -106,14 +106,14 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
             </span>
           )}
           {lote.has_resolutoria && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/95 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-warning/95 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
               <Award className="h-2.5 w-2.5" /> Resolutoría
             </span>
           )}
         </div>
         <div className="absolute right-2 bottom-2 flex flex-col items-end gap-1">
           {porValidar && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-warning px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
               <AlertCircle className="h-2.5 w-2.5" /> Por validar
             </span>
           )}
