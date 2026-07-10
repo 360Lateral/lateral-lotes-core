@@ -635,20 +635,38 @@ const Index = () => {
               <span className="h-3 w-3 rounded-full bg-primary/60" />
               <span className="h-3 w-3 rounded-full bg-secondary/40" />
               <span className="ml-4 rounded-md bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
-                urbanix360.com/dashboard
+                360lateral.com/dashboard
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr]">
-              <aside className="hidden flex-col gap-3 border-r border-border bg-secondary/[0.04] p-4 md:flex">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary font-body text-xs font-bold text-secondary-foreground">
-                  3L
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1fr]">
+              <aside className="hidden flex-col gap-1 border-r border-border bg-secondary/[0.04] p-3 md:flex">
+                <div className="mb-2 flex items-center gap-2 px-2 py-1">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary font-body text-xs font-bold text-secondary-foreground">
+                    3L
+                  </div>
+                  <span className="font-body text-xs font-semibold text-foreground">360Lateral</span>
                 </div>
-                <div className="mt-2 h-2 w-3/4 rounded bg-muted" />
-                <div className="h-2 w-2/3 rounded bg-muted" />
-                <div className="h-2 w-1/2 rounded bg-muted" />
-                <div className="h-2 w-3/4 rounded bg-muted" />
-                <div className="h-2 w-2/3 rounded bg-muted" />
+                {[
+                  { icon: LayoutDashboard, label: "Dashboard", active: true },
+                  { icon: MapPin, label: "Mis lotes" },
+                  { icon: FileCheck, label: "Diagnósticos" },
+                  { icon: Handshake, label: "Negociaciones" },
+                  { icon: BarChart3, label: "Mercado" },
+                  { icon: Users, label: "Contactos" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className={`flex items-center gap-2 rounded-md px-2 py-1.5 font-body text-xs ${
+                      item.active
+                        ? "bg-primary/15 font-semibold text-primary"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    <item.icon className="h-3.5 w-3.5" />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
               </aside>
 
               <div className="p-6">
@@ -677,11 +695,55 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="relative mt-4 h-40 overflow-hidden rounded-lg border border-border bg-gradient-to-br from-secondary/10 via-primary/5 to-secondary/15">
-                  <BarChart3 className="absolute right-3 top-3 h-5 w-5 text-muted-foreground/40" />
-                  <span className="absolute left-[20%] top-[30%] flex h-3 w-3 items-center justify-center rounded-full bg-primary ring-4 ring-primary/20" />
-                  <span className="absolute left-[55%] top-[60%] flex h-3 w-3 items-center justify-center rounded-full bg-primary ring-4 ring-primary/20" />
-                  <span className="absolute left-[78%] top-[40%] flex h-3 w-3 items-center justify-center rounded-full bg-secondary ring-4 ring-secondary/20" />
+                <div className="relative mt-4 h-48 overflow-hidden rounded-lg border border-border bg-[hsl(var(--muted))]">
+                  {/* Base blocks (city fill) */}
+                  <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-[2px] p-[2px]">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="rounded-[2px] bg-secondary/[0.06]"
+                        style={{ opacity: 0.4 + ((i * 37) % 60) / 100 }}
+                      />
+                    ))}
+                  </div>
+                  {/* Streets */}
+                  <div className="absolute inset-x-0 top-[24%] h-[2px] bg-background/80" />
+                  <div className="absolute inset-x-0 top-[52%] h-[3px] bg-background/90" />
+                  <div className="absolute inset-x-0 top-[78%] h-[2px] bg-background/80" />
+                  <div className="absolute inset-y-0 left-[22%] w-[2px] bg-background/80" />
+                  <div className="absolute inset-y-0 left-[48%] w-[3px] bg-background/90" />
+                  <div className="absolute inset-y-0 left-[72%] w-[2px] bg-background/80" />
+                  {/* Diagonal highway */}
+                  <div className="absolute left-[-10%] top-[10%] h-[2px] w-[130%] rotate-[18deg] bg-primary/30" />
+                  {/* Pins */}
+                  {[
+                    { x: "16%", y: "20%", c: "primary" },
+                    { x: "38%", y: "42%", c: "primary" },
+                    { x: "58%", y: "28%", c: "secondary" },
+                    { x: "72%", y: "62%", c: "primary" },
+                    { x: "28%", y: "72%", c: "secondary" },
+                    { x: "84%", y: "38%", c: "primary" },
+                    { x: "50%", y: "80%", c: "primary" },
+                  ].map((p, i) => (
+                    <span
+                      key={i}
+                      className={`absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ${
+                        p.c === "primary"
+                          ? "bg-primary ring-primary/25"
+                          : "bg-secondary ring-secondary/25"
+                      }`}
+                      style={{ left: p.x, top: p.y }}
+                    />
+                  ))}
+                  {/* Zoom control */}
+                  <div className="absolute right-2 top-2 flex flex-col overflow-hidden rounded border border-border bg-background shadow-sm">
+                    <span className="border-b border-border px-1.5 py-0.5 font-body text-[10px] text-muted-foreground">+</span>
+                    <span className="px-1.5 py-0.5 font-body text-[10px] text-muted-foreground">−</span>
+                  </div>
+                  {/* Attribution */}
+                  <span className="absolute bottom-1 right-2 font-body text-[9px] text-muted-foreground/70">
+                    Mapa · 360Lateral
+                  </span>
                 </div>
               </div>
             </div>
