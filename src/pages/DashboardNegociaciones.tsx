@@ -121,6 +121,9 @@ const DashboardNegociaciones = () => {
                       onCheckedChange={(val) => updateNeg.mutate({ negId: n.id, updates: { contacto_visible: val } })}
                     />
                   </td>
+                  <td className="py-3 text-right text-muted-foreground">
+                    <ChevronRight className="ml-auto h-4 w-4" aria-hidden="true" />
+                  </td>
                 </tr>
               ))}
             </tbody>
