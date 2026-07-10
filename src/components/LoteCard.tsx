@@ -51,11 +51,11 @@ const LoteCard = ({ id, nombre, barrio, area_m2, precio_m2, estado, lat, lng, sc
   return (
   <div className="flex flex-col overflow-hidden rounded-lg border border-gray-light bg-card">
     {isBucketFoto ? (
-      <FotoLote url={foto_url} alt={`Foto de ${nombre}`} className="h-22 w-full object-cover" fallbackClassName="h-22 w-full" />
+      <FotoLote url={foto_url} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" fallbackClassName="h-24 w-full" />
     ) : foto_url || staticMapUrl ? (
-      <img src={(foto_url || staticMapUrl)!} alt={`Foto de ${nombre}`} className="h-22 w-full object-cover" />
+      <img src={(foto_url || staticMapUrl)!} alt={`Foto de ${nombre}`} className="h-24 w-full object-cover" />
     ) : (
-      <div className="flex h-22 items-center justify-center bg-secondary">
+      <div className="flex h-24 items-center justify-center bg-secondary">
         <Logo variant="on-navy" className="opacity-40" />
       </div>
     )}
