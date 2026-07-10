@@ -20,6 +20,15 @@ import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 const PROD_BASE = "https://urbanix360.com";
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const FechaHoy = () =>
   new Date().toLocaleDateString("es-CO", {
     year: "numeric",
