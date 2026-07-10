@@ -263,7 +263,7 @@ const Diagnostico = () => {
 
           {/* Estimation card */}
           {searched && !loading && (
-            <div className="mt-8 rounded-xl p-6 md:p-8" style={{ backgroundColor: "#1a2744" }}>
+            <div className="mt-8 rounded-xl bg-secondary p-6 md:p-8">
               {estimacion ? (
                 <>
                   <h2 className="text-lg font-heading font-semibold text-white mb-4">
@@ -275,11 +275,11 @@ const Diagnostico = () => {
                       <p className="text-white/70 text-sm mb-1">Precio por m² en {municipio.trim()}</p>
                       <p className="text-white text-lg">
                         Entre{" "}
-                        <span style={{ color: "#E8951A" }} className="font-bold">
+                        <span className="font-bold text-primary">
                           {formatCOP(estimacion.min)}
                         </span>{" "}
                         y{" "}
-                        <span style={{ color: "#E8951A" }} className="font-bold">
+                        <span className="font-bold text-primary">
                           {formatCOP(estimacion.max)}
                         </span>{" "}
                         por m²
@@ -290,15 +290,15 @@ const Diagnostico = () => {
                       <p className="text-white/70 text-sm mb-1">Estimación total de tu lote</p>
                       <p className="text-white text-lg">
                         Tu lote de{" "}
-                        <span style={{ color: "#E8951A" }} className="font-bold">
+                        <span className="font-bold text-primary">
                           {formatMetros(areaNum)}
                         </span>{" "}
                         podría valer entre{" "}
-                        <span style={{ color: "#E8951A" }} className="font-bold">
+                        <span className="font-bold text-primary">
                           {formatCOP(areaNum * estimacion.min)}
                         </span>{" "}
                         y{" "}
-                        <span style={{ color: "#E8951A" }} className="font-bold">
+                        <span className="font-bold text-primary">
                           {formatCOP(areaNum * estimacion.max)}
                         </span>{" "}
                         COP
