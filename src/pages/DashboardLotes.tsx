@@ -529,7 +529,7 @@ const DashboardLotes = () => {
       </header>
 
       {/* KPIs */}
-      <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-5">
+      <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <KPIEstado label="Total" value={totalLotes} icon={MapPin} colorClass="text-foreground" iconColorClass="text-muted-foreground" />
         <KPIEstado label="Disponibles" value={lotesDisponibles} icon={Check} colorClass="text-green-600" iconColorClass="text-green-600" />
         <KPIEstado label="Reservados" value={lotesReservados} icon={Clock} colorClass="text-primary" iconColorClass="text-primary" />
