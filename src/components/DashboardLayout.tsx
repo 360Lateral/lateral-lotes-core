@@ -476,7 +476,16 @@ const DashboardLayout = ({ children }: Props) => {
             <CampanaNotificaciones />
           </header>
         ) : (
-          <header className="flex h-12 items-center justify-end border-b border-border bg-background px-4">
+          <header className="flex h-12 items-center justify-between border-b border-border bg-background px-4">
+            <span className="font-body text-sm font-semibold text-foreground">
+              {(() => {
+                const all = groups.flatMap((g) => g.items);
+                const match = all
+                  .filter((it) => isActive(it.href, it.end))
+                  .sort((a, b) => b.href.length - a.href.length)[0];
+                return match?.label ?? "Dashboard";
+              })()}
+            </span>
             <CampanaNotificaciones />
           </header>
         )}
