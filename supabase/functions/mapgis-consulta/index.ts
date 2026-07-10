@@ -173,7 +173,7 @@ async function establecerContextoCBML(cbml: string, cookies: string): Promise<vo
     await fetch(EP.porCBML, {
       method: "POST",
       headers: { ...BASE_HEADERS, Cookie: cookies },
-      body: `cbml=${cbml}`,
+      body: `cbml=${encodeURIComponent(cbml)}`,
     });
     // Pausa mínima para que MapGIS procese
     await new Promise((r) => setTimeout(r, 300));
