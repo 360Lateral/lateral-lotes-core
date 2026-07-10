@@ -7,7 +7,7 @@ import { Landmark } from "lucide-react";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { extractFotoPath } from "@/lib/foto-storage";
 
-import { useGoogleMapsKey } from "@/hooks/useGoogleMapsKey";
+import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
 
 interface LoteCardProps {
