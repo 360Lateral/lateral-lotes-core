@@ -32,7 +32,7 @@ const DashboardNotificaciones = lazy(() => import("./pages/DashboardNotificacion
 const DashboardNegociaciones = lazy(() => import("./pages/DashboardNegociaciones"));
 const SalaNegociacion = lazy(() => import("./pages/SalaNegociacion"));
 const Diagnostico = lazy(() => import("./pages/Diagnostico"));
-const DiagnosticoResultado = lazy(() => import("./pages/DiagnosticoResultado"));
+
 const Mercado = lazy(() => import("./pages/Mercado"));
 const Resolutoria = lazy(() => import("./pages/Resolutoria"));
 const Planes = lazy(() => import("./pages/Planes"));
