@@ -83,43 +83,9 @@ const Footer = () => {
             </h4>
             <ul className="mt-4 space-y-2 font-body text-sm text-secondary-foreground/70">
               <li>
-                <Link to="/sobre-nosotros" className="transition-colors hover:text-primary">
-                  Sobre nosotros
-                </Link>
-              </li>
-              <li>
                 <a href="mailto:hola@360lateral.com" className="transition-colors hover:text-primary">
                   Contacto
                 </a>
-              </li>
-              <li>
-                <Link to="/blog" className="transition-colors hover:text-primary">
-                  Blog
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Columna Legal */}
-          <div>
-            <h4 className="font-body text-sm font-semibold uppercase tracking-wider text-secondary-foreground">
-              Legal
-            </h4>
-            <ul className="mt-4 space-y-2 font-body text-sm text-secondary-foreground/70">
-              <li>
-                <Link to="/terminos" className="transition-colors hover:text-primary">
-                  Términos
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacidad" className="transition-colors hover:text-primary">
-                  Privacidad
-                </Link>
-              </li>
-              <li>
-                <Link to="/nda" className="transition-colors hover:text-primary">
-                  NDA
-                </Link>
               </li>
             </ul>
           </div>
