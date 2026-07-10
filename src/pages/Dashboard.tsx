@@ -18,7 +18,9 @@ import {
   SlidersHorizontal,
   X,
   Building2,
+  MapPin,
 } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
