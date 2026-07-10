@@ -16,9 +16,6 @@ const perfiles: {
   titulo: string;
   descripcion: string;
   beneficios: string[];
-  accentClass: string;
-  borderClass: string;
-  checkClass: string;
 }[] = [
   {
     id: "propietario",
@@ -30,9 +27,6 @@ const perfiles: {
       "Conexión con desarrolladores calificados",
       "Resultoría 360° para viabilizar tu predio",
     ],
-    accentClass: "border-orange text-orange",
-    borderClass: "hover:border-orange",
-    checkClass: "text-orange",
   },
   {
     id: "comisionista",
@@ -44,9 +38,6 @@ const perfiles: {
       "Deberás subir un documento de autorización",
       "Conecta con compradores calificados",
     ],
-    accentClass: "border-emerald-500 text-emerald-500",
-    borderClass: "hover:border-emerald-500",
-    checkClass: "text-emerald-500",
   },
   {
     id: "desarrollador",
@@ -58,9 +49,6 @@ const perfiles: {
       "Score de viabilidad jurídica y técnica",
       "Alertas cuando aparezcan lotes de mi interés",
     ],
-    accentClass: "border-blue-500 text-blue-500",
-    borderClass: "hover:border-blue-500",
-    checkClass: "text-blue-500",
   },
 ];
 
