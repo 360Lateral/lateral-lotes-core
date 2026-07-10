@@ -187,6 +187,7 @@ const DashboardLotes = () => {
            tipo_lote, lat, lng, foto_url, precio_venta_estimado, created_at,
            fotos_lotes(url, orden)`
         )
+        .neq("estado_publicacion", "retirado")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as LoteRow[];
