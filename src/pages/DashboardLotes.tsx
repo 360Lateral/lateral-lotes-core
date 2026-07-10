@@ -226,16 +226,19 @@ const DashboardLotes = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("lotes").delete().eq("id", id);
+      const { error } = await supabase
+        .from("lotes")
+        .update({ estado_publicacion: "retirado" })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: "Lote eliminado correctamente" });
+      toast({ title: "Lote archivado correctamente" });
       queryClient.invalidateQueries({ queryKey: ["dash-lotes-list"] });
       setDeleteId(null);
     },
     onError: (err: any) => {
-      toast({ title: "Error al eliminar", description: err.message, variant: "destructive" });
+      toast({ title: "Error al archivar", description: err.message, variant: "destructive" });
       setDeleteId(null);
     },
   });
