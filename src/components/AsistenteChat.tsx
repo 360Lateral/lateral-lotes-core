@@ -12,28 +12,8 @@ interface ChatMessage {
   content: string;
 }
 
-interface LoteContext {
-  nombre_lote: string;
-  ciudad: string | null;
-  departamento: string | null;
-  area_total_m2: number | null;
-  uso_principal: string | null;
-  indice_construccion: number | null;
-  indice_ocupacion: number | null;
-  altura_max_pisos: number | null;
-  altura_max_metros: number | null;
-  zona_pot: string | null;
-  tratamiento: string | null;
-  norma_vigente: string | null;
-  score_juridico: number | null;
-  score_normativo: number | null;
-  score_servicios: number | null;
-  notas: string | null;
-}
-
 interface Props {
   loteId: string;
-  loteContext: LoteContext;
 }
 
 const WELCOME_MESSAGE =
@@ -45,7 +25,7 @@ const SUGGESTIONS = [
   "¿Cuál es el mayor uso de este lote?",
 ];
 
-const AsistenteChat = ({ loteId, loteContext }: Props) => {
+const AsistenteChat = ({ loteId }: Props) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
