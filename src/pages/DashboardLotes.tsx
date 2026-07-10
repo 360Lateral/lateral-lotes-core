@@ -882,7 +882,7 @@ const DashboardLotes = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar lote?</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás a punto de archivar <strong>{deleteName}</strong>. Esta acción no se puede deshacer y eliminará también sus datos asociados.
+              Vas a archivar <strong>{deleteName}</strong>. El lote dejará de estar visible en tus listados activos y en el catálogo público. Podrás recuperarlo más adelante cambiando su estado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -903,7 +903,7 @@ const DashboardLotes = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar {seleccionados.size} lote{seleccionados.size === 1 ? "" : "s"}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará los lotes seleccionados junto con sus datos asociados. No se puede deshacer.
+              Los lotes seleccionados dejarán de estar visibles en tus listados activos y en el catálogo público. Podrás recuperarlos más adelante cambiando su estado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
