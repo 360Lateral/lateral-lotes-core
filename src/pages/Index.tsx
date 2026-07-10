@@ -635,7 +635,7 @@ const Index = () => {
               <span className="h-3 w-3 rounded-full bg-primary/60" />
               <span className="h-3 w-3 rounded-full bg-secondary/40" />
               <span className="ml-4 rounded-md bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
-                360lateral.com/dashboard
+                urbanix360.com/dashboard
               </span>
             </div>
 
