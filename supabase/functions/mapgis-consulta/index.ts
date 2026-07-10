@@ -114,7 +114,8 @@ async function resolverCBML(
   const headers = { ...BASE_HEADERS, Cookie: cookies };
 
   if (tipo === "cbml") {
-    return valor.trim();
+    const v = valor.trim();
+    return /^\d{11}$/.test(v) ? v : null;
   }
 
   if (tipo === "matricula") {
