@@ -23,6 +23,23 @@ const SENDER_DOMAIN = "notify.notify.360lateral.com"
 const FROM_NAME: string = Deno.env.get("EMAIL_FROM_NAME") ?? "Notificaciones · 360Lateral"
 const FROM_ADDRESS: string = Deno.env.get("EMAIL_FROM_ADDRESS") ?? "noreply@notify.360lateral.com"
 
+// Parse a JWT and return its claims, or null if unparseable.
+function parseJwtClaims(token: string): Record<string, unknown> | null {
+  const parts = token.split('.')
+  if (parts.length < 2) {
+    return null
+  }
+  try {
+    const payload = parts[1]
+      .replaceAll('-', '+')
+      .replaceAll('_', '/')
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=')
+    return JSON.parse(atob(payload)) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
   const bytes = new Uint8Array(32)
