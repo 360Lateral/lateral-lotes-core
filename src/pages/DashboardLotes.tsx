@@ -422,7 +422,10 @@ const DashboardLotes = () => {
   const handleArchivarMultipleConfirm = async () => {
     const ids = Array.from(seleccionados);
     try {
-      const { error } = await supabase.from("lotes").delete().in("id", ids);
+      const { error } = await supabase
+        .from("lotes")
+        .update({ estado_publicacion: "retirado" })
+        .in("id", ids);
       if (error) throw error;
       toast({ title: `${ids.length} lote${ids.length === 1 ? "" : "s"} archivado${ids.length === 1 ? "" : "s"}` });
       setSeleccionados(new Set());
