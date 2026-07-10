@@ -84,6 +84,8 @@ const DashboardNegociaciones = () => {
                 <th className="pb-2">Fecha</th>
                 <th className="pb-2">Estado</th>
                 <th className="pb-2">Contacto</th>
+                <th className="pb-2 w-8" aria-label="Abrir" />
+
               </tr>
             </thead>
             <tbody>
