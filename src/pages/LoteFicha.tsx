@@ -669,7 +669,7 @@ const LoteFicha = () => {
                 Para más información sobre este activo, contacta a 360Lateral.
               </p>
               <p className="text-xs text-muted-foreground">
-                contacto@urbanix360.com · urbanix360.com
+                contacto@360lateral.com · urbanix360.com
               </p>
               <div className="mt-3 flex justify-center">
                 <Logo />
