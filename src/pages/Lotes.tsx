@@ -225,7 +225,7 @@ const Lotes = () => {
                       position={{ lat: selectedLote.lat, lng: selectedLote.lng }}
                       onCloseClick={() => setSelectedLote(null)}
                     >
-                      <div style={{ fontFamily: "Montserrat, sans-serif", padding: "4px 0" }}>
+                      <div style={{ fontFamily: "Raleway, sans-serif", padding: "4px 0" }}>
                         <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 4px" }}>{selectedLote.nombre_lote}</p>
                         <p style={{ fontSize: 12, color: "#666", margin: "0 0 2px" }}>Área: {formatMetros(selectedLote.area_total_m2 ?? 0)}</p>
                         <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>Precio/m²: {formatCOP(selectedLote.precio_m2)}</p>

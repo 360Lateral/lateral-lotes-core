@@ -13,7 +13,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ["Montserrat", "sans-serif"],
+        body: ["Raleway", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
