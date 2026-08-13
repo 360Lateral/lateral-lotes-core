@@ -150,7 +150,13 @@ const Lotes = () => {
 
   return (
     <div className="flex h-screen flex-col">
+      <Seo
+        title="Catálogo de lotes disponibles | 360Lateral"
+        description="Explora lotes urbanos y rurales en Colombia con mapa, filtros por área, ciudad y precio por m², y diagnóstico normativo 360Lateral."
+        path="/lotes"
+      />
       <Navbar />
+      <h1 className="sr-only">Catálogo de lotes disponibles en Colombia</h1>
 
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
