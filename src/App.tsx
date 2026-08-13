@@ -168,7 +168,10 @@ const App = () => (
             <Route path="/dashboard/notificaciones" element={<ProtectedRoute requireDeveloper><DashboardNotificaciones /></ProtectedRoute>} />
 
             {/* Negociaciones */}
-            <Route path="/negociacion/:id" element={<ProtectedRoute><SalaNegociacion /></ProtectedRoute>} />
+            {/* Sala de negociación: participan propietario y desarrollador, además del
+                equipo interno. La RLS ya restringe cada fila a sus participantes
+                (developer_id / owner_id / admin), así que abrir la ruta no expone datos ajenos. */}
+            <Route path="/negociacion/:id" element={<ProtectedRoute allowPropietario allowDesarrollador><SalaNegociacion /></ProtectedRoute>} />
             <Route path="/dashboard/negociaciones" element={<ProtectedRoute requireAdmin><DashboardNegociaciones /></ProtectedRoute>} />
             <Route path="/dashboard/owner" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwner /></RedirectIfPropietarioOnly></ProtectedRoute>} />
             <Route path="/dashboard/owner/lotes" element={<ProtectedRoute allowPropietario><RedirectIfPropietarioOnly><DashboardOwnerLotes /></RedirectIfPropietarioOnly></ProtectedRoute>} />
