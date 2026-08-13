@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import FAQPrecioRespuesta from "@/components/landing/FAQPrecioRespuesta";
@@ -466,6 +467,11 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <Seo
+        title="360Lateral — Diagnóstico e inteligencia inmobiliaria"
+        description="Plataforma de diagnósticos inmobiliarios y mercado curado de activos para desarrolladores e inversionistas en Colombia."
+        path="/"
+      />
       <Navbar />
 
       {renderHero()}

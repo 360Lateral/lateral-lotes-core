@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import HeroImage from "@/components/ui/HeroImage";
@@ -281,6 +282,11 @@ const Planes = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Seo
+        title="Planes de diagnóstico para propietarios | 360Lateral"
+        description="Compara los planes de diagnóstico 360Lateral para propietarios: alcance, tiempos de entrega y precio por lote en COP."
+        path="/planes"
+      />
       <Navbar />
       <main className="flex-1">
         <HeroImage imageUrl={PLANES_IMG} height="260px" overlay="split">

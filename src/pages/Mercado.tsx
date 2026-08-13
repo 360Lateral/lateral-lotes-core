@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -125,6 +126,11 @@ const Mercado = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Seo
+        title="Índice de precios del suelo en Colombia | 360Lateral"
+        description="Consulta precios por m² de lotes en Colombia: índice de mercado por ciudad y barrio, tendencias y comparables verificados."
+        path="/mercado"
+      />
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
