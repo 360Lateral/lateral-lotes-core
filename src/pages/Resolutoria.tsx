@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import HeroImage from "@/components/ui/HeroImage";
@@ -43,6 +44,11 @@ const resultados = [
 const Resolutoria = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Seo
+        title="Resolutoría 360 — Viabilidad de tu lote | 360Lateral"
+        description="Resolutoría 360: estudio técnico, jurídico y normativo que define qué se puede construir en tu lote y con qué rentabilidad."
+        path="/resolutoria"
+      />
       <Navbar />
       <main className="flex-1">
         {/* HERO */}

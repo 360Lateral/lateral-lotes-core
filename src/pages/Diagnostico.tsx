@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,6 +203,11 @@ const Diagnostico = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Seo
+        title="Diagnóstico gratuito de tu lote | 360Lateral"
+        description="Responde unas preguntas y obtén un diagnóstico preliminar del potencial normativo y comercial de tu lote en Colombia."
+        path="/diagnostico"
+      />
       <Navbar />
       <main className="flex-1">
         <HeroImage imageUrl={DIAGNOSTICO_IMG} height="220px" overlay="dark">

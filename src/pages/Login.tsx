@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/contexts/AuthContext";
 
 import Logo from "@/components/ui/Logo";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -168,10 +169,20 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted px-4">
+      <Seo
+        title="Iniciar sesión | 360Lateral"
+        description="Accede a tu cuenta 360Lateral para gestionar lotes, diagnósticos y negociaciones inmobiliarias en Colombia."
+        path="/login"
+        noindex
+      />
       <div className="w-full max-w-sm rounded-lg border border-gray-light bg-card p-8">
-        <div className="mb-6 flex justify-center">
+        <div className="mb-4 flex justify-center">
           <Logo variant="on-white" />
         </div>
+        <h1 className="mb-6 text-center font-heading text-lg font-semibold text-foreground">
+          Iniciar sesión en 360Lateral
+        </h1>
+
 
         {/* Tabs */}
         <div className="mb-6 flex rounded-md border border-gray-light overflow-hidden">

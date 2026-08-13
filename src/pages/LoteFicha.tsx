@@ -415,6 +415,34 @@ const LoteFicha = () => {
   const seoUrl = `${PROD_BASE}/lotes/${id}/ficha`;
   const seoImage = data.foto_url ?? `${PROD_BASE}/og-default.png`;
 
+  const jsonLdFicha = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: data.nombre_lote ?? "Lote",
+    url: seoUrl,
+    description: seoDesc,
+    ...(data.foto_url ? { image: data.foto_url } : {}),
+    ...(data.area_total_m2
+      ? {
+          floorSize: {
+            "@type": "QuantitativeValue",
+            value: Number(data.area_total_m2),
+            unitCode: "MTK",
+          },
+        }
+      : {}),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: data.ciudad ?? undefined,
+      addressCountry: "CO",
+    },
+    provider: {
+      "@type": "Organization",
+      name: "360Lateral",
+      url: `${PROD_BASE}/`,
+    },
+  };
+
   return (
     <div className="min-h-screen bg-muted/30 print:bg-background">
       <Helmet>
@@ -430,6 +458,7 @@ const LoteFicha = () => {
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDesc} />
         <meta name="twitter:image" content={seoImage} />
+        <script type="application/ld+json">{JSON.stringify(jsonLdFicha)}</script>
       </Helmet>
 
       <div className="no-print sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
