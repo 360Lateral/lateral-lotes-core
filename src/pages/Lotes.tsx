@@ -5,6 +5,7 @@ import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { supabase } from "@/integrations/supabase/client";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 
 import LotesFilterPanel from "@/components/LotesFilterPanel";
 import LoteListCard from "@/components/LoteListCard";
