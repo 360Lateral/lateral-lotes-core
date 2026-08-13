@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
  * - requireDesarrollador: rol desarrollador (admin/experto también pasan para soporte).
  * - requireDeveloper: legacy (DevRoleContext), equivalente a desarrollador con fallback a admin/experto.
  * - allowPropietario / allowOwner (deprecated): permite propietario/comisionista además del default admin/experto.
+ * - allowDesarrollador: permite desarrollador SIN excluir a los demás roles permitidos.
+ *   Se diferencia de requireDesarrollador, que corta antes y deja fuera a propietarios.
  * - sin ningún flag: admin/experto. Propietario y comisionista se redirigen a su portal natural.
  *   Desarrollador puro se redirige a /mercado.
  */
@@ -22,6 +24,12 @@ interface Props {
   allowPropietario?: boolean;
   /** Permite que un usuario con rol comisionista entre sin redirect (evita bucles en /comisionista). */
   allowComisionista?: boolean;
+  /**
+   * Permite el paso a desarrolladores en rutas compartidas con otros roles
+   * (p. ej. la sala de negociación, donde participan propietario y desarrollador).
+   * A diferencia de requireDesarrollador, es aditivo: no excluye a nadie más.
+   */
+  allowDesarrollador?: boolean;
 }
 
 const ProtectedRoute = ({
@@ -33,6 +41,7 @@ const ProtectedRoute = ({
   allowOwner,
   allowPropietario,
   allowComisionista,
+  allowDesarrollador,
 }: Props) => {
   const {
     user,
@@ -122,6 +131,7 @@ const ProtectedRoute = ({
   }
 
   if (isDesarrollador) {
+    if (allowDesarrollador) return <>{children}</>;
     console.warn("[ProtectedRoute] desarrollador puro en ruta admin → redirect /mercado");
     return <Navigate to="/mercado" replace />;
   }
