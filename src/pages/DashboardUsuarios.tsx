@@ -733,6 +733,19 @@ const DashboardUsuarios = () => {
             cortesiaDialogUser?.full_name || cortesiaDialogUser?.email || undefined
           }
         />
+
+        <EliminarUsuarioDialog
+          usuario={
+            eliminarDialogUser
+              ? {
+                  id: eliminarDialogUser.id,
+                  email: eliminarDialogUser.email ?? "",
+                  full_name: eliminarDialogUser.full_name,
+                }
+              : null
+          }
+          onOpenChange={(open) => !open && setEliminarDialogUser(null)}
+        />
       </div>
     </DashboardLayout>
   );
