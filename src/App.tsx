@@ -10,6 +10,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import RedirectIfPropietarioOnly from "@/components/RedirectIfPropietarioOnly";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HomeButton from "@/components/ui/HomeButton";
+import FloatingActionStack from "@/components/ui/FloatingActionStack";
 import DevRoleBanner from "@/components/DevRoleBanner";
 import PageLoadingFallback from "@/components/PageLoadingFallback";
 
@@ -105,8 +106,10 @@ const App = () => (
           <ErrorBoundary>
           <BrowserRouter>
             <DevRoleBanner />
-            <HomeButton />
-            <FeedbackWidget />
+            <FloatingActionStack>
+              <HomeButton />
+              <FeedbackWidget />
+            </FloatingActionStack>
             <Suspense fallback={<PageLoadingFallback />}>
             <Routes>
             {/* Rutas públicas */}
