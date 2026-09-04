@@ -1,31 +1,30 @@
-# Respaldo de los datos del backend
+# Botones flotantes que no se pisen nunca más
 
-Objetivo: tener una copia segura de la información del proyecto, sin cambiar de backend ni tocar la aplicación.
+## Problema
+Hoy hay dos botones flotantes que se posicionan por su cuenta en la esquina inferior derecha:
+el botón naranja "Inicio" y el botón oscuro "Feedback". Cada uno fija su propia posición, así
+que en las pantallas donde ambos aparecen quedan encima uno del otro.
 
-## Opción recomendada (sin código, la haces tú)
+## Solución
+Crear una única "columna" de botones flotantes en la esquina inferior derecha. Los botones
+dejan de posicionarse solos: se colocan dentro de esa columna, apilados en vertical con
+separación fija. Si mañana se agrega un tercer botón flotante, entra en la misma columna y
+tampoco se superpone.
 
-En el panel **Cloud → Advanced settings → Export data**. Genera el volcado completo de la base de datos y es la vía oficial de respaldo. No requiere cambios en el proyecto.
+Orden propuesto (de abajo hacia arriba): Inicio, luego Feedback.
 
-## Opción complementaria (la ejecuto yo)
-
-Exportar en archivos CSV las tablas de negocio críticas, para que tengas copias legibles en Excel:
-
-- `lotes`, `normativa_urbana`, `fotos_lotes`
-- `perfiles`, `user_roles`, `usuario_owner`
-- `engagements_lote`, `entregables_engagement`, `documentos_subidos_engagement`
-- `transacciones`, `suscripciones`, `suscripciones_desarrollador`, `comisiones_venta`
-- `negociaciones`, `mensajes`, `solicitudes_contacto`, `leads`, `diagnosticos`
-- Tablas de análisis 360 (`analisis_*`)
-
-Los archivos quedan disponibles para descarga desde la carpeta de documentos del proyecto.
-
-## Notas
-
-- No se crean ni modifican tablas: es solo lectura y exportación.
-- El código de la aplicación no cambia.
-- Las fotos y documentos guardados en almacenamiento (`fotos-lotes`, `docs-cliente`) no se incluyen en un CSV; si los quieres respaldar, se copian aparte archivo por archivo.
-- Conviene repetir el respaldo periódicamente, ya que es una foto del momento.
+## Detalle visual
+- La columna se ancla a 24px del borde inferior y derecho, con 12px entre botones.
+- En móvil los botones se mantienen compactos (solo ícono si no cabe el texto), como ahora.
+- Se respeta la lógica actual: "Inicio" sigue oculto en portada, login, bienvenida y dashboard;
+  "Feedback" sigue visible solo con sesión iniciada.
 
 ## Detalle técnico
-
-Consultas `COPY (SELECT ...) TO STDOUT WITH CSV HEADER` por tabla, escritas en `/mnt/documents/backup-<fecha>/`. Sin migraciones ni escrituras en la base de datos.
+- Nuevo `src/components/ui/FloatingActionStack.tsx`: contenedor `fixed bottom-6 right-6 z-50
+  flex flex-col-reverse items-end gap-3`, con `pointer-events-none` en el contenedor y
+  `pointer-events-auto` en los hijos.
+- `HomeButton.tsx` y `FeedbackWidget.tsx`: se les quitan las clases `fixed bottom-* right-* z-*`
+  y quedan como elementos normales dentro del stack.
+- `src/App.tsx`: `<HomeButton />` y `<FeedbackWidget />` se envuelven en `<FloatingActionStack>`.
+- Regla a futuro: cualquier botón flotante nuevo va dentro de `FloatingActionStack`, nunca con
+  `fixed` propio.
