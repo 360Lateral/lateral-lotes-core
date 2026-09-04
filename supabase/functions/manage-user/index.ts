@@ -51,6 +51,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const callerIsSuperAdmin = roleCheck.some((r: any) => r.role === "super_admin");
+
     const body = await req.json();
     const { action, user_id } = body;
 
