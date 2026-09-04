@@ -84,6 +84,8 @@ const DashboardUsuarios = () => {
   const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
   const [cortesiaDialogUser, setCortesiaDialogUser] = useState<UserRecord | null>(null);
   const [otorgarCortesiaOpen, setOtorgarCortesiaOpen] = useState(false);
+  const [eliminarDialogUser, setEliminarDialogUser] = useState<UserRecord | null>(null);
+  const [filterEstado, setFilterEstado] = useState("todos");
 
   const isSuperAdmin = myRoles.includes("super_admin");
   const isAdmin = myRoles.includes("admin") || isSuperAdmin;
