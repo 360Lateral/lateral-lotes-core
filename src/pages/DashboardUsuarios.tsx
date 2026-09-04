@@ -336,7 +336,14 @@ const DashboardUsuarios = () => {
                           onClick={() => openEditDialog(u)}
                         >
                           <TableCell>
-                            <p className="font-medium text-foreground">{u.full_name || "Sin nombre"}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-foreground">{u.full_name || "Sin nombre"}</p>
+                              {u.activo === false && (
+                                <Badge variant="outline" className="border-destructive text-destructive text-[10px]">
+                                  Inactivo
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">{u.email}</p>
                           </TableCell>
                           <TableCell>
