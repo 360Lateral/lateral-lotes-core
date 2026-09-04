@@ -419,6 +419,42 @@ const DashboardUsuarios = () => {
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(u.created_at).toLocaleDateString("es-CO")}
                           </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            {isSuperAdmin && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Acciones del usuario">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => openEditDialog(u)}>
+                                    <Edit className="mr-2 h-4 w-4" /> Editar usuario
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    disabled={toggleActivoMutation.isPending}
+                                    onClick={() =>
+                                      toggleActivoMutation.mutate({ user_id: u.id, activo: u.activo === false })
+                                    }
+                                  >
+                                    {u.activo === false ? (
+                                      <><CheckCircle2 className="mr-2 h-4 w-4" /> Reactivar cuenta</>
+                                    ) : (
+                                      <><Ban className="mr-2 h-4 w-4" /> Desactivar cuenta</>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    disabled={u.id === user?.id || u.roles.includes("super_admin")}
+                                    onClick={() => setEliminarDialogUser(u)}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" /> Eliminar definitivamente
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
+                          </TableCell>
                         </TableRow>
                       ))
                     )}
