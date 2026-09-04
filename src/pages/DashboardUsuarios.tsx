@@ -291,6 +291,14 @@ const DashboardUsuarios = () => {
                 <SelectItem value="admin">Administradores</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={filterEstado} onValueChange={setFilterEstado}>
+              <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Estado: todos</SelectItem>
+                <SelectItem value="activos">Activos</SelectItem>
+                <SelectItem value="inactivos">Inactivos</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
