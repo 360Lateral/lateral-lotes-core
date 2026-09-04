@@ -17,7 +17,11 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus, MoreHorizontal, Ban, CheckCircle2, Trash2 } from "lucide-react";
+import EliminarUsuarioDialog from "@/components/usuarios/EliminarUsuarioDialog";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
@@ -80,6 +84,8 @@ const DashboardUsuarios = () => {
   const [historialDialogUser, setHistorialDialogUser] = useState<UserRecord | null>(null);
   const [cortesiaDialogUser, setCortesiaDialogUser] = useState<UserRecord | null>(null);
   const [otorgarCortesiaOpen, setOtorgarCortesiaOpen] = useState(false);
+  const [eliminarDialogUser, setEliminarDialogUser] = useState<UserRecord | null>(null);
+  const [filterEstado, setFilterEstado] = useState("todos");
 
   const isSuperAdmin = myRoles.includes("super_admin");
   const isAdmin = myRoles.includes("admin") || isSuperAdmin;
@@ -187,7 +193,25 @@ const DashboardUsuarios = () => {
     const q = search.toLowerCase();
     const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
     const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "experto"].includes(r)));
-    return matchSearch && matchType;
+    const matchEstado =
+      filterEstado === "todos" ||
+      (filterEstado === "activos" ? u.activo !== false : u.activo === false);
+    return matchSearch && matchType && matchEstado;
+  });
+
+  const toggleActivoMutation = useMutation({
+    mutationFn: async ({ user_id, activo }: { user_id: string; activo: boolean }) => {
+      const { data, error } = await supabase.functions.invoke("manage-user", {
+        body: { action: "toggle_activo", user_id, activo },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success(vars.activo ? "Cuenta reactivada" : "Cuenta desactivada");
+    },
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const openEditDialog = (user: UserRecord) => {
@@ -267,6 +291,14 @@ const DashboardUsuarios = () => {
                 <SelectItem value="admin">Administradores</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={filterEstado} onValueChange={setFilterEstado}>
+              <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Estado: todos</SelectItem>
+                <SelectItem value="activos">Activos</SelectItem>
+                <SelectItem value="inactivos">Inactivos</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -286,12 +318,13 @@ const DashboardUsuarios = () => {
                       <TableHead>Roles</TableHead>
                       <TableHead>Nivel</TableHead>
                       <TableHead>Registro</TableHead>
+                      <TableHead className="w-10" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                           <Users className="mx-auto mb-2 h-8 w-8" />No se encontraron usuarios
                         </TableCell>
                       </TableRow>
@@ -303,7 +336,14 @@ const DashboardUsuarios = () => {
                           onClick={() => openEditDialog(u)}
                         >
                           <TableCell>
-                            <p className="font-medium text-foreground">{u.full_name || "Sin nombre"}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-foreground">{u.full_name || "Sin nombre"}</p>
+                              {u.activo === false && (
+                                <Badge variant="outline" className="border-destructive text-destructive text-[10px]">
+                                  Inactivo
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">{u.email}</p>
                           </TableCell>
                           <TableCell>
@@ -385,6 +425,42 @@ const DashboardUsuarios = () => {
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(u.created_at).toLocaleDateString("es-CO")}
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            {isSuperAdmin && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Acciones del usuario">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => openEditDialog(u)}>
+                                    <Edit className="mr-2 h-4 w-4" /> Editar usuario
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    disabled={toggleActivoMutation.isPending}
+                                    onClick={() =>
+                                      toggleActivoMutation.mutate({ user_id: u.id, activo: u.activo === false })
+                                    }
+                                  >
+                                    {u.activo === false ? (
+                                      <><CheckCircle2 className="mr-2 h-4 w-4" /> Reactivar cuenta</>
+                                    ) : (
+                                      <><Ban className="mr-2 h-4 w-4" /> Desactivar cuenta</>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    disabled={u.id === user?.id || u.roles.includes("super_admin")}
+                                    onClick={() => setEliminarDialogUser(u)}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" /> Eliminar definitivamente
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))
@@ -656,6 +732,19 @@ const DashboardUsuarios = () => {
           desarrolladorLabelPredefinido={
             cortesiaDialogUser?.full_name || cortesiaDialogUser?.email || undefined
           }
+        />
+
+        <EliminarUsuarioDialog
+          usuario={
+            eliminarDialogUser
+              ? {
+                  id: eliminarDialogUser.id,
+                  email: eliminarDialogUser.email ?? "",
+                  full_name: eliminarDialogUser.full_name,
+                }
+              : null
+          }
+          onOpenChange={(open) => !open && setEliminarDialogUser(null)}
         />
       </div>
     </DashboardLayout>

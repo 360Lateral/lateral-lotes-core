@@ -73,10 +73,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchUserType = async (userId: string) => {
     const { data } = await supabase
       .from("perfiles")
-      .select("user_type")
+      .select("user_type, activo")
       .eq("id", userId)
       .single();
     if (data && mountedRef.current) {
+      if ((data as any).activo === false) {
+        setRoles([]);
+        setUserType(null);
+        setSession(null);
+        setUser(null);
+        lastUserIdRef.current = null;
+        try {
+          await supabase.auth.signOut({ scope: "local" });
+        } catch {
+          // ignore
+        }
+        if (typeof window !== "undefined") {
+          window.alert("Tu cuenta está desactivada. Contacta al administrador.");
+        }
+        return;
+      }
       setUserType((data as any).user_type ?? null);
     } else if (mountedRef.current) {
       await supabase
