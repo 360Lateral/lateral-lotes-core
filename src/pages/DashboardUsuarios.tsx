@@ -318,12 +318,13 @@ const DashboardUsuarios = () => {
                       <TableHead>Roles</TableHead>
                       <TableHead>Nivel</TableHead>
                       <TableHead>Registro</TableHead>
+                      <TableHead className="w-10" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                           <Users className="mx-auto mb-2 h-8 w-8" />No se encontraron usuarios
                         </TableCell>
                       </TableRow>
