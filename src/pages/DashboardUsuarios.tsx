@@ -193,7 +193,25 @@ const DashboardUsuarios = () => {
     const q = search.toLowerCase();
     const matchSearch = !q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q) || u.roles.some((r) => ROLE_LABELS[r]?.toLowerCase().includes(q));
     const matchType = filterType === "todos" || u.user_type === filterType || (filterType === "admin" && u.roles.some(r => ["admin", "super_admin", "experto"].includes(r)));
-    return matchSearch && matchType;
+    const matchEstado =
+      filterEstado === "todos" ||
+      (filterEstado === "activos" ? u.activo !== false : u.activo === false);
+    return matchSearch && matchType && matchEstado;
+  });
+
+  const toggleActivoMutation = useMutation({
+    mutationFn: async ({ user_id, activo }: { user_id: string; activo: boolean }) => {
+      const { data, error } = await supabase.functions.invoke("manage-user", {
+        body: { action: "toggle_activo", user_id, activo },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success(vars.activo ? "Cuenta reactivada" : "Cuenta desactivada");
+    },
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const openEditDialog = (user: UserRecord) => {
