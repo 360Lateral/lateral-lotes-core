@@ -17,7 +17,11 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Clock, Edit, Loader2, Search, ShieldPlus, UserPlus, Users, X, Sparkles, Plus, MoreHorizontal, Ban, CheckCircle2, Trash2 } from "lucide-react";
+import EliminarUsuarioDialog from "@/components/usuarios/EliminarUsuarioDialog";
 import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
