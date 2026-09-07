@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bug,
   Lightbulb,
@@ -54,21 +54,36 @@ const TIPOS: { value: TipoFeedback; label: string; icon: typeof Bug }[] = [
 
 const SEVERIDADES: SeveridadFeedback[] = ["baja", "media", "alta", "critica"];
 
-const EnviarFeedbackDialog = ({ open, onOpenChange }: Props) => {
-  const [tipo, setTipo] = useState<TipoFeedback>("mejora");
+const EnviarFeedbackDialog = ({
+  open,
+  onOpenChange,
+  tituloInicial,
+  descripcionInicial,
+  tipoInicial,
+}: Props) => {
+  const [tipo, setTipo] = useState<TipoFeedback>(tipoInicial ?? "mejora");
   const [severidad, setSeveridad] = useState<SeveridadFeedback>("media");
-  const [titulo, setTitulo] = useState("");
-  const [descripcion, setDescripcion] = useState("");
+  const [titulo, setTitulo] = useState(tituloInicial ?? "");
+  const [descripcion, setDescripcion] = useState(descripcionInicial ?? "");
+
+  useEffect(() => {
+    if (open) {
+      setTipo(tipoInicial ?? "mejora");
+      setTitulo(tituloInicial ?? "");
+      setDescripcion(descripcionInicial ?? "");
+    }
+  }, [open, tipoInicial, tituloInicial, descripcionInicial]);
 
   const enviar = useEnviarFeedback();
   const valido = titulo.trim().length >= 3 && descripcion.trim().length >= 10;
 
   const reset = () => {
-    setTipo("mejora");
+    setTipo(tipoInicial ?? "mejora");
     setSeveridad("media");
-    setTitulo("");
-    setDescripcion("");
+    setTitulo(tituloInicial ?? "");
+    setDescripcion(descripcionInicial ?? "");
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
