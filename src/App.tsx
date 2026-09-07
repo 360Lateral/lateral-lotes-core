@@ -43,6 +43,8 @@ const DashboardOwnerLotes = lazy(() => import("./pages/DashboardOwnerLotes"));
 const DashboardOwnerDiagnosticos = lazy(() => import("./pages/DashboardOwnerDiagnosticos"));
 const DashboardOwnerNegociaciones = lazy(() => import("./pages/DashboardOwnerNegociaciones"));
 const DashboardUsuarios = lazy(() => import("./pages/DashboardUsuarios"));
+const DashboardQA = lazy(() => import("./pages/DashboardQA"));
+
 const RedirectLoteAnalisisAEngagement = lazy(() => import("./pages/RedirectLoteAnalisisAEngagement"));
 const DashboardConfig = lazy(() => import("./pages/DashboardConfig"));
 const PortafolioDashboard = lazy(() => import("./pages/PortafolioDashboard"));

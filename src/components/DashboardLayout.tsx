@@ -268,7 +268,9 @@ const DashboardLayout = ({ children }: Props) => {
       admItems.push({ label: "Feedback", href: "/dashboard/feedback", icon: MessageCircle });
       if (isSuperAdmin) admItems.push({ label: "Precios y planes", href: "/dashboard/config-suscripciones", icon: Tag });
       if (isSuperAdmin) admItems.push({ label: "Configuración", href: "/dashboard/config", icon: Settings });
+      if (isRealSuperAdmin) admItems.push({ label: "Pruebas", href: "/dashboard/qa", icon: ClipboardCheck });
       g.push({ key: "administracion", title: "Administración", items: admItems });
+
     }
 
     // Mi trabajo (experto)
