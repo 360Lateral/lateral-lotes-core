@@ -233,8 +233,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        session,
-        user,
+        session: isVisitorSim ? null : session,
+        user: isVisitorSim ? null : user,
         roles: effectiveRoles,
         userType: effectiveUserType,
         loading,
@@ -243,6 +243,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isSuperAdmin,
         isPropietario,
         isComisionista,
+        isRealSuperAdmin,
+
         // Aliases (deprecated)
         isAdminOrAsesor: isAdminOrExperto,
         isDeveloper: isDesarrollador,
