@@ -37,7 +37,12 @@ import { cn } from "@/lib/utils";
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  /** Prellenado opcional (usado por el modo pruebas). */
+  tituloInicial?: string;
+  descripcionInicial?: string;
+  tipoInicial?: TipoFeedback;
 }
+
 
 const TIPOS: { value: TipoFeedback; label: string; icon: typeof Bug }[] = [
   { value: "bug", label: "Bug", icon: Bug },
