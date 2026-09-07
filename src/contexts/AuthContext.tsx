@@ -25,12 +25,15 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isPropietario: boolean;
   isComisionista: boolean;
+  /** Rol real del usuario autenticado, ignorando la simulación de roles (modo pruebas). */
+  isRealSuperAdmin: boolean;
   // Backwards-compatible aliases — DO NOT USE in new code
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
   isInversor: boolean;
   signOut: () => Promise<void>;
 }
+
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -43,6 +46,8 @@ const AuthContext = createContext<AuthContextType>({
   isSuperAdmin: false,
   isPropietario: false,
   isComisionista: false,
+  isRealSuperAdmin: false,
+
   isAdminOrAsesor: false,
   isDeveloper: false,
   isInversor: false,
@@ -172,13 +177,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isRealSuperAdmin = roles.includes("super_admin");
   const canSimulate = isRealSuperAdmin && isSimulating;
 
-  const effectiveRoles: AppRole[] = canSimulate
+  const isVisitorSim = canSimulate && devRole === "visitante";
+
+  const effectiveRoles: AppRole[] = isVisitorSim
+    ? []
+    : canSimulate
     ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
     : roles;
 
-  const effectiveUserType: string | null = canSimulate
+  const effectiveUserType: string | null = isVisitorSim
+    ? null
+    : canSimulate
     ? (["desarrollador", "propietario", "comisionista"].includes(devRole) ? devRole : userType)
     : userType;
+
 
   const isAdminOrExperto = effectiveRoles.some((r) =>
     ["super_admin", "admin", "experto"].includes(r as string)
@@ -221,8 +233,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        session,
-        user,
+        session: isVisitorSim ? null : session,
+        user: isVisitorSim ? null : user,
         roles: effectiveRoles,
         userType: effectiveUserType,
         loading,
@@ -231,6 +243,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isSuperAdmin,
         isPropietario,
         isComisionista,
+        isRealSuperAdmin,
+
         // Aliases (deprecated)
         isAdminOrAsesor: isAdminOrExperto,
         isDeveloper: isDesarrollador,

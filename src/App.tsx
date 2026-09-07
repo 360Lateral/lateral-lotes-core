@@ -43,6 +43,8 @@ const DashboardOwnerLotes = lazy(() => import("./pages/DashboardOwnerLotes"));
 const DashboardOwnerDiagnosticos = lazy(() => import("./pages/DashboardOwnerDiagnosticos"));
 const DashboardOwnerNegociaciones = lazy(() => import("./pages/DashboardOwnerNegociaciones"));
 const DashboardUsuarios = lazy(() => import("./pages/DashboardUsuarios"));
+const DashboardQA = lazy(() => import("./pages/DashboardQA"));
+
 const RedirectLoteAnalisisAEngagement = lazy(() => import("./pages/RedirectLoteAnalisisAEngagement"));
 const DashboardConfig = lazy(() => import("./pages/DashboardConfig"));
 const PortafolioDashboard = lazy(() => import("./pages/PortafolioDashboard"));
@@ -147,6 +149,8 @@ const App = () => (
             <Route path="/dashboard/lotes/:id/analisis" element={<ProtectedRoute><RedirectLoteAnalisisAEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/leads" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard/usuarios" element={<ProtectedRoute requireAdmin><DashboardUsuarios /></ProtectedRoute>} />
+            <Route path="/dashboard/qa" element={<DashboardQA />} />
+
             <Route path="/dashboard/config" element={<ProtectedRoute requireSuperAdmin><DashboardConfig /></ProtectedRoute>} />
             <Route path="/dashboard/contratos-marco" element={<ProtectedRoute requireSuperAdmin><DashboardContratosMarco /></ProtectedRoute>} />
             <Route path="/dashboard/ordenes-servicio" element={<ProtectedRoute><DashboardOrdenesServicio /></ProtectedRoute>} />

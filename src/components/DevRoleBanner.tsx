@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDevRole, DevRoleSimulated } from "@/contexts/DevRoleContext";
@@ -10,10 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, X } from "lucide-react";
+import { ShieldAlert, X, Home, ClipboardCheck } from "lucide-react";
 
 const ROLE_LABELS: Record<DevRoleSimulated, string> = {
   none: "Sin simulación (mi rol real)",
+  visitante: "Visitante (sin sesión)",
   super_admin: "Super Admin",
   admin: "Admin",
   experto: "Experto",
@@ -22,37 +22,32 @@ const ROLE_LABELS: Record<DevRoleSimulated, string> = {
   comisionista: "Comisionista",
 };
 
-const ROLE_HOME: Record<DevRoleSimulated, string> = {
+export const ROLE_HOME: Record<DevRoleSimulated, string> = {
   none: "/dashboard",
+  visitante: "/",
   super_admin: "/dashboard",
   admin: "/dashboard",
   experto: "/dashboard",
   desarrollador: "/dashboard/developer",
   propietario: "/portal",
-  comisionista: "/portal",
+  comisionista: "/comisionista",
 };
 
-
 const DevRoleBanner = () => {
-  const { roles, loading } = useAuth();
+  const { isRealSuperAdmin, loading } = useAuth();
   const { devRole, setDevRole, isSimulating } = useDevRole();
   const navigate = useNavigate();
 
-  const isSuperAdmin = roles.includes("super_admin");
+  if (loading || !isRealSuperAdmin) return null;
 
-  // Auto-redirect cuando cambia el rol simulado
-  useEffect(() => {
-    if (isSimulating) {
-      navigate(ROLE_HOME[devRole], { replace: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [devRole]);
-
-  if (loading || !isSuperAdmin) return null;
+  const cambiarRol = (v: DevRoleSimulated) => {
+    setDevRole(v);
+    navigate(ROLE_HOME[v], { replace: true });
+  };
 
   return (
     <div
-      className={`sticky top-0 z-[60] flex items-center gap-2 border-b px-3 py-1.5 ${
+      className={`sticky top-0 z-[60] flex flex-wrap items-center gap-2 border-b px-3 py-1.5 ${
         isSimulating
           ? "bg-primary/15 border-primary/40"
           : "bg-secondary border-secondary-foreground/10"
@@ -64,14 +59,14 @@ const DevRoleBanner = () => {
         }`}
       />
       <span className="font-body text-xs font-semibold text-secondary-foreground hidden sm:inline">
-        Modo Super Admin · Simular vista como:
+        {isSimulating ? "Estás viendo el portal como:" : "Modo Super Admin · Simular vista como:"}
       </span>
       <span className="font-body text-xs font-semibold text-secondary-foreground sm:hidden">
         Simular:
       </span>
 
-      <Select value={devRole} onValueChange={(v) => setDevRole(v as DevRoleSimulated)}>
-        <SelectTrigger className="h-7 w-[180px] bg-background text-xs">
+      <Select value={devRole} onValueChange={(v) => cambiarRol(v as DevRoleSimulated)}>
+        <SelectTrigger className="h-7 w-[200px] bg-background text-xs">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -84,19 +79,43 @@ const DevRoleBanner = () => {
       </Select>
 
       {isSimulating && (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-7 px-2 text-xs"
-          onClick={() => {
-            setDevRole("none");
-            navigate("/dashboard", { replace: true });
-          }}
-        >
-          <X className="h-3 w-3 mr-1" />
-          Salir
-        </Button>
+        <>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => navigate(ROLE_HOME[devRole])}
+          >
+            <Home className="h-3 w-3 mr-1" />
+            Inicio del rol
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              setDevRole("none");
+              navigate("/dashboard", { replace: true });
+            }}
+          >
+            <X className="h-3 w-3 mr-1" />
+            Salir
+          </Button>
+        </>
       )}
+
+      <Button
+        size="sm"
+        variant="ghost"
+        className="ml-auto h-7 px-2 text-xs"
+        onClick={() => {
+          setDevRole("none");
+          navigate("/dashboard/qa");
+        }}
+      >
+        <ClipboardCheck className="h-3 w-3 mr-1" />
+        Pruebas
+      </Button>
     </div>
   );
 };
