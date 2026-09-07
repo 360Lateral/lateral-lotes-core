@@ -3,7 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface FichaLoteData {
   encontrada: boolean;
+  acceso?: boolean;
   id?: string;
+
   nombre_lote?: string;
   ciudad?: string | null;
   barrio?: string | null;
