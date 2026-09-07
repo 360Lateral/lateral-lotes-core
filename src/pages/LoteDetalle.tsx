@@ -141,6 +141,41 @@ const LoteDetalle = () => {
     );
   }
 
+  if (data.bloqueado) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+          <div className="mx-auto mb-5 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <ShieldCheck className="h-7 w-7 text-primary" />
+          </div>
+          <h1 className="text-2xl font-semibold mb-3">
+            Información reservada{data.ciudad ? ` · ${data.ciudad}` : ""}
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            La información de este lote está disponible para usuarios con un plan activo, acceso
+            otorgado o pago por vista. Crea tu cuenta o elige un plan para verla.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button asChild>
+              <Link to="/planes">Ver planes</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/login">Iniciar sesión</Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link to="/lotes">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Ver lotes de ejemplo
+              </Link>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   const nivel = data.nivel_usuario;
   const accesoCompleto = !!data.acceso_completo;
   const tieneNda = data.tiene_nda_firmado;

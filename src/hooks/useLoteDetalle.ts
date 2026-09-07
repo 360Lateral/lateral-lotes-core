@@ -58,6 +58,7 @@ export interface LoteDetalle {
   score_mercado?: number | null;
   score_sspp?: number | null;
   score_360_promedio?: number | null;
+  bloqueado?: boolean;
   error?: string;
 }
 
@@ -96,7 +97,7 @@ export const useLoteDetalle = (loteId: string | undefined) => {
       });
       if (error) throw error;
       const base = data as unknown as LoteDetalle;
-      if (!base || base.error) return base;
+      if (!base || base.error || base.bloqueado) return base;
 
       const nivel = base.nivel_usuario;
       const accesoBasicoPlus =
