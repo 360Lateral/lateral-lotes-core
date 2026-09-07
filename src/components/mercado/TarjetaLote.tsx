@@ -88,6 +88,11 @@ const TarjetaLote = ({ lote }: Props) => {
             {lote.codigo_anonimo}
           </Badge>
           <div className="flex flex-col items-end gap-1">
+            {lote.es_ejemplo && (
+              <Badge variant="outline" className="bg-background/90 backdrop-blur text-xs">
+                Ejemplo
+              </Badge>
+            )}
             {esNuevo && (
               <Badge className="bg-primary text-primary-foreground gap-1 text-xs">
                 <Sparkles className="h-3 w-3" />

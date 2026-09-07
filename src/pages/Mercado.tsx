@@ -91,6 +91,11 @@ const Mercado = () => {
     return Array.from(set).sort();
   }, [baseLotes]);
 
+  const soloEjemplos = useMemo(
+    () => baseLotes.length > 0 && baseLotes.every((l) => l.es_ejemplo),
+    [baseLotes],
+  );
+
   const lotesOrdenados = useMemo(
     () => [...lotes].sort((a, b) => sortLotes(a, b, orden)),
     [lotes, orden],
@@ -193,6 +198,26 @@ const Mercado = () => {
                   </SheetContent>
                 </Sheet>
               </div>
+
+              {soloEjemplos && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
+                  <h2 className="font-heading text-lg font-bold text-secondary mb-1">
+                    Estás viendo lotes de ejemplo
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    El inventario real está reservado para cuentas con plan activo. Crea tu cuenta o
+                    elige un plan para ver todos los lotes disponibles.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button asChild>
+                      <Link to="/planes">Ver planes</Link>
+                    </Button>
+                    <Button asChild variant="outline">
+                      <Link to="/bienvenida?rol=desarrollador">Crear cuenta</Link>
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Heatmap */}
               <HeatmapMapa lotes={lotes} />

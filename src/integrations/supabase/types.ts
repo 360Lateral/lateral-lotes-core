@@ -5040,6 +5040,25 @@ export type Database = {
           tipo_lote: string
         }[]
       }
+      listar_mercado_publico: {
+        Args: never
+        Returns: {
+          area_m2_redondeada: number
+          barrio: string
+          categoria_area: string
+          ciudad: string
+          codigo_anonimo: string
+          es_ejemplo: boolean
+          has_resolutoria: boolean
+          latitud_zona: number
+          longitud_zona: number
+          lote_id: string
+          publicado_en: string
+          rango_precio: string
+          score_360: number
+          uso_actual: string
+        }[]
+      }
       listar_mis_engagements_cliente: {
         Args: never
         Returns: {
@@ -5219,6 +5238,7 @@ export type Database = {
         Returns: Json
       }
       obtener_smlmv_vigente: { Args: { p_fecha?: string }; Returns: number }
+      obtener_stats_publicas: { Args: never; Returns: Json }
       obtener_tendencia_financiera: {
         Args: { p_meses?: number }
         Returns: Json

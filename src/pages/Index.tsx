@@ -240,18 +240,13 @@ const Index = () => {
   ] } = useQuery({
     queryKey: ["trust-stats"],
     queryFn: async () => {
-      const [lotesRes, ciudadesRes, diagRes, resoRes] = await Promise.all([
-        supabase.from("lotes_publicos" as any).select("id", { count: "exact", head: true }).eq("estado_disponibilidad", "Disponible"),
-        supabase.from("lotes_publicos" as any).select("ciudad"),
-        supabase.rpc("count_diagnosticos"),
-        supabase.from("lotes_publicos" as any).select("id", { count: "exact", head: true }).eq("has_resolutoria", true),
-      ]);
-      const uniqueCiudades = new Set((ciudadesRes.data ?? []).map((l: any) => l.ciudad).filter(Boolean));
+      const { data } = await (supabase as any).rpc("obtener_stats_publicas");
+      const s = (data ?? {}) as Record<string, number>;
       return [
-        { label: "Lotes disponibles", value: String(lotesRes.count ?? 0) },
-        { label: "Municipios", value: String(uniqueCiudades.size) },
-        { label: "Diagnósticos", value: String(diagRes.data ?? 0) },
-        { label: "Resolutorías", value: String(resoRes.count ?? 0) },
+        { label: "Lotes disponibles", value: String(s.lotes_disponibles ?? 0) },
+        { label: "Municipios", value: String(s.ciudades ?? 0) },
+        { label: "Diagnósticos", value: String(s.diagnosticos ?? 0) },
+        { label: "Resolutorías", value: String(s.con_resolutoria ?? 0) },
       ];
     },
   });

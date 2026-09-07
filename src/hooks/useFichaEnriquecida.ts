@@ -141,7 +141,7 @@ export const useFichaEnriquecida = (loteId: string | undefined) => {
     queryFn: async (): Promise<FichaEnriquecidaData> => {
       const [scoresRes, normRes, enriqRes] = await Promise.all([
         (supabase as any)
-          .from("vw_lotes_publicos")
+          .from("lotes")
           .select(
             "score_juridico, score_normativo, score_servicios, score_ambiental, score_geotecnico, score_mercado, score_arquitectonico, score_financiero, precio_venta_estimado",
           )
