@@ -102,25 +102,16 @@ const Lotes = () => {
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
     queryFn: async () => {
-      const { data: lotesData, error } = await (supabase as any)
-        .from("vw_lotes_publicos")
-        .select("id, nombre_lote, barrio, ciudad, area_total_m2, estado_disponibilidad, lat, lng, score_juridico, score_normativo, score_servicios, es_publico, created_at");
+      const { data: lotesData, error } = await (supabase as any).rpc("listar_catalogo_lotes");
       if (error) throw error;
 
-      const ids = lotesData.map((l) => l.id);
-      const { data: preciosData } = await supabase
-        .from("precios")
-        .select("lote_id, precio_m2_cop")
-        .in("lote_id", ids);
-
-      const precioMap = new Map(preciosData?.map((p) => [p.lote_id, p.precio_m2_cop]) ?? []);
-
-      return lotesData.map((l) => ({
+      return ((lotesData ?? []) as any[]).map((l) => ({
         ...l,
-        precio_m2: precioMap.get(l.id) ?? 0,
+        precio_m2: l.precio_m2 ?? 0,
       })) as LoteWithPrecio[];
     },
   });
+
 
   const filteredLotes = useMemo(() => {
     return allLotes.filter((l) => {
