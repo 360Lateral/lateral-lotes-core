@@ -365,6 +365,34 @@ const LoteFicha = () => {
     );
   }
 
+  if (data.acceso === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="max-w-md p-8 text-center">
+          <h1 className="mb-2 text-xl font-semibold">
+            {data.nombre_lote ?? "Este lote"}
+          </h1>
+          <p className="mb-1 text-sm text-muted-foreground">
+            {data.ciudad ?? "Colombia"}
+          </p>
+          <p className="mb-6 mt-4 text-sm text-muted-foreground">
+            La ficha técnica de este lote es privada. Necesitas una cuenta con plan
+            activo o acceso autorizado para verla y descargarla.
+          </p>
+          <div className="flex flex-col gap-2">
+            <Button asChild>
+              <a href="/planes">Ver planes</a>
+            </Button>
+            <Button asChild variant="outline">
+              <a href="/login">Iniciar sesión</a>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+
   const analisis = [
     { label: "Jurídico", on: data.tiene_analisis_juridico },
     { label: "Ambiental", on: data.tiene_analisis_ambiental },
