@@ -46,6 +46,8 @@ const AuthContext = createContext<AuthContextType>({
   isSuperAdmin: false,
   isPropietario: false,
   isComisionista: false,
+  isRealSuperAdmin: false,
+
   isAdminOrAsesor: false,
   isDeveloper: false,
   isInversor: false,
@@ -175,13 +177,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isRealSuperAdmin = roles.includes("super_admin");
   const canSimulate = isRealSuperAdmin && isSimulating;
 
-  const effectiveRoles: AppRole[] = canSimulate
+  const isVisitorSim = canSimulate && devRole === "visitante";
+
+  const effectiveRoles: AppRole[] = isVisitorSim
+    ? []
+    : canSimulate
     ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
     : roles;
 
-  const effectiveUserType: string | null = canSimulate
+  const effectiveUserType: string | null = isVisitorSim
+    ? null
+    : canSimulate
     ? (["desarrollador", "propietario", "comisionista"].includes(devRole) ? devRole : userType)
     : userType;
+
 
   const isAdminOrExperto = effectiveRoles.some((r) =>
     ["super_admin", "admin", "experto"].includes(r as string)
