@@ -34,7 +34,9 @@ import {
   ChevronRight,
   UserPlus,
   type LucideIcon,
+  ClipboardCheck,
 } from "lucide-react";
+
 import { useLotesPendientesValidacion } from "@/hooks/useLotesPendientesValidacion";
 import { useSolicitudesContacto } from "@/hooks/useSolicitudesContacto";
 import { useOrdenesServicio } from "@/hooks/useOrdenesServicio";
@@ -63,7 +65,7 @@ interface Props {
 const STORAGE_PREFIX = "sidebar_grupo_";
 
 const DashboardLayout = ({ children }: Props) => {
-  const { user, roles, signOut, isDeveloper } = useAuth();
+  const { user, roles, signOut, isDeveloper, isRealSuperAdmin } = useAuth();
   const { planSlug } = usePlan();
   const navigate = useNavigate();
   const { toast } = useToast();
