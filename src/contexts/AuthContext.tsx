@@ -25,12 +25,15 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isPropietario: boolean;
   isComisionista: boolean;
+  /** Rol real del usuario autenticado, ignorando la simulación de roles (modo pruebas). */
+  isRealSuperAdmin: boolean;
   // Backwards-compatible aliases — DO NOT USE in new code
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
   isInversor: boolean;
   signOut: () => Promise<void>;
 }
+
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
