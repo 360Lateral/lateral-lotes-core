@@ -11,9 +11,7 @@ export const useStatsMercado = () => {
   return useQuery<StatsMercado>({
     queryKey: ["stats-mercado"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("vw_mercado_publico")
-        .select("ciudad,publicado_en");
+      const { data, error } = await (supabase as any).rpc("listar_mercado_publico");
       if (error) throw error;
       const rows = (data ?? []) as Array<{ ciudad: string | null; publicado_en: string | null }>;
       const ciudades = new Set<string>();
