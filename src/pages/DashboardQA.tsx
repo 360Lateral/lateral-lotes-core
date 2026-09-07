@@ -91,8 +91,10 @@ const DashboardQA = () => {
       <Seo
         title="Modo pruebas | 360Lateral"
         description="Recorrido guiado de pruebas por rol."
-        noIndex
+        path="/dashboard/qa"
+        noindex
       />
+
       <div className="space-y-6">
         <div>
           <h1 className="font-heading text-2xl font-bold text-foreground">Pruebas por rol</h1>
