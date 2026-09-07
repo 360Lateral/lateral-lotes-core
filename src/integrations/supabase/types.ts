@@ -2645,6 +2645,7 @@ export type Database = {
           departamento: string | null
           destacado: boolean | null
           direccion: string | null
+          es_ejemplo: boolean
           es_publico: boolean
           estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion: Database["public"]["Enums"]["estado_publicacion_lote"]
@@ -2692,6 +2693,7 @@ export type Database = {
           departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
+          es_ejemplo?: boolean
           es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
@@ -2739,6 +2741,7 @@ export type Database = {
           departamento?: string | null
           destacado?: boolean | null
           direccion?: string | null
+          es_ejemplo?: boolean
           es_publico?: boolean
           estado_disponibilidad?: Database["public"]["Enums"]["estado_disponibilidad"]
           estado_publicacion?: Database["public"]["Enums"]["estado_publicacion_lote"]
@@ -5014,6 +5017,29 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      listar_catalogo_lotes: {
+        Args: never
+        Returns: {
+          area_total_m2: number
+          barrio: string
+          ciudad: string
+          created_at: string
+          departamento: string
+          es_ejemplo: boolean
+          es_publico: boolean
+          estado_disponibilidad: Database["public"]["Enums"]["estado_disponibilidad"]
+          foto_url: string
+          id: string
+          lat: number
+          lng: number
+          nombre_lote: string
+          precio_m2: number
+          score_juridico: number
+          score_normativo: number
+          score_servicios: number
+          tipo_lote: string
+        }[]
+      }
       listar_mis_engagements_cliente: {
         Args: never
         Returns: {
@@ -5270,6 +5296,10 @@ export type Database = {
       solicitar_diagnostico: {
         Args: { p_lote_id: string; p_plan_id: string }
         Returns: string
+      }
+      tiene_acceso_ficha: {
+        Args: { _lote_id: string; _user_id: string }
+        Returns: boolean
       }
       toggle_contrato_activo: {
         Args: { p_activo: boolean; p_contrato_id: string }
