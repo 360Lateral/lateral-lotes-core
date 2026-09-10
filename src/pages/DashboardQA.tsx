@@ -221,6 +221,7 @@ const DashboardQA = () => {
                                 size="sm"
                                 variant="secondary"
                                 className="h-8"
+                                disabled={rec.rol === "super_admin" && !isRealSuperAdmin}
                                 onClick={() => irAlPaso(rec, paso)}
                               >
                                 <ExternalLink className="mr-1 h-3.5 w-3.5" />
