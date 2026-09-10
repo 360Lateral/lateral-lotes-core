@@ -32,7 +32,7 @@ const leerProgreso = (): Progreso => {
 };
 
 const DashboardQA = () => {
-  const { isRealSuperAdmin, loading } = useAuth();
+  const { isRealSuperAdmin, canUseQaMode, loading } = useAuth();
   const { setDevRole } = useDevRole();
   const navigate = useNavigate();
   const [progreso, setProgreso] = useState<Progreso>(leerProgreso);
