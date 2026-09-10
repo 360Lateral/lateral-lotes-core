@@ -51,6 +51,8 @@ const AuthContext = createContext<AuthContextType>({
   isPropietario: false,
   isComisionista: false,
   isRealSuperAdmin: false,
+  isRealAdmin: false,
+  canUseQaMode: false,
 
   isAdminOrAsesor: false,
   isDeveloper: false,
