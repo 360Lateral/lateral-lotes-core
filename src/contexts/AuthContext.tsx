@@ -187,12 +187,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const devRolePermitido = !isRealSuperAdmin && devRole === "super_admin" ? "none" : devRole;
   const canSimulate = canUseQaMode && isSimulating && devRolePermitido !== "none";
 
-  const isVisitorSim = canSimulate && devRole === "visitante";
+  const isVisitorSim = canSimulate && devRolePermitido === "visitante";
 
   const effectiveRoles: AppRole[] = isVisitorSim
     ? []
     : canSimulate
-    ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
+    ? ([devRolePermitido] as AppRole[]).filter((r) => (r as string) !== "none")
     : roles;
 
   const effectiveUserType: string | null = isVisitorSim
