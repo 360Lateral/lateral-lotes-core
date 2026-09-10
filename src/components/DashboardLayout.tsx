@@ -65,7 +65,7 @@ interface Props {
 const STORAGE_PREFIX = "sidebar_grupo_";
 
 const DashboardLayout = ({ children }: Props) => {
-  const { user, roles, signOut, isDeveloper, isRealSuperAdmin } = useAuth();
+  const { user, roles, signOut, isDeveloper, canUseQaMode } = useAuth();
   const { planSlug } = usePlan();
   const navigate = useNavigate();
   const { toast } = useToast();
