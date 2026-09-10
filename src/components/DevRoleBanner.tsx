@@ -74,7 +74,7 @@ const DevRoleBanner = () => {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {(Object.keys(ROLE_LABELS) as DevRoleSimulated[]).map((r) => (
+          {rolesDisponibles.map((r) => (
             <SelectItem key={r} value={r} className="text-xs">
               {ROLE_LABELS[r]}
             </SelectItem>
