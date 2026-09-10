@@ -27,6 +27,10 @@ interface AuthContextType {
   isComisionista: boolean;
   /** Rol real del usuario autenticado, ignorando la simulación de roles (modo pruebas). */
   isRealSuperAdmin: boolean;
+  /** Rol real admin (sin simulación). */
+  isRealAdmin: boolean;
+  /** Puede usar el modo pruebas (super admin o admin reales). */
+  canUseQaMode: boolean;
   // Backwards-compatible aliases — DO NOT USE in new code
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
@@ -47,6 +51,8 @@ const AuthContext = createContext<AuthContextType>({
   isPropietario: false,
   isComisionista: false,
   isRealSuperAdmin: false,
+  isRealAdmin: false,
+  canUseQaMode: false,
 
   isAdminOrAsesor: false,
   isDeveloper: false,
@@ -175,20 +181,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const { devRole, isSimulating } = useDevRole();
   const isRealSuperAdmin = roles.includes("super_admin");
-  const canSimulate = isRealSuperAdmin && isSimulating;
+  const isRealAdmin = roles.includes("admin");
+  const canUseQaMode = isRealSuperAdmin || isRealAdmin;
+  // Un admin no puede simular super_admin (aunque quede un valor viejo guardado).
+  const devRolePermitido = !isRealSuperAdmin && devRole === "super_admin" ? "none" : devRole;
+  const canSimulate = canUseQaMode && isSimulating && devRolePermitido !== "none";
 
-  const isVisitorSim = canSimulate && devRole === "visitante";
+  const isVisitorSim = canSimulate && devRolePermitido === "visitante";
 
   const effectiveRoles: AppRole[] = isVisitorSim
     ? []
     : canSimulate
-    ? ([devRole] as AppRole[]).filter((r) => (r as string) !== "none")
+    ? ([devRolePermitido] as AppRole[]).filter((r) => (r as string) !== "none")
     : roles;
 
   const effectiveUserType: string | null = isVisitorSim
     ? null
     : canSimulate
-    ? (["desarrollador", "propietario", "comisionista"].includes(devRole) ? devRole : userType)
+    ? (["desarrollador", "propietario", "comisionista"].includes(devRolePermitido) ? devRolePermitido : userType)
     : userType;
 
 
@@ -244,6 +254,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isPropietario,
         isComisionista,
         isRealSuperAdmin,
+        isRealAdmin,
+        canUseQaMode,
 
         // Aliases (deprecated)
         isAdminOrAsesor: isAdminOrExperto,

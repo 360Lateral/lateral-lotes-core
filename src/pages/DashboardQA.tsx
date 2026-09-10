@@ -32,7 +32,7 @@ const leerProgreso = (): Progreso => {
 };
 
 const DashboardQA = () => {
-  const { isRealSuperAdmin, loading } = useAuth();
+  const { isRealSuperAdmin, canUseQaMode, loading } = useAuth();
   const { setDevRole } = useDevRole();
   const navigate = useNavigate();
   const [progreso, setProgreso] = useState<Progreso>(leerProgreso);
@@ -69,7 +69,7 @@ const DashboardQA = () => {
   }, [hallazgos]);
 
   if (loading) return null;
-  if (!isRealSuperAdmin) return <Navigate to="/dashboard" replace />;
+  if (!canUseQaMode) return <Navigate to="/dashboard" replace />;
 
   const estadoDe = (id: string): EstadoPaso => progreso[id] ?? "pendiente";
 
@@ -160,6 +160,12 @@ const DashboardQA = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="mb-3 font-body text-xs text-muted-foreground">{rec.descripcion}</p>
+                  {rec.rol === "super_admin" && !isRealSuperAdmin && (
+                    <p className="mb-3 rounded-md border border-border bg-muted/40 p-2 font-body text-xs text-muted-foreground">
+                      Este recorrido es solo de lectura para tu perfil: no puedes activar la vista de
+                      Super Admin.
+                    </p>
+                  )}
                   <ol className="space-y-2">
                     {rec.pasos.map((paso, i) => {
                       const estado = estadoDe(paso.id);
@@ -215,6 +221,7 @@ const DashboardQA = () => {
                                 size="sm"
                                 variant="secondary"
                                 className="h-8"
+                                disabled={rec.rol === "super_admin" && !isRealSuperAdmin}
                                 onClick={() => irAlPaso(rec, paso)}
                               >
                                 <ExternalLink className="mr-1 h-3.5 w-3.5" />
