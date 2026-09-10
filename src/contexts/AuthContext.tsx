@@ -198,7 +198,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const effectiveUserType: string | null = isVisitorSim
     ? null
     : canSimulate
-    ? (["desarrollador", "propietario", "comisionista"].includes(devRole) ? devRole : userType)
+    ? (["desarrollador", "propietario", "comisionista"].includes(devRolePermitido) ? devRolePermitido : userType)
     : userType;
 
 
