@@ -69,7 +69,7 @@ const DashboardQA = () => {
   }, [hallazgos]);
 
   if (loading) return null;
-  if (!isRealSuperAdmin) return <Navigate to="/dashboard" replace />;
+  if (!canUseQaMode) return <Navigate to="/dashboard" replace />;
 
   const estadoDe = (id: string): EstadoPaso => progreso[id] ?? "pendiente";
 
