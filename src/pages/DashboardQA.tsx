@@ -160,6 +160,12 @@ const DashboardQA = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="mb-3 font-body text-xs text-muted-foreground">{rec.descripcion}</p>
+                  {rec.rol === "super_admin" && !isRealSuperAdmin && (
+                    <p className="mb-3 rounded-md border border-border bg-muted/40 p-2 font-body text-xs text-muted-foreground">
+                      Este recorrido es solo de lectura para tu perfil: no puedes activar la vista de
+                      Super Admin.
+                    </p>
+                  )}
                   <ol className="space-y-2">
                     {rec.pasos.map((paso, i) => {
                       const estado = estadoDe(paso.id);
