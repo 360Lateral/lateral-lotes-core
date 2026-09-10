@@ -34,11 +34,15 @@ export const ROLE_HOME: Record<DevRoleSimulated, string> = {
 };
 
 const DevRoleBanner = () => {
-  const { isRealSuperAdmin, loading } = useAuth();
+  const { isRealSuperAdmin, canUseQaMode, loading } = useAuth();
   const { devRole, setDevRole, isSimulating } = useDevRole();
   const navigate = useNavigate();
 
-  if (loading || !isRealSuperAdmin) return null;
+  if (loading || !canUseQaMode) return null;
+
+  const rolesDisponibles = (Object.keys(ROLE_LABELS) as DevRoleSimulated[]).filter(
+    (r) => isRealSuperAdmin || r !== "super_admin"
+  );
 
   const cambiarRol = (v: DevRoleSimulated) => {
     setDevRole(v);
