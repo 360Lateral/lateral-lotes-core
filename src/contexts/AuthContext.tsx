@@ -27,6 +27,10 @@ interface AuthContextType {
   isComisionista: boolean;
   /** Rol real del usuario autenticado, ignorando la simulación de roles (modo pruebas). */
   isRealSuperAdmin: boolean;
+  /** Rol real admin (sin simulación). */
+  isRealAdmin: boolean;
+  /** Puede usar el modo pruebas (super admin o admin reales). */
+  canUseQaMode: boolean;
   // Backwards-compatible aliases — DO NOT USE in new code
   isAdminOrAsesor: boolean;
   isDeveloper: boolean;
