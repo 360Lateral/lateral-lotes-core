@@ -254,6 +254,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isPropietario,
         isComisionista,
         isRealSuperAdmin,
+        isRealAdmin,
+        canUseQaMode,
 
         // Aliases (deprecated)
         isAdminOrAsesor: isAdminOrExperto,
