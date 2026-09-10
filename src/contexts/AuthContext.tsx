@@ -181,7 +181,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const { devRole, isSimulating } = useDevRole();
   const isRealSuperAdmin = roles.includes("super_admin");
-  const canSimulate = isRealSuperAdmin && isSimulating;
+  const isRealAdmin = roles.includes("admin");
+  const canUseQaMode = isRealSuperAdmin || isRealAdmin;
+  // Un admin no puede simular super_admin (aunque quede un valor viejo guardado).
+  const devRolePermitido = !isRealSuperAdmin && devRole === "super_admin" ? "none" : devRole;
+  const canSimulate = canUseQaMode && isSimulating && devRolePermitido !== "none";
 
   const isVisitorSim = canSimulate && devRole === "visitante";
 
