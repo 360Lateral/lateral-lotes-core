@@ -135,7 +135,9 @@ interface DocFile {
 const LoteWizard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, isPropietario, isComisionista, isAdminOrExperto } = useAuth();
+  // Propietarios/comisionistas (reales o simulados en modo pruebas) envían el lote a validación
+  const requiereValidacion = (isPropietario || isComisionista) && !isAdminOrExperto;
   const { draftInicial, draftCargado, guardarDraft, limpiarDraft } = useLoteWizardDraft();
 
   const [step, setStep] = useState(1);
@@ -318,6 +320,13 @@ const LoteWizard = () => {
           estado_disponibilidad: "En revisión" as any,
           owner_id: user?.id || null,
           es_publico: false,
+          ...(requiereValidacion
+            ? {
+                publicado_venta: true,
+                estado_publicacion: "pendiente_validacion",
+                ...(isPropietario ? { propietario_id: user?.id ?? null } : {}),
+              }
+            : {}),
         } as any)
         .select("id")
         .single();
