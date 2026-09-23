@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, ChangeEvent, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef, ChangeEvent, useCallback } from "react";
 import { useLoteWizardDraft, formatRelativoDraft } from "@/hooks/wizard/useLoteWizardDraft";
 import { AlertCircle } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
@@ -214,8 +214,18 @@ const LoteWizard = () => {
       servicios: { ...p.servicios, [s]: !p.servicios[s] },
     }));
 
+  // ---- Ubicación: origen del pin ----
+  const [origenPin, setOrigenPin] = useState<"auto" | "manual" | null>(null);
+  const [geoFallo, setGeoFallo] = useState(false);
+  const [editarCoords, setEditarCoords] = useState(false);
+  const [geoQuery, setGeoQuery] = useState("");
+  const origenRef = useRef(origenPin);
+  origenRef.current = origenPin;
+  const ciudadPrevRef = useRef<string | null>(null);
+
   const handleMapClick = useCallback((e: any) => {
     if (!e.latLng) return;
+    setOrigenPin("manual");
     setForm((p) => ({
       ...p,
       lat: e.latLng!.lat().toFixed(6),
@@ -223,7 +233,15 @@ const LoteWizard = () => {
     }));
   }, []);
 
+  const handleGeocoded = useCallback((r: { lat: number; lng: number; ok: boolean }) => {
+    setGeoFallo(!r.ok);
+    if (!r.ok || origenRef.current === "manual") return;
+    setOrigenPin("auto");
+    setForm((prev) => ({ ...prev, lat: r.lat.toFixed(6), lng: r.lng.toFixed(6) }));
+  }, []);
+
   const handlePlaceSelect = useCallback((p: { lat: number; lng: number; address?: string }) => {
+    setOrigenPin("auto");
     setForm((prev) => ({
       ...prev,
       lat: p.lat.toFixed(6),
@@ -234,12 +252,40 @@ const LoteWizard = () => {
 
   const handleMarkerDragEnd = useCallback((e: any) => {
     if (!e.latLng) return;
+    setOrigenPin("manual");
     setForm((p) => ({
       ...p,
       lat: e.latLng!.lat().toFixed(6),
       lng: e.latLng!.lng().toFixed(6),
     }));
   }, []);
+
+  // Búsqueda automática en el mapa a partir de los datos de ubicación
+  useEffect(() => {
+    if (!form.ciudad) return;
+    const primeraVez = ciudadPrevRef.current === null;
+    const ciudadCambio = !primeraVez && ciudadPrevRef.current !== form.ciudad;
+    if (primeraVez && form.lat && form.lng && origenRef.current === null) {
+      // Coordenadas recuperadas de un borrador: se respetan como confirmadas
+      origenRef.current = "manual";
+      setOrigenPin("manual");
+    }
+    ciudadPrevRef.current = form.ciudad;
+    if (ciudadCambio && origenRef.current === "manual") {
+      setOrigenPin(null);
+      toast({ title: "Cambiaste de municipio", description: "Reubicamos el pin; ajústalo de nuevo al punto exacto." });
+    }
+    const q = [form.direccion, form.barrio, form.ciudad, form.departamento, "Colombia"]
+      .map((x) => x?.trim())
+      .filter(Boolean)
+      .join(", ");
+    const t = setTimeout(() => setGeoQuery(q), 900);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.ciudad, form.departamento, form.barrio, form.direccion]);
+
+  const geoZoom = form.direccion.trim() ? 17 : form.barrio.trim() ? 15 : 13;
+  const pinConfirmado = !!form.lat && !!form.lng && origenPin !== "auto";
 
   // ---- Photo handlers ----
   const handlePhotos = (e: ChangeEvent<HTMLInputElement>) => {
@@ -708,71 +754,100 @@ const LoteWizard = () => {
 
         {/* Step 2 */}
         {step === 2 && (
-          <div className="flex flex-col gap-5">
-            <WizardSection icon={Landmark} title="Jurisdicción" description="Departamento, municipio y sector del predio.">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <FieldLabel required>Departamento</FieldLabel>
-                  <SearchableSelect
-                    options={DEPARTAMENTO_NOMBRES}
-                    value={form.departamento}
-                    onValueChange={(v) => {
-                      update("departamento", v);
-                      if (v !== form.departamento) update("ciudad", "");
-                    }}
-                    placeholder="Seleccionar departamento"
-                    searchPlaceholder="Buscar departamento..."
-                    emptyText="Departamento no encontrado."
-                    className={errClass("departamento")}
-                  />
-                </div>
-                <div>
-                  <FieldLabel required>Municipio</FieldLabel>
-                  <SearchableSelect
-                    options={getMunicipios(form.departamento)}
-                    value={form.ciudad}
-                    onValueChange={(v) => update("ciudad", v)}
-                    placeholder="Seleccionar municipio"
-                    searchPlaceholder="Buscar municipio..."
-                    emptyText="Municipio no encontrado."
-                    className={errClass("ciudad")}
-                    disabled={!form.departamento}
-                  />
-                </div>
-                <div>
-                  <FieldLabel>Barrio o vereda</FieldLabel>
-                  <Input value={form.barrio} onChange={(e) => update("barrio", e.target.value)} />
-                </div>
-                <div>
-                  <FieldLabel>Dirección aproximada</FieldLabel>
-                  <Input value={form.direccion} onChange={(e) => update("direccion", e.target.value)} placeholder="No se mostrará exacta" />
-                </div>
+          <WizardSection icon={MapPin} title="Ubicación del predio" description="Completa los datos y el mapa buscará la zona. Luego solo ajusta el pin al punto exacto del lote.">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <FieldLabel required>Departamento</FieldLabel>
+                <SearchableSelect
+                  options={DEPARTAMENTO_NOMBRES}
+                  value={form.departamento}
+                  onValueChange={(v) => {
+                    update("departamento", v);
+                    if (v !== form.departamento) update("ciudad", "");
+                  }}
+                  placeholder="Seleccionar departamento"
+                  searchPlaceholder="Buscar departamento..."
+                  emptyText="Departamento no encontrado."
+                  className={errClass("departamento")}
+                />
               </div>
-              <p className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
-                <Lock className="h-3.5 w-3.5" /> La dirección exacta no se mostrará públicamente por seguridad.
-              </p>
-            </WizardSection>
+              <div>
+                <FieldLabel required>Municipio</FieldLabel>
+                <SearchableSelect
+                  options={getMunicipios(form.departamento)}
+                  value={form.ciudad}
+                  onValueChange={(v) => update("ciudad", v)}
+                  placeholder="Seleccionar municipio"
+                  searchPlaceholder="Buscar municipio..."
+                  emptyText="Municipio no encontrado."
+                  className={errClass("ciudad")}
+                  disabled={!form.departamento}
+                />
+              </div>
+              <div>
+                <FieldLabel>Barrio o vereda</FieldLabel>
+                <Input value={form.barrio} onChange={(e) => update("barrio", e.target.value)} />
+              </div>
+              <div>
+                <FieldLabel>Dirección aproximada</FieldLabel>
+                <Input value={form.direccion} onChange={(e) => update("direccion", e.target.value)} placeholder="Ej: CL 50 30 20" />
+              </div>
+            </div>
+            <p className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
+              <Lock className="h-3.5 w-3.5" /> La dirección exacta no se mostrará públicamente por seguridad.
+            </p>
 
-            <WizardSection icon={MapPin} title="Georreferenciación" description="Haz clic en el mapa o arrastra el marcador a la ubicación aproximada.">
-              <div className="overflow-hidden rounded-lg border border-border">
-                <GoogleMapsGate
-                  fallback={<div className="flex h-56 w-full items-center justify-center bg-muted text-sm text-muted-foreground">Cargando mapa…</div>}
-                >
-                  <MemoizedLoteMap lat={form.lat} lng={form.lng} onMapClick={handleMapClick} onMarkerDragEnd={handleMarkerDragEnd} onPlaceSelect={handlePlaceSelect} />
-                </GoogleMapsGate>
-              </div>
+            <GoogleMapsGate
+              fallback={<div className="flex h-72 w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">Cargando mapa…</div>}
+            >
+              <MemoizedLoteMap
+                lat={form.lat}
+                lng={form.lng}
+                onMapClick={handleMapClick}
+                onMarkerDragEnd={handleMarkerDragEnd}
+                onPlaceSelect={handlePlaceSelect}
+                geocodeQuery={geoQuery}
+                geocodeZoom={geoZoom}
+                onGeocoded={handleGeocoded}
+              />
+            </GoogleMapsGate>
+
+            {pinConfirmado ? (
+              <p className="flex items-center gap-1.5 rounded-md bg-success/10 px-3 py-2 font-body text-sm font-medium text-success">
+                <CheckCircle2 className="h-4 w-4" /> Ubicación confirmada
+              </p>
+            ) : form.lat ? (
+              <p className="flex items-center gap-1.5 rounded-md bg-warning/10 px-3 py-2 font-body text-sm font-medium text-foreground">
+                <AlertCircle className="h-4 w-4 text-warning" /> Ubicación aproximada — arrastra el pin o haz clic en el punto exacto del lote
+              </p>
+            ) : geoFallo ? (
+              <p className="flex items-center gap-1.5 rounded-md bg-warning/10 px-3 py-2 font-body text-sm text-foreground">
+                <AlertCircle className="h-4 w-4 text-warning" /> No encontramos la dirección exacta; ubica el pin manualmente haciendo clic en el mapa
+              </p>
+            ) : (
+              <p className="font-body text-xs text-muted-foreground">Elige departamento y municipio para centrar el mapa, o haz clic en el mapa para poner el pin.</p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2 font-body text-xs text-muted-foreground">
+              <span>{form.lat && form.lng ? `${form.lat}, ${form.lng}` : "Sin coordenadas"}</span>
+              <span>·</span>
+              <button type="button" className="font-medium text-secondary underline-offset-2 hover:underline" onClick={() => setEditarCoords((v) => !v)}>
+                {editarCoords ? "Ocultar coordenadas" : "Editar coordenadas"}
+              </button>
+            </div>
+            {editarCoords && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <FieldLabel>Latitud</FieldLabel>
-                  <Input value={form.lat} onChange={(e) => update("lat", e.target.value)} placeholder="6.2530" />
+                  <Input value={form.lat} onChange={(e) => { setOrigenPin("manual"); update("lat", e.target.value); }} placeholder="6.2530" />
                 </div>
                 <div>
                   <FieldLabel>Longitud</FieldLabel>
-                  <Input value={form.lng} onChange={(e) => update("lng", e.target.value)} placeholder="-75.5736" />
+                  <Input value={form.lng} onChange={(e) => { setOrigenPin("manual"); update("lng", e.target.value); }} placeholder="-75.5736" />
                 </div>
               </div>
-            </WizardSection>
-          </div>
+            )}
+          </WizardSection>
         )}
 
         {/* Step 3 */}

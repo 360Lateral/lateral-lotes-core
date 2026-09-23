@@ -23,10 +23,14 @@ interface MemoizedLoteMapProps {
   onMapClick: (e: google.maps.MapMouseEvent) => void;
   onMarkerDragEnd: (e: google.maps.MapMouseEvent) => void;
   onPlaceSelect?: (p: PlaceSelection) => void;
+  /** Texto a geocodificar automáticamente (dirección, barrio, municipio...) */
+  geocodeQuery?: string;
+  geocodeZoom?: number;
+  onGeocoded?: (r: { lat: number; lng: number; ok: boolean }) => void;
 }
 
 const MemoizedLoteMap = React.memo(
-  ({ lat, lng, onMapClick, onMarkerDragEnd, onPlaceSelect }: MemoizedLoteMapProps) => {
+  ({ lat, lng, onMapClick, onMarkerDragEnd, onPlaceSelect, geocodeQuery, geocodeZoom, onGeocoded }: MemoizedLoteMapProps) => {
     const parsedLat = parseFloat(lat) || defaultCenter.lat;
     const parsedLng = parseFloat(lng) || defaultCenter.lng;
     const center = { lat: parsedLat, lng: parsedLng };
@@ -69,6 +73,32 @@ const MemoizedLoteMap = React.memo(
       return () => l.remove();
     }, [onPlaceSelect, aplicar]);
 
+    useEffect(() => {
+      const q = geocodeQuery?.trim();
+      if (!q || !window.google?.maps) return;
+      let cancel = false;
+      new google.maps.Geocoder().geocode(
+        { address: q, componentRestrictions: { country: "CO" } },
+        (res, status) => {
+          if (cancel) return;
+          if (status === "OK" && res?.[0]) {
+            const loc = res[0].geometry.location;
+            onGeocoded?.({ lat: loc.lat(), lng: loc.lng(), ok: true });
+            if (mapRef.current) {
+              mapRef.current.panTo(loc);
+              mapRef.current.setZoom(geocodeZoom ?? 15);
+            }
+          } else {
+            onGeocoded?.({ lat: 0, lng: 0, ok: false });
+          }
+        },
+      );
+      return () => {
+        cancel = true;
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [geocodeQuery]);
+
     const buscarTexto = () => {
       const q = query.trim();
       if (!q || !window.google?.maps) return;
@@ -103,7 +133,7 @@ const MemoizedLoteMap = React.memo(
                       buscarTexto();
                     }
                   }}
-                  placeholder="Busca una dirección o un sitio de referencia (ej: Parque Lleras, Medellín)"
+                  placeholder="¿No encuentras la dirección? Busca un sitio cercano (ej: Parque Lleras)"
                   className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 font-body text-base focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
@@ -142,7 +172,9 @@ const MemoizedLoteMap = React.memo(
     prev.lng === next.lng &&
     prev.onMapClick === next.onMapClick &&
     prev.onMarkerDragEnd === next.onMarkerDragEnd &&
-    prev.onPlaceSelect === next.onPlaceSelect,
+    prev.onPlaceSelect === next.onPlaceSelect &&
+    prev.geocodeQuery === next.geocodeQuery &&
+    prev.onGeocoded === next.onGeocoded,
 );
 
 MemoizedLoteMap.displayName = "MemoizedLoteMap";
