@@ -245,62 +245,52 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       {/* Header */}
-      <header className="mb-4">
-        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+      <header className="mb-6">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Hola {nombre}, este es tu panorama
             </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">{panorama}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{panorama}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => navigate("/dashboard/lotes/nuevo")}>
-              <Plus className="mr-1.5 h-4 w-4" /> Nuevo lote
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleExportar}>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={handleExportar} className="rounded-xl border-2 font-semibold">
               <Download className="mr-1.5 h-4 w-4" /> Reporte
+            </Button>
+            <Button onClick={() => navigate("/dashboard/lotes/nuevo")} className="rounded-xl font-bold shadow-lg shadow-primary/25">
+              <Plus className="mr-1.5 h-4 w-4" /> Nuevo lote
             </Button>
           </div>
         </div>
 
-        <section className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          <KPIEstado
-            label="Atrasados"
-            value={atrasados}
-            icon={AlertTriangle}
-            colorClass="text-destructive"
-            destacado={atrasados > 0}
-            onClick={() => setFiltro("atrasados")}
-          />
-          <KPIEstado
-            label="Por publicar"
-            value={pendientesPublicar}
-            icon={Send}
-            colorClass="text-primary"
-            destacado={pendientesPublicar > 0}
-            onClick={() => setFiltro("con_engagement")}
-          />
-          <KPIEstado
-            label="En riesgo"
-            value={enRiesgo}
-            icon={Clock}
-            colorClass="text-amber-600"
-            onClick={() => setFiltro("con_engagement")}
-          />
-          <KPIEstado
-            label="Cumplidos"
-            value={cumplidos}
-            icon={CheckCircle2}
-            colorClass="text-green-600"
-          />
-          <KPIEstado
-            label="Sin asesor"
-            value={sinAsesor}
-            icon={Users}
-            colorClass="text-foreground"
-            destacado={sinAsesor > 0}
-            onClick={() => setFiltro("sin_asesor")}
-          />
+        <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {([
+            { label: "Atrasados", value: atrasados, icon: AlertTriangle, color: "text-destructive", onClick: () => setFiltro("atrasados") },
+            { label: "Por publicar", value: pendientesPublicar, icon: Send, color: "text-primary", onClick: () => setFiltro("con_engagement") },
+            { label: "En riesgo", value: enRiesgo, icon: Clock, color: "text-warning", onClick: () => setFiltro("con_engagement") },
+            { label: "Cumplidos", value: cumplidos, icon: CheckCircle2, color: "", destacado: true },
+            { label: "Sin asesor", value: sinAsesor, icon: Users, color: "text-muted-foreground", onClick: () => setFiltro("sin_asesor") },
+          ] as { label: string; value: number; icon: typeof Users; color: string; destacado?: boolean; onClick?: () => void }[]).map((k) => (
+            <button
+              key={k.label}
+              type="button"
+              onClick={k.onClick}
+              disabled={!k.onClick}
+              className={`rounded-2xl p-4 text-left transition-colors ${
+                k.destacado
+                  ? "bg-secondary text-secondary-foreground shadow-md"
+                  : "border border-border bg-card shadow-sm hover:border-primary"
+              } ${k.onClick ? "cursor-pointer" : "cursor-default"}`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-[11px] font-bold uppercase tracking-wide ${k.destacado ? "opacity-60" : k.color}`}>
+                  {k.label}
+                </span>
+                <k.icon className={`h-4 w-4 ${k.destacado ? "opacity-60" : k.color}`} />
+              </div>
+              <div className={`mt-1 text-2xl font-bold ${k.destacado ? "" : "text-foreground"}`}>{k.value}</div>
+            </button>
+          ))}
         </section>
       </header>
 
@@ -370,100 +360,78 @@ const Dashboard = () => {
       )}
 
       {/* Toolbar */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <DropdownPropietario
-          propietarioId={filtros.propietarioId ?? null}
-          onChange={(id) =>
-            setFiltros({ ...filtros, propietarioId: id ?? undefined })
-          }
-        />
-        <div className="relative min-w-[200px] flex-1">
-          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Buscar lote, ciudad, asesor..."
-            className="h-8 pl-7 text-xs"
+      <div className="mb-6 space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+          <DropdownPropietario
+            propietarioId={filtros.propietarioId ?? null}
+            onChange={(id) =>
+              setFiltros({ ...filtros, propietarioId: id ?? undefined })
+            }
           />
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar lote, ciudad, asesor..."
+              className="h-10 rounded-xl border-transparent bg-muted/60 pl-10 focus-visible:ring-secondary/20"
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setSheetOpen(true)}
+            className="relative h-10 gap-1.5 rounded-xl text-xs font-semibold"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filtros avanzados
+            {filtrosAvanzadosActivos > 0 && (
+              <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-bold text-secondary-foreground">
+                {filtrosAvanzadosActivos}
+              </span>
+            )}
+          </Button>
+          <div className="flex gap-1 rounded-xl bg-muted/60 p-1">
+            {([
+              { v: "grid", icon: LayoutGrid, label: "Tarjetas" },
+              { v: "tabla", icon: List, label: "Tabla" },
+              { v: "por_propietario", icon: Building2, label: "Por propietario" },
+            ] as const).map(({ v, icon: Icon, label }) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setVista(v)}
+                aria-label={label}
+                title={label}
+                className={`rounded-lg p-1.5 transition-colors ${
+                  vista === v
+                    ? "bg-card text-secondary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-3">
           {FILTROS.map((f) => (
             <button
               key={f.v}
               type="button"
               onClick={() => setFiltro(f.v)}
-              className={`inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] transition-colors ${
+              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition-colors ${
                 tipoFiltroDestacado(f.v)
-                  ? "border-secondary bg-secondary text-white"
-                  : "border-border bg-background text-foreground hover:bg-muted"
+                  ? "bg-secondary text-secondary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {f.label}
-              <span
-                className={`rounded-full px-1 text-[9px] font-bold ${
-                  tipoFiltroDestacado(f.v)
-                    ? "bg-white/20 text-white"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
+              <span className={tipoFiltroDestacado(f.v) ? "opacity-60" : "opacity-50"}>
                 {(contadores as Record<string, number>)[f.v] ?? 0}
               </span>
             </button>
           ))}
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setSheetOpen(true)}
-          className="relative h-8 gap-1 text-[11px]"
-        >
-          <SlidersHorizontal className="h-3.5 w-3.5" />
-          Filtros avanzados
-          {filtrosAvanzadosActivos > 0 && (
-            <span className="ml-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-bold text-white">
-              {filtrosAvanzadosActivos}
-            </span>
-          )}
-        </Button>
-        <div className="ml-auto flex gap-1 rounded-md border border-border bg-background p-0.5">
-          <button
-            type="button"
-            onClick={() => setVista("grid")}
-            className={`rounded p-1 ${
-              vista === "grid"
-                ? "bg-secondary text-white"
-                : "text-muted-foreground hover:bg-muted"
-            }`}
-            aria-label="Grid"
-          >
-            <LayoutGrid className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setVista("tabla")}
-            className={`rounded p-1 ${
-              vista === "tabla"
-                ? "bg-secondary text-white"
-                : "text-muted-foreground hover:bg-muted"
-            }`}
-            aria-label="Tabla"
-          >
-            <List className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setVista("por_propietario")}
-            className={`rounded p-1 ${
-              vista === "por_propietario"
-                ? "bg-secondary text-white"
-                : "text-muted-foreground hover:bg-muted"
-            }`}
-            aria-label="Por propietario"
-            title="Por propietario"
-          >
-            <Building2 className="h-3.5 w-3.5" />
-          </button>
         </div>
       </div>
 
@@ -664,6 +632,9 @@ const Dashboard = () => {
         </div>
       )}
 
+      {/* Bento: lotes + columna lateral */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <div className="min-w-0 xl:col-span-8">
       {/* Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -761,96 +732,109 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Resumen inferior */}
-      <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {/* Leads */}
-        <div className="rounded-md border border-border bg-background p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-foreground">Leads recientes</h2>
-            <span className="text-[10px] text-muted-foreground">
-              {resumenLeads?.nuevos ?? 0} nuevos
-            </span>
-          </div>
-          <div className="space-y-1.5">
-            {(resumenLeads?.leads ?? []).length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sin leads recientes.</p>
-            ) : (
-              (resumenLeads?.leads ?? []).map((lead: any) => (
-                <div
-                  key={lead.id}
-                  className="flex items-center justify-between rounded-md border border-border/60 px-2 py-1.5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-foreground">
-                      {lead.nombre ?? "—"}
-                    </p>
-                    <p className="truncate text-[10px] text-muted-foreground">
-                      {lead.lotes?.nombre_lote ?? "—"} ·{" "}
-                      {formatoRelativo(lead.created_at)}
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                    {lead.estado}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+      </div>
 
-        {/* Engagements */}
-        <div className="rounded-md border border-border bg-background p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-foreground">Engagements activos</h2>
-            <span className="text-[10px] text-muted-foreground">
-              {resumenEngagements?.total ?? 0} en curso
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-1.5">
-            {Object.entries(resumenEngagements?.porEstado ?? {}).map(
-              ([estado, count]) => (
-                <button
-                  key={estado}
-                  type="button"
-                  onClick={() =>
-                    navigate(`/dashboard/portafolio?estado=${estado}`)
-                  }
-                  className="rounded-md bg-muted/40 p-2 text-center transition-colors hover:bg-muted"
-                >
-                  <p className="text-base font-bold text-foreground">
-                    {count as number}
-                  </p>
-                  <p className="text-[9px] uppercase text-muted-foreground">
-                    {estado.replace(/_/g, " ")}
-                  </p>
-                </button>
-              ),
+      {/* Columna lateral */}
+      <aside className="space-y-6 xl:col-span-4">
+        {/* Leads */}
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">Leads recientes</h2>
+            {(resumenLeads?.nuevos ?? 0) > 0 && (
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
+                {resumenLeads?.nuevos} nuevos
+              </span>
             )}
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-2 text-center">
-            <div className="rounded-md bg-muted/30 p-1.5">
-              <p className="text-[9px] uppercase text-muted-foreground">SLA cumplido</p>
-              <p className="text-sm font-bold text-foreground">
-                {resumenEngagements?.slaCumplidoPct ?? 0}%
-              </p>
-            </div>
-            <div className="rounded-md bg-muted/30 p-1.5">
-              <p className="text-[9px] uppercase text-muted-foreground">
-                Tiempo promedio
-              </p>
-              <p className="text-sm font-bold text-foreground">
-                {resumenEngagements?.tiempoPromedio ?? 0} días
-              </p>
-            </div>
+          <div className="space-y-4">
+            {(resumenLeads?.leads ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sin leads recientes.</p>
+            ) : (
+              (resumenLeads?.leads ?? []).map((lead: any) => {
+                const iniciales = (lead.nombre ?? "—")
+                  .split(" ")
+                  .map((p: string) => p[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase();
+                return (
+                  <div key={lead.id} className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
+                      {iniciales}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-foreground">
+                        {lead.nombre ?? "—"}
+                      </p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {lead.lotes?.nombre_lote ?? "—"} · {formatoRelativo(lead.created_at)}
+                      </p>
+                    </div>
+                    {lead.estado === "nuevo" && (
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
           <button
             type="button"
+            onClick={() => navigate("/dashboard/leads")}
+            className="mt-6 w-full rounded-xl border border-border py-2 text-xs font-bold text-foreground transition-colors hover:bg-muted"
+          >
+            Ver todos los leads
+          </button>
+        </div>
+
+        {/* Engagements */}
+        <div className="rounded-3xl bg-secondary p-6 text-secondary-foreground shadow-lg">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-bold">Engagements activos</h2>
+            <span className="text-[11px] opacity-60">
+              {resumenEngagements?.total ?? 0} en curso
+            </span>
+          </div>
+          <div className="mb-5 flex items-end justify-between">
+            <div>
+              <p className="text-3xl font-bold">{resumenEngagements?.slaCumplidoPct ?? 0}%</p>
+              <p className="text-[10px] uppercase tracking-wide opacity-50">SLA cumplido</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold">{resumenEngagements?.tiempoPromedio ?? 0}d</p>
+              <p className="text-[10px] uppercase tracking-wide opacity-50">Tiempo prom.</p>
+            </div>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary-foreground/10">
+            <div
+              className="h-full bg-primary"
+              style={{ width: `${Math.min(100, resumenEngagements?.slaCumplidoPct ?? 0)}%` }}
+            />
+          </div>
+          {Object.keys(resumenEngagements?.porEstado ?? {}).length > 0 && (
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {Object.entries(resumenEngagements?.porEstado ?? {}).map(([estado, count]) => (
+                <button
+                  key={estado}
+                  type="button"
+                  onClick={() => navigate(`/dashboard/portafolio?estado=${estado}`)}
+                  className="rounded-xl bg-secondary-foreground/5 p-2 text-center transition-colors hover:bg-secondary-foreground/10"
+                >
+                  <p className="text-base font-bold">{count as number}</p>
+                  <p className="text-[9px] uppercase opacity-60">{estado.replace(/_/g, " ")}</p>
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
             onClick={() => navigate("/dashboard/portafolio")}
-            className="mt-3 text-xs text-primary hover:underline"
+            className="mt-5 text-xs font-bold text-primary hover:underline"
           >
             Ir al portafolio Kanban →
           </button>
         </div>
+      </aside>
       </div>
 
       <LoteDetalleDrawer
