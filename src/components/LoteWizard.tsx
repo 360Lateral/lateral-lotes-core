@@ -39,6 +39,7 @@ import { WizardSection, ChoiceSegment, ServiceTile, FieldLabel } from "@/compone
 import { calculateLoteScore } from "@/lib/loteScore";
 import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { BarrioCombobox } from "@/components/wizard/BarrioCombobox";
 import LoteScoreResult from "@/components/LoteScoreResult";
 import { formatCOP } from "@/lib/format-moneda";
 
@@ -786,7 +787,12 @@ const LoteWizard = () => {
               </div>
               <div>
                 <FieldLabel>Barrio o vereda</FieldLabel>
-                <Input value={form.barrio} onChange={(e) => update("barrio", e.target.value)} />
+                <BarrioCombobox
+                  departamento={form.departamento}
+                  ciudad={form.ciudad}
+                  value={form.barrio}
+                  onChange={(v) => update("barrio", v)}
+                />
               </div>
               <div>
                 <FieldLabel>Dirección aproximada</FieldLabel>
