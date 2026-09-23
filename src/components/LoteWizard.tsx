@@ -150,42 +150,40 @@ const LoteWizard = () => {
   const [published, setPublished] = useState(false);
   const [mostrarBannerDraft, setMostrarBannerDraft] = useState(false);
 
-  // Mostrar banner si encontramos un draft al montar
+  // Al encontrar un borrador, se restaura AUTOMÁTICAMENTE (sin esperar
+  // decisión). El banner solo informa y permite empezar de nuevo.
+  const [draftAplicado, setDraftAplicado] = useState(false);
   useEffect(() => {
-    if (draftCargado && draftInicial) setMostrarBannerDraft(true);
-  }, [draftCargado, draftInicial]);
-
-  const continuarBorrador = () => {
+    if (!draftCargado || draftAplicado) return;
     if (draftInicial) {
       setStep(draftInicial.step);
       setForm(draftInicial.form);
       setPublished(draftInicial.published);
       setVideoMode(draftInicial.videoMode);
       setVideoUrl(draftInicial.videoUrl);
+      setMostrarBannerDraft(true);
     }
-    setMostrarBannerDraft(false);
-  };
+    setDraftAplicado(true);
+  }, [draftCargado, draftInicial, draftAplicado]);
+
+  const continuarBorrador = () => setMostrarBannerDraft(false);
 
   const descartarBorrador = () => {
     limpiarDraft();
+    setStep(1);
+    setForm(emptyWizard);
+    setPublished(false);
+    setVideoMode("upload");
+    setVideoUrl("");
     setMostrarBannerDraft(false);
   };
 
-  // Autosave (debounced en el hook). No guardar antes de cargar ni mientras
-  // el banner está visible (el usuario aún no decidió).
+  // Autosave: solo después de haber restaurado el borrador (evita
+  // sobrescribirlo con el formulario vacío al entrar a la página).
   useEffect(() => {
-    if (!draftCargado || mostrarBannerDraft || published) return;
+    if (!draftAplicado || published) return;
     guardarDraft({ step, form, published, videoMode, videoUrl });
-  }, [
-    step,
-    form,
-    published,
-    videoMode,
-    videoUrl,
-    draftCargado,
-    mostrarBannerDraft,
-    guardarDraft,
-  ]);
+  }, [step, form, published, videoMode, videoUrl, draftAplicado, guardarDraft]);
 
   // Aviso defensivo al cerrar pestaña si hay datos digitados
   useEffect(() => {
@@ -202,9 +200,6 @@ const LoteWizard = () => {
   }, [form, published]);
 
   const update = (key: keyof WizardForm, value: any) => {
-    // Si el usuario empieza a escribir sin decidir sobre el borrador anterior,
-    // se asume que empieza uno nuevo y se reactiva el autoguardado.
-    if (mostrarBannerDraft) setMostrarBannerDraft(false);
     setForm((p) => ({ ...p, [key]: value }));
   };
 
@@ -505,10 +500,10 @@ const LoteWizard = () => {
             <AlertCircle className="h-5 w-5 shrink-0 text-warning" />
             <div className="flex-1">
               <p className="font-body text-sm font-semibold text-foreground">
-                Tienes un borrador sin terminar
+                Recuperamos tu borrador
               </p>
               <p className="mt-1 font-body text-xs text-muted-foreground">
-                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Step{" "}
+                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Paso{" "}
                 {draftInicial.step} de 4
               </p>
               <p className="mt-1 font-body text-xs text-muted-foreground">
@@ -517,7 +512,7 @@ const LoteWizard = () => {
             </div>
             <div className="flex gap-2 sm:shrink-0">
               <Button size="sm" onClick={continuarBorrador}>
-                Continuar borrador
+                Entendido
               </Button>
               <Button size="sm" variant="outline" onClick={descartarBorrador}>
                 Empezar nuevo
