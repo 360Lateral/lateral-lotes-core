@@ -32,7 +32,10 @@ import {
   Upload,
   FileText,
   CheckCircle2,
+  Cloud, Building2, Ruler, Lock, Landmark, MapPin, Layers, Scale, Video, FolderOpen,
+  Star, Send, Droplets, Zap, Flame, Waves, Route,
 } from "lucide-react";
+import { WizardSection, ChoiceSegment, ServiceTile, FieldLabel } from "@/components/wizard/WizardUI";
 import { calculateLoteScore } from "@/lib/loteScore";
 import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -497,238 +500,192 @@ const LoteWizard = () => {
     "Otro",
   ];
 
+  const STEP_META: Record<number, { title: string; desc: string; mins: string }> = {
+    1: { title: "Datos del activo", desc: "Identifica el lote y define su valor.", mins: "2 min" },
+    2: { title: "Ubicación", desc: "Jurisdicción y georreferenciación del predio.", mins: "1 min" },
+    3: { title: "Información técnica", desc: "Uso de suelo, servicios y estado jurídico.", mins: "2 min" },
+    4: { title: "Fotos y documentos", desc: "Galería y expediente para la validación.", mins: "3 min" },
+  };
+  const progreso = Math.round(((step - 1) / STEPS.length) * 100);
+  const precioNum = parseInt(form.precio_cop);
+  const areaNum = parseFloat(form.area_total_m2);
+  const SERVICIO_ICONS: Record<string, any> = {
+    Agua: Droplets,
+    Energía: Zap,
+    Gas: Flame,
+    Alcantarillado: Waves,
+    "Vía pavimentada": Route,
+  };
+  const SI_NO = [
+    { value: "si", label: "Sí" },
+    { value: "no", label: "No" },
+  ];
+  const SI_NO_NS = [...SI_NO, { value: "no_se", label: "No sé" }];
+
   return (
     <DashboardLayout>
-      <h1 className="mb-4 font-body text-xl font-bold text-foreground">
-        Publicar mi lote
-      </h1>
+      <div className="mx-auto w-full max-w-4xl pb-28">
+        {/* Header */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-body text-xs font-semibold uppercase tracking-widest text-primary">
+              Publicación de activo
+            </p>
+            <h1 className="mt-1 font-body text-2xl font-bold text-foreground">Publicar mi lote</h1>
+          </div>
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-body text-xs text-muted-foreground">
+            <Cloud className="h-3.5 w-3.5 text-success" />
+            Borrador guardado automáticamente
+          </span>
+        </div>
 
-      {mostrarBannerDraft && draftInicial && (
-        <Card className="mb-6 border-warning bg-warning/10">
-          <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-start">
+        {mostrarBannerDraft && draftInicial && (
+          <div className="mb-6 flex flex-col gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4 sm:flex-row sm:items-start">
             <AlertCircle className="h-5 w-5 shrink-0 text-warning" />
             <div className="flex-1">
-              <p className="font-body text-sm font-semibold text-foreground">
-                Recuperamos tu borrador
-              </p>
+              <p className="font-body text-sm font-semibold text-foreground">Recuperamos tu borrador</p>
               <p className="mt-1 font-body text-xs text-muted-foreground">
-                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Paso{" "}
-                {draftInicial.step} de 4
+                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Paso {draftInicial.step} de 4
               </p>
               <p className="mt-1 font-body text-xs text-muted-foreground">
                 Los archivos (fotos, video, documentos) NO se conservan — solo los datos digitados.
               </p>
             </div>
             <div className="flex gap-2 sm:shrink-0">
-              <Button size="sm" onClick={continuarBorrador}>
-                Entendido
-              </Button>
-              <Button size="sm" variant="outline" onClick={descartarBorrador}>
-                Empezar nuevo
-              </Button>
+              <Button size="sm" onClick={continuarBorrador}>Entendido</Button>
+              <Button size="sm" variant="outline" onClick={descartarBorrador}>Empezar nuevo</Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
 
-
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {STEPS.map((s, i) => {
-            const isActive = step === s.num;
-            const isCompleted = step > s.num;
-            return (
-              <div key={s.num} className="flex flex-1 flex-col items-center">
-                <div className="flex w-full items-center">
-                  {i > 0 && (
-                    <div
-                      className={`h-0.5 flex-1 ${
-                        step > s.num - 1 ? "bg-success" : "bg-accent"
-                      }`}
-                    />
-                  )}
-                  <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-body text-sm font-bold transition-colors ${
+        {/* Stepper */}
+        <div className="mb-6 rounded-xl border border-border bg-card p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between font-body text-xs">
+            <span className="font-semibold text-foreground">
+              Paso {step} de {STEPS.length} · {STEP_META[step].title}
+            </span>
+            <span className="text-muted-foreground">Aprox. {STEP_META[step].mins} · {progreso}% completado</span>
+          </div>
+          <div className="mb-5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500"
+              style={{ width: `${Math.max(progreso, 4)}%` }}
+            />
+          </div>
+          <ol className="grid grid-cols-4 gap-2">
+            {STEPS.map((s) => {
+              const isActive = step === s.num;
+              const isCompleted = step > s.num;
+              return (
+                <li key={s.num} className="flex flex-col items-center gap-1.5 text-center sm:flex-row sm:text-left">
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-body text-xs font-bold transition-colors ${
                       isCompleted
-                        ? "bg-success text-primary-foreground"
+                        ? "bg-secondary text-secondary-foreground"
                         : isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-accent text-muted-foreground"
+                          ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                          : "border border-border bg-background text-muted-foreground"
                     }`}
                   >
                     {isCompleted ? <Check className="h-4 w-4" /> : s.num}
-                  </div>
-                  {i < STEPS.length - 1 && (
-                    <div
-                      className={`h-0.5 flex-1 ${
-                        step > s.num ? "bg-success" : "bg-accent"
-                      }`}
-                    />
-                  )}
-                </div>
-                <span
-                  className={`mt-1 text-center font-body text-xs ${
-                    isActive
-                      ? "font-semibold text-primary"
-                      : isCompleted
-                        ? "font-medium text-success"
-                        : "text-muted-foreground"
-                  }`}
-                >
-                  {s.label}
-                </span>
-              </div>
-            );
-          })}
+                  </span>
+                  <span
+                    className={`font-body text-[11px] leading-tight sm:text-xs ${
+                      isActive ? "font-semibold text-foreground" : isCompleted ? "text-secondary" : "text-muted-foreground"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </div>
-      </div>
 
-      {/* Step 1 */}
-      {step === 1 && (
-        <Card>
-          <CardContent className="flex flex-col gap-4 pt-6">
-            <div>
-              <Label className="text-xs">
-                Nombre del lote <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                className={errClass("nombre_lote")}
-                value={form.nombre_lote}
-                onChange={(e) => update("nombre_lote", e.target.value)}
-                placeholder="Ej: Lote La Pradera"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">
-                Nombre del propietario <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                className={errClass("nombre_propietario")}
-                value={form.nombre_propietario}
-                onChange={(e) => update("nombre_propietario", e.target.value)}
-                placeholder="Ej: Juan Pérez o Constructora XYZ"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">
-                Tipo de lote <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={form.tipo_lote || undefined}
-                onValueChange={(v) => update("tipo_lote", v)}
-              >
-                <SelectTrigger className={errClass("tipo_lote")}>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Urbano">Urbano</SelectItem>
-                  <SelectItem value="Rural">Rural</SelectItem>
-                  <SelectItem value="Expansión urbana">Expansión urbana</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div>
-                <Label className="text-xs">
-                  Área en m² <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  type="number"
-                  className={errClass("area_total_m2")}
-                  value={form.area_total_m2}
-                  onChange={(e) => update("area_total_m2", e.target.value)}
-                />
+        <p className="mb-4 font-body text-sm text-muted-foreground">{STEP_META[step].desc}</p>
+
+        {/* Step 1 */}
+        {step === 1 && (
+          <div className="flex flex-col gap-5">
+            <WizardSection icon={Building2} title="Identificación general" description="Cómo se reconocerá el activo en la plataforma.">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <FieldLabel required>Nombre del lote</FieldLabel>
+                  <Input className={errClass("nombre_lote")} value={form.nombre_lote} onChange={(e) => update("nombre_lote", e.target.value)} placeholder="Ej: Lote La Pradera" />
+                </div>
+                <div>
+                  <FieldLabel required>Nombre del propietario</FieldLabel>
+                  <Input className={errClass("nombre_propietario")} value={form.nombre_propietario} onChange={(e) => update("nombre_propietario", e.target.value)} placeholder="Ej: Juan Pérez o Constructora XYZ" />
+                </div>
               </div>
               <div>
-                <Label className="text-xs">Frente en metros</Label>
-                <Input
-                  type="number"
-                  value={form.frente_ml}
-                  onChange={(e) => update("frente_ml", e.target.value)}
+                <FieldLabel required>Tipo de lote</FieldLabel>
+                <ChoiceSegment
+                  value={form.tipo_lote}
+                  onChange={(v) => update("tipo_lote", v)}
+                  options={[
+                    { value: "Urbano", label: "Urbano" },
+                    { value: "Rural", label: "Rural" },
+                    { value: "Expansión urbana", label: "Expansión urbana" },
+                  ]}
                 />
+                {errors.tipo_lote && <p className="mt-1 font-body text-xs text-destructive">Selecciona el tipo de lote.</p>}
               </div>
               <div>
-                <Label className="text-xs">Fondo en metros</Label>
-                <Input
-                  type="number"
-                  value={form.fondo_ml}
-                  onChange={(e) => update("fondo_ml", e.target.value)}
-                />
+                <FieldLabel>Descripción del lote (opcional)</FieldLabel>
+                <Textarea value={form.notas} onChange={(e) => update("notas", e.target.value)} placeholder="Describe las características principales del lote..." rows={3} />
               </div>
-            </div>
-            <div>
-              <Label className="text-xs">
-                Precio total en COP <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                type="number"
-                className={errClass("precio_cop")}
-                value={form.precio_cop}
-                onChange={(e) => update("precio_cop", e.target.value)}
-                placeholder="Ej: 350000000"
-              />
-              {form.precio_cop && (
-                <p className="mt-1 font-body text-xs text-muted-foreground">
-                  = {formatCOP(parseInt(form.precio_cop))} COP
-                  {form.area_total_m2 && ` · ${formatCOP(Math.round(
-                    parseInt(form.precio_cop) / parseFloat(form.area_total_m2)
-                  ))}/m²`}
-                </p>
+            </WizardSection>
 
-              )}
-            </div>
-            <div>
-              <Label className="text-xs">Descripción del lote (opcional)</Label>
-              <Textarea
-                value={form.notas}
-                onChange={(e) => update("notas", e.target.value)}
-                placeholder="Describe las características principales del lote..."
-                rows={3}
-              />
-            </div>
+            <WizardSection icon={Ruler} title="Métricas y valor" description="Superficie y precio de venta esperado.">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                  <FieldLabel required>Área total m²</FieldLabel>
+                  <Input type="number" className={errClass("area_total_m2")} value={form.area_total_m2} onChange={(e) => update("area_total_m2", e.target.value)} />
+                </div>
+                <div>
+                  <FieldLabel>Frente (m)</FieldLabel>
+                  <Input type="number" value={form.frente_ml} onChange={(e) => update("frente_ml", e.target.value)} />
+                </div>
+                <div>
+                  <FieldLabel>Fondo (m)</FieldLabel>
+                  <Input type="number" value={form.fondo_ml} onChange={(e) => update("fondo_ml", e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <FieldLabel required>Precio total en COP</FieldLabel>
+                <Input type="number" className={errClass("precio_cop")} value={form.precio_cop} onChange={(e) => update("precio_cop", e.target.value)} placeholder="Ej: 350000000" />
+                {precioNum > 0 && (
+                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="rounded-lg bg-secondary px-4 py-3 text-secondary-foreground">
+                      <p className="font-body text-[11px] uppercase tracking-wide opacity-70">Precio total</p>
+                      <p className="font-body text-lg font-bold">{formatCOP(precioNum)}</p>
+                    </div>
+                    {areaNum > 0 && (
+                      <div className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3">
+                        <p className="font-body text-[11px] uppercase tracking-wide text-muted-foreground">Valor por m²</p>
+                        <p className="font-body text-lg font-bold text-foreground">{formatCOP(Math.round(precioNum / areaNum))}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </WizardSection>
 
-            {/* Adquisición (opcional) */}
-            <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
-              <h4 className="text-sm font-semibold mb-1">
-                Información de adquisición{" "}
-                <span className="text-muted-foreground font-normal">
-                  (opcional)
-                </span>
-              </h4>
-              <p className="text-xs text-muted-foreground mb-3">
-                Estos datos solo los ves tú y se usan para calcular la plusvalía
-                de tu portafolio.
-              </p>
+            <WizardSection icon={Lock} title="Información de adquisición" description="Opcional. Solo la ves tú; se usa para calcular la plusvalía de tu portafolio.">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div>
-                  <Label className="text-xs">Precio de compra original</Label>
-                  <Input
-                    type="number"
-                    value={form.precio_compra_original}
-                    onChange={(e) =>
-                      update("precio_compra_original", e.target.value)
-                    }
-                    placeholder="Ej: 500000000"
-                  />
+                  <FieldLabel>Precio de compra original</FieldLabel>
+                  <Input type="number" value={form.precio_compra_original} onChange={(e) => update("precio_compra_original", e.target.value)} placeholder="Ej: 500000000" />
                 </div>
                 <div>
-                  <Label className="text-xs">Fecha de compra</Label>
-                  <Input
-                    type="date"
-                    value={form.fecha_compra}
-                    onChange={(e) => update("fecha_compra", e.target.value)}
-                  />
+                  <FieldLabel>Fecha de compra</FieldLabel>
+                  <Input type="date" value={form.fecha_compra} onChange={(e) => update("fecha_compra", e.target.value)} />
                 </div>
                 <div>
-                  <Label className="text-xs">Moneda</Label>
-                  <Select
-                    value={form.moneda_compra}
-                    onValueChange={(v) => update("moneda_compra", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <FieldLabel>Moneda</FieldLabel>
+                  <Select value={form.moneda_compra} onValueChange={(v) => update("moneda_compra", v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="COP">COP</SelectItem>
                       <SelectItem value="USD">USD</SelectItem>
@@ -736,422 +693,266 @@ const LoteWizard = () => {
                   </Select>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </WizardSection>
+          </div>
+        )}
 
-      {/* Step 2 */}
-      {step === 2 && (
-        <Card>
-          <CardContent className="flex flex-col gap-4 pt-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Label className="text-xs">
-                  Departamento <span className="text-destructive">*</span>
-                </Label>
-                <SearchableSelect
-                  options={DEPARTAMENTO_NOMBRES}
-                  value={form.departamento}
-                  onValueChange={(v) => {
-                    update("departamento", v);
-                    // Reset ciudad when departamento changes
-                    if (v !== form.departamento) update("ciudad", "");
-                  }}
-                  placeholder="Seleccionar departamento"
-                  searchPlaceholder="Buscar departamento..."
-                  emptyText="Departamento no encontrado."
-                  className={errClass("departamento")}
-                />
+        {/* Step 2 */}
+        {step === 2 && (
+          <div className="flex flex-col gap-5">
+            <WizardSection icon={Landmark} title="Jurisdicción" description="Departamento, municipio y sector del predio.">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <FieldLabel required>Departamento</FieldLabel>
+                  <SearchableSelect
+                    options={DEPARTAMENTO_NOMBRES}
+                    value={form.departamento}
+                    onValueChange={(v) => {
+                      update("departamento", v);
+                      if (v !== form.departamento) update("ciudad", "");
+                    }}
+                    placeholder="Seleccionar departamento"
+                    searchPlaceholder="Buscar departamento..."
+                    emptyText="Departamento no encontrado."
+                    className={errClass("departamento")}
+                  />
+                </div>
+                <div>
+                  <FieldLabel required>Municipio</FieldLabel>
+                  <SearchableSelect
+                    options={getMunicipios(form.departamento)}
+                    value={form.ciudad}
+                    onValueChange={(v) => update("ciudad", v)}
+                    placeholder="Seleccionar municipio"
+                    searchPlaceholder="Buscar municipio..."
+                    emptyText="Municipio no encontrado."
+                    className={errClass("ciudad")}
+                    disabled={!form.departamento}
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Barrio o vereda</FieldLabel>
+                  <Input value={form.barrio} onChange={(e) => update("barrio", e.target.value)} />
+                </div>
+                <div>
+                  <FieldLabel>Dirección aproximada</FieldLabel>
+                  <Input value={form.direccion} onChange={(e) => update("direccion", e.target.value)} placeholder="No se mostrará exacta" />
+                </div>
               </div>
-              <div>
-                <Label className="text-xs">
-                  Municipio <span className="text-destructive">*</span>
-                </Label>
-                <SearchableSelect
-                  options={getMunicipios(form.departamento)}
-                  value={form.ciudad}
-                  onValueChange={(v) => update("ciudad", v)}
-                  placeholder="Seleccionar municipio"
-                  searchPlaceholder="Buscar municipio..."
-                  emptyText="Municipio no encontrado."
-                  className={errClass("ciudad")}
-                  disabled={!form.departamento}
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs">Barrio o vereda</Label>
-              <Input
-                value={form.barrio}
-                onChange={(e) => update("barrio", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Dirección aproximada</Label>
-              <Input
-                value={form.direccion}
-                onChange={(e) => update("direccion", e.target.value)}
-                placeholder="No se mostrará exacta por seguridad"
-              />
-              <p className="mt-1 font-body text-xs text-muted-foreground">
-                🔒 La dirección exacta no se mostrará públicamente por seguridad.
+              <p className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
+                <Lock className="h-3.5 w-3.5" /> La dirección exacta no se mostrará públicamente por seguridad.
               </p>
-            </div>
-            <div>
-              <Label className="mb-2 block text-xs">
-                Marca la ubicación aproximada en el mapa
-              </Label>
-              <GoogleMapsGate
-                fallback={<div className="h-56 w-full rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">Cargando mapa…</div>}
-              >
-                <MemoizedLoteMap
-                  lat={form.lat}
-                  lng={form.lng}
-                  onMapClick={handleMapClick}
-                  onMarkerDragEnd={handleMarkerDragEnd}
-                />
-              </GoogleMapsGate>
-              <div className="mt-2 grid grid-cols-2 gap-4">
+            </WizardSection>
+
+            <WizardSection icon={MapPin} title="Georreferenciación" description="Haz clic en el mapa o arrastra el marcador a la ubicación aproximada.">
+              <div className="overflow-hidden rounded-lg border border-border">
+                <GoogleMapsGate
+                  fallback={<div className="flex h-56 w-full items-center justify-center bg-muted text-sm text-muted-foreground">Cargando mapa…</div>}
+                >
+                  <MemoizedLoteMap lat={form.lat} lng={form.lng} onMapClick={handleMapClick} onMarkerDragEnd={handleMarkerDragEnd} />
+                </GoogleMapsGate>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs">Latitud</Label>
-                  <Input
-                    value={form.lat}
-                    onChange={(e) => update("lat", e.target.value)}
-                    placeholder="6.2530"
-                  />
+                  <FieldLabel>Latitud</FieldLabel>
+                  <Input value={form.lat} onChange={(e) => update("lat", e.target.value)} placeholder="6.2530" />
                 </div>
                 <div>
-                  <Label className="text-xs">Longitud</Label>
-                  <Input
-                    value={form.lng}
-                    onChange={(e) => update("lng", e.target.value)}
-                    placeholder="-75.5736"
-                  />
+                  <FieldLabel>Longitud</FieldLabel>
+                  <Input value={form.lng} onChange={(e) => update("lng", e.target.value)} placeholder="-75.5736" />
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </WizardSection>
+          </div>
+        )}
 
-      {/* Step 3 */}
-      {step === 3 && (
-        <Card>
-          <CardContent className="flex flex-col gap-5 pt-6">
-            <div>
-              <Label className="text-xs">Uso de suelo</Label>
-              <Select
-                value={form.uso_principal || undefined}
-                onValueChange={(v) => update("uso_principal", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Residencial">Residencial</SelectItem>
-                  <SelectItem value="Comercial">Comercial</SelectItem>
-                  <SelectItem value="Industrial">Industrial</SelectItem>
-                  <SelectItem value="Dotacional">Dotacional</SelectItem>
-                  <SelectItem value="Rural">Rural</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="mb-2 block text-xs">Servicios disponibles</Label>
-              <div className="flex flex-wrap gap-4">
-                {Object.keys(form.servicios).map((s) => (
-                  <label
-                    key={s}
-                    className="flex items-center gap-2 font-body text-sm"
-                  >
-                    <Checkbox
-                      checked={form.servicios[s]}
-                      onCheckedChange={() => toggleServicio(s)}
-                    />
-                    {s}
-                  </label>
-                ))}
+        {/* Step 3 */}
+        {step === 3 && (
+          <div className="flex flex-col gap-5">
+            <WizardSection icon={Layers} title="Norma y servicios" description="Uso de suelo y servicios públicos disponibles.">
+              <div>
+                <FieldLabel>Uso de suelo</FieldLabel>
+                <Select value={form.uso_principal || undefined} onValueChange={(v) => update("uso_principal", v)}>
+                  <SelectTrigger className="sm:max-w-xs"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Residencial">Residencial</SelectItem>
+                    <SelectItem value="Comercial">Comercial</SelectItem>
+                    <SelectItem value="Industrial">Industrial</SelectItem>
+                    <SelectItem value="Dotacional">Dotacional</SelectItem>
+                    <SelectItem value="Rural">Rural</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+              <div>
+                <FieldLabel>Servicios disponibles</FieldLabel>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                  {Object.keys(form.servicios).map((s) => (
+                    <ServiceTile key={s} label={s} icon={SERVICIO_ICONS[s] ?? Check} active={form.servicios[s]} onToggle={() => toggleServicio(s)} />
+                  ))}
+                </div>
+              </div>
+            </WizardSection>
 
-            <div>
-              <Label className="mb-2 block text-xs">
-                ¿Tiene escritura pública?
-              </Label>
-              <RadioGroup
-                value={form.tiene_escritura}
-                onValueChange={(v) => update("tiene_escritura", v)}
-                className="flex gap-4"
-              >
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="si" /> Sí
-                </label>
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="no" /> No
-                </label>
-              </RadioGroup>
-            </div>
+            <WizardSection icon={Scale} title="Situación jurídica" description="Ayuda al equipo a validar el activo más rápido.">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <span className="font-body text-sm font-medium text-foreground">¿Tiene escritura pública?</span>
+                <ChoiceSegment value={form.tiene_escritura} onChange={(v) => update("tiene_escritura", v)} options={SI_NO} />
+              </div>
+              <div className="flex flex-col gap-4 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <span className="font-body text-sm font-medium text-foreground">¿Tiene deudas o gravámenes?</span>
+                <ChoiceSegment value={form.tiene_deudas} onChange={(v) => update("tiene_deudas", v)} options={SI_NO_NS} />
+              </div>
+              <div className="flex flex-col gap-4 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <span className="font-body text-sm font-medium text-foreground">¿Tiene algún problema jurídico?</span>
+                <ChoiceSegment value={form.problema_juridico} onChange={(v) => update("problema_juridico", v)} options={SI_NO_NS} />
+              </div>
+              <div className="border-t border-border pt-4">
+                <FieldLabel>Observaciones técnicas (opcional)</FieldLabel>
+                <Textarea value={form.observaciones} onChange={(e) => update("observaciones", e.target.value)} rows={3} />
+              </div>
+            </WizardSection>
+          </div>
+        )}
 
-            <div>
-              <Label className="mb-2 block text-xs">
-                ¿Tiene deudas o gravámenes?
-              </Label>
-              <RadioGroup
-                value={form.tiene_deudas}
-                onValueChange={(v) => update("tiene_deudas", v)}
-                className="flex gap-4"
-              >
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="si" /> Sí
-                </label>
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="no" /> No
-                </label>
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="no_se" /> No sé
-                </label>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label className="mb-2 block text-xs">
-                ¿Tiene algún problema jurídico?
-              </Label>
-              <RadioGroup
-                value={form.problema_juridico}
-                onValueChange={(v) => update("problema_juridico", v)}
-                className="flex gap-4"
-              >
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="si" /> Sí
-                </label>
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="no" /> No
-                </label>
-                <label className="flex items-center gap-2 font-body text-sm">
-                  <RadioGroupItem value="no_se" /> No sé
-                </label>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label className="text-xs">Observaciones técnicas (opcional)</Label>
-              <Textarea
-                value={form.observaciones}
-                onChange={(e) => update("observaciones", e.target.value)}
-                rows={3}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 4 */}
-      {step === 4 && (
-        <div className="flex flex-col gap-6">
-          {/* Photos */}
-          <Card>
-            <CardContent className="flex flex-col gap-4 pt-6">
-              <Label className="text-sm font-semibold">
-                Fotos del lote <span className="text-destructive">*</span>
-                <span className="ml-2 font-normal text-muted-foreground">
-                  (mín. 1, máx. 10)
-                </span>
-              </Label>
-              {errors.photos && (
-                <p className="font-body text-sm text-destructive">
-                  Sube al menos una foto del lote.
-                </p>
-              )}
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+        {/* Step 4 */}
+        {step === 4 && (
+          <div className="flex flex-col gap-5">
+            <WizardSection
+              icon={ImagePlus}
+              title="Galería multimedia"
+              description="Mínimo 1, máximo 10 fotos (JPG o PNG). La primera será la portada."
+              aside={<span className="rounded-full bg-muted px-2.5 py-1 font-body text-xs font-semibold text-muted-foreground">{photos.length}/10</span>}
+            >
+              {errors.photos && <p className="font-body text-sm text-destructive">Sube al menos una foto del lote.</p>}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {photoPreviews.map((src, i) => (
-                  <div key={i} className="group relative">
-                    <img
-                      src={src}
-                      alt={`Foto ${i + 1}`}
-                      className="h-24 w-full rounded-md object-cover"
-                    />
+                  <div key={i} className={`group relative overflow-hidden rounded-lg border border-border ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+                    <img src={src} alt={`Foto ${i + 1}`} className={`w-full object-cover ${i === 0 ? "h-full min-h-48" : "h-24"}`} />
+                    {i === 0 && (
+                      <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 font-body text-[11px] font-semibold text-primary-foreground">
+                        <Star className="h-3 w-3" /> Portada
+                      </span>
+                    )}
                     <button
                       type="button"
+                      aria-label={`Eliminar foto ${i + 1}`}
                       onClick={() => removePhoto(i)}
-                      className="absolute right-1 top-1 hidden rounded bg-destructive p-1 text-primary-foreground group-hover:block"
+                      className="absolute right-2 top-2 rounded-md bg-destructive p-1.5 text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
-                    <span className="absolute bottom-1 left-1 rounded bg-foreground/60 px-1 font-body text-[10px] text-primary-foreground">
-                      {i + 1}
-                    </span>
                   </div>
                 ))}
                 {photos.length < 10 && (
-                  <label className="flex h-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-muted/50 transition-colors hover:bg-muted">
-                    <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                    <span className="font-body text-[10px] text-muted-foreground">
-                      Agregar
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png"
-                      multiple
-                      className="hidden"
-                      onChange={handlePhotos}
-                    />
+                  <label className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border bg-muted/40 transition-colors hover:border-primary hover:bg-primary/5 ${photos.length === 0 ? "col-span-2 h-40 sm:col-span-4" : "h-24"}`}>
+                    <ImagePlus className="h-6 w-6 text-primary" />
+                    <span className="font-body text-xs font-medium text-foreground">{photos.length === 0 ? "Agregar fotos del lote" : "Agregar"}</span>
+                    {photos.length === 0 && <span className="font-body text-[11px] text-muted-foreground">JPG o PNG</span>}
+                    <input type="file" accept="image/jpeg,image/png" multiple className="hidden" onChange={handlePhotos} />
                   </label>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </WizardSection>
 
-          {/* Video */}
-          <Card>
-            <CardContent className="flex flex-col gap-4 pt-6">
-              <Label className="text-sm font-semibold">
-                Video del lote (opcional)
-              </Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={videoMode === "upload" ? "default" : "outline"}
-                  onClick={() => setVideoMode("upload")}
-                >
-                  <Upload className="mr-1 h-4 w-4" /> Subir archivo
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={videoMode === "link" ? "default" : "outline"}
-                  onClick={() => setVideoMode("link")}
-                >
-                  🔗 Pegar link
-                </Button>
-              </div>
+            <WizardSection icon={Video} title="Video del lote" description="Opcional. Sube un archivo o pega un enlace.">
+              <ChoiceSegment
+                value={videoMode}
+                onChange={(v) => setVideoMode(v as any)}
+                options={[
+                  { value: "upload", label: "Subir archivo" },
+                  { value: "link", label: "Pegar enlace" },
+                ]}
+              />
               {videoMode === "upload" ? (
-                <div>
-                  {videoFile ? (
-                    <div className="flex items-center gap-2 rounded-md border border-border p-2">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                      <span className="flex-1 truncate font-body text-sm">
-                        {videoFile.name}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setVideoFile(null)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex h-20 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-muted/50 transition-colors hover:bg-muted">
-                      <Upload className="h-6 w-6 text-muted-foreground" />
-                      <span className="font-body text-xs text-muted-foreground">
-                        MP4, máximo 100MB
-                      </span>
-                      <input
-                        type="file"
-                        accept="video/mp4"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f && f.size <= 100 * 1024 * 1024) setVideoFile(f);
-                          else if (f)
-                            toast({
-                              title: "El video excede 100MB",
-                              variant: "destructive",
-                            });
-                        }}
-                      />
-                    </label>
-                  )}
-                </div>
-              ) : (
-                <Input
-                  placeholder="https://youtube.com/... o link de Drive"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                />
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Documents */}
-          <Card>
-            <CardContent className="flex flex-col gap-4 pt-6">
-              <Label className="text-sm font-semibold">
-                Documentos (opcional)
-              </Label>
-              {docs.map((d, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 rounded-md border border-border p-2"
-                >
-                  <FileText className="h-5 w-5 text-muted-foreground" />
-                  <span className="flex-1 truncate font-body text-sm">
-                    {d.file.name}
-                  </span>
-                  <span className="rounded bg-muted px-2 py-0.5 font-body text-xs text-muted-foreground">
-                    {d.categoria}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeDoc(i)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-              <div className="flex flex-wrap gap-2">
-                {DOC_CATEGORIES.map((cat) => (
-                  <label
-                    key={cat}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-muted/50 px-3 py-1.5 font-body text-xs transition-colors hover:bg-muted"
-                  >
-                    <Upload className="h-3 w-3" />
-                    {cat}
+                videoFile ? (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <FileText className="h-5 w-5 text-secondary" />
+                    <span className="flex-1 truncate font-body text-sm">{videoFile.name}</span>
+                    <button type="button" aria-label="Quitar video" onClick={() => setVideoFile(null)} className="text-destructive">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border bg-muted/40 transition-colors hover:border-primary hover:bg-primary/5">
+                    <Upload className="h-5 w-5 text-primary" />
+                    <span className="font-body text-xs text-muted-foreground">MP4, máximo 100MB</span>
                     <input
                       type="file"
+                      accept="video/mp4"
                       className="hidden"
-                      onChange={(e) => handleDocAdd(e, cat)}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f && f.size <= 100 * 1024 * 1024) setVideoFile(f);
+                        else if (f) toast({ title: "El video excede 100MB", variant: "destructive" });
+                      }}
                     />
                   </label>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                )
+              ) : (
+                <Input placeholder="https://youtube.com/... o link de Drive" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} />
+              )}
+            </WizardSection>
 
-      {/* Navigation buttons */}
-      <div className="mt-6 flex justify-between">
-        {step > 1 ? (
-          <Button type="button" variant="outline" onClick={goPrev}>
-            <ChevronLeft className="mr-1 h-4 w-4" /> Anterior
-          </Button>
-        ) : (
-          <div />
+            <WizardSection icon={FolderOpen} title="Expediente documental" description="Opcional, pero acelera la validación jurídica del activo.">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {DOC_CATEGORIES.map((cat) => {
+                  const adjuntos = docs.map((d, i) => ({ d, i })).filter(({ d }) => d.categoria === cat);
+                  return (
+                    <div key={cat} className={`rounded-lg border p-3 ${adjuntos.length ? "border-success/40 bg-success/5" : "border-border"}`}>
+                      <div className="flex items-center gap-2">
+                        {adjuntos.length ? <CheckCircle2 className="h-4 w-4 text-success" /> : <FileText className="h-4 w-4 text-muted-foreground" />}
+                        <span className="flex-1 font-body text-sm font-medium text-foreground">{cat}</span>
+                        <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 font-body text-xs font-medium transition-colors hover:border-primary hover:text-primary">
+                          <Upload className="h-3 w-3" /> Adjuntar
+                          <input type="file" className="hidden" onChange={(e) => handleDocAdd(e, cat)} />
+                        </label>
+                      </div>
+                      {adjuntos.map(({ d, i }) => (
+                        <div key={i} className="mt-2 flex items-center gap-2 rounded-md bg-card px-2 py-1.5">
+                          <span className="flex-1 truncate font-body text-xs text-muted-foreground">{d.file.name}</span>
+                          <button type="button" aria-label="Quitar documento" onClick={() => removeDoc(i)} className="text-destructive">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </WizardSection>
+          </div>
         )}
-        {step < 4 ? (
-          <Button type="button" onClick={goNext}>
-            Siguiente <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={handlePublish}
-            disabled={publishMutation.isPending}
-          >
-            {publishMutation.isPending ? (
-              <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Subiendo fotos y documentos...
-              </span>
-            ) : "Publicar mi lote"}
-          </Button>
-        )}
+      </div>
+
+      {/* Sticky action bar */}
+      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3">
+          {step > 1 ? (
+            <Button type="button" variant="outline" onClick={goPrev}>
+              <ChevronLeft className="mr-1 h-4 w-4" /> Volver
+            </Button>
+          ) : (
+            <span className="font-body text-xs text-muted-foreground">Los campos con * son obligatorios</span>
+          )}
+          {step < 4 ? (
+            <Button type="button" onClick={goNext} className="font-semibold">
+              Continuar a {STEPS[step].label} <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button type="button" onClick={handlePublish} disabled={publishMutation.isPending} className="font-semibold">
+              {publishMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  Subiendo fotos y documentos...
+                </span>
+              ) : (
+                <>
+                  <Send className="mr-1.5 h-4 w-4" /> Enviar activo a validación
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
