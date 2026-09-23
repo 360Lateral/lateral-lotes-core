@@ -7,7 +7,7 @@ import { BadgeSla } from "@/components/portafolio/BadgeSla";
 import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
-import { formatMetros } from "@/lib/format-moneda";
+import { formatMetros, formatCOPCompact } from "@/lib/format-moneda";
 
 interface Props {
   lote: LoteUnificado;
@@ -46,10 +46,20 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   const { data: engagementActivoId, isLoading: loadingEngagement } =
     useEngagementActivoDelLote(lote.id);
 
+  const ubicacion = [lote.ciudad, lote.barrio].filter(Boolean).join(" · ");
+  const estadoPill = porValidar
+    ? { label: "Por validar", cls: "bg-warning text-white" }
+    : lote.publicado_venta && lote.estado_publicacion === "aprobado"
+      ? { label: "En venta", cls: "bg-card/95 text-secondary" }
+      : lote.estado_publicacion === "rechazado"
+        ? { label: "Rechazado", cls: "bg-destructive text-destructive-foreground" }
+        : { label: "Privado", cls: "bg-secondary text-secondary-foreground" };
+  const avance = lote.engagement_avance_pct;
+
   return (
     <article
       onClick={onClick}
-      className={`group relative cursor-pointer overflow-hidden rounded-lg border border-border border-l-4 bg-background transition-shadow hover:shadow-md ${colorBordeIzq(
+      className={`group relative cursor-pointer overflow-hidden rounded-3xl border border-border border-l-4 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl ${colorBordeIzq(
         lote,
       )} ${selected ? "ring-2 ring-primary" : ""}`}
     >
@@ -61,144 +71,139 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
             e.stopPropagation();
             onToggleSelect();
           }}
-          className="absolute right-2 top-2 z-10 flex h-5 w-5 items-center justify-center rounded border border-border bg-background/95"
+          className="absolute right-3 top-3 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-card/95 shadow-sm"
         >
-          {selected && <Check className="h-3 w-3 text-primary" />}
+          {selected && <Check className="h-3.5 w-3.5 text-primary" />}
         </button>
       )}
 
-      <div className="relative h-32 w-full overflow-hidden bg-muted">
+      <div className="relative h-44 w-full overflow-hidden bg-muted">
         {lote.foto_url ? (
-          <>
-            <FotoLote
-              url={lote.foto_url}
-              alt={lote.nombre_lote}
-              className="h-full w-full object-cover"
-            />
-            <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[9px] font-medium text-foreground/80 backdrop-blur-sm">
-              <ImageIcon className="h-2.5 w-2.5" /> Foto
-            </span>
-          </>
+          <FotoLote url={lote.foto_url} alt={lote.nombre_lote} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : lote.lat != null && lote.lng != null ? (
-          <>
-            <MapaEstaticoLote
-              lat={lote.lat}
-              lng={lote.lng}
-              nombre={lote.nombre_lote}
-              className="h-full w-full object-cover"
-            />
-            <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[9px] font-medium text-foreground/80 backdrop-blur-sm">
-              <MapPinned className="h-2.5 w-2.5" /> Ubicación
-            </span>
-          </>
+          <MapaEstaticoLote lat={lote.lat} lng={lote.lng} nombre={lote.nombre_lote} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-muted to-muted/60 px-3 text-center text-muted-foreground">
-            <MapPin className="h-6 w-6 opacity-60" />
-            <span className="line-clamp-2 text-[10px]">
-              {[lote.ciudad, lote.barrio].filter(Boolean).join(" · ") || "Sin ubicación"}
-            </span>
+            <MapPin className="h-7 w-7 opacity-50" />
+            <span className="line-clamp-2 text-[11px]">{ubicacion || "Sin ubicación"}</span>
           </div>
         )}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {lote.score_360 != null && (
-            <span className="rounded-full bg-background/95 px-1.5 py-0.5 text-[9px] font-semibold text-foreground shadow-sm">
-              Score {lote.score_360.toFixed(1)}
-            </span>
-          )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
+
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${estadoPill.cls}`}>
+            {porValidar && <AlertCircle className="h-3 w-3" />}
+            {estadoPill.label}
+          </span>
           {lote.has_resolutoria && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-warning/95 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
-              <Award className="h-2.5 w-2.5" /> Resolutoría
+            <span className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm">
+              <Award className="h-3 w-3" /> Resolutoría
             </span>
           )}
         </div>
-        <div className="absolute right-2 bottom-2 flex flex-col items-end gap-1">
-          {porValidar && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-warning px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
-              <AlertCircle className="h-2.5 w-2.5" /> Por validar
-            </span>
-          )}
+
+        <div className="absolute bottom-3 left-3">
+          <span className="inline-flex items-center gap-1 rounded-full bg-card/80 px-2 py-0.5 text-[10px] font-medium text-foreground/80 backdrop-blur-sm">
+            {lote.foto_url ? <ImageIcon className="h-3 w-3" /> : <MapPinned className="h-3 w-3" />}
+            {lote.foto_url ? "Foto" : "Ubicación"}
+          </span>
+        </div>
+
+        <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5">
           {tieneEngagement && lote.sla_estado && (
-            <BadgeSla
-              estado={lote.sla_estado as SlaEstado}
-              diasParaSla={lote.dias_para_sla}
-              size="xs"
-            />
+            <BadgeSla estado={lote.sla_estado as SlaEstado} diasParaSla={lote.dias_para_sla} size="xs" />
+          )}
+          {lote.score_360 != null && (
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-card/95 px-2.5 py-1 text-xs font-bold text-secondary shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              Score 360: {lote.score_360.toFixed(1)}
+            </span>
           )}
         </div>
       </div>
 
-      <div className="space-y-1.5 p-2.5">
-        <h3 className="truncate text-sm font-semibold text-foreground">
-          {lote.nombre_lote}
-        </h3>
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-          <MapPin className="h-3 w-3 shrink-0" />
-          <span className="truncate">
-            {[lote.ciudad, lote.barrio].filter(Boolean).join(" · ") || "—"}
-            {lote.area_total_m2 && (
-              <> · {formatMetros(lote.area_total_m2)}</>
-            )}
-          </span>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="truncate text-lg font-bold leading-tight text-foreground">{lote.nombre_lote}</h3>
+            <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3 shrink-0" />
+              {ubicacion || "—"}
+            </p>
+          </div>
+          {lote.precio_venta_estimado != null && (
+            <div className="shrink-0 text-right">
+              <p className="text-lg font-bold text-primary">{formatCOPCompact(lote.precio_venta_estimado)}</p>
+              <p className="text-[10px] text-muted-foreground">COP</p>
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1">
-          {tieneEngagement && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-secondary/10 px-1.5 py-0.5 text-[9px] font-medium text-secondary">
-              <Briefcase className="h-2.5 w-2.5" />
-              {labelEstadoEngagement(lote.engagement_estado)}
-            </span>
-          )}
-          {tieneLeads && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] font-medium text-blue-700">
-              <Users className="h-2.5 w-2.5" />
-              {lote.leads_count} {lote.leads_count === 1 ? "lead" : "leads"}
+        <div className="my-4 grid grid-cols-3 gap-2 border-y border-border/60 py-3">
+          <div className="text-center">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Área</p>
+            <p className="text-sm font-semibold text-foreground">
+              {lote.area_total_m2 ? formatMetros(lote.area_total_m2) : "—"}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Leads</p>
+            <p className="text-sm font-semibold text-foreground">
+              {lote.leads_count}
               {lote.leads_nuevos_count > 0 && (
-                <span className="ml-0.5 rounded-full bg-blue-700 px-1 text-[8px] text-white">
-                  {lote.leads_nuevos_count}
+                <span className="ml-1 rounded-full bg-primary px-1.5 text-[9px] font-bold text-primary-foreground">
+                  +{lote.leads_nuevos_count}
                 </span>
               )}
-            </span>
-          )}
-          {lote.tiene_entregables_borrador && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium text-primary">
-              <Send className="h-2.5 w-2.5" /> Sin publicar
-            </span>
-          )}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Avance</p>
+            <p className="text-sm font-semibold text-foreground">
+              {avance != null ? `${Math.round(avance)}%` : "—"}
+            </p>
+          </div>
         </div>
 
-        {tieneEngagement && lote.engagement_avance_pct != null && (
-          <div className="space-y-0.5 pt-1">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full bg-primary"
-                style={{ width: `${Math.min(100, lote.engagement_avance_pct)}%` }}
-              />
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+              <User className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
-            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-              <span>{Math.round(lote.engagement_avance_pct)}%</span>
-              <span className="flex items-center gap-0.5 truncate">
-                <User className="h-2.5 w-2.5" />
-                {lote.asesor_nombre ?? <em className="not-italic">Sin asesor</em>}
-              </span>
-            </div>
+            <span className="truncate text-xs text-muted-foreground">
+              {lote.asesor_nombre ?? (tieneEngagement ? "Sin asesor" : labelEstadoEngagement(null))}
+            </span>
           </div>
-        )}
+          <div className="flex flex-wrap gap-1">
+            {tieneEngagement && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-secondary/10 px-2 py-0.5 text-[10px] font-semibold text-secondary">
+                <Briefcase className="h-3 w-3" />
+                {labelEstadoEngagement(lote.engagement_estado)}
+              </span>
+            )}
+            {lote.tiene_entregables_borrador && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                <Send className="h-3 w-3" /> Sin publicar
+              </span>
+            )}
+          </div>
+        </div>
 
-        <div className="pt-1.5" onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()}>
           {loadingEngagement ? (
-            <Button size="sm" variant="outline" disabled className="h-7 w-full gap-1 text-[10px]">
-              <Loader2 className="h-3 w-3 animate-spin" />
+            <Button size="sm" variant="outline" disabled className="h-9 w-full gap-1 rounded-xl text-xs">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             </Button>
           ) : engagementActivoId ? (
-            <Button asChild size="sm" variant="default" className="h-7 w-full gap-1 text-[10px]">
+            <Button asChild size="sm" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/engagements/${engagementActivoId}`}>
-                <Briefcase className="h-3 w-3" /> Abrir engagement
+                <Briefcase className="h-3.5 w-3.5" /> Abrir engagement
               </Link>
             </Button>
           ) : (
-            <Button asChild size="sm" variant="outline" className="h-7 w-full gap-1 text-[10px]">
+            <Button asChild size="sm" variant="outline" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
-                <Plus className="h-3 w-3" /> Crear engagement
+                <Plus className="h-3.5 w-3.5" /> Crear engagement
               </Link>
             </Button>
           )}
