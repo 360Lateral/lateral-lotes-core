@@ -150,42 +150,40 @@ const LoteWizard = () => {
   const [published, setPublished] = useState(false);
   const [mostrarBannerDraft, setMostrarBannerDraft] = useState(false);
 
-  // Mostrar banner si encontramos un draft al montar
+  // Al encontrar un borrador, se restaura AUTOMÁTICAMENTE (sin esperar
+  // decisión). El banner solo informa y permite empezar de nuevo.
+  const [draftAplicado, setDraftAplicado] = useState(false);
   useEffect(() => {
-    if (draftCargado && draftInicial) setMostrarBannerDraft(true);
-  }, [draftCargado, draftInicial]);
-
-  const continuarBorrador = () => {
+    if (!draftCargado || draftAplicado) return;
     if (draftInicial) {
       setStep(draftInicial.step);
       setForm(draftInicial.form);
       setPublished(draftInicial.published);
       setVideoMode(draftInicial.videoMode);
       setVideoUrl(draftInicial.videoUrl);
+      setMostrarBannerDraft(true);
     }
-    setMostrarBannerDraft(false);
-  };
+    setDraftAplicado(true);
+  }, [draftCargado, draftInicial, draftAplicado]);
+
+  const continuarBorrador = () => setMostrarBannerDraft(false);
 
   const descartarBorrador = () => {
     limpiarDraft();
+    setStep(1);
+    setForm(initialForm);
+    setPublished(false);
+    setVideoMode("upload");
+    setVideoUrl("");
     setMostrarBannerDraft(false);
   };
 
-  // Autosave (debounced en el hook). No guardar antes de cargar ni mientras
-  // el banner está visible (el usuario aún no decidió).
+  // Autosave: solo después de haber restaurado el borrador (evita
+  // sobrescribirlo con el formulario vacío al entrar a la página).
   useEffect(() => {
-    if (!draftCargado || mostrarBannerDraft || published) return;
+    if (!draftAplicado || published) return;
     guardarDraft({ step, form, published, videoMode, videoUrl });
-  }, [
-    step,
-    form,
-    published,
-    videoMode,
-    videoUrl,
-    draftCargado,
-    mostrarBannerDraft,
-    guardarDraft,
-  ]);
+  }, [step, form, published, videoMode, videoUrl, draftAplicado, guardarDraft]);
 
   // Aviso defensivo al cerrar pestaña si hay datos digitados
   useEffect(() => {
