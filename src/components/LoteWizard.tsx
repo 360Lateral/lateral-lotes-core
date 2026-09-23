@@ -500,10 +500,10 @@ const LoteWizard = () => {
             <AlertCircle className="h-5 w-5 shrink-0 text-warning" />
             <div className="flex-1">
               <p className="font-body text-sm font-semibold text-foreground">
-                Tienes un borrador sin terminar
-              </p>
                 Recuperamos tu borrador
-                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Step{" "}
+              </p>
+              <p className="mt-1 font-body text-xs text-muted-foreground">
+                Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Paso{" "}
                 {draftInicial.step} de 4
               </p>
               <p className="mt-1 font-body text-xs text-muted-foreground">
@@ -512,9 +512,9 @@ const LoteWizard = () => {
             </div>
             <div className="flex gap-2 sm:shrink-0">
               <Button size="sm" onClick={continuarBorrador}>
-                Continuar borrador
-              </Button>
                 Entendido
+              </Button>
+              <Button size="sm" variant="outline" onClick={descartarBorrador}>
                 Empezar nuevo
               </Button>
             </div>
