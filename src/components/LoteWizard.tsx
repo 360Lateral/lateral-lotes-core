@@ -263,7 +263,13 @@ const LoteWizard = () => {
   // Búsqueda automática en el mapa a partir de los datos de ubicación
   useEffect(() => {
     if (!form.ciudad) return;
-    const ciudadCambio = ciudadPrevRef.current !== null && ciudadPrevRef.current !== form.ciudad;
+    const primeraVez = ciudadPrevRef.current === null;
+    const ciudadCambio = !primeraVez && ciudadPrevRef.current !== form.ciudad;
+    if (primeraVez && form.lat && form.lng && origenRef.current === null) {
+      // Coordenadas recuperadas de un borrador: se respetan como confirmadas
+      origenRef.current = "manual";
+      setOrigenPin("manual");
+    }
     ciudadPrevRef.current = form.ciudad;
     if (ciudadCambio && origenRef.current === "manual") {
       setOrigenPin(null);
