@@ -191,6 +191,15 @@ const EnviarFeedbackDialog = ({
           </DialogDescription>
         </DialogHeader>
 
+        {borradorRecuperado && (
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/40 p-2 text-xs text-muted-foreground">
+            <span>Recuperamos lo que habías escrito antes.</span>
+            <Button type="button" variant="ghost" size="sm" onClick={reset}>
+              Empezar de nuevo
+            </Button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Tipo</Label>
