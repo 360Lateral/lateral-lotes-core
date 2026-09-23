@@ -502,7 +502,7 @@ const LoteWizard = () => {
               <p className="font-body text-sm font-semibold text-foreground">
                 Tienes un borrador sin terminar
               </p>
-              <p className="mt-1 font-body text-xs text-muted-foreground">
+                Recuperamos tu borrador
                 Última edición: {formatRelativoDraft(draftInicial.savedAt)} · Step{" "}
                 {draftInicial.step} de 4
               </p>
@@ -514,7 +514,7 @@ const LoteWizard = () => {
               <Button size="sm" onClick={continuarBorrador}>
                 Continuar borrador
               </Button>
-              <Button size="sm" variant="outline" onClick={descartarBorrador}>
+                Entendido
                 Empezar nuevo
               </Button>
             </div>
