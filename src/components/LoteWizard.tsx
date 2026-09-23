@@ -171,7 +171,7 @@ const LoteWizard = () => {
   const descartarBorrador = () => {
     limpiarDraft();
     setStep(1);
-    setForm(initialForm);
+    setForm(emptyWizard);
     setPublished(false);
     setVideoMode("upload");
     setVideoUrl("");
@@ -204,7 +204,6 @@ const LoteWizard = () => {
     // se asume que empieza uno nuevo y se reactiva el autoguardado.
     if (mostrarBannerDraft) setMostrarBannerDraft(false);
     setForm((p) => ({ ...p, [key]: value }));
-  };
 
   const toggleServicio = (s: string) =>
     setForm((p) => ({
