@@ -21,7 +21,6 @@ import {
   MapPin,
 } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
-import KPIEstado from "@/components/ui/KPIEstado";
 import BulkActionsBar from "@/components/ui/BulkActionsBar";
 import { LoteCardUnificada } from "@/components/dashboard/LoteCardUnificada";
 import { LoteDetalleDrawer } from "@/components/dashboard/LoteDetalleDrawer";
@@ -637,7 +636,7 @@ const Dashboard = () => {
       <div className="min-w-0 xl:col-span-8">
       {/* Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-56 w-full" />
           ))}
@@ -653,7 +652,7 @@ const Dashboard = () => {
             ctaVariant="default"
           />
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {propietarios.map((p) => (
               <CardPropietario
                 key={p.id}
@@ -676,7 +675,7 @@ const Dashboard = () => {
           ctaVariant="default"
         />
       ) : vista === "grid" ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {lotes.map((l) => (
             <LoteCardUnificada
               key={l.id}
