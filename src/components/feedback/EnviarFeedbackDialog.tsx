@@ -54,6 +54,33 @@ const TIPOS: { value: TipoFeedback; label: string; icon: typeof Bug }[] = [
 
 const SEVERIDADES: SeveridadFeedback[] = ["baja", "media", "alta", "critica"];
 
+const BORRADOR_KEY = "feedback_borrador_v1";
+
+type Borrador = {
+  clave: string;
+  tipo: TipoFeedback;
+  severidad: SeveridadFeedback;
+  titulo: string;
+  descripcion: string;
+};
+
+const leerBorrador = (): Borrador | null => {
+  try {
+    const raw = window.localStorage.getItem(BORRADOR_KEY);
+    return raw ? (JSON.parse(raw) as Borrador) : null;
+  } catch {
+    return null;
+  }
+};
+
+const borrarBorrador = () => {
+  try {
+    window.localStorage.removeItem(BORRADOR_KEY);
+  } catch {
+    // ignore
+  }
+};
+
 const EnviarFeedbackDialog = ({
   open,
   onOpenChange,
@@ -65,24 +92,74 @@ const EnviarFeedbackDialog = ({
   const [severidad, setSeveridad] = useState<SeveridadFeedback>("media");
   const [titulo, setTitulo] = useState(tituloInicial ?? "");
   const [descripcion, setDescripcion] = useState(descripcionInicial ?? "");
+  const [borradorRecuperado, setBorradorRecuperado] = useState(false);
+
+  // Clave del contexto: distingue un reporte prellenado (modo pruebas) del genérico.
+  const clave = `${tituloInicial ?? ""}|${descripcionInicial ?? ""}`;
 
   useEffect(() => {
-    if (open) {
-      setTipo(tipoInicial ?? "mejora");
-      setTitulo(tituloInicial ?? "");
-      setDescripcion(descripcionInicial ?? "");
+    if (!open) return;
+    const guardado = leerBorrador();
+    if (
+      guardado &&
+      guardado.clave === clave &&
+      (guardado.titulo?.trim() || guardado.descripcion?.trim())
+    ) {
+      setTipo(guardado.tipo ?? tipoInicial ?? "mejora");
+      setSeveridad(guardado.severidad ?? "media");
+      setTitulo(guardado.titulo ?? "");
+      setDescripcion(guardado.descripcion ?? "");
+      setBorradorRecuperado(true);
+      return;
     }
-  }, [open, tipoInicial, tituloInicial, descripcionInicial]);
+    setTipo(tipoInicial ?? "mejora");
+    setSeveridad("media");
+    setTitulo(tituloInicial ?? "");
+    setDescripcion(descripcionInicial ?? "");
+    setBorradorRecuperado(false);
+  }, [open, clave, tipoInicial, tituloInicial, descripcionInicial]);
+
+  // Autoguardado del borrador mientras el formulario está abierto.
+  useEffect(() => {
+    if (!open) return;
+    const sinCambios =
+      titulo === (tituloInicial ?? "") &&
+      descripcion === (descripcionInicial ?? "");
+    if (sinCambios) return;
+    const t = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          BORRADOR_KEY,
+          JSON.stringify({ clave, tipo, severidad, titulo, descripcion }),
+        );
+      } catch {
+        // ignore
+      }
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, [
+    open,
+    clave,
+    tipo,
+    severidad,
+    titulo,
+    descripcion,
+    tituloInicial,
+    descripcionInicial,
+  ]);
 
   const enviar = useEnviarFeedback();
   const valido = titulo.trim().length >= 3 && descripcion.trim().length >= 10;
 
   const reset = () => {
+    borrarBorrador();
+    setBorradorRecuperado(false);
     setTipo(tipoInicial ?? "mejora");
     setSeveridad("media");
     setTitulo(tituloInicial ?? "");
     setDescripcion(descripcionInicial ?? "");
   };
+
 
 
   const handleSubmit = (e: React.FormEvent) => {
