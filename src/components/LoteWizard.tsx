@@ -201,8 +201,12 @@ const LoteWizard = () => {
     return () => window.removeEventListener("beforeunload", handler);
   }, [form, published]);
 
-  const update = (key: keyof WizardForm, value: any) =>
+  const update = (key: keyof WizardForm, value: any) => {
+    // Si el usuario empieza a escribir sin decidir sobre el borrador anterior,
+    // se asume que empieza uno nuevo y se reactiva el autoguardado.
+    if (mostrarBannerDraft) setMostrarBannerDraft(false);
     setForm((p) => ({ ...p, [key]: value }));
+  };
 
   const toggleServicio = (s: string) =>
     setForm((p) => ({

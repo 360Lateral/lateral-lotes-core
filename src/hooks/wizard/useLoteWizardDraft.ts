@@ -53,26 +53,34 @@ export const useLoteWizardDraft = () => {
   }, [draftKey]);
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingRef = useRef<Omit<DraftEnvelope, "version" | "savedAt"> | null>(null);
+
+  const escribir = useCallback(() => {
+    if (!draftKey || !pendingRef.current) return;
+    try {
+      const full: DraftEnvelope = {
+        version: DRAFT_VERSION,
+        savedAt: new Date().toISOString(),
+        ...pendingRef.current,
+      };
+      localStorage.setItem(draftKey, JSON.stringify(full));
+      pendingRef.current = null;
+    } catch (err) {
+      console.error("Error guardando draft de wizard:", err);
+    }
+  }, [draftKey]);
 
   const guardarDraft = useCallback(
     (envelope: Omit<DraftEnvelope, "version" | "savedAt">) => {
       if (!draftKey) return;
+      pendingRef.current = envelope;
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {
-        try {
-          const full: DraftEnvelope = {
-            version: DRAFT_VERSION,
-            savedAt: new Date().toISOString(),
-            ...envelope,
-          };
-          localStorage.setItem(draftKey, JSON.stringify(full));
-        } catch (err) {
-          // localStorage puede fallar (modo incógnito, cuota llena, etc.)
-          console.error("Error guardando draft de wizard:", err);
-        }
+        saveTimeoutRef.current = null;
+        escribir();
       }, 400);
     },
-    [draftKey]
+    [draftKey, escribir]
   );
 
   const limpiarDraft = useCallback(() => {
@@ -80,6 +88,7 @@ export const useLoteWizardDraft = () => {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
     }
+    pendingRef.current = null;
     if (!draftKey) return;
     try {
       localStorage.removeItem(draftKey);
@@ -87,11 +96,28 @@ export const useLoteWizardDraft = () => {
     setDraftInicial(null);
   }, [draftKey]);
 
+  // Forzar guardado inmediato al cerrar/ocultar la pestaña o desmontar
   useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    const flush = () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+      escribir();
     };
-  }, []);
+    const onVis = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", flush);
+      document.removeEventListener("visibilitychange", onVis);
+      flush();
+    };
+  }, [escribir]);
 
   return { draftInicial, draftCargado, guardarDraft, limpiarDraft };
 };
