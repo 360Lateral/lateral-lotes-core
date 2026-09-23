@@ -5017,6 +5017,12 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      listar_barrios_municipio: {
+        Args: { _ciudad: string; _departamento: string }
+        Returns: {
+          barrio: string
+        }[]
+      }
       listar_catalogo_lotes: {
         Args: never
         Returns: {
