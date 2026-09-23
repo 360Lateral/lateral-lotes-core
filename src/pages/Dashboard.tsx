@@ -275,7 +275,7 @@ const Dashboard = () => {
               type="button"
               onClick={k.onClick}
               disabled={!k.onClick}
-              className={`rounded-2xl p-4 text-left transition-colors ${
+              className={`rounded-2xl p-4 text-left transition-colors last:col-span-2 sm:last:col-span-1 ${
                 k.destacado
                   ? "bg-secondary text-secondary-foreground shadow-md"
                   : "border border-border bg-card shadow-sm hover:border-primary"
@@ -413,13 +413,13 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-3">
+        <div className="-mx-4 flex items-center gap-1.5 overflow-x-auto border-t border-border/60 px-4 pt-3 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
           {FILTROS.map((f) => (
             <button
               key={f.v}
               type="button"
               onClick={() => setFiltro(f.v)}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition-colors ${
+              className={`inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs font-bold transition-colors ${
                 tipoFiltroDestacado(f.v)
                   ? "bg-secondary text-secondary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
