@@ -223,6 +223,15 @@ const LoteWizard = () => {
     }));
   }, []);
 
+  const handlePlaceSelect = useCallback((p: { lat: number; lng: number; address?: string }) => {
+    setForm((prev) => ({
+      ...prev,
+      lat: p.lat.toFixed(6),
+      lng: p.lng.toFixed(6),
+      direccion: prev.direccion || (p.address ?? "").replace(/, Colombia$/, ""),
+    }));
+  }, []);
+
   const handleMarkerDragEnd = useCallback((e: any) => {
     if (!e.latLng) return;
     setForm((p) => ({
@@ -749,7 +758,7 @@ const LoteWizard = () => {
                 <GoogleMapsGate
                   fallback={<div className="flex h-56 w-full items-center justify-center bg-muted text-sm text-muted-foreground">Cargando mapa…</div>}
                 >
-                  <MemoizedLoteMap lat={form.lat} lng={form.lng} onMapClick={handleMapClick} onMarkerDragEnd={handleMarkerDragEnd} />
+                  <MemoizedLoteMap lat={form.lat} lng={form.lng} onMapClick={handleMapClick} onMarkerDragEnd={handleMarkerDragEnd} onPlaceSelect={handlePlaceSelect} />
                 </GoogleMapsGate>
               </div>
               <div className="grid grid-cols-2 gap-4">
