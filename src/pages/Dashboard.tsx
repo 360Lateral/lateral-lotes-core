@@ -777,13 +777,6 @@ const Dashboard = () => {
               })
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard/leads")}
-            className="mt-6 w-full rounded-xl border border-border py-2 text-xs font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            Ver todos los leads
-          </button>
         </div>
 
         {/* Engagements */}
