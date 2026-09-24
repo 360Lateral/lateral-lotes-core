@@ -1490,6 +1490,8 @@ export type Database = {
           email: string | null
           estado: string | null
           id: string
+          latitud: number | null
+          longitud: number | null
           lote_id: string | null
           nombre: string | null
           notas: string | null
@@ -1510,6 +1512,8 @@ export type Database = {
           email?: string | null
           estado?: string | null
           id?: string
+          latitud?: number | null
+          longitud?: number | null
           lote_id?: string | null
           nombre?: string | null
           notas?: string | null
@@ -1530,6 +1534,8 @@ export type Database = {
           email?: string | null
           estado?: string | null
           id?: string
+          latitud?: number | null
+          longitud?: number | null
           lote_id?: string | null
           nombre?: string | null
           notas?: string | null
