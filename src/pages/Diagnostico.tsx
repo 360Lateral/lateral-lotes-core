@@ -190,8 +190,12 @@ const Diagnostico = () => {
   };
 
   const handleSubmitDiagnostico = async () => {
-    if (!nombre.trim() || !email.trim()) {
-      toast({ title: "Campos requeridos", description: "Nombre y email son obligatorios.", variant: "destructive" });
+    if (!nombre.trim() || !email.trim() || !telefono.trim()) {
+      toast({ title: "Campos requeridos", description: "Nombre, email y teléfono son obligatorios.", variant: "destructive" });
+      return;
+    }
+    if (telefono.replace(/\D/g, "").length < 7) {
+      toast({ title: "Teléfono inválido", description: "Ingresa un número de teléfono válido.", variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -209,7 +213,7 @@ const Diagnostico = () => {
         objetivo: objetivo || null,
         nombre: nombre.trim(),
         email: email.trim(),
-        telefono: telefono.trim() || null,
+        telefono: telefono.trim(),
         estado: "nuevo",
       } as any);
       if (error) throw error;
@@ -513,7 +517,7 @@ const Diagnostico = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="diag-telefono">Teléfono (opcional)</Label>
+                <Label htmlFor="diag-telefono">Teléfono *</Label>
                 <Input
                   id="diag-telefono"
                   type="tel"
@@ -526,7 +530,7 @@ const Diagnostico = () => {
 
               <Button
                 onClick={handleSubmitDiagnostico}
-                disabled={submitting || !nombre.trim() || !email.trim()}
+                disabled={submitting || !nombre.trim() || !email.trim() || !telefono.trim()}
                 className="w-full bg-orange hover:bg-orange/90 text-white"
                 size="lg"
               >
