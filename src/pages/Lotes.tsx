@@ -247,10 +247,10 @@ const Lotes = () => {
                           strokeColor: "#1a2744",
                           strokeWeight: 2.5,
                           scale: hoveredLoteId === lote.id || selectedLote?.id === lote.id ? 1.9 : 1.5,
-                          anchor: new google.maps.Point(12, 36),
-                          labelOrigin: new google.maps.Point(12, 12),
+                          anchor: (window as any).google?.maps ? new (window as any).google.maps.Point(12, 36) : undefined,
+                          
                         }}
-                        animation={selectedLote?.id === lote.id ? google.maps.Animation.BOUNCE : undefined}
+                        animation={selectedLote?.id === lote.id ? (window as any).google?.maps?.Animation?.BOUNCE : undefined}
                         title={lote.nombre_lote}
                         onClick={() => setSelectedLote(lote)}
                         zIndex={hoveredLoteId === lote.id ? 10 : 1}
