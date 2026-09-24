@@ -7,15 +7,9 @@ project_id = "xtcicjrpznawnwvjdqhe"
     verify_jwt = false
   [functions.mapgis-consulta]
     verify_jwt = true
-  [functions.process-email-queue]
-    verify_jwt = true
   [functions.wompi-webhook]
-    verify_jwt = false
-  [functions.send-transactional-email]
     verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
-  [functions.handle-email-unsubscribe]
-    verify_jwt = false
-  [functions.handle-email-suppression]
+  [functions.notificar-acceso-manual]
     verify_jwt = false
