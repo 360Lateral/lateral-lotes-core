@@ -1,2 +1,2 @@
 # Roadmap
-- [ ] Buscador /lotes: solo lotes listados como públicos
+- [x] Buscador /lotes: solo lotes listados como públicos
