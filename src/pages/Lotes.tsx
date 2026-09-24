@@ -17,6 +17,8 @@ import MapErrorBoundary, { MapFallback } from "@/components/maps/MapErrorBoundar
 import { useGoogleMapsAuthStatus } from "@/hooks/useGoogleMapsAuthStatus";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
 import { useAuth } from "@/contexts/AuthContext";
+import MapaLotesEjemplo from "@/components/lotes/MapaLotesEjemplo";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const PIN_PATH = "M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0zm0 17a5 5 0 110-10 5 5 0 010 10z";
 
@@ -42,6 +44,8 @@ export interface LoteWithPrecio {
   score_normativo: number | null;
   score_servicios: number | null;
   created_at: string | null;
+  es_publico?: boolean;
+  es_ejemplo?: boolean;
 }
 
 export interface Filters {
@@ -162,7 +166,27 @@ const Lotes = () => {
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
         <div className={`relative ${isMobile || esVisitante ? "h-full w-full" : "h-full w-[60%]"}`}>
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-md">
+            {esVisitante ? (
+              <Select
+                value={selectedLote?.id ?? ""}
+                onValueChange={(id) => {
+                  const lote = baseLotes.find((item) => item.id === id);
+                  if (lote) irALote(lote);
+                }}
+              >
+                <SelectTrigger id="lotes-search" className="h-11 rounded-full bg-background px-4 shadow-lg" aria-label="Seleccionar lote de ejemplo">
+                  <SelectValue placeholder={isLoading ? "Cargando lotes de ejemplo…" : "Selecciona un lote de ejemplo"} />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {baseLotes.map((lote) => (
+                    <SelectItem key={lote.id} value={lote.id}>
+                      {lote.nombre_lote} · {[lote.barrio, lote.ciudad].filter(Boolean).join(", ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <input
@@ -215,8 +239,16 @@ const Lotes = () => {
                 </div>
               )}
             </div>
+            )}
           </div>
-          {mapsAuthFailed ? (
+          {esVisitante ? (
+            <MapaLotesEjemplo
+              lotes={baseLotes}
+              seleccionado={selectedLote}
+              onSeleccionar={(lote) => setSelectedLote(lote as LoteWithPrecio)}
+              onVerFicha={(id) => navigate(`/lotes/${id}`)}
+            />
+          ) : mapsAuthFailed ? (
             <MapFallback />
           ) : (
             <MapErrorBoundary>
@@ -331,7 +363,7 @@ const Lotes = () => {
         )}
 
         {esVisitante && (
-          <div className="absolute bottom-24 sm:bottom-6 left-1/2 z-20 w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+          <div className="absolute bottom-24 sm:bottom-6 left-1/2 z-[1000] w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
             <p className="font-body text-sm font-semibold text-foreground">Estás viendo lotes de ejemplo</p>
             <p className="mt-1 text-xs text-muted-foreground">El inventario real solo lo ven desarrolladores y propietarios registrados.</p>
             <div className="mt-3 flex gap-2">

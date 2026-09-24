@@ -1,2 +1,2 @@
 # Roadmap
-- [x] Buscador /lotes: solo lotes listados como públicos
+- [x] Visitante en /lotes: selector exclusivo de lotes de ejemplo y mapa visible
