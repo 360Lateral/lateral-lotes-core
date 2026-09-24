@@ -19,6 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
 
 const DIAGNOSTICO_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85";
 
@@ -223,14 +225,33 @@ const Diagnostico = () => {
 
         <div className="mx-auto max-w-2xl px-4 py-12 lg:py-20">
           <div className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="municipio">Municipio</Label>
-              <Input
-                id="municipio"
-                placeholder="Ej: Medellín, Rionegro, Envigado"
-                value={municipio}
-                onChange={(e) => setMunicipio(e.target.value)}
-              />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Departamento</Label>
+                <SearchableSelect
+                  options={DEPARTAMENTO_NOMBRES}
+                  value={departamento}
+                  onValueChange={(v) => {
+                    if (v !== departamento) setMunicipio("");
+                    setDepartamento(v);
+                  }}
+                  placeholder="Seleccionar departamento"
+                  searchPlaceholder="Buscar departamento..."
+                  emptyText="Departamento no encontrado."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Municipio</Label>
+                <SearchableSelect
+                  options={getMunicipios(departamento)}
+                  value={municipio}
+                  onValueChange={setMunicipio}
+                  placeholder={departamento ? "Seleccionar municipio" : "Primero el departamento"}
+                  searchPlaceholder="Buscar municipio..."
+                  emptyText="Municipio no encontrado."
+                  disabled={!departamento}
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -355,15 +376,6 @@ const Diagnostico = () => {
             </p>
 
             <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="departamento">Departamento</Label>
-                <Input
-                  id="departamento"
-                  placeholder="Ej: Antioquia"
-                  value={departamento}
-                  onChange={(e) => setDepartamento(e.target.value)}
-                />
-              </div>
 
               <div className="space-y-2">
                 <Label>¿Tiene escritura pública?</Label>
