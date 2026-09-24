@@ -1,3 +1,4 @@
+import { sendTemplateEmailLogged } from '../_shared/transactional-email-templates/send-and-log.ts'
 // @ts-nocheck
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -306,10 +307,7 @@ async function enviarEmailActivacion(
         .filter(Boolean);
     }
 
-    await admin.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "engagement-activado",
-        recipientEmail: email,
+    await sendTemplateEmailLogged("engagement-activado", email, {
         idempotencyKey: `engagement-activado-${transaccionId}`,
         templateData: {
           nombrePropietario: data?.propietario?.nombre ?? "Cliente",
@@ -319,7 +317,6 @@ async function enviarEmailActivacion(
           analisisIncluidos: analisis,
           loteUrl: `https://urbanix360.com/lotes/${data?.engagement?.lote?.id ?? ""}`,
         },
-      },
     });
     return;
   }
@@ -344,10 +341,7 @@ async function enviarEmailActivacion(
       .single();
     if (!perfil?.email) return;
 
-    await admin.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "suscripcion-activada",
-        recipientEmail: perfil.email,
+    await sendTemplateEmailLogged("suscripcion-activada", perfil.email, {
         idempotencyKey: `suscripcion-activada-${transaccionId}`,
         templateData: {
           nombreDesarrollador: perfil.nombre ?? "Desarrollador",
@@ -356,7 +350,6 @@ async function enviarEmailActivacion(
           fechaVencimiento: fmtFecha(data?.suscripcion?.fecha_fin),
           marketplaceUrl: "https://urbanix360.com/lotes",
         },
-      },
     });
     return;
   }
@@ -391,10 +384,7 @@ async function enviarEmailActivacion(
       ? Math.max(1, Math.round((expira.getTime() - Date.now()) / 86400000))
       : 30;
 
-    await admin.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "acceso-lote-activado",
-        recipientEmail: perfil.email,
+    await sendTemplateEmailLogged("acceso-lote-activado", perfil.email, {
         idempotencyKey: `acceso-lote-${transaccionId}`,
         templateData: {
           nombreDesarrollador: perfil.nombre ?? "Desarrollador",
@@ -403,7 +393,6 @@ async function enviarEmailActivacion(
           fechaExpiracion: fmtFecha(data?.acceso?.fecha_expiracion),
           loteUrl: `https://urbanix360.com/lotes/${data?.acceso?.lote?.id ?? ""}`,
         },
-      },
     });
   }
 }

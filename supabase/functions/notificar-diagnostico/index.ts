@@ -1,3 +1,4 @@
+import { sendTemplateEmailLogged } from '../_shared/transactional-email-templates/send-and-log.ts'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
@@ -31,31 +32,22 @@ Deno.serve(async (req) => {
     const mapaUrl = d.latitud && d.longitud
       ? `https://www.google.com/maps?q=${d.latitud},${d.longitud}` : ''
 
-    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const enviar = (body: unknown) => fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-transactional-email`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, apikey: key, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    const envios: Promise<Response>[] = []
+    const envios: Promise<unknown>[] = []
     if (d.email) {
-      envios.push(enviar({
-          templateName: 'diagnostico-confirmacion',
-          recipientEmail: d.email,
-          idempotencyKey: `diagnostico-confirmacion-${d.id}`,
-          templateData: { nombre: d.nombre, ubicacion, area },
-        }))
-    }
-    envios.push(enviar({
-        templateName: 'diagnostico-nuevo-admin',
-        idempotencyKey: `diagnostico-nuevo-admin-${d.id}`,
-        templateData: {
-          nombre: d.nombre, email: d.email, telefono: d.telefono, ubicacion, area,
-          tipo: d.tipo_lote, objetivo: d.objetivo, mapaUrl,
-        },
+      envios.push(sendTemplateEmailLogged('diagnostico-confirmacion', d.email, {
+        idempotencyKey: `diagnostico-confirmacion-${d.id}`,
+        templateData: { nombre: d.nombre, ubicacion, area },
       }))
-    const res = await Promise.all(envios)
-    for (const r of res) if (!r.ok) console.error('Envio falló', r.status, await r.text())
+    }
+    envios.push(sendTemplateEmailLogged('diagnostico-nuevo-admin', '', {
+      idempotencyKey: `diagnostico-nuevo-admin-${d.id}`,
+      templateData: {
+        nombre: d.nombre, email: d.email, telefono: d.telefono, ubicacion, area,
+        tipo: d.tipo_lote, objetivo: d.objetivo, mapaUrl,
+      },
+    }))
+    const res = await Promise.allSettled(envios)
+    for (const r of res) if (r.status === 'rejected') console.error('Envio falló', String(r.reason))
     return json({ ok: true })
   } catch (e) {
     console.error(e)
