@@ -166,7 +166,7 @@ const Lotes = () => {
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
         <div className={`relative ${isMobile || esVisitante ? "h-full w-full" : "h-full w-[60%]"}`}>
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-md">
             {esVisitante ? (
               <Select
                 value={selectedLote?.id ?? ""}
@@ -363,7 +363,7 @@ const Lotes = () => {
         )}
 
         {esVisitante && (
-          <div className="absolute bottom-24 sm:bottom-6 left-1/2 z-20 w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+          <div className="absolute bottom-24 sm:bottom-6 left-1/2 z-[1000] w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
             <p className="font-body text-sm font-semibold text-foreground">Estás viendo lotes de ejemplo</p>
             <p className="mt-1 text-xs text-muted-foreground">El inventario real solo lo ven desarrolladores y propietarios registrados.</p>
             <div className="mt-3 flex gap-2">
