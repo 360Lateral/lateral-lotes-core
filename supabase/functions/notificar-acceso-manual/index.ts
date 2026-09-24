@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
 
     const { data: acc, error } = await admin
       .from('accesos_lote')
-      .select('id, lote_id, desarrollador_id, fecha_inicio, fecha_expiracion, lote:lotes(nombre_lote)')
+      .select('id, lote_id, desarrollador_id, fecha_expiracion, lote:lotes(nombre_lote)')
       .eq('id', acceso_id)
       .maybeSingle()
     if (error || !acc) return json({ error: 'Acceso no encontrado' }, 404)
