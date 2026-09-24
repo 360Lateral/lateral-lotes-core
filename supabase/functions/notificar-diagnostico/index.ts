@@ -31,29 +31,31 @@ Deno.serve(async (req) => {
     const mapaUrl = d.latitud && d.longitud
       ? `https://www.google.com/maps?q=${d.latitud},${d.longitud}` : ''
 
-    const envios = []
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const enviar = (body: unknown) => fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, apikey: key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const envios: Promise<Response>[] = []
     if (d.email) {
-      envios.push(admin.functions.invoke('send-transactional-email', {
-        body: {
+      envios.push(enviar({
           templateName: 'diagnostico-confirmacion',
           recipientEmail: d.email,
           idempotencyKey: `diagnostico-confirmacion-${d.id}`,
           templateData: { nombre: d.nombre, ubicacion, area },
-        },
-      }))
+        })
     }
-    envios.push(admin.functions.invoke('send-transactional-email', {
-      body: {
+    envios.push(enviar({
         templateName: 'diagnostico-nuevo-admin',
         idempotencyKey: `diagnostico-nuevo-admin-${d.id}`,
         templateData: {
           nombre: d.nombre, email: d.email, telefono: d.telefono, ubicacion, area,
           tipo: d.tipo_lote, objetivo: d.objetivo, mapaUrl,
         },
-      },
-    }))
+      })
     const res = await Promise.all(envios)
-    res.forEach((r) => r.error && console.error('Envio falló', r.error))
+    for (const r of res) if (!r.ok) console.error('Envio falló', r.status, await r.text())
     return json({ ok: true })
   } catch (e) {
     console.error(e)
