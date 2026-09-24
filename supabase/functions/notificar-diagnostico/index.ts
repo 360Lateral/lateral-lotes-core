@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
           recipientEmail: d.email,
           idempotencyKey: `diagnostico-confirmacion-${d.id}`,
           templateData: { nombre: d.nombre, ubicacion, area },
-        })
+        }))
     }
     envios.push(enviar({
         templateName: 'diagnostico-nuevo-admin',
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
           nombre: d.nombre, email: d.email, telefono: d.telefono, ubicacion, area,
           tipo: d.tipo_lote, objetivo: d.objetivo, mapaUrl,
         },
-      })
+      }))
     const res = await Promise.all(envios)
     for (const r of res) if (!r.ok) console.error('Envio falló', r.status, await r.text())
     return json({ ok: true })
