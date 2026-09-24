@@ -9,9 +9,7 @@ import {
   Head,
   Heading,
   Html,
-  Img,
   Preview,
-  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -20,32 +18,28 @@ interface RecoveryEmailProps {
   confirmationUrl: string
 }
 
-const LOGO_URL = 'https://xtcicjrpznawnwvjdqhe.supabase.co/storage/v1/object/public/email-assets/logo.png'
-
 export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
 }: RecoveryEmailProps) => (
-  <Html lang="es" dir="ltr">
-    <Head />
-    <Preview>Restablece tu contraseña de {siteName}</Preview>
+  <Html lang="en" dir="ltr">
+    <Head>
+      <style>{darkModeCss}</style>
+    </Head>
+    <Preview>Reset your password for {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={logoSection}>
-          <Img src={LOGO_URL} alt={siteName} height="40" style={logo} />
-        </Section>
-        <Heading style={h1}>Restablece tu contraseña</Heading>
+        <Heading style={h1}>Reset your password</Heading>
         <Text style={text}>
-          Recibimos una solicitud para cambiar la contraseña de tu cuenta en {siteName}.
-          Haz clic en el botón para elegir una nueva.
+          We received a request to reset your password for {siteName}. Click
+          the button below to choose a new password.
         </Text>
-        <Section style={{ textAlign: 'center' }}>
-          <Button style={button} href={confirmationUrl}>
-            Crear nueva contraseña
-          </Button>
-        </Section>
+        <Button className="dm-btn" style={button} href={confirmationUrl}>
+          Reset Password
+        </Button>
         <Text style={footer}>
-          Si no solicitaste este cambio, puedes ignorar este mensaje. Tu contraseña actual seguirá funcionando.
+          If you didn't request a password reset, you can safely ignore this
+          email. Your password will not be changed.
         </Text>
       </Container>
     </Body>
@@ -54,20 +48,35 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif' }
-const container = { padding: '32px 28px', maxWidth: '560px' }
-const logoSection = { marginBottom: '24px' }
-const logo = { display: 'block' }
-const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#1a2744', margin: '0 0 20px' }
-const text = { fontSize: '15px', color: '#3f4a5e', lineHeight: '1.6', margin: '0 0 22px' }
-const button = {
-  backgroundColor: '#F49D15',
-  color: '#ffffff',
-  fontSize: '15px',
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
   fontWeight: 'bold' as const,
-  borderRadius: '8px',
-  padding: '14px 28px',
-  textDecoration: 'none',
-  display: 'inline-block',
+  color: '#000000',
+  margin: '0 0 20px',
 }
-const footer = { fontSize: '12px', color: '#8a93a3', margin: '32px 0 0', lineHeight: '1.5' }
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  border: '1px solid #000000',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
+const darkModeCss = `
+  @media (prefers-color-scheme: dark) {
+    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  }
+  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+`
