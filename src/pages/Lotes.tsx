@@ -16,6 +16,9 @@ import { usePersistedState } from "@/hooks/usePersistedState";
 import MapErrorBoundary, { MapFallback } from "@/components/maps/MapErrorBoundary";
 import { useGoogleMapsAuthStatus } from "@/hooks/useGoogleMapsAuthStatus";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { useAuth } from "@/contexts/AuthContext";
+
+const PIN_PATH = "M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0zm0 17a5 5 0 110-10 5 5 0 010 10z";
 
 const MEDELLIN_CENTER = { lat: 6.2530, lng: -75.5736 };
 
@@ -70,6 +73,8 @@ const Lotes = () => {
   const [mapZoom, setMapZoom] = useState(12);
   const mapRef = useRef<google.maps.Map | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { user, isDesarrollador, isPropietario, isAdminOrExperto } = useAuth();
+  const esVisitante = !user || !(isDesarrollador || isPropietario || isAdminOrExperto);
   const normalizar = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   const irALote = useCallback((l: LoteWithPrecio) => {
@@ -98,8 +103,18 @@ const Lotes = () => {
   });
 
 
+  const baseLotes = useMemo(
+    () => (esVisitante ? allLotes.filter((l: any) => l.es_ejemplo) : allLotes),
+    [allLotes, esVisitante],
+  );
+
   const filteredLotes = useMemo(() => {
-    return allLotes.filter((l) => {
+    return baseLotes.filter((l) => {
+      if (esVisitante) {
+        if (!searchText.trim()) return true;
+        const q = normalizar(searchText.trim());
+        return normalizar([l.nombre_lote, l.barrio, l.ciudad].filter(Boolean).join(" ")).includes(q);
+      }
       if (filters.ciudad !== "Todos" && l.ciudad && l.ciudad !== filters.ciudad) return false;
       if (filters.estado !== "Todos" && l.estado_disponibilidad !== filters.estado) return false;
       if (filters.areaMin && (l.area_total_m2 ?? 0) < Number(filters.areaMin)) return false;
@@ -113,7 +128,7 @@ const Lotes = () => {
       return true;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allLotes, filters, searchText]);
+  }, [baseLotes, filters, searchText, esVisitante]);
 
   const sugerencias = useMemo(() => (searchOpen && searchText.trim() ? filteredLotes.slice(0, 6) : []), [searchOpen, searchText, filteredLotes]);
 
@@ -146,7 +161,7 @@ const Lotes = () => {
 
       <div className="relative flex flex-1 overflow-hidden">
         {/* Map */}
-        <div className={`relative ${isMobile ? "h-full w-full" : "h-full w-[60%]"}`}>
+        <div className={`relative ${isMobile || esVisitante ? "h-full w-full" : "h-full w-[60%]"}`}>
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
@@ -155,7 +170,7 @@ const Lotes = () => {
                 type="text"
                 autoComplete="off"
                 aria-label="Buscar lotes"
-                placeholder="Buscar lote por nombre, barrio o municipio..."
+                placeholder={esVisitante ? "Buscar lotes de ejemplo..." : "Buscar lote por nombre, barrio o municipio..."}
                 value={searchText}
                 onChange={(e) => { setSearchText(e.target.value); setSearchOpen(true); }}
                 onFocus={() => setSearchOpen(true)}
@@ -179,7 +194,7 @@ const Lotes = () => {
               {searchOpen && searchText.trim() && (
                 <div className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-xl border border-border bg-background shadow-lg">
                   {sugerencias.length === 0 ? (
-                    <p className="px-4 py-3 text-sm text-muted-foreground">No hay lotes listados que coincidan.</p>
+                    <p className="px-4 py-3 text-sm text-muted-foreground">{esVisitante ? "No hay lotes de ejemplo que coincidan." : "No hay lotes listados que coincidan."}</p>
                   ) : (
                     sugerencias.map((l) => (
                       <button
@@ -226,13 +241,17 @@ const Lotes = () => {
                         key={lote.id}
                         position={{ lat: lote.lat!, lng: lote.lng! }}
                         icon={{
-                          path: 0,
-                          fillColor: PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
+                          path: PIN_PATH,
+                          fillColor: esVisitante ? "#F49D15" : PIN_COLORS[lote.estado_disponibilidad] ?? "#9CA3AF",
                           fillOpacity: 1,
-                          strokeColor: "#FFFFFF",
-                          strokeWeight: 3,
-                          scale: hoveredLoteId === lote.id ? 12 : 8,
+                          strokeColor: "#1a2744",
+                          strokeWeight: 2.5,
+                          scale: hoveredLoteId === lote.id || selectedLote?.id === lote.id ? 1.9 : 1.5,
+                          anchor: new google.maps.Point(12, 36),
+                          labelOrigin: new google.maps.Point(12, 12),
                         }}
+                        animation={selectedLote?.id === lote.id ? google.maps.Animation.BOUNCE : undefined}
+                        title={lote.nombre_lote}
                         onClick={() => setSelectedLote(lote)}
                         zIndex={hoveredLoteId === lote.id ? 10 : 1}
                       />
@@ -262,7 +281,7 @@ const Lotes = () => {
         </div>
 
         {/* Desktop panel */}
-        {!isMobile && (
+        {!isMobile && !esVisitante && (
           <div className="flex h-full w-[40%] flex-col overflow-y-auto border-l border-border bg-background">
             <LotesFilterPanel
               filters={filters}
@@ -311,8 +330,19 @@ const Lotes = () => {
           </div>
         )}
 
+        {esVisitante && (
+          <div className="absolute bottom-6 left-1/2 z-20 w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+            <p className="font-body text-sm font-semibold text-foreground">Estás viendo lotes de ejemplo</p>
+            <p className="mt-1 text-xs text-muted-foreground">El inventario real solo lo ven desarrolladores y propietarios registrados.</p>
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" className="flex-1" onClick={() => navigate("/login")}>Ingresar o registrarme</Button>
+              <Button size="sm" variant="outline" className="flex-1" onClick={() => navigate("/planes")}>Ver planes</Button>
+            </div>
+          </div>
+        )}
+
         {/* Mobile floating button */}
-        {isMobile && !showList && (
+        {isMobile && !showList && !esVisitante && (
           <Button
             variant="default"
             size="lg"
@@ -325,7 +355,7 @@ const Lotes = () => {
         )}
 
         {/* Mobile list sheet */}
-        {isMobile && showList && (
+        {isMobile && showList && !esVisitante && (
           <div className="absolute inset-0 z-30 flex flex-col overflow-y-auto bg-background">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-4 py-3">
               <span className="font-body text-sm font-semibold text-foreground">
