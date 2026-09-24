@@ -105,6 +105,8 @@ const Lotes = () => {
       if (filters.areaMin && (l.area_total_m2 ?? 0) < Number(filters.areaMin)) return false;
       if (filters.areaMax && (l.area_total_m2 ?? 0) > Number(filters.areaMax)) return false;
       if (searchText.trim()) {
+        // La búsqueda solo muestra lotes listados como públicos.
+        if (!(l as any).es_publico) return false;
         const q = normalizar(searchText.trim());
         if (!normalizar([l.nombre_lote, l.barrio, l.ciudad].filter(Boolean).join(" ")).includes(q)) return false;
       }
