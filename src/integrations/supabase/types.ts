@@ -1495,6 +1495,7 @@ export type Database = {
           lote_id: string | null
           nombre: string | null
           notas: string | null
+          notificado_at: string | null
           objetivo: string | null
           problema_juridico: string | null
           servicios: string[] | null
@@ -1517,6 +1518,7 @@ export type Database = {
           lote_id?: string | null
           nombre?: string | null
           notas?: string | null
+          notificado_at?: string | null
           objetivo?: string | null
           problema_juridico?: string | null
           servicios?: string[] | null
@@ -1539,6 +1541,7 @@ export type Database = {
           lote_id?: string | null
           nombre?: string | null
           notas?: string | null
+          notificado_at?: string | null
           objetivo?: string | null
           problema_juridico?: string | null
           servicios?: string[] | null
