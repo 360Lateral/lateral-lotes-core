@@ -308,7 +308,7 @@ const Diagnostico = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="area">Área en m²</Label>
+              <Label htmlFor="area">Área total del lote (m²)</Label>
               <Input
                 id="area"
                 type="number"
