@@ -37,28 +37,11 @@ export const useOtorgarAccesoManual = () => {
       if (error) throw error;
       const result = data as unknown as OtorgarResult;
 
-      if (input.notificar && result?.dev_email) {
+      if (input.notificar && result?.dev_email && result.acceso_id) {
         // Best-effort: no bloquear si el correo falla.
         try {
-          const fechaExpFmt = result.fecha_expiracion
-            ? new Date(result.fecha_expiracion).toLocaleDateString("es-CO", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
-            : "";
-          await supabase.functions.invoke("send-transactional-email", {
-            body: {
-              template: "acceso-manual-otorgado",
-              to: result.dev_email,
-              data: {
-                nombreDesarrollador: result.dev_nombre ?? "Desarrollador",
-                nombreLote: result.lote_nombre,
-                diasAcceso: input.dias,
-                fechaExpiracion: fechaExpFmt,
-                loteUrl: `${window.location.origin}/lotes/${input.lote_id}`,
-              },
-            },
+          await supabase.functions.invoke("notificar-acceso-manual", {
+            body: { acceso_id: result.acceso_id, origin: window.location.origin },
           });
         } catch (e) {
           console.warn("[useOtorgarAccesoManual] email falló:", e);
