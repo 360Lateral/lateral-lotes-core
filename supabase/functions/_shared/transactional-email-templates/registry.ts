@@ -5,6 +5,8 @@ import { template as engagementActivado } from './engagement-activado.tsx'
 import { template as suscripcionActivada } from './suscripcion-activada.tsx'
 import { template as accesoLoteActivado } from './acceso-lote-activado.tsx'
 import { template as accesoManualOtorgado } from './acceso-manual-otorgado.tsx'
+import { template as diagnosticoConfirmacion } from './diagnostico-confirmacion.tsx'
+import { template as diagnosticoNuevoAdmin } from './diagnostico-nuevo-admin.tsx'
 
 // Entry shape required by send-transactional-email and preview-transactional-email.
 export interface TemplateEntry {
@@ -20,4 +22,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'suscripcion-activada': suscripcionActivada,
   'acceso-lote-activado': accesoLoteActivado,
   'acceso-manual-otorgado': accesoManualOtorgado,
+  'diagnostico-confirmacion': diagnosticoConfirmacion,
+  'diagnostico-nuevo-admin': diagnosticoNuevoAdmin,
 }

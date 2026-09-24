@@ -200,7 +200,9 @@ const Diagnostico = () => {
     }
     setSubmitting(true);
     try {
+      const diagId = crypto.randomUUID();
       const { error } = await supabase.from("diagnosticos").insert({
+        id: diagId,
         ciudad: municipio.trim() || null,
         departamento: departamento.trim() || null,
         latitud: lat ? Number(lat) : null,
@@ -217,6 +219,7 @@ const Diagnostico = () => {
         estado: "nuevo",
       } as any);
       if (error) throw error;
+      supabase.functions.invoke("notificar-diagnostico", { body: { id: diagId } }).catch(() => {});
       toast({
         title: "¡Diagnóstico recibido!",
         description: "En menos de 24 horas tendrás tu reporte en el email registrado.",
