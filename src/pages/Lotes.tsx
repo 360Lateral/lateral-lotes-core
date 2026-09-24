@@ -69,35 +69,20 @@ const Lotes = () => {
   const [mapCenter, setMapCenter] = useState(MEDELLIN_CENTER);
   const [mapZoom, setMapZoom] = useState(12);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const normalizar = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-  const initAutocomplete = useCallback(() => {
-    const input = document.getElementById("google-places-search") as HTMLInputElement;
-    if (!input || !window.google?.maps?.places) return;
-    if (autocompleteRef.current) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: "co" },
-      fields: ["geometry", "name", "formatted_address"],
-    });
-
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry?.location) return;
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setMapCenter({ lat, lng });
-      setMapZoom(15);
-      if (mapRef.current) {
-        mapRef.current.panTo({ lat, lng });
-        mapRef.current.setZoom(15);
-      }
-      setSearchText(place.formatted_address || place.name || "");
-    });
-
-    autocompleteRef.current = autocomplete;
+  const irALote = useCallback((l: LoteWithPrecio) => {
+    setSearchText(l.nombre_lote);
+    setSearchOpen(false);
+    setSelectedLote(l);
+    if (l.lat != null && l.lng != null) {
+      setMapCenter({ lat: l.lat, lng: l.lng });
+      setMapZoom(16);
+      mapRef.current?.panTo({ lat: l.lat, lng: l.lng });
+      mapRef.current?.setZoom(16);
+    }
   }, []);
-
 
   const { data: allLotes = [], isLoading } = useQuery({
     queryKey: ["lotes-mapa"],
@@ -119,9 +104,16 @@ const Lotes = () => {
       if (filters.estado !== "Todos" && l.estado_disponibilidad !== filters.estado) return false;
       if (filters.areaMin && (l.area_total_m2 ?? 0) < Number(filters.areaMin)) return false;
       if (filters.areaMax && (l.area_total_m2 ?? 0) > Number(filters.areaMax)) return false;
+      if (searchText.trim()) {
+        const q = normalizar(searchText.trim());
+        if (!normalizar([l.nombre_lote, l.barrio, l.ciudad].filter(Boolean).join(" ")).includes(q)) return false;
+      }
       return true;
     });
-  }, [allLotes, filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allLotes, filters, searchText]);
+
+  const sugerencias = useMemo(() => (searchOpen && searchText.trim() ? filteredLotes.slice(0, 6) : []), [searchOpen, searchText, filteredLotes]);
 
   const mapOptions = useMemo(() => ({
     mapTypeId: "hybrid",
@@ -157,12 +149,15 @@ const Lotes = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <input
-                id="google-places-search"
+                id="lotes-search"
                 type="text"
-                aria-label="Buscar por ubicación"
-                placeholder="Buscar por dirección, barrio o municipio..."
+                autoComplete="off"
+                aria-label="Buscar lotes"
+                placeholder="Buscar lote por nombre, barrio o municipio..."
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={(e) => { setSearchText(e.target.value); setSearchOpen(true); }}
+                onFocus={() => setSearchOpen(true)}
+                onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
                 className="w-full rounded-full border border-border bg-background pl-9 pr-9 py-2.5 text-sm shadow-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {searchText && (
@@ -173,12 +168,34 @@ const Lotes = () => {
                     setSearchText("");
                     setMapCenter(MEDELLIN_CENTER);
                     setMapZoom(12);
-                    const input = document.getElementById("google-places-search") as HTMLInputElement;
-                    if (input) input.value = "";
+                    setSelectedLote(null);
                   }}
                 >
                   <X className="h-4 w-4" />
                 </button>
+              )}
+              {searchOpen && searchText.trim() && (
+                <div className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-xl border border-border bg-background shadow-lg">
+                  {sugerencias.length === 0 ? (
+                    <p className="px-4 py-3 text-sm text-muted-foreground">No hay lotes listados que coincidan.</p>
+                  ) : (
+                    sugerencias.map((l) => (
+                      <button
+                        key={l.id}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => irALote(l)}
+                        className="flex w-full items-start gap-2 px-4 py-2.5 text-left hover:bg-muted"
+                      >
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium text-foreground">{l.nombre_lote}</span>
+                          <span className="block truncate text-xs text-muted-foreground">{[l.barrio, l.ciudad].filter(Boolean).join(", ")}</span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -198,7 +215,7 @@ const Lotes = () => {
                   center={mapCenter}
                   zoom={mapZoom}
                   options={mapOptions}
-                  onLoad={(map) => { mapRef.current = map; initAutocomplete(); }}
+                  onLoad={(map) => { mapRef.current = map; }}
                 >
                   {filteredLotes
                     .filter((l) => l.lat != null && l.lng != null)
