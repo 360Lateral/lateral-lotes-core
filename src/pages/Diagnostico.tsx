@@ -19,6 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
+import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
+import { useCallback, useEffect as useEffectMap } from "react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
 
@@ -47,6 +50,28 @@ const Diagnostico = () => {
 
   // Estimation fields
   const [municipio, setMunicipio] = useState("");
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
+  const [geoQuery, setGeoQuery] = useState("");
+  const [pinManual, setPinManual] = useState(false);
+  const pinManualRef = useRef(false);
+  pinManualRef.current = pinManual;
+  const setPin = useCallback((e: any) => {
+    if (!e.latLng) return;
+    setPinManual(true);
+    setLat(e.latLng.lat().toFixed(6));
+    setLng(e.latLng.lng().toFixed(6));
+  }, []);
+  const handleGeocoded = useCallback((r: { lat: number; lng: number; ok: boolean }) => {
+    if (!r.ok || pinManualRef.current) return;
+    setLat(r.lat.toFixed(6));
+    setLng(r.lng.toFixed(6));
+  }, []);
+  const handlePlaceSelect = useCallback((p: { lat: number; lng: number }) => {
+    setPinManual(true);
+    setLat(p.lat.toFixed(6));
+    setLng(p.lng.toFixed(6));
+  }, []);
   const [area, setArea] = useState("");
   const [tipo, setTipo] = useState<TipoLote | "">("");
   const [loading, setLoading] = useState(false);
@@ -63,6 +88,12 @@ const Diagnostico = () => {
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffectMap(() => {
+    if (!municipio) return;
+    setPinManual(false);
+    setGeoQuery([municipio, departamento, "Colombia"].join(", "));
+  }, [municipio, departamento]);
 
   const canEstimate = municipio.trim() && area && Number(area) > 0 && tipo;
 
@@ -168,6 +199,8 @@ const Diagnostico = () => {
       const { error } = await supabase.from("diagnosticos").insert({
         ciudad: municipio.trim() || null,
         departamento: departamento.trim() || null,
+        latitud: lat ? Number(lat) : null,
+        longitud: lng ? Number(lng) : null,
         area_m2: area ? Number(area) : null,
         tipo_lote: tipo || null,
         tiene_escritura: escritura === "si" ? true : escritura === "no" ? false : null,
@@ -186,6 +219,7 @@ const Diagnostico = () => {
       });
       // Reset extended fields
       setDepartamento("");
+      setLat(""); setLng("");
       setEscritura("");
       setProblemaJuridico("");
       setServiciosSeleccionados([]);
@@ -252,6 +286,25 @@ const Diagnostico = () => {
                   disabled={!departamento}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Ubicación en el mapa <span className="font-normal text-muted-foreground">(opcional)</span></Label>
+              <GoogleMapsGate fallback={<div className="flex h-64 w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">Cargando mapa…</div>}>
+                <MemoizedLoteMap
+                  lat={lat}
+                  lng={lng}
+                  onMapClick={setPin}
+                  onMarkerDragEnd={setPin}
+                  onPlaceSelect={handlePlaceSelect}
+                  geocodeQuery={geoQuery}
+                  geocodeZoom={13}
+                  onGeocoded={handleGeocoded}
+                />
+              </GoogleMapsGate>
+              <p className="text-xs text-muted-foreground">
+                {pinManual ? "Ubicación marcada. Puedes arrastrar el pin para ajustarla." : "Busca una dirección o haz clic en el mapa para marcar dónde está tu lote."}
+              </p>
             </div>
 
             <div className="space-y-2">
