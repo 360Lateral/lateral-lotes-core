@@ -73,7 +73,9 @@ Deno.serve(async (req) => {
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-  const claims = parseJwtClaims(bearer)
+  const serviceKeyEnv = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const isServiceKey = !!serviceKeyEnv && bearer === serviceKeyEnv
+  const claims = isServiceKey ? { role: 'service_role' } : parseJwtClaims(bearer)
   if (!claims) {
     return new Response(
       JSON.stringify({ error: 'Unauthorized' }),
