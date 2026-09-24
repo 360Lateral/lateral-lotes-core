@@ -70,7 +70,7 @@ export async function sendTemplateEmail(
     await sendLovableEmail(
       {
         to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+        from: `${Deno.env.get('EMAIL_FROM_NAME') ?? 'Notificaciones · 360Lateral'} <${Deno.env.get('EMAIL_FROM_ADDRESS') ?? 'noreply@' + FROM_DOMAIN}>`,
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
