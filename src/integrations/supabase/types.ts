@@ -4946,16 +4946,7 @@ export type Database = {
         }
         Returns: string
       }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
       detectar_sla_en_riesgo: { Args: never; Returns: number }
-      email_queue_dispatch: { Args: never; Returns: undefined }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       es_experto_de_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
@@ -5165,15 +5156,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       obtener_digest_sla: { Args: { p_user_id: string }; Returns: Json }
       obtener_embudo_conversion: {
         Args: { p_desde?: string; p_hasta?: string }
@@ -5285,14 +5267,6 @@ export type Database = {
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean
-      }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
       recalcular_todas_notificaciones: { Args: never; Returns: number }
       refresh_matches_alerta: {
