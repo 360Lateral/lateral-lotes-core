@@ -224,6 +224,13 @@ const LoteDetalle = () => {
           </Badge>
         )}
 
+        {data.es_ejemplo && (
+          <div className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-secondary">
+            <span className="font-semibold">Lote de ejemplo.</span> Los datos y análisis son ilustrativos
+            y muestran toda la información que 360Lateral entrega en un Análisis 360°.
+          </div>
+        )}
+
         {data.acceso_por_ppv && !data.es_propietario && !data.es_admin && id && (
           <PayPerViewCTA loteId={id} accesoActivoExpira={data.ppv_expira ?? undefined} />
         )}

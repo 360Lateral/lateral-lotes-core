@@ -59,6 +59,7 @@ export interface LoteDetalle {
   score_sspp?: number | null;
   score_360_promedio?: number | null;
   bloqueado?: boolean;
+  es_ejemplo?: boolean;
   error?: string;
 }
 
