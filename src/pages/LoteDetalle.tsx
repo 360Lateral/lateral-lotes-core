@@ -130,9 +130,9 @@ const LoteDetalle = () => {
             {data?.error ?? "No pudimos cargar la información del lote en este momento."}
           </p>
           <Button asChild>
-            <Link to="/mercado">
+            <Link to="/lotes">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al mercado
+              Volver a lotes
             </Link>
           </Button>
         </div>
@@ -211,10 +211,10 @@ const LoteDetalle = () => {
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
         <Link
-          to="/mercado"
+          to="/lotes"
           className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-primary"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver al mercado
+          <ArrowLeft className="h-3.5 w-3.5" /> Volver a lotes
         </Link>
 
         {(data.es_propietario || data.es_admin) && (
@@ -222,6 +222,13 @@ const LoteDetalle = () => {
             <ShieldCheck className="h-3 w-3 mr-1" />
             {data.es_propietario ? "Vista de propietario" : "Vista admin"}
           </Badge>
+        )}
+
+        {data.es_ejemplo && (
+          <div className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-secondary">
+            <span className="font-semibold">Lote de ejemplo.</span> Los datos y análisis son ilustrativos
+            y muestran toda la información que 360Lateral entrega en un Análisis 360°.
+          </div>
         )}
 
         {data.acceso_por_ppv && !data.es_propietario && !data.es_admin && id && (

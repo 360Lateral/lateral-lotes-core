@@ -1,0 +1,2 @@
+drop policy if exists "Fotos de ejemplo visibles a todos" on storage.objects;
+create policy "Fotos de ejemplo visibles a todos" on storage.objects for select to anon, authenticated using (bucket_id = 'fotos-lotes' and (storage.foldername(name))[1] = 'ejemplos');

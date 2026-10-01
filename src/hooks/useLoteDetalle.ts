@@ -59,6 +59,7 @@ export interface LoteDetalle {
   score_sspp?: number | null;
   score_360_promedio?: number | null;
   bloqueado?: boolean;
+  es_ejemplo?: boolean;
   error?: string;
 }
 
@@ -99,16 +100,8 @@ export const useLoteDetalle = (loteId: string | undefined) => {
       const base = data as unknown as LoteDetalle;
       if (!base || base.error || base.bloqueado) return base;
 
-      const nivel = base.nivel_usuario;
-      const accesoBasicoPlus =
-        base.es_propietario ||
-        base.es_admin ||
-        base.acceso_completo ||
-        ["basico", "profesional", "premium"].includes(nivel);
-
-      if (!accesoBasicoPlus) {
-        return base;
-      }
+      // Los permisos de lectura de cada análisis los controla la base de datos
+      // (incluye lotes de ejemplo visibles para todos), así que siempre intentamos cargarlos.
 
       try {
         const { j, a, ar, f, g, m, s } = await fetchAnalisis(loteId!);
