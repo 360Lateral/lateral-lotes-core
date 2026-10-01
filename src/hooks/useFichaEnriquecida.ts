@@ -1,5 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  scoreJuridico,
+  scoreAmbiental,
+  scoreArquitectonico,
+  scoreFinanciero,
+  scoreGeotecnico,
+  scoreMercado,
+  scoreSspp,
+} from "@/lib/lote-scores";
 
 export interface ScoresLote {
   score_juridico: number | null;
@@ -157,48 +166,93 @@ export const useFichaEnriquecida = (loteId: string | undefined) => {
         (supabase as any).rpc("obtener_ficha_publica_enriquecida", { p_lote_id: loteId }),
       ]);
 
-      const scores = (scoresRes.data ?? null) as ScoresLote | null;
+      // Tablas de análisis: la base de datos decide qué se puede leer
+      // (p. ej. lotes de ejemplo son visibles para todos).
+      const tablas = [
+        "analisis_juridico",
+        "analisis_ambiental",
+        "analisis_arquitectonico",
+        "analisis_financiero",
+        "analisis_geotecnico",
+        "analisis_mercado",
+        "analisis_sspp",
+      ];
+      const filas = await Promise.all(
+        tablas.map((t) =>
+          (supabase as any)
+            .from(t)
+            .select("*")
+            .eq("lote_id", loteId!)
+            .limit(1)
+            .maybeSingle()
+            .then((r: any) => (r.error ? null : r.data)),
+        ),
+      );
+      const [aj, aa, aar, af, ag, am, as_] = filas as any[];
+
+      const scoresDb = (scoresRes.data ?? null) as ScoresLote | null;
+      const calc = {
+        score_juridico: scoreJuridico(aj),
+        score_ambiental: scoreAmbiental(aa),
+        score_arquitectonico: scoreArquitectonico(aar),
+        score_financiero: scoreFinanciero(af),
+        score_geotecnico: scoreGeotecnico(ag),
+        score_mercado: scoreMercado(am),
+        score_servicios: scoreSspp(as_),
+      };
+      const hayCalc = Object.values(calc).some((v) => v != null);
+      const scores: ScoresLote | null = hayCalc
+        ? {
+            score_normativo: null,
+            precio_venta_estimado:
+              scoresDb?.precio_venta_estimado ?? num(af?.precio_estimado_promedio),
+            ...calc,
+          }
+        : scoresDb;
       const normativa = (normRes.data ?? null) as NormativaLote | null;
       const enriqRaw = (enriqRes.data ?? null) as any;
+      const arqSrc = enriqRaw?.arquitectonico ?? aar;
+      const finSrc = enriqRaw?.financiero ?? af;
+      const merSrc = enriqRaw?.mercado ?? am;
 
-      const arquitectonico: ArquitectonicoLote | null = enriqRaw?.arquitectonico
+      const arquitectonico: ArquitectonicoLote | null = arqSrc
         ? {
-            m2_construibles_total: num(enriqRaw.arquitectonico.m2_construibles_total),
-            unidades_estimadas: num(enriqRaw.arquitectonico.unidades_estimadas),
-            area_vendible_pct: num(enriqRaw.arquitectonico.area_vendible_pct),
-            tipologias: enriqRaw.arquitectonico.tipologias ?? null,
-            eficiencia_lote_pct: num(enriqRaw.arquitectonico.eficiencia_lote_pct),
-            forma_lote: enriqRaw.arquitectonico.forma_lote ?? null,
-            permite_sotano: enriqRaw.arquitectonico.permite_sotano ?? null,
-            observaciones: enriqRaw.arquitectonico.observaciones ?? null,
+            m2_construibles_total: num(arqSrc.m2_construibles_total),
+            unidades_estimadas: num(arqSrc.unidades_estimadas),
+            area_vendible_pct: num(arqSrc.area_vendible_pct),
+            tipologias: arqSrc.tipologias ?? null,
+            eficiencia_lote_pct: num(arqSrc.eficiencia_lote_pct),
+            forma_lote: arqSrc.forma_lote ?? null,
+            permite_sotano: arqSrc.permite_sotano ?? null,
+            observaciones: arqSrc.observaciones ?? null,
           }
         : null;
 
-      const financiero: FinancieroLote | null = enriqRaw?.financiero
+      const financiero: FinancieroLote | null = finSrc
         ? {
-            valor_compra_lote: num(enriqRaw.financiero.valor_compra_lote),
-            costo_construccion_m2: num(enriqRaw.financiero.costo_construccion_m2),
-            ingresos_proyectados: num(enriqRaw.financiero.ingresos_proyectados),
-            margen_bruto_pct: num(enriqRaw.financiero.margen_bruto_pct),
-            tir_pct: num(enriqRaw.financiero.tir_pct),
-            vpn: num(enriqRaw.financiero.vpn),
-            punto_equilibrio_pct: num(enriqRaw.financiero.punto_equilibrio_pct),
-            precio_estimado_min: num(enriqRaw.financiero.precio_estimado_min),
-            precio_estimado_promedio: num(enriqRaw.financiero.precio_estimado_promedio),
-            precio_estimado_max: num(enriqRaw.financiero.precio_estimado_max),
-            observaciones: enriqRaw.financiero.observaciones ?? null,
+            valor_compra_lote: num(finSrc.valor_compra_lote),
+            costo_construccion_m2: num(finSrc.costo_construccion_m2),
+            ingresos_proyectados: num(finSrc.ingresos_proyectados),
+            margen_bruto_pct: num(finSrc.margen_bruto_pct),
+            tir_pct: num(finSrc.tir_pct),
+            vpn: num(finSrc.vpn),
+            punto_equilibrio_pct: num(finSrc.punto_equilibrio_pct),
+            precio_estimado_min: num(finSrc.precio_estimado_min),
+            precio_estimado_promedio: num(finSrc.precio_estimado_promedio),
+            precio_estimado_max: num(finSrc.precio_estimado_max),
+            observaciones: finSrc.observaciones ?? null,
           }
         : null;
 
-      const mercado: MercadoLote | null = enriqRaw?.mercado
+      const mercado: MercadoLote | null = merSrc
         ? {
-            precio_venta_m2_zona: num(enriqRaw.mercado.precio_venta_m2_zona),
-            precio_unidad_promedio: num(enriqRaw.mercado.precio_unidad_promedio),
-            proyectos_competidores: num(enriqRaw.mercado.proyectos_competidores),
-            velocidad_absorcion_unidades_mes: num(enriqRaw.mercado.velocidad_absorcion_unidades_mes),
-            perfil_comprador: enriqRaw.mercado.perfil_comprador ?? null,
-            valorizacion_anual_pct: num(enriqRaw.mercado.valorizacion_anual_pct),
-            observaciones: enriqRaw.mercado.observaciones ?? null,
+            precio_venta_m2_zona: num(merSrc.precio_venta_m2_zona),
+            precio_unidad_promedio: num(merSrc.precio_unidad_promedio),
+            proyectos_competidores: num(merSrc.proyectos_competidores),
+            velocidad_absorcion_unidades_mes: num(merSrc.velocidad_absorcion_unidades_mes),
+            perfil_comprador: merSrc.perfil_comprador ?? null,
+            valorizacion_anual_pct: num(merSrc.valorizacion_anual_pct),
+            observaciones: merSrc.observaciones ?? null,
           }
         : null;
 
