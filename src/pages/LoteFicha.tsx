@@ -603,9 +603,7 @@ const LoteFicha = () => {
 
           {/* Lo que puedes construir: índices normativos */}
           {tieneAlgunNormativo && (
-            <section id="normativa" className="mb-8 scroll-mt-56 md:scroll-mt-24" ref={(element) => {
-              if (element && window.location.hash === "#normativa") element.scrollIntoView();
-            }}>
+            <section className="mb-8">
               <h2 className="mb-3 text-lg font-semibold text-foreground">Lo que puedes construir</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <NormativaChip

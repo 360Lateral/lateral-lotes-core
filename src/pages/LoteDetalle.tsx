@@ -308,7 +308,6 @@ const LoteDetalle = () => {
               </h2>
               <Card className="p-5">
                 <Score360Visualizacion
-                  normativaHref={`/lotes/${id}/ficha#normativa`}
                   scoreJuridico={data.score_juridico}
                   scoreAmbiental={data.score_ambiental}
                   scoreArquitectonico={data.score_arquitectonico}
