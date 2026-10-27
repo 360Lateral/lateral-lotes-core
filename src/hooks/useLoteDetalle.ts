@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { calcularScore360, type Scores360 } from "@/lib/calcular-score-360";
+import { obtenerScores360 } from "@/lib/obtener-scores-360";
 
 export type NivelUsuario = "gratuito" | "basico" | "profesional" | "premium";
 
@@ -68,12 +69,7 @@ export const useLoteDetalle = (loteId: string | undefined) => {
       const base = data as unknown as LoteDetalle;
       if (!base || base.error || base.bloqueado) return base;
 
-      const { data: scores, error: scoresError } = await supabase
-        .from("vw_lotes_publicos")
-        .select("score_juridico,score_normativo,score_servicios,score_ambiental,score_arquitectonico,score_financiero,score_geotecnico,score_mercado")
-        .eq("id", loteId)
-        .maybeSingle();
-      if (scoresError) throw scoresError;
+      const scores = (await obtenerScores360([loteId])).get(loteId);
       Object.assign(base, scores ?? {});
       const score = calcularScore360(scores ?? {});
       base.score_360_promedio = score?.promedio ?? null;

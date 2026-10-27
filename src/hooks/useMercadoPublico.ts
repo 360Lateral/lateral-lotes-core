@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Scores360 } from "@/lib/calcular-score-360";
+import { obtenerScores360 } from "@/lib/obtener-scores-360";
 
 export interface FiltrosMercado {
   ciudad?: string;
@@ -35,13 +36,7 @@ export const useMercadoPublico = (filtros: FiltrosMercado = {}) => {
       if (error) throw error;
       const catalogo = (data ?? []) as LoteMercado[];
       // Enrich only the lots authorized by the existing catalog RPC.
-      const { data: scores, error: scoresError } = catalogo.length
-        ? await supabase.from("vw_lotes_publicos")
-            .select("id,score_juridico,score_normativo,score_servicios,score_ambiental,score_arquitectonico,score_financiero,score_geotecnico,score_mercado")
-            .in("id", catalogo.map((lote) => lote.lote_id))
-        : { data: [], error: null };
-      if (scoresError) throw scoresError;
-      const scoresPorId = new Map((scores ?? []).map((lote) => [lote.id, lote]));
+      const scoresPorId = await obtenerScores360(catalogo.map((lote) => lote.lote_id));
       const rows = catalogo.map((lote) => ({ ...lote, ...scoresPorId.get(lote.lote_id) })).filter((l) => {
         if (filtros.ciudad && l.ciudad !== filtros.ciudad) return false;
         if (filtros.barrio && !(l.barrio ?? "").toLowerCase().includes(filtros.barrio.toLowerCase()))
