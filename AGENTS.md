@@ -1,3 +1,4 @@
 # UI rules
+- Market cards and lot detail must read `score_360_promedio` through the same `useLoteDetalle` query and render `Score360Badge`; this reuses the detail calculation and cache without introducing a second score or database changes.
 - Keep the compact mobile action menu scoped to `/mercado` and `/lotes/:id` in `FloatingActionStack`; preserve the existing actions on other routes and desktop to avoid unrelated UI changes.
 - Keep mobile lot-detail zoom controls in `MapaHeroLote` and reuse the centralized map loader; this allows accessible touch targets without changing desktop map controls.
