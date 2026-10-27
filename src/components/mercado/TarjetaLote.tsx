@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { GoogleMap, MarkerF } from "@react-google-maps/api";
-import { Ruler, Sparkles, MapPin, ArrowRight, Image as ImageIcon, Award, Star } from "lucide-react";
+import { Ruler, Sparkles, MapPin, ArrowRight, Image as ImageIcon, Award } from "lucide-react";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
 import { Badge } from "@/components/ui/badge";
 import type { LoteMercado } from "@/hooks/useMercadoPublico";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 import { formatMetros } from "@/lib/format-moneda";
+import { useLoteDetalle } from "@/hooks/useLoteDetalle";
+import { Score360Badge } from "@/components/lotes/Score360Badge";
 
 interface Props {
   lote: LoteMercado;
@@ -33,6 +35,7 @@ const MapaMini = ({ lat, lng }: { lat: number; lng: number }) => (
 );
 
 const TarjetaLote = ({ lote }: Props) => {
+  const { data: detalle } = useLoteDetalle(lote.lote_id);
   const ref = useRef<HTMLDivElement | null>(null);
   const [enViewport, setEnViewport] = useState(false);
 
@@ -99,12 +102,7 @@ const TarjetaLote = ({ lote }: Props) => {
                 Nuevo
               </Badge>
             )}
-            {lote.score_360 != null && (
-              <Badge className="bg-success text-primary-foreground gap-1 text-xs">
-                <Star className="h-3 w-3" />
-                Score {Number(lote.score_360).toFixed(1)}
-              </Badge>
-            )}
+            <Score360Badge score={detalle?.score_360_promedio} />
             {lote.has_resolutoria && (
               <Badge className="bg-secondary text-secondary-foreground gap-1 text-xs">
                 <Award className="h-3 w-3" />

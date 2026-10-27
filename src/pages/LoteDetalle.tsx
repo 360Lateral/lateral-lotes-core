@@ -31,6 +31,7 @@ import { SidebarStickyLote } from "@/components/lotes/SidebarStickyLote";
 import { GaleriaFotosLote } from "@/components/lotes/GaleriaFotosLote";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { Score360Badge } from "@/components/lotes/Score360Badge";
 
 const MetricaKey = ({
   label,
@@ -278,17 +279,12 @@ const LoteDetalle = () => {
                   label="Estrato"
                   value={verBasico && data.estrato != null ? String(data.estrato) : "—"}
                 />
-                <MetricaKey
-                  label="Score 360°"
-                  value={
-                    scoresBloqueados
-                      ? "—"
-                      : data.score_360_promedio != null
-                      ? `${data.score_360_promedio.toFixed(1)}/10`
-                      : "—"
-                  }
-                  highlight={!scoresBloqueados && (data.score_360_promedio ?? 0) >= 8}
-                />
+                <div className="rounded-lg border bg-card p-3">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Score 360°</p>
+                  <div className="mt-1">
+                    <Score360Badge score={data.score_360_promedio} />
+                  </div>
+                </div>
               </div>
 
               <Button asChild variant="outline" className="w-full sm:w-auto">
