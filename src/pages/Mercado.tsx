@@ -130,7 +130,7 @@ const Mercado = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background pb-24 md:pb-0">
       <Seo
         title="Índice de precios del suelo en Colombia | 360Lateral"
         description="Consulta precios por m² de lotes en Colombia: índice de mercado por ciudad y barrio, tendencias y comparables verificados."

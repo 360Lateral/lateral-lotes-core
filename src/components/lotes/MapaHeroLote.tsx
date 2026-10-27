@@ -1,6 +1,9 @@
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
-import { Eye, MapPin } from "lucide-react";
+import { Eye, MapPin, Plus, Minus } from "lucide-react";
+import { useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   lat?: number | null;
@@ -18,6 +21,16 @@ const Fallback = ({ msg }: { msg: string }) => (
 );
 
 export const MapaHeroLote = ({ lat, lng, ofuscado }: Props) => {
+  const isMobile = useIsMobile();
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const changeZoom = (delta: number) => {
+    const map = mapRef.current;
+    const zoom = map?.getZoom();
+    if (!map || zoom == null) return;
+    map.setZoom(zoom + delta);
+  };
+
   if (lat == null || lng == null) {
     return <Fallback msg="Ubicación no disponible" />;
   }
@@ -31,15 +44,27 @@ export const MapaHeroLote = ({ lat, lng, ofuscado }: Props) => {
           mapContainerStyle={containerStyle}
           center={center}
           zoom={ofuscado ? 14 : 16}
+          onLoad={(map) => { mapRef.current = map; }}
+          onUnmount={() => { mapRef.current = null; }}
           options={{
             disableDefaultUI: true,
-            zoomControl: true,
+            zoomControl: !isMobile,
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
             gestureHandling: "cooperative",
           }}
         >
+          {isMobile && (
+            <div className="absolute right-2 top-2 z-10 flex flex-col overflow-hidden rounded-md border border-border bg-background shadow-sm">
+              <Button variant="ghost" size="icon" className="h-12 w-12 rounded-none" aria-label="Acercar mapa" title="Acercar mapa" onClick={() => changeZoom(1)}>
+                <Plus className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-12 w-12 rounded-none border-t border-border" aria-label="Alejar mapa" title="Alejar mapa" onClick={() => changeZoom(-1)}>
+                <Minus className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
           {ofuscado ? (
             <Marker
               position={center}
