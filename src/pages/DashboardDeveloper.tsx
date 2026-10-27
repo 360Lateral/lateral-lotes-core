@@ -311,9 +311,9 @@ const DashboardDeveloper = () => {
         <strong>Pantalla de debug interna.</strong> Esta vista es para depuración del sistema y NO está relacionada con el rol de usuario "Desarrollador" (que se gestiona en <code>/dashboard/usuarios</code>).
       </div>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-body text-xl font-bold text-foreground">Mis Criterios de Inversión</h1>
-        <div className="flex items-center gap-2">
+      <div className="mb-6 flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <h1 className="min-w-0 font-body text-xl font-bold text-foreground">Mis Criterios de Inversión</h1>
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 md:w-auto md:flex-nowrap">
           <Button variant="outline" size="sm" asChild>
             <Link to="/lotes">
               <Search className="mr-2 h-4 w-4" />
@@ -331,7 +331,7 @@ const DashboardDeveloper = () => {
             </Link>
           </Button>
           {!showForm && (
-            <Button variant="default" size="sm" onClick={() => setShowForm(true)}>
+            <Button variant="default" size="sm" className="min-h-[44px] w-full md:min-h-0 md:w-auto" onClick={() => setShowForm(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo criterio
             </Button>
