@@ -282,7 +282,7 @@ const LoteDetalle = () => {
                 <div className="rounded-lg border bg-card p-3">
                   <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">Score 360°</p>
                   <div className="mt-1">
-                    <Score360Badge score={data.score_360_promedio} />
+                    <Score360Badge score={data.score_360_promedio} modulos={data.score_360_modulos ?? 0} />
                   </div>
                 </div>
               </div>

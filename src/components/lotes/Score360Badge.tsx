@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatScore360, score360Tone } from "@/lib/score-360-display";
 
-const description = "Score 360°: puntaje de 0 a 10 que resume la viabilidad del lote (jurídico, normativo y servicios).";
+const description = "Score 360°: promedio de 0 a 10 de los módulos de análisis ya completados (jurídico, normativo, servicios, etc.).";
 const tones = {
   missing: "bg-muted text-muted-foreground border-border",
   danger: "bg-danger text-destructive-foreground border-danger",
@@ -11,7 +11,8 @@ const tones = {
   success: "bg-success text-primary-foreground border-success",
 };
 
-export const Score360Badge = ({ score }: { score: number | null | undefined }) => (
+export const Score360Badge = ({ score, modulos }: { score: number | null | undefined; modulos?: number }) => (
+  <span className="inline-flex max-w-full flex-col items-start gap-1">
   <Tooltip>
     <TooltipTrigger asChild>
       <span tabIndex={0} title={description} aria-label={`${formatScore360(score)}. ${description}`} className="pointer-events-auto inline-flex max-w-full cursor-help rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -24,4 +25,6 @@ export const Score360Badge = ({ score }: { score: number | null | undefined }) =
     </TooltipTrigger>
     <TooltipContent className="max-w-[min(280px,calc(100vw-32px))]">{description}</TooltipContent>
   </Tooltip>
+    {modulos !== undefined && <span className="text-xs text-muted-foreground">{modulos} de 8 módulos</span>}
+  </span>
 );
