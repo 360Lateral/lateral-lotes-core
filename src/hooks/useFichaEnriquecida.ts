@@ -200,15 +200,25 @@ export const useFichaEnriquecida = (loteId: string | undefined) => {
         score_mercado: scoreMercado(am),
         score_servicios: scoreSspp(as_),
       };
+      // Stored scores are the source of truth; estimates only fill gaps
+      // when the stored value is missing (e.g. visitors who can't read lotes).
       const hayCalc = Object.values(calc).some((v) => v != null);
-      const scores: ScoresLote | null = hayCalc
-        ? {
-            score_normativo: null,
-            precio_venta_estimado:
-              scoresDb?.precio_venta_estimado ?? num(af?.precio_estimado_promedio),
-            ...calc,
-          }
-        : scoresDb;
+      const scores: ScoresLote | null =
+        scoresDb || hayCalc
+          ? {
+              score_normativo: num(scoresDb?.score_normativo),
+              score_juridico: num(scoresDb?.score_juridico) ?? calc.score_juridico,
+              score_servicios: num(scoresDb?.score_servicios) ?? calc.score_servicios,
+              score_ambiental: num(scoresDb?.score_ambiental) ?? calc.score_ambiental,
+              score_geotecnico: num(scoresDb?.score_geotecnico) ?? calc.score_geotecnico,
+              score_mercado: num(scoresDb?.score_mercado) ?? calc.score_mercado,
+              score_arquitectonico:
+                num(scoresDb?.score_arquitectonico) ?? calc.score_arquitectonico,
+              score_financiero: num(scoresDb?.score_financiero) ?? calc.score_financiero,
+              precio_venta_estimado:
+                num(scoresDb?.precio_venta_estimado) ?? num(af?.precio_estimado_promedio),
+            }
+          : null;
       const normativa = (normRes.data ?? null) as NormativaLote | null;
       const enriqRaw = (enriqRes.data ?? null) as any;
       const arqSrc = enriqRaw?.arquitectonico ?? aar;
