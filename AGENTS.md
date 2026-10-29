@@ -1,4 +1,5 @@
 # UI rules
+- Mobile plan summaries derive counts and new-feature highlights from the same inclusion arrays as the comparison table; keep desktop rendering unchanged so both views stay consistent.
 - Market cards and lot detail use `calcularScore360` on the eight stored module scores and render `Score360Badge`; stored scores always win over derived estimates (the ficha may only fill gaps). Read `vw_lotes_publicos` first and fall back to `listar_mercado_publico`, which returns all eight scores for the rows the user is already authorized to see, so visitors and members get the same score.
 - Keep the compact mobile action menu scoped to `/mercado` and `/lotes/:id` in `FloatingActionStack`; preserve the existing actions on other routes and desktop to avoid unrelated UI changes.
 - Keep mobile lot-detail zoom controls in `MapaHeroLote` and reuse the centralized map loader; this allows accessible touch targets without changing desktop map controls.
