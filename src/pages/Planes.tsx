@@ -410,7 +410,7 @@ const Planes = () => {
                   <p className="mt-3 text-2xl font-bold text-primary">{p.precioLabel}</p>
                   <p className="text-xs text-muted-foreground">Pago único</p>
                   <p className="mt-3 text-sm text-muted-foreground">Incluye {resumen.total} de {FEATURES.length} análisis</p>
-                  <ul className="mt-4 space-y-2">
+                  <ul className="mb-6 mt-4 space-y-2">
                     {resumen.nuevas.map((i) => (
                       <li key={FEATURES[i].label} className="flex items-start gap-2 text-sm">
                           <Check className="h-4 w-4 shrink-0 text-success mt-0.5" />
@@ -422,7 +422,7 @@ const Planes = () => {
                   </ul>
                   <Button
                     asChild
-                    className="mt-auto w-full translate-y-0"
+                    className="mt-auto w-full"
                     variant={p.destacado ? "default" : "outline"}
                   >
                     <Link to="/diagnostico">
@@ -432,6 +432,22 @@ const Planes = () => {
                 </Card>
                 );
               })}
+              </div>
+              <div className="flex items-center justify-center gap-1" aria-label="Seleccionar plan">
+                {planes.map((p, indice) => (
+                  <Button
+                    key={`indicador-${p.id}`}
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    aria-label={`Ver plan ${p.nombre}`}
+                    aria-pressed={planActivo === indice}
+                    onClick={() => irAPlan(indice)}
+                  >
+                    <span className={`h-2 w-2 rounded-full ${planActivo === indice ? "bg-primary" : "bg-muted-foreground/40"}`} />
+                  </Button>
+                ))}
+              </div>
               <div id="tabla-comparativa" className="scroll-mt-20">
                 <h2 className="mb-4 font-body text-xl font-bold text-secondary">Comparar planes</h2>
                 <div className="max-w-full overflow-x-auto rounded-lg border border-border bg-background" role="region" aria-label="Tabla comparativa de planes" tabIndex={0}>
