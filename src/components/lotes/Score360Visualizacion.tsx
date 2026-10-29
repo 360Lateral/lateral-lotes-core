@@ -1,4 +1,5 @@
-import { LucideIcon, Scale, Leaf, Building, Coins, Mountain, TrendingUp, Wrench, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { LucideIcon, Landmark, Scale, Leaf, Building, Coins, Mountain, TrendingUp, Wrench, Lock } from "lucide-react";
 
 interface ScoreItem {
   key: string;
@@ -6,6 +7,7 @@ interface ScoreItem {
   label: string;
   score: number | null | undefined;
   bloqueado?: boolean;
+  href?: string;
 }
 
 const colorByScore = (score: number | null | undefined) => {
@@ -16,6 +18,8 @@ const colorByScore = (score: number | null | undefined) => {
 };
 
 export interface Score360Props {
+  scoreNormativo?: number | null;
+  normativoHref?: string;
   scoreJuridico?: number | null;
   scoreAmbiental?: number | null;
   scoreArquitectonico?: number | null;
@@ -28,24 +32,27 @@ export interface Score360Props {
 
 export const Score360Visualizacion = (props: Score360Props) => {
   const items: ScoreItem[] = [
+    { key: "normativo", icon: Landmark, label: "Normativo", score: props.scoreNormativo, bloqueado: props.bloqueado, href: props.normativoHref },
     { key: "juridico", icon: Scale, label: "Jurídico", score: props.scoreJuridico, bloqueado: props.bloqueado },
     { key: "ambiental", icon: Leaf, label: "Ambiental", score: props.scoreAmbiental, bloqueado: props.bloqueado },
-    { key: "arquitectonico", icon: Building, label: "Arquitec.", score: props.scoreArquitectonico, bloqueado: props.bloqueado },
-    { key: "financiero", icon: Coins, label: "Financiero", score: props.scoreFinanciero, bloqueado: props.bloqueado },
+    { key: "sspp", icon: Wrench, label: "Servicios", score: props.scoreSspp, bloqueado: props.bloqueado },
     { key: "geotecnico", icon: Mountain, label: "Geotécnico", score: props.scoreGeotecnico, bloqueado: props.bloqueado },
     { key: "mercado", icon: TrendingUp, label: "Mercado", score: props.scoreMercado, bloqueado: props.bloqueado },
-    { key: "sspp", icon: Wrench, label: "Servicios", score: props.scoreSspp, bloqueado: props.bloqueado },
+    { key: "arquitectonico", icon: Building, label: "Arquitec.", score: props.scoreArquitectonico, bloqueado: props.bloqueado },
+    { key: "financiero", icon: Coins, label: "Financiero", score: props.scoreFinanciero, bloqueado: props.bloqueado },
   ];
 
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {items.map((item) => {
         const Icon = item.icon;
+        const Wrapper: any = item.href ? Link : "div";
         const { bg, border, text } = item.bloqueado ? colorByScore(null) : colorByScore(item.score);
         return (
-          <div
+          <Wrapper
             key={item.key}
-            className={`rounded-lg border ${border} ${bg} p-3 flex flex-col items-center text-center gap-1`}
+            {...(item.href ? { to: item.href } : {})}
+            className={`rounded-lg border ${border} ${bg} p-3 flex flex-col items-center text-center gap-1${item.href ? " transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : ""}`}
           >
             {item.bloqueado ? (
               <Lock className={`h-5 w-5 ${text}`} />
@@ -58,7 +65,7 @@ export const Score360Visualizacion = (props: Score360Props) => {
             <span className={`text-lg font-bold ${text}`}>
               {item.bloqueado ? "NDA" : item.score != null ? item.score.toFixed(1) : "—"}
             </span>
-          </div>
+          </Wrapper>
         );
       })}
     </div>

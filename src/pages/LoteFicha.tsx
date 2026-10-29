@@ -1,7 +1,7 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Building, Check, Construction, Copy, Home, MapPin, Printer, ChevronLeft, ChevronRight, ExternalLink, Download, Loader2, Square } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -223,6 +223,10 @@ const LoteFicha = () => {
   const [searchParams] = useSearchParams();
   const { data, isLoading, error } = useFichaLote(id);
   const { data: enriquecida } = useFichaEnriquecida(id);
+  useEffect(() => {
+    if (!enriquecida || window.location.hash !== "#normativa") return;
+    requestAnimationFrame(() => document.getElementById("normativa")?.scrollIntoView({ behavior: "smooth" }));
+  }, [enriquecida]);
   const { data: mapsKey } = useGoogleMapsKey();
 
   const seccionesActivas = useMemo(
@@ -603,7 +607,7 @@ const LoteFicha = () => {
 
           {/* Lo que puedes construir: índices normativos */}
           {tieneAlgunNormativo && (
-            <section className="mb-8">
+            <section id="normativa" className="mb-8 scroll-mt-24">
               <h2 className="mb-3 text-lg font-semibold text-foreground">Lo que puedes construir</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <NormativaChip
