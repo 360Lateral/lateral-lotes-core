@@ -118,7 +118,7 @@ const HeroAnonimo = () => (
             asChild
             className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
           >
-            <Link to="/lotes">
+            <Link to="/mercado">
               <Play className="mr-2 h-4 w-4" />
               Ver lote de ejemplo
             </Link>
@@ -298,7 +298,7 @@ const Index = () => {
           </p>
           <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/lotes">
+              <Link to="/mercado">
                 <Search className="mr-2 h-5 w-5" />
                 Explorar catálogo
               </Link>
@@ -344,7 +344,7 @@ const Index = () => {
           </p>
           <div className="mt-8">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/lotes">
+              <Link to="/mercado">
                 <Search className="mr-2 h-5 w-5" />
                 Explorar lotes
               </Link>
@@ -844,7 +844,7 @@ const Index = () => {
                 asChild
                 className="border-white/30 bg-white/5 text-secondary-foreground hover:bg-white/15 hover:text-secondary-foreground"
               >
-                <Link to="/lotes">Explorar catálogo</Link>
+                <Link to="/mercado">Explorar catálogo</Link>
               </Button>
             </div>
           </div>

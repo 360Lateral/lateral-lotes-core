@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Loader2, TrendingUp, SlidersHorizontal } from "lucide-react";
+import { Loader2, TrendingUp, SlidersHorizontal, Map as MapIcon, List } from "lucide-react";
 import FiltrosMercadoSticky from "@/components/mercado/FiltrosMercadoSticky";
 import HeatmapMapa from "@/components/mercado/HeatmapMapa";
 import TarjetaLote from "@/components/mercado/TarjetaLote";
@@ -63,6 +63,7 @@ const Mercado = () => {
   const [filtros, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [vistaMovil, setVistaMovil] = useState<"lista" | "mapa">("lista");
   const [orden, setOrden] = useState<OrdenMercado>(() => {
     try {
       const v = localStorage.getItem(ORDEN_KEY);
@@ -174,8 +175,19 @@ const Mercado = () => {
 
             {/* Contenido principal */}
             <div className="space-y-6">
+              {/* Mobile list/map toggle */}
+              <Button
+                variant="secondary"
+                className="w-full min-h-[48px] lg:hidden"
+                onClick={() => setVistaMovil((v) => (v === "lista" ? "mapa" : "lista"))}
+                aria-pressed={vistaMovil === "mapa"}
+              >
+                {vistaMovil === "lista" ? <MapIcon className="h-4 w-4 mr-2" /> : <List className="h-4 w-4 mr-2" />}
+                {vistaMovil === "lista" ? "Ver mapa" : "Ver lista"}
+              </Button>
+
               {/* Mobile filter trigger */}
-              <div className="lg:hidden">
+              <div className={`lg:hidden ${vistaMovil === "lista" ? "" : "hidden"}`}>
                 <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
                   <SheetTrigger asChild>
                     <Button variant="outline" className="w-full">
@@ -220,8 +232,11 @@ const Mercado = () => {
               )}
 
               {/* Heatmap */}
-              <HeatmapMapa lotes={lotes} />
+              <div className={`${vistaMovil === "mapa" ? "" : "hidden"} lg:block`}>
+                <HeatmapMapa lotes={lotes} />
+              </div>
 
+              <div className={`${vistaMovil === "lista" ? "" : "hidden"} lg:block space-y-6`}>
               {/* Header de resultados */}
               <ResultadosHeader
                 total={lotes.length}
@@ -263,6 +278,7 @@ const Mercado = () => {
                   />
                 </>
               )}
+              </div>
             </div>
           </div>
 

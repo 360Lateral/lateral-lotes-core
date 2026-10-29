@@ -315,7 +315,7 @@ const DashboardDeveloper = () => {
         <h1 className="min-w-0 font-body text-xl font-bold text-foreground">Mis Criterios de Inversión</h1>
         <div className="flex w-full min-w-0 flex-wrap items-center gap-2 md:w-auto md:flex-nowrap">
           <Button variant="outline" size="sm" asChild>
-            <Link to="/lotes">
+            <Link to="/mercado">
               <Search className="mr-2 h-4 w-4" />
               Explorar lotes
             </Link>

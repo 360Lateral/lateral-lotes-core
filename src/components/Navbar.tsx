@@ -43,12 +43,12 @@ const Navbar = () => {
       return [
         { label: "Mi panel", href: "/portal" },
         { label: "Diagnóstico", href: "/diagnostico" },
-        { label: "Catálogo público", href: "/lotes" },
+        { label: "Catálogo público", href: "/mercado" },
       ];
     }
     if (user && isDesarrollador) {
       return [
-        { label: "Catálogo", href: "/lotes" },
+        { label: "Catálogo", href: "/mercado" },
         { label: "Suscripción", href: "/suscripcion" },
         { label: "Mi cuenta", href: "/mi-cuenta" },
         { label: "Diagnóstico", href: "/diagnostico" },

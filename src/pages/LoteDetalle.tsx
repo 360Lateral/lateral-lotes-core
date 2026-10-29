@@ -131,7 +131,7 @@ const LoteDetalle = () => {
             {data?.error ?? "No pudimos cargar la información del lote en este momento."}
           </p>
           <Button asChild>
-            <Link to="/lotes">
+            <Link to="/mercado">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a lotes
             </Link>
@@ -165,7 +165,7 @@ const LoteDetalle = () => {
               <Link to="/login">Iniciar sesión</Link>
             </Button>
             <Button asChild variant="ghost">
-              <Link to="/lotes">
+              <Link to="/mercado">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Ver lotes de ejemplo
               </Link>
@@ -212,7 +212,7 @@ const LoteDetalle = () => {
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
         <Link
-          to="/lotes"
+          to="/mercado"
           className="text-sm text-muted-foreground inline-flex items-center gap-1 hover:text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Volver a lotes
