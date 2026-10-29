@@ -43,6 +43,7 @@ export interface LoteDetalle extends Scores360 {
   ppv_expira?: string | null;
   // Scores 360°
   score_juridico?: number | null;
+  score_normativo?: number | null;
   score_ambiental?: number | null;
   score_arquitectonico?: number | null;
   score_financiero?: number | null;
