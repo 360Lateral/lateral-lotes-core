@@ -1,4 +1,5 @@
 # UI rules
+- Landing trust-strip counts reuse `useStatsMercado` unchanged, with viewport and reduced-motion handling local to the strip, so market calculations stay identical without changing other animations.
 - Market card photo enrichment keeps the catalog RPC as the authorization gate, reads `foto_url` from `vw_lotes_publicos` for only returned IDs, and falls back to the existing access-checked ficha RPC; use signed storage URLs without broadening permissions.
 - Mobile plan summaries derive counts and new-feature highlights from the same inclusion arrays as the comparison table; keep desktop rendering unchanged so both views stay consistent.
 - Market cards and lot detail use `calcularScore360` on the eight stored module scores and render `Score360Badge`; stored scores always win over derived estimates (the ficha may only fill gaps). Read `vw_lotes_publicos` first and fall back to `listar_mercado_publico`, which returns all eight scores for the rows the user is already authorized to see, so visitors and members get the same score.

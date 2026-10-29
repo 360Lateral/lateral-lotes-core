@@ -1,13 +1,12 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Seo from "@/components/Seo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import FAQPrecioRespuesta from "@/components/landing/FAQPrecioRespuesta";
+import TrustStatsStrip from "@/components/landing/TrustStatsStrip";
 
 import {
   LayoutDashboard,
@@ -32,7 +31,6 @@ import {
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
-import { useCountUp } from "@/hooks/useCountUp";
 
 const HERO_AERIAL_URL =
   "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=2400&q=80&auto=format&fit=crop";
@@ -180,33 +178,6 @@ const HeroAnonimo = () => (
   </section>
 );
 
-const TrustStat = ({
-  icon: Icon,
-  value,
-  label,
-}: {
-  icon: LucideIcon;
-  value: string;
-  label: string;
-}) => {
-  const numericValue = parseInt(value, 10);
-  const isNumber = !isNaN(numericValue);
-  const { value: animated, ref } = useCountUp({ target: isNumber ? numericValue : 0 });
-
-  return (
-    <div ref={ref} className="flex items-center gap-3 px-4">
-      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
-        <Icon className="h-6 w-6 text-primary" />
-      </div>
-      <div className="flex flex-col">
-        <span className="font-body text-2xl font-bold text-secondary tabular-nums md:text-3xl">
-          {isNumber ? animated : value}
-        </span>
-        <span className="font-body text-xs text-muted-foreground">{label}</span>
-      </div>
-    </div>
-  );
-};
 
 
 
@@ -231,25 +202,6 @@ const Index = () => {
     return "Usuario";
   };
 
-  // Trust bar stats
-  const { data: trustStats = [
-    { label: "Lotes disponibles", value: "—" },
-    { label: "Municipios", value: "—" },
-    { label: "Diagnósticos", value: "—" },
-    { label: "Resolutorías", value: "—" },
-  ] } = useQuery({
-    queryKey: ["trust-stats"],
-    queryFn: async () => {
-      const { data } = await (supabase as any).rpc("obtener_stats_publicas");
-      const s = (data ?? {}) as Record<string, number>;
-      return [
-        { label: "Lotes disponibles", value: String(s.lotes_disponibles ?? 0) },
-        { label: "Municipios", value: String(s.ciudades ?? 0) },
-        { label: "Diagnósticos", value: String(s.diagnosticos ?? 0) },
-        { label: "Resolutorías", value: String(s.con_resolutoria ?? 0) },
-      ];
-    },
-  });
 
   const renderHero = () => {
     if (authLoading) return null;
@@ -471,39 +423,7 @@ const Index = () => {
 
       {renderHero()}
 
-      {/* Trust bar — hidden until real numbers exist */}
-      {(() => {
-        const hasRealData = trustStats.some((s) => {
-          const n = parseInt(s.value, 10);
-          return !isNaN(n) && n > 0;
-        });
-        if (hasRealData) {
-          return (
-            <section className="border-b border-border bg-background py-10">
-              <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-around gap-6 px-4">
-                <TrustStat icon={MapPin} value={trustStats[0]?.value ?? "—"} label={trustStats[0]?.label ?? "Lotes disponibles"} />
-                <TrustStat icon={Building2} value={trustStats[1]?.value ?? "—"} label={trustStats[1]?.label ?? "Municipios"} />
-                <TrustStat icon={FileCheck} value={trustStats[2]?.value ?? "—"} label={trustStats[2]?.label ?? "Diagnósticos"} />
-                <TrustStat icon={Award} value={trustStats[3]?.value ?? "—"} label={trustStats[3]?.label ?? "Resolutorías"} />
-              </div>
-            </section>
-          );
-        }
-        if (user) return null;
-        return (
-          <section className="border-b border-border bg-gradient-to-r from-secondary/[0.04] via-primary/[0.06] to-secondary/[0.04] py-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-3 px-4 text-center sm:flex-row sm:gap-4">
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-1 font-body text-[11px] font-bold uppercase tracking-wider text-primary">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-                Plataforma en lanzamiento
-              </span>
-              <p className="font-body text-sm text-foreground/80 sm:text-base">
-                Sé de los primeros en publicar tu lote y conectarte con desarrolladores calificados.
-              </p>
-            </div>
-          </section>
-        );
-      })()}
+      <TrustStatsStrip />
 
       {/* Cómo funciona — only for non-logged users */}
       {!user && (
