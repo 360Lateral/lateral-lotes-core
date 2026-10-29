@@ -507,7 +507,7 @@ const Index = () => {
 
       {/* Cómo funciona — only for non-logged users */}
       {!user && (
-        <section className="mx-auto w-full max-w-6xl px-4 py-20">
+        <section id="como-funciona" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
           <div className="text-center">
             <span className="inline-block rounded-full bg-primary/12 px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider text-primary">
               Metodología 360°
