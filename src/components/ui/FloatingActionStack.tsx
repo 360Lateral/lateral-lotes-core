@@ -20,7 +20,7 @@ const FloatingActionStack = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const affectedPage = pathname === "/mercado" || /^\/lotes\/[^/]+$/.test(pathname)
+  const affectedPage = pathname === "/mercado" || /^\/lotes\/[^/]+(?:\/ficha)?$/.test(pathname)
     || PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
 
   if (isMobile && affectedPage) {
