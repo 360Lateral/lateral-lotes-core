@@ -68,18 +68,18 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-secondary">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
-        <Link to="/" className="shrink-0">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 xl:px-8">
+        <Link to="/" className="shrink-0 lg:mr-8">
           <Logo variant="on-navy" />
         </Link>
 
         {/* Desktop nav links */}
-        <div className="hidden items-center gap-8 lg:flex">
+        <div className="hidden shrink-0 items-center gap-6 lg:flex xl:gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className="font-body text-sm text-secondary-foreground transition-colors hover:text-primary"
+              className="whitespace-nowrap font-body text-sm text-secondary-foreground transition-colors hover:text-primary"
             >
               {link.label}
             </Link>
@@ -87,10 +87,10 @@ const Navbar = () => {
         </div>
 
         {/* Desktop right side */}
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 lg:ml-6 lg:flex">
           {loading ? null : user ? (
             <>
-              <span className="font-body text-sm text-secondary-foreground">
+              <span className="hidden whitespace-nowrap font-body text-sm text-secondary-foreground xl:inline">
                 {displayName}
               </span>
               {dashboardRoute && (
