@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { GoogleMap, MarkerF } from "@react-google-maps/api";
-import { Ruler, Sparkles, MapPin, ArrowRight, Image as ImageIcon, Award } from "lucide-react";
-import GoogleMapsGate from "@/components/maps/GoogleMapsGate";
+import { Ruler, Sparkles, MapPin, ArrowRight, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { LoteMercado } from "@/hooks/useMercadoPublico";
 import { formatearCategoriaArea, formatearRangoPrecio } from "@/lib/mercado-format";
@@ -14,49 +12,9 @@ interface Props {
   lote: LoteMercado;
 }
 
-const containerStyle = { width: "100%", height: "100%" };
-const mapOptions: google.maps.MapOptions = {
-  disableDefaultUI: true,
-  gestureHandling: "none",
-  keyboardShortcuts: false,
-  clickableIcons: false,
-  zoomControl: false,
-};
-
-const MapaMini = ({ lat, lng }: { lat: number; lng: number }) => (
-  <GoogleMap
-    mapContainerStyle={containerStyle}
-    center={{ lat, lng }}
-    zoom={13}
-    options={mapOptions}
-  >
-    <MarkerF position={{ lat, lng }} />
-  </GoogleMap>
-);
-
 const TarjetaLote = ({ lote }: Props) => {
   const score = calcularScore360(lote);
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [enViewport, setEnViewport] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current || enViewport) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setEnViewport(true);
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [enViewport]);
-
-  const lat = lote.latitud_zona != null ? Number(lote.latitud_zona) : null;
-  const lng = lote.longitud_zona != null ? Number(lote.longitud_zona) : null;
-  const tieneCoords = lat != null && lng != null && !Number.isNaN(lat) && !Number.isNaN(lng);
+  const [failedPhoto, setFailedPhoto] = useState<string | null>(null);
 
   const esNuevo =
     lote.publicado_en &&
@@ -67,27 +25,19 @@ const TarjetaLote = ({ lote }: Props) => {
       to={`/lotes/${lote.lote_id}`}
       className="group block rounded-xl border border-border bg-card overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      {/* Map preview */}
-      <div ref={ref} className="relative w-full h-40 bg-muted">
-        {enViewport && tieneCoords ? (
-          <GoogleMapsGate
-            fallback={
-              <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
-              </div>
-            }
-          >
-            <MapaMini lat={lat as number} lng={lng as number} />
-          </GoogleMapsGate>
+      {/* Photo preview */}
+      <div className="relative aspect-video w-full overflow-hidden market-photo-fallback">
+        {lote.foto_url && failedPhoto !== lote.foto_url ? (
+          <img src={lote.foto_url} alt={`Lote en ${[lote.ciudad, lote.barrio].filter(Boolean).join(" · ")}`} className="h-full w-full object-cover" loading="lazy" onError={() => setFailedPhoto(lote.foto_url ?? null)} />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <MapPin className="h-8 w-8 text-muted-foreground/40" />
+            <MapPin className="h-8 w-8 text-secondary-foreground" />
           </div>
         )}
 
         {/* Badges */}
         <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2 pointer-events-none">
-          <Badge variant="secondary" className="bg-background/90 backdrop-blur text-xs font-mono">
+          <Badge variant="secondary" className="rounded border-0 bg-secondary/75 px-2 py-1 text-xs font-mono text-secondary-foreground">
             {lote.codigo_anonimo}
           </Badge>
           <div className="flex flex-col items-end gap-1">
