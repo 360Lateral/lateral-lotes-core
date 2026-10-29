@@ -331,7 +331,19 @@ const Planes = () => {
             {/* Mobile cards */}
             <div className="md:hidden space-y-4">
                   <Button variant="outline" className="w-full" asChild>
-                    <a href="#tabla-comparativa">
+                    <a
+                      href="#tabla-comparativa"
+                      onClick={(event) => {
+                        const tabla = document.getElementById("tabla-comparativa");
+                        if (!tabla) return;
+                        event.preventDefault();
+                        window.history.replaceState(null, "", "#tabla-comparativa");
+                        tabla.scrollIntoView({
+                          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+                          block: "start",
+                        });
+                      }}
+                    >
                     <TableIcon className="mr-2 h-4 w-4" />
                     Ver tabla comparativa
                     </a>
