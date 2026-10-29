@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Seo from "@/components/Seo";
@@ -6,13 +6,6 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import HeroImage from "@/components/ui/HeroImage";
 import { Card } from "@/components/ui/card";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
@@ -24,6 +17,7 @@ import { usePlanesConPrecio, type PlanConPrecio } from "@/hooks/usePlanesConPrec
 import { useSmlmvVigente } from "@/hooks/useSmlmvVigente";
 import PlanesFAQ from "@/components/planes/PlanesFAQ";
 import { formatCOP } from "@/lib/format-moneda";
+import { resumirInclusiones } from "@/components/planes/plan-summary";
 
 const PLANES_IMG =
   "https://images.unsplash.com/photo-1448630360428-65456885c650?w=1600&q=85";
@@ -179,11 +173,11 @@ const FeatureLabel = ({
   </TooltipProvider>
 );
 
-const PlanTabla = ({ planes }: { planes: PlanRow[] }) => (
-  <table className="w-full text-sm">
+const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boolean }) => (
+  <table className={`w-full text-sm ${mobile ? "min-w-[900px] table-fixed" : ""}`}>
     <thead>
       <tr>
-        <th className="text-left p-3 font-medium text-muted-foreground w-1/3" />
+        <th className={`text-left p-3 font-medium text-muted-foreground ${mobile ? "sticky left-0 z-20 w-[180px] bg-background" : "w-1/3"}`} />
         {planes.map((p) => (
           <th key={p.id} className="p-3 text-center align-top">
             <div className="flex flex-col items-center gap-1">
@@ -208,7 +202,7 @@ const PlanTabla = ({ planes }: { planes: PlanRow[] }) => (
     <tbody>
       {FEATURES.map((f, i) => (
         <tr key={f.label} className={i % 2 === 0 ? "bg-muted/30" : ""}>
-          <td className="p-3 font-medium text-foreground">
+          <td className={`p-3 font-medium text-foreground ${mobile ? "sticky left-0 z-10 bg-background" : ""}`}>
             <FeatureLabel label={f.label} tech={f.tech} description={f.description} />
           </td>
           {planes.map((p) => (
@@ -223,7 +217,7 @@ const PlanTabla = ({ planes }: { planes: PlanRow[] }) => (
         </tr>
       ))}
       <tr>
-        <td />
+        <td className={mobile ? "sticky left-0 z-10 bg-background" : undefined} />
         {planes.map((p) => (
           <td key={p.id} className="p-3 text-center">
             <Button asChild size="sm" variant={p.destacado ? "default" : "outline"}>
@@ -239,7 +233,6 @@ const PlanTabla = ({ planes }: { planes: PlanRow[] }) => (
 const Planes = () => {
   const { data: planesRemotos } = usePlanesConPrecio();
   const { data: smlmv } = useSmlmvVigente();
-  const [tablaAbierta, setTablaAbierta] = useState(false);
 
   // Map remote plan rows onto our display rows; fallback to defaults if remote query fails.
   const planes: PlanRow[] = useMemo(() => {
@@ -337,24 +330,16 @@ const Planes = () => {
 
             {/* Mobile cards */}
             <div className="md:hidden space-y-4">
-              <Sheet open={tablaAbierta} onOpenChange={setTablaAbierta}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" asChild>
+                    <a href="#tabla-comparativa">
                     <TableIcon className="mr-2 h-4 w-4" />
                     Ver tabla comparativa
+                    </a>
                   </Button>
-                </SheetTrigger>
-                <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle>Comparar planes</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-4 overflow-x-auto">
-                    <PlanTabla planes={planes} />
-                  </div>
-                </SheetContent>
-              </Sheet>
 
-              {planes.map((p) => (
+              {planes.map((p, planIndex) => {
+                const resumen = resumirInclusiones(p.included, planes[planIndex - 1]?.included);
+                return (
                 <Card
                   key={p.id}
                   className={`p-6 ${
@@ -369,21 +354,14 @@ const Planes = () => {
                   <h3 className="font-heading text-xl font-bold text-secondary">{p.nombre}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{p.descripcion}</p>
                   <p className="mt-3 text-2xl font-bold text-primary">{p.precioLabel}</p>
-                  <p className="text-xs text-muted-foreground">{p.precioSubLabel}</p>
+                  <p className="text-xs text-muted-foreground">Pago único</p>
+                  <p className="mt-3 text-sm text-muted-foreground">Incluye {resumen.total} de {FEATURES.length} análisis</p>
                   <ul className="mt-4 space-y-2">
-                    {FEATURES.map((f, i) => (
-                      <li key={f.label} className="flex items-start gap-2 text-sm">
-                        {p.included[i] ? (
+                    {resumen.nuevas.map((i) => (
+                      <li key={FEATURES[i].label} className="flex items-start gap-2 text-sm">
                           <Check className="h-4 w-4 shrink-0 text-success mt-0.5" />
-                        ) : (
-                          <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
-                        )}
-                        <span
-                          className={
-                            p.included[i] ? "text-foreground" : "text-muted-foreground/60"
-                          }
-                        >
-                          {f.label}
+                        <span className="text-foreground">
+                          {FEATURES[i].label}
                         </span>
                       </li>
                     ))}
@@ -398,7 +376,14 @@ const Planes = () => {
                     </Link>
                   </Button>
                 </Card>
-              ))}
+                );
+              })}
+              <div id="tabla-comparativa" className="scroll-mt-20">
+                <h2 className="mb-4 font-body text-xl font-bold text-secondary">Comparar planes</h2>
+                <div className="max-w-full overflow-x-auto rounded-lg border border-border bg-background" role="region" aria-label="Tabla comparativa de planes" tabIndex={0}>
+                  <PlanTabla planes={planes} mobile />
+                </div>
+              </div>
             </div>
 
             {/* Secondary CTA */}
