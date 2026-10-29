@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import EnviarFeedbackDialog from "@/components/feedback/EnviarFeedbackDialog";
 
-export const PUBLIC_MOBILE_ACTION_PATHS = ["/", "/planes", "/resolutoria", "/diagnostico"];
+export const PUBLIC_MOBILE_ACTION_PATHS = ["/", "/planes", "/resolutoria", "/diagnostico", "/nosotros", "/contacto", "/unsubscribe"];
 
 /**
  * Contenedor único para botones flotantes de la esquina inferior derecha.
