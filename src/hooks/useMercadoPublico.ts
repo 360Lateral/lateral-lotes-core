@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Scores360 } from "@/lib/calcular-score-360";
 import { obtenerScores360 } from "@/lib/obtener-scores-360";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
+import type { FichaLoteData } from "@/hooks/useFichaLote";
 
 export interface FiltrosMercado {
   ciudad?: string;
@@ -46,9 +47,13 @@ export const useMercadoPublico = (filtros: FiltrosMercado = {}) => {
       const fotos = new Map<string, string | null>((fotosVista.data ?? []).map((foto) => [foto.id, foto.foto_url]));
       const pendientes = ids.filter((id) => !fotos.has(id));
       if (pendientes.length) {
-        // The view may be unavailable to visitors; retain the same authorized IDs and RLS.
-        const { data: fotosLotes } = await supabase.from("lotes").select("id, foto_url").in("id", pendientes);
-        for (const foto of fotosLotes ?? []) fotos.set(foto.id, foto.foto_url);
+        // Use the same access-checked ficha already available for these catalog lots.
+        await Promise.all(pendientes.map(async (id) => {
+          const { data, error } = await supabase.rpc("obtener_ficha_lote", { p_lote_id: id });
+          if (error) return;
+          const ficha = data as unknown as FichaLoteData | null;
+          if (ficha?.encontrada && ficha.acceso !== false) fotos.set(id, ficha.foto_url ?? null);
+        }));
       }
       const fotosFirmadas = new Map(await Promise.all(catalogo.map(async (lote) => [lote.lote_id, await getSignedFotoUrl(lote.foto_url ?? fotos.get(lote.lote_id))] as const)));
       const rows = catalogo.map((lote) => ({ ...lote, ...scoresPorId.get(lote.lote_id), foto_url: fotosFirmadas.get(lote.lote_id) ?? null })).filter((l) => {

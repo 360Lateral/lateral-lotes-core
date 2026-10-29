@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Fotos 16:9 lazy y código legible en tarjetas de /mercado; comprobar foto real y respaldo de error a 390 px, sin cambiar base de datos.
 - [x] Menú único y 96 px en /nosotros, /contacto, /unsubscribe y /lotes/:id/ficha; verificado a 390 px sin desbordes, con páginas privadas y escritorio intactos. /nosotros y /contacto conservan su contenido actual de página no encontrada.
 - [x] Extender el menú único y los 96 px en páginas públicas también con sesión; Feedback e Inicio comprobados a 390 px sin desbordes, escritorio y dashboard intactos.
 - [x] Reutilizar el menú flotante y reservar 96 px al final en páginas públicas móviles sin sesión; verificado a 390 px, sin desbordes, con escritorio y controles de sesión intactos.
