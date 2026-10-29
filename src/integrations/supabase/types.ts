@@ -5063,6 +5063,14 @@ export type Database = {
           publicado_en: string
           rango_precio: string
           score_360: number
+          score_ambiental: number
+          score_arquitectonico: number
+          score_financiero: number
+          score_geotecnico: number
+          score_juridico: number
+          score_mercado: number
+          score_normativo: number
+          score_servicios: number
           uso_actual: string
         }[]
       }
