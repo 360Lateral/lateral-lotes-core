@@ -68,7 +68,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-secondary">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 xl:px-8">
         <Link to="/" className="shrink-0 lg:mr-8">
           <Logo variant="on-navy" />
         </Link>
