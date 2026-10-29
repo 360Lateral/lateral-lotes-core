@@ -31,7 +31,7 @@ const PayPerViewBanner = () => {
           </div>
         </div>
         <Button asChild size="lg" className="md:shrink-0">
-          <Link to="/lotes">Buscar lote y pagar</Link>
+          <Link to="/mercado">Buscar lote y pagar</Link>
         </Button>
       </div>
     </Card>

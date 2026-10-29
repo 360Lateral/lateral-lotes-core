@@ -112,7 +112,7 @@ const ProtectedRoute = ({
   if (requireDeveloper) {
     if (!isDesarrollador && !isAdminOrExperto) {
       console.warn("[ProtectedRoute] requireDeveloper → redirect /lotes");
-      return <Navigate to="/lotes" replace />;
+      return <Navigate to="/mercado" replace />;
     }
     return <>{children}</>;
   }

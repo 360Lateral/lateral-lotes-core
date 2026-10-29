@@ -63,6 +63,7 @@ const Mercado = () => {
   const [filtros, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [vistaMovil, setVistaMovil] = useState<"lista" | "mapa">("lista");
   const [orden, setOrden] = useState<OrdenMercado>(() => {
     try {
       const v = localStorage.getItem(ORDEN_KEY);

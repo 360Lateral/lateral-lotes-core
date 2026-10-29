@@ -20,6 +20,11 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 // Lazy: resto del árbol — reduce bundle inicial
+const LotesRedirect = () => {
+  const { search, hash } = useLocation();
+  return <Navigate to={`/mercado${search}${hash}`} replace />;
+};
+
 const Lotes = lazy(() => import("./pages/Lotes"));
 const LoteDetalle = lazy(() => import("./pages/LoteDetalle"));
 const LoteFicha = lazy(() => import("./pages/LoteFicha"));
@@ -116,7 +121,7 @@ const App = () => (
             <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Index />} />
-            <Route path="/lotes" element={<Lotes />} />
+            <Route path="/lotes" element={<LotesRedirect />} />
             <Route path="/lotes/:id/ficha" element={<LoteFicha />} />
             <Route path="/lotes/:id" element={<LoteDetalle />} />
             <Route path="/login" element={<Login />} />

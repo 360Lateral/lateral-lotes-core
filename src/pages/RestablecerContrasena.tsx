@@ -85,7 +85,7 @@ const RestablecerContrasena = () => {
     setTimeout(() => {
       if (isAdminOrExperto) navigate("/dashboard", { replace: true });
       else if (isPropietario || isComisionista) navigate("/portal", { replace: true });
-      else if (isDesarrollador) navigate("/lotes", { replace: true });
+      else if (isDesarrollador) navigate("/mercado", { replace: true });
       else navigate("/dashboard", { replace: true });
     }, 1000);
   };

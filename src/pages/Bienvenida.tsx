@@ -69,7 +69,7 @@ const Bienvenida = () => {
       } else if (isDesarrollador) {
         navigate("/dashboard/developer", { replace: true });
       } else {
-        navigate("/lotes", { replace: true });
+        navigate("/mercado", { replace: true });
       }
     }
   }, [user, loading, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, navigate]);

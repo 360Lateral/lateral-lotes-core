@@ -41,9 +41,9 @@ const Login = () => {
     } else if (isPropietario) {
       navigate("/portal", { replace: true });
     } else if (isDesarrollador) {
-      navigate("/lotes", { replace: true });
+      navigate("/mercado", { replace: true });
     } else {
-      navigate("/lotes", { replace: true });
+      navigate("/mercado", { replace: true });
     }
   }, [loginSuccess, authLoading, user, isAdminOrExperto, isPropietario, isComisionista, isDesarrollador, userType, navigate]);
 
@@ -57,7 +57,7 @@ const Login = () => {
     } else if (isPropietario) {
       navigate("/portal", { replace: true });
     } else {
-      navigate("/lotes", { replace: true });
+      navigate("/mercado", { replace: true });
     }
   }, [authLoading, user, isAdminOrExperto, isPropietario, isComisionista, navigate, loginSuccess]);
 

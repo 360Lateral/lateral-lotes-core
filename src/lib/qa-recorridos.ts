@@ -36,14 +36,14 @@ export const RECORRIDOS: RecorridoQA[] = [
         titulo: "Catálogo público de lotes",
         esperado:
           "Se listan los lotes disponibles, el mapa carga y los filtros responden sin dejar el listado vacío por defecto.",
-        ruta: "/lotes",
+        ruta: "/mercado",
       },
       {
         id: "vis-ficha",
         titulo: "Ficha de un lote",
         esperado:
           "Se muestran fotos y datos básicos; la información financiera y de mercado aparece bloqueada con invitación a registrarse.",
-        ruta: "/lotes",
+        ruta: "/mercado",
       },
       {
         id: "vis-diagnostico",
@@ -180,14 +180,14 @@ export const RECORRIDOS: RecorridoQA[] = [
         id: "des-catalogo",
         titulo: "Catálogo con filtros",
         esperado: "Filtros combinados devuelven resultados correctos y el mapa se sincroniza.",
-        ruta: "/lotes",
+        ruta: "/mercado",
       },
       {
         id: "des-ficha",
         titulo: "Ficha completa de un lote",
         esperado:
           "Con acceso: normativa, análisis y financiero visibles. Sin acceso: bloques bloqueados con CTA claro.",
-        ruta: "/lotes",
+        ruta: "/mercado",
       },
       {
         id: "des-suscripcion",
@@ -200,7 +200,7 @@ export const RECORRIDOS: RecorridoQA[] = [
         id: "des-contacto",
         titulo: "Solicitar contacto / firmar NDA",
         esperado: "La solicitud se envía y queda registrada para el admin.",
-        ruta: "/lotes",
+        ruta: "/mercado",
       },
       {
         id: "des-negociacion",
