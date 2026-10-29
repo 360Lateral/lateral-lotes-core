@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Seo from "@/components/Seo";
@@ -174,25 +174,25 @@ const FeatureLabel = ({
 );
 
 const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boolean }) => (
-  <table className={`w-full text-sm ${mobile ? "min-w-[900px] table-fixed" : ""}`}>
+  <table className={`w-full ${mobile ? "min-w-[560px] table-fixed text-xs" : "text-sm"}`}>
     <thead>
       <tr>
-        <th className={`text-left p-3 font-medium text-muted-foreground ${mobile ? "sticky left-0 z-20 w-[180px] bg-background" : "w-1/3"}`} />
+        <th className={`text-left font-medium text-muted-foreground ${mobile ? "sticky left-0 z-20 w-[120px] bg-background p-1.5" : "w-1/3 p-3"}`} />
         {planes.map((p) => (
-          <th key={p.id} className="p-3 text-center align-top">
+          <th key={p.id} className={`${mobile ? "p-1.5" : "p-3"} text-center align-top`}>
             <div className="flex flex-col items-center gap-1">
               {p.destacado && (
-                <span className="rounded-full bg-primary px-3 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                <span className={`rounded-full bg-primary ${mobile ? "px-1" : "px-3"} py-0.5 text-[10px] font-semibold text-primary-foreground`}>
                   Más popular
                 </span>
               )}
-              <span className="font-heading text-lg font-bold text-secondary">
+              <span className={`font-heading ${mobile ? "text-sm" : "text-lg"} font-bold text-secondary`}>
                 {p.nombre}
               </span>
               <span className="text-xs text-muted-foreground max-w-[12rem] leading-tight">
                 {p.descripcion}
               </span>
-              <span className="mt-1 text-xl font-bold text-primary">{p.precioLabel}</span>
+              <span className={`mt-1 ${mobile ? "text-sm" : "text-xl"} font-bold text-primary`}>{p.precioLabel}</span>
               <span className="text-xs text-muted-foreground">{p.precioSubLabel}</span>
             </div>
           </th>
@@ -202,11 +202,11 @@ const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boo
     <tbody>
       {FEATURES.map((f, i) => (
         <tr key={f.label} className={i % 2 === 0 ? "bg-muted/30" : ""}>
-          <td className={`p-3 font-medium text-foreground ${mobile ? "sticky left-0 z-10 bg-background" : ""}`}>
+          <td className={`font-medium text-foreground ${mobile ? "sticky left-0 z-10 bg-background p-1.5 text-xs" : "p-3"}`}>
             <FeatureLabel label={f.label} tech={f.tech} description={f.description} />
           </td>
           {planes.map((p) => (
-            <td key={p.id} className="p-3 text-center">
+            <td key={p.id} className={`${mobile ? "p-1.5" : "p-3"} text-center`}>
               {p.included[i] ? (
                 <Check className="mx-auto h-5 w-5 text-success" />
               ) : (
@@ -219,8 +219,8 @@ const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boo
       <tr>
         <td className={mobile ? "sticky left-0 z-10 bg-background" : undefined} />
         {planes.map((p) => (
-          <td key={p.id} className="p-3 text-center">
-            <Button asChild size="sm" variant={p.destacado ? "default" : "outline"}>
+          <td key={p.id} className={`${mobile ? "p-1.5" : "p-3"} text-center`}>
+            <Button asChild size="sm" className={mobile ? "h-auto min-h-9 w-full whitespace-normal px-1 text-xs" : undefined} variant={p.destacado ? "default" : "outline"}>
               <Link to="/diagnostico">{p.codigo === "gratuito" ? "Empezar gratis" : "Comprar plan"}</Link>
             </Button>
           </td>
@@ -233,6 +233,8 @@ const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boo
 const Planes = () => {
   const { data: planesRemotos } = usePlanesConPrecio();
   const { data: smlmv } = useSmlmvVigente();
+  const carruselRef = useRef<HTMLDivElement>(null);
+  const [planActivo, setPlanActivo] = useState(2);
 
   // Map remote plan rows onto our display rows; fallback to defaults if remote query fails.
   const planes: PlanRow[] = useMemo(() => {
@@ -272,6 +274,27 @@ const Planes = () => {
       included: FEATURES.map((f) => f.fallback[idx]),
     }));
   }, [planesRemotos, smlmv]);
+
+  const codigosPlanes = planes.map((p) => p.codigo).join(",");
+  useEffect(() => {
+    const carrusel = carruselRef.current;
+    if (!carrusel || !window.matchMedia("(max-width: 767px)").matches) return;
+    const indice = codigosPlanes.split(",").indexOf("pro");
+    const tarjeta = carrusel.children.item(Math.max(0, indice));
+    if (!(tarjeta instanceof HTMLElement)) return;
+    carrusel.scrollTo({ left: tarjeta.offsetLeft - carrusel.offsetLeft - (carrusel.clientWidth - tarjeta.offsetWidth) / 2, behavior: "instant" });
+    setPlanActivo(Math.max(0, indice));
+  }, [codigosPlanes]);
+
+  const irAPlan = (indice: number) => {
+    const carrusel = carruselRef.current;
+    const tarjeta = carrusel?.children.item(indice);
+    if (!carrusel || !(tarjeta instanceof HTMLElement)) return;
+    carrusel.scrollTo({
+      left: tarjeta.offsetLeft - carrusel.offsetLeft - (carrusel.clientWidth - tarjeta.offsetWidth) / 2,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -349,12 +372,31 @@ const Planes = () => {
                     </a>
                   </Button>
 
+              <div
+                ref={carruselRef}
+                role="region"
+                aria-label="Planes de diagnóstico"
+                aria-roledescription="carrusel"
+                className="relative flex max-w-full snap-x snap-mandatory gap-3 overflow-x-auto px-[7.5%] py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                onScroll={(event) => {
+                  const carrusel = event.currentTarget;
+                  const centro = carrusel.scrollLeft + carrusel.clientWidth / 2;
+                  let cercano = 0;
+                  let distancia = Infinity;
+                  Array.from(carrusel.children).forEach((tarjeta, indice) => {
+                    if (!(tarjeta instanceof HTMLElement)) return;
+                    const diferencia = Math.abs(tarjeta.offsetLeft - carrusel.offsetLeft + tarjeta.offsetWidth / 2 - centro);
+                    if (diferencia < distancia) { distancia = diferencia; cercano = indice; }
+                  });
+                  setPlanActivo(cercano);
+                }}
+              >
               {planes.map((p, planIndex) => {
                 const resumen = resumirInclusiones(p.included, planes[planIndex - 1]?.included);
                 return (
                 <Card
                   key={p.id}
-                  className={`p-6 ${
+                  className={`flex w-full shrink-0 snap-center flex-col p-5 ${
                     p.destacado ? "border-primary ring-2 ring-primary bg-primary/5" : ""
                   }`}
                 >
@@ -380,7 +422,7 @@ const Planes = () => {
                   </ul>
                   <Button
                     asChild
-                    className="mt-6 w-full"
+                    className="mt-auto w-full translate-y-0"
                     variant={p.destacado ? "default" : "outline"}
                   >
                     <Link to="/diagnostico">
@@ -447,7 +489,7 @@ const Planes = () => {
               Estructuración, Gerencia y Desarrollo del lote completo.
               Honorarios + participación. A convenir.
             </p>
-            <Button
+                  <Button
               asChild
               size="lg"
               className="mt-6 bg-primary hover:bg-primary/90 text-primary-foreground"
