@@ -1,15 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Linkedin, Instagram, Mail } from "lucide-react";
 import Logo from "@/components/ui/Logo";
+import { useAuth } from "@/contexts/AuthContext";
+import { PUBLIC_MOBILE_ACTION_PATHS } from "@/components/ui/FloatingActionStack";
 
 // TODO: las páginas /terminos, /privacidad, /nda, /sobre-nosotros, /blog aún no existen.
 // Cuando se creen, estos links ya funcionarán sin cambios.
 
 const Footer = () => {
   const year = new Date().getFullYear();
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+  const needsMobileActionSpace = !user && PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer className={`bg-secondary text-secondary-foreground${needsMobileActionSpace ? " pb-24 md:pb-0" : ""}`}>
       <div className="mx-auto w-full max-w-6xl px-4 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Columna marca */}
