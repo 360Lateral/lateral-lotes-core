@@ -352,7 +352,7 @@ const LoteFicha = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center bg-background pb-24 text-muted-foreground md:pb-0">
         Cargando ficha…
       </div>
     );
@@ -360,7 +360,7 @@ const LoteFicha = () => {
 
   if (error || !data || data.encontrada !== true) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-background pb-24 md:pb-0">
         <Card className="p-8 text-center">
           <h1 className="mb-2 text-xl font-semibold">Ficha no disponible</h1>
           <p className="text-muted-foreground">El activo que buscas no existe o fue retirado.</p>
@@ -371,7 +371,7 @@ const LoteFicha = () => {
 
   if (data.acceso === false) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 pb-24 md:pb-0">
         <Card className="max-w-md p-8 text-center">
           <h1 className="mb-2 text-xl font-semibold">
             {data.nombre_lote ?? "Este lote"}
@@ -476,7 +476,7 @@ const LoteFicha = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 print:bg-background">
+    <div className="min-h-screen bg-muted/30 pb-24 md:pb-0 print:bg-background print:pb-0">
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDesc} />

@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Menú único y 96 px en /nosotros, /contacto, /unsubscribe y /lotes/:id/ficha; verificado a 390 px sin desbordes, con páginas privadas y escritorio intactos. /nosotros y /contacto conservan su contenido actual de página no encontrada.
 - [x] Extender el menú único y los 96 px en páginas públicas también con sesión; Feedback e Inicio comprobados a 390 px sin desbordes, escritorio y dashboard intactos.
 - [x] Reutilizar el menú flotante y reservar 96 px al final en páginas públicas móviles sin sesión; verificado a 390 px, sin desbordes, con escritorio y controles de sesión intactos.
 - [x] Promedio compartido de módulos almacenados: Escobero muestra 4.0/10 y 3 de 8 en tarjeta y ficha, con sesión y sin sesión; 10 pruebas aprobadas, sin desbordes a 390 px.

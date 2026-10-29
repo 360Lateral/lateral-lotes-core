@@ -72,7 +72,7 @@ const Unsubscribe = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 pt-12 pb-24 md:py-12">
       <Card className="w-full max-w-md p-8 space-y-5 text-center">
         {estado === "validando" && (
           <>
