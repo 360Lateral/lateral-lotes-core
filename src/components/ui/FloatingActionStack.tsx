@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import EnviarFeedbackDialog from "@/components/feedback/EnviarFeedbackDialog";
 
+export const PUBLIC_MOBILE_ACTION_PATHS = ["/", "/planes", "/resolutoria", "/diagnostico"];
+
 /**
  * Contenedor único para botones flotantes de la esquina inferior derecha.
  * Cualquier botón flotante nuevo debe ir aquí dentro (sin clases `fixed` propias)
@@ -18,7 +20,8 @@ const FloatingActionStack = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const affectedPage = pathname === "/mercado" || /^\/lotes\/[^/]+$/.test(pathname);
+  const affectedPage = pathname === "/mercado" || /^\/lotes\/[^/]+$/.test(pathname)
+    || (!user && PUBLIC_MOBILE_ACTION_PATHS.includes(pathname));
 
   if (isMobile && affectedPage) {
     return (
