@@ -42,7 +42,7 @@ const TarjetaLote = ({ lote }: Props) => {
           </Badge>
           <div className="flex flex-col items-end gap-1">
             {lote.es_ejemplo && (
-              <Badge variant="outline" className="bg-background/90 backdrop-blur text-xs">
+              <Badge variant="outline" className="hidden bg-background/90 backdrop-blur text-xs md:inline-flex">
                 Ejemplo
               </Badge>
             )}
@@ -52,7 +52,10 @@ const TarjetaLote = ({ lote }: Props) => {
                 Nuevo
               </Badge>
             )}
-            <Score360Badge score={score?.promedio} modulos={score?.modulos ?? 0} />
+            <div className="flex flex-col items-start gap-1 rounded-md border border-border bg-background/95 px-[10px] py-[6px] shadow-sm">
+              <Score360Badge score={score?.promedio} />
+              <span className="whitespace-nowrap text-[11px] text-muted-foreground">{score?.modulos ?? 0} de 8 módulos</span>
+            </div>
             {lote.has_resolutoria && (
               <Badge className="bg-secondary text-secondary-foreground gap-1 text-xs">
                 <Award className="h-3 w-3" />
@@ -61,6 +64,11 @@ const TarjetaLote = ({ lote }: Props) => {
             )}
           </div>
         </div>
+        {lote.es_ejemplo && (
+          <Badge variant="outline" className="absolute bottom-2 left-2 bg-background/90 backdrop-blur text-xs md:hidden">
+            Ejemplo
+          </Badge>
+        )}
       </div>
 
       {/* Body */}
