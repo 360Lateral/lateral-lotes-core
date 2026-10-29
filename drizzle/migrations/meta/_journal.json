@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793303154724,
+      "tag": "0000_listar_mercado_publico_scores",
+      "breakpoints": true
+    }
+  ]
+}
