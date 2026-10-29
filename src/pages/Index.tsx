@@ -631,12 +631,15 @@ const Index = () => {
           </div>
 
           <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
-            <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
               <span className="h-3 w-3 rounded-full bg-destructive/60" />
               <span className="h-3 w-3 rounded-full bg-primary/60" />
               <span className="h-3 w-3 rounded-full bg-secondary/40" />
-              <span className="ml-4 rounded-md bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
-                urbanix360.com/dashboard
+              <span className="rounded-md bg-background px-2 py-1 font-mono text-xs text-muted-foreground md:ml-4 md:px-3">
+                Vista de ejemplo
+              </span>
+              <span className="ml-auto rounded border border-border bg-background px-2 py-1 font-body text-[10px] text-muted-foreground">
+                Ejemplo ilustrativo
               </span>
             </div>
 
@@ -673,26 +676,26 @@ const Index = () => {
               <div className="p-6">
                 <h3 className="font-body text-base font-semibold text-foreground">Mi portafolio</h3>
                 <div className="mt-4 grid grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-border bg-background p-4">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span className="font-body text-xs">Lotes activos</span>
+                  <div className="flex min-h-[112px] min-w-0 flex-col rounded-lg border border-border bg-background p-2 md:block md:min-h-0 md:p-4">
+                    <div className="flex min-w-0 flex-col items-start gap-1 text-muted-foreground md:flex-row md:items-center md:gap-2">
+                      <LayoutDashboard className="h-4 w-4 shrink-0" />
+                      <span className="max-w-full break-words font-body text-xs">Lotes activos</span>
                     </div>
-                    <p className="mt-2 font-body text-2xl font-bold text-foreground">12</p>
+                    <p className="mt-auto pt-2 font-body text-2xl font-bold text-foreground md:mt-2 md:pt-0">12</p>
                   </div>
-                  <div className="rounded-lg border border-border bg-background p-4">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <FileCheck className="h-4 w-4" />
-                      <span className="font-body text-xs">Diagnósticos</span>
+                  <div className="flex min-h-[112px] min-w-0 flex-col rounded-lg border border-border bg-background p-2 md:block md:min-h-0 md:p-4">
+                    <div className="flex min-w-0 flex-col items-start gap-1 text-muted-foreground md:flex-row md:items-center md:gap-2">
+                      <FileCheck className="h-4 w-4 shrink-0" />
+                      <span className="max-w-full break-words font-body text-xs">Diagnósticos</span>
                     </div>
-                    <p className="mt-2 font-body text-2xl font-bold text-foreground">8</p>
+                    <p className="mt-auto pt-2 font-body text-2xl font-bold text-foreground md:mt-2 md:pt-0">8</p>
                   </div>
-                  <div className="rounded-lg border border-border bg-background p-4">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Coins className="h-4 w-4" />
-                      <span className="font-body text-xs">En negociación</span>
+                  <div className="flex min-h-[112px] min-w-0 flex-col rounded-lg border border-border bg-background p-2 md:block md:min-h-0 md:p-4">
+                    <div className="flex min-w-0 flex-col items-start gap-1 text-muted-foreground md:flex-row md:items-center md:gap-2">
+                      <Coins className="h-4 w-4 shrink-0" />
+                      <span className="max-w-full break-words font-body text-xs">En negociación</span>
                     </div>
-                    <p className="mt-2 font-body text-2xl font-bold text-foreground">3</p>
+                    <p className="mt-auto pt-2 font-body text-2xl font-bold text-foreground md:mt-2 md:pt-0">3</p>
                   </div>
                 </div>
 
@@ -749,6 +752,9 @@ const Index = () => {
               </div>
             </div>
           </div>
+          <p className="mx-auto mt-3 max-w-5xl text-center font-body text-xs text-muted-foreground">
+            Datos de demostración. Tu panel mostrará tus propios lotes y análisis.
+          </p>
         </section>
       )}
 
