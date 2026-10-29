@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { usePlanesConPrecio } from "@/hooks/usePlanesConPrecio";
 import { usePreciosSuscripcion } from "@/hooks/usePreciosSuscripcion";
 import { formatCOP } from "@/lib/format-moneda";
@@ -36,23 +37,32 @@ const FAQPrecioRespuesta = () => {
         Publicar tu lote es <strong className="text-foreground">gratis</strong>. Solo cobras cuando decides contratar un diagnóstico profesional.
       </p>
       {planMin && (
-        <p>
-          <strong className="text-foreground">Para propietarios:</strong> diagnóstico {planMin.nombre.toLowerCase()} desde{" "}
-          <strong className="text-foreground">{formatCOP(planMin.precio_cop_actual)}</strong>{" "}
-          ({planMin.precio_smlmv} SMLMV).
-        </p>
+        <div className="pt-2">
+          <p className="font-semibold text-foreground">Si eres propietario</p>
+          <p className="mt-1">
+            Diagnóstico {planMin.nombre.toLowerCase()} desde{" "}
+            <strong className="text-foreground">{formatCOP(planMin.precio_cop_actual)}</strong>{" "}
+            ({planMin.precio_smlmv} SMLMV). Pago único por lote.
+          </p>
+          <Link to="/planes" className="mt-1 inline-block font-semibold text-primary underline-offset-4 hover:underline">
+            Ver planes de diagnóstico
+          </Link>
+        </div>
       )}
       {suscMin && (
-        <p>
-          <strong className="text-foreground">Para desarrolladores:</strong> suscripción desde{" "}
-          <strong className="text-foreground">
-            {formatCOP(Math.round(suscMin.precio_cop / suscMin.periodo_meses))}/mes
-          </strong>
-          {suscMin.periodo_meses > 1 && (
-            <span> (facturada cada {suscMin.periodo_meses} meses)</span>
-          )}
-          .
-        </p>
+        <div className="pt-2">
+          <p className="font-semibold text-foreground">Si eres desarrollador</p>
+          <p className="mt-1">
+            Suscripción desde{" "}
+            <strong className="text-foreground">
+              {formatCOP(Math.round(suscMin.precio_cop / suscMin.periodo_meses))}/mes
+            </strong>
+            {suscMin.periodo_meses > 1 && <span> (facturada cada {suscMin.periodo_meses} meses)</span>}.
+          </p>
+          <a href="/#como-funciona" className="mt-1 inline-block font-semibold text-primary underline-offset-4 hover:underline">
+            Ver cómo funciona
+          </a>
+        </div>
       )}
       {!planMin && !suscMin && (
         <p>Consulta nuestros planes en el onboarding para conocer los precios actualizados.</p>
