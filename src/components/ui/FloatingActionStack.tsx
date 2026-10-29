@@ -21,7 +21,7 @@ const FloatingActionStack = ({ children }: { children: ReactNode }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const affectedPage = pathname === "/mercado" || /^\/lotes\/[^/]+$/.test(pathname)
-    || (!user && PUBLIC_MOBILE_ACTION_PATHS.includes(pathname));
+    || PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
 
   if (isMobile && affectedPage) {
     return (

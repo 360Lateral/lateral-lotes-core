@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Linkedin, Instagram, Mail } from "lucide-react";
 import Logo from "@/components/ui/Logo";
-import { useAuth } from "@/contexts/AuthContext";
 import { PUBLIC_MOBILE_ACTION_PATHS } from "@/components/ui/FloatingActionStack";
 
 // TODO: las páginas /terminos, /privacidad, /nda, /sobre-nosotros, /blog aún no existen.
@@ -9,9 +8,8 @@ import { PUBLIC_MOBILE_ACTION_PATHS } from "@/components/ui/FloatingActionStack"
 
 const Footer = () => {
   const year = new Date().getFullYear();
-  const { user } = useAuth();
   const { pathname } = useLocation();
-  const needsMobileActionSpace = !user && PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
+  const needsMobileActionSpace = PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
 
   return (
     <footer className={`bg-secondary text-secondary-foreground${needsMobileActionSpace ? " pb-24 md:pb-0" : ""}`}>
