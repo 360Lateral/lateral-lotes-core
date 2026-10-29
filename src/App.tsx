@@ -25,7 +25,6 @@ const LotesRedirect = () => {
   return <Navigate to={`/mercado${search}${hash}`} replace />;
 };
 
-const Lotes = lazy(() => import("./pages/Lotes"));
 const LoteDetalle = lazy(() => import("./pages/LoteDetalle"));
 const LoteFicha = lazy(() => import("./pages/LoteFicha"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
