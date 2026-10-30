@@ -1,4 +1,5 @@
 # UI rules
+- Market filters whitelist supported fields before persistence, query keys and filtering, so retired filters cannot affect restored searches; responsive panel styling stays local to the filter components.
 - Landing trust-strip counts reuse `useStatsMercado` unchanged, with viewport and reduced-motion handling local to the strip, so market calculations stay identical without changing other animations.
 - Market card photo enrichment keeps the catalog RPC as the authorization gate, reads `foto_url` from `vw_lotes_publicos` for only returned IDs, and falls back to the existing access-checked ficha RPC; use signed storage URLs without broadening permissions.
 - Mobile plan summaries derive counts and new-feature highlights from the same inclusion arrays as the comparison table; keep desktop rendering unchanged so both views stay consistent.

@@ -21,7 +21,7 @@ const FiltrosMercadoSticky = ({ value, onChange, ciudadesDisponibles = [], stick
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-base font-semibold text-secondary">Filtros</h2>
           {hayFiltros && (
-            <Button variant="ghost" size="sm" onClick={() => onChange({})}>
+            <Button variant="ghost" size="sm" onClick={() => onChange({})} className="md:hidden">
               <X className="h-4 w-4 mr-1" />
               Limpiar
             </Button>

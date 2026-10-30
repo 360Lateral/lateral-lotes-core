@@ -24,7 +24,6 @@ const labelFiltro = (key: keyof FiltrosMercado, value: string): string => {
   if (key === "categoria_area") return formatearCategoriaArea(value);
   if (key === "rango_precio") return formatearRangoPrecio(value);
   if (key === "ciudad") return `Ciudad: ${value}`;
-  if (key === "barrio") return `Barrio: ${value}`;
   if (key === "uso_actual") return `Uso: ${value}`;
   return value;
 };
