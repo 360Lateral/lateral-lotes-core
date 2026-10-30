@@ -4,10 +4,10 @@ import type { Scores360 } from "@/lib/calcular-score-360";
 import { obtenerScores360 } from "@/lib/obtener-scores-360";
 import { getSignedFotoUrl } from "@/lib/foto-storage";
 import type { FichaLoteData } from "@/hooks/useFichaLote";
+import { normalizarFiltrosMercado } from "@/lib/mercado-filtros";
 
 export interface FiltrosMercado {
   ciudad?: string;
-  barrio?: string;
   categoria_area?: string[];
   rango_precio?: string[];
   uso_actual?: string;
@@ -31,7 +31,8 @@ export interface LoteMercado extends Scores360 {
   foto_url?: string | null;
 }
 
-export const useMercadoPublico = (filtros: FiltrosMercado = {}) => {
+export const useMercadoPublico = (value: FiltrosMercado = {}) => {
+  const filtros = normalizarFiltrosMercado(value);
   return useQuery({
     queryKey: ["mercado-publico", JSON.stringify(filtros)],
     queryFn: async (): Promise<LoteMercado[]> => {
@@ -58,8 +59,6 @@ export const useMercadoPublico = (filtros: FiltrosMercado = {}) => {
       const fotosFirmadas = new Map(await Promise.all(catalogo.map(async (lote) => [lote.lote_id, await getSignedFotoUrl(lote.foto_url ?? fotos.get(lote.lote_id))] as const)));
       const rows = catalogo.map((lote) => ({ ...lote, ...scoresPorId.get(lote.lote_id), foto_url: fotosFirmadas.get(lote.lote_id) ?? null })).filter((l) => {
         if (filtros.ciudad && l.ciudad !== filtros.ciudad) return false;
-        if (filtros.barrio && !(l.barrio ?? "").toLowerCase().includes(filtros.barrio.toLowerCase()))
-          return false;
         if (filtros.categoria_area?.length && !filtros.categoria_area.includes(l.categoria_area))
           return false;
         if (filtros.rango_precio?.length && !filtros.rango_precio.includes(l.rango_precio))

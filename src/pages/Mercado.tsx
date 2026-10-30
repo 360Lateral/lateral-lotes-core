@@ -25,6 +25,7 @@ import {
 } from "@/hooks/useMercadoPublico";
 import { useStatsMercado } from "@/hooks/useStatsMercado";
 import { usePersistedState } from "@/hooks/usePersistedState";
+import { normalizarFiltrosMercado } from "@/lib/mercado-filtros";
 
 const ORDEN_KEY = "mercado_orden";
 const PAGE_SIZE = 12;
@@ -60,7 +61,11 @@ const StatInline = ({ value, label }: { value: number | string; label: string })
 );
 
 const Mercado = () => {
-  const [filtros, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
+  const [filtrosGuardados, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
+  const filtros = useMemo(() => normalizarFiltrosMercado(filtrosGuardados), [filtrosGuardados]);
+  useEffect(() => {
+    if (JSON.stringify(filtrosGuardados) !== JSON.stringify(filtros)) setFiltros(filtros);
+  }, [filtrosGuardados, filtros, setFiltros]);
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [vistaMovil, setVistaMovil] = useState<"lista" | "mapa">("lista");
