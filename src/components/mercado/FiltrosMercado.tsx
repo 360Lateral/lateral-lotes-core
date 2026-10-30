@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { badgeVariants } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { FiltrosMercado as Filtros } from "@/hooks/useMercadoPublico";
 import {
   CATEGORIAS_AREA,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const FiltrosMercado = ({ value, onChange, ciudadesDisponibles = [] }: Props) => {
+  const isMobile = useIsMobile();
   const toggleArr = (key: "categoria_area" | "rango_precio", item: string) => {
     const current = value[key] ?? [];
     const next = current.includes(item)
@@ -38,7 +40,7 @@ const FiltrosMercado = ({ value, onChange, ciudadesDisponibles = [] }: Props) =>
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:contents">
         <div className="md:order-1 md:w-full md:min-w-0">
         <label htmlFor="mercado-ciudad" className="hidden md:block text-xs font-medium text-muted-foreground mb-2">Ciudad</label>
-        {ciudadesDisponibles.length > 0 || window.matchMedia("(min-width: 768px)").matches ? (
+        {ciudadesDisponibles.length > 0 || !isMobile ? (
           <select
             id="mercado-ciudad"
             aria-label="Ciudad"
@@ -90,7 +92,7 @@ const FiltrosMercado = ({ value, onChange, ciudadesDisponibles = [] }: Props) =>
                 variant={active ? "default" : "outline"}
                 size="sm"
                 aria-pressed={active}
-                className={`${badgeVariants({ variant: active ? "default" : "outline" })} h-auto min-h-0 md:min-h-10 md:whitespace-normal md:text-left md:justify-start`}
+                className={`${badgeVariants({ variant: active ? "default" : "outline" })} h-auto min-h-0 md:w-full md:min-h-10 md:whitespace-normal md:text-left md:justify-start`}
                 onClick={() => toggleArr("categoria_area", cat)}
               >
                 {formatearCategoriaArea(cat)}
@@ -111,7 +113,7 @@ const FiltrosMercado = ({ value, onChange, ciudadesDisponibles = [] }: Props) =>
                 variant={active ? "default" : "outline"}
                 size="sm"
                 aria-pressed={active}
-                className={`${badgeVariants({ variant: active ? "default" : "outline" })} h-auto min-h-0 md:min-h-10 md:whitespace-normal md:text-left md:justify-start`}
+                className={`${badgeVariants({ variant: active ? "default" : "outline" })} h-auto min-h-0 md:w-full md:min-h-10 md:whitespace-normal md:text-left md:justify-start`}
                 onClick={() => toggleArr("rango_precio", r)}
               >
                 {formatearRangoPrecio(r)}
