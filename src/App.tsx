@@ -64,6 +64,8 @@ const PreferenciasUsuario = lazy(() => import("./pages/PreferenciasUsuario"));
 const MisEngagements = lazy(() => import("./pages/portal/MisEngagements"));
 const EngagementClienteDetalle = lazy(() => import("./pages/portal/EngagementClienteDetalle"));
 const PortafolioPropietario = lazy(() => import("./pages/portal/PortafolioPropietario"));
+const VidDiagnosticosEquipo = lazy(() => import("./pages/VidDiagnosticos").then((m) => ({ default: m.VidDiagnosticosEquipo })));
+const VidDiagnosticosCliente = lazy(() => import("./pages/VidDiagnosticos").then((m) => ({ default: m.VidDiagnosticosCliente })));
 const PortalProtectedRoute = lazy(() => import("@/components/portal/PortalProtectedRoute"));
 const RecuperarContrasena = lazy(() => import("./pages/RecuperarContrasena"));
 const RestablecerContrasena = lazy(() => import("./pages/RestablecerContrasena"));
@@ -161,6 +163,7 @@ const App = () => (
             <Route path="/dashboard/ordenes-servicio/:id" element={<ProtectedRoute><DashboardOrdenServicioDetalle /></ProtectedRoute>} />
             <Route path="/dashboard/mis-ordenes" element={<ProtectedRoute><DashboardMisOrdenes /></ProtectedRoute>} />
             <Route path="/dashboard/metricas/expertos" element={<ProtectedRoute><DashboardMetricasExpertos /></ProtectedRoute>} />
+            <Route path="/dashboard/vid/*" element={<ProtectedRoute><VidDiagnosticosEquipo /></ProtectedRoute>} />
             <Route path="/dashboard/portafolio" element={<ProtectedRoute><PortafolioDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/importar" element={<ProtectedRoute requireSuperAdmin><DashboardImportarEngagement /></ProtectedRoute>} />
             <Route path="/dashboard/engagements/:id" element={<ProtectedRoute><EngagementDetalle /></ProtectedRoute>} />
@@ -192,6 +195,7 @@ const App = () => (
 
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
+            <Route path="/portal/diagnosticos/*" element={<PortalProtectedRoute><VidDiagnosticosCliente /></PortalProtectedRoute>} />
             <Route path="/portal/portafolio" element={<PortalProtectedRoute><PortafolioPropietario /></PortalProtectedRoute>} />
             <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
 

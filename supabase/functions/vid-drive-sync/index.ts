@@ -144,7 +144,7 @@ async function llamarIA(instructions: string, content: unknown[], schemaName: st
         const ev = JSON.parse(d);
         if (ev.type === "response.output_text.delta") out += ev.delta;
         if (ev.type === "response.refusal.delta" || ev.type === "error" || ev.type === "response.failed") {
-          throw new Error("La IA no pudo procesar el documento.");
+          throw new Error("La IA no pudo procesar el documento: " + JSON.stringify(ev.error ?? ev.response?.error ?? ev.delta ?? ev).slice(0, 250));
         }
       } catch (e) {
         if (e instanceof SyntaxError) continue;
@@ -418,6 +418,13 @@ Deno.serve(async (req) => {
     if (accion === "procesar") {
       const limite = Math.min(Math.max(Number(body.limite) || 2, 1), 5);
       return json(await procesar(sb, limite, codigo));
+    }
+    if (accion === "reintentar") {
+      let q = sb.from("vid_drive_archivos").update({ estado: "pendiente", motivo: null }).eq("estado", "error");
+      if (codigo) q = q.eq("codigo_activo", codigo);
+      const { error } = await q;
+      if (error) throw new Error(error.message);
+      return json({ ok: true });
     }
     if (accion === "consolidar") {
       if (!codigo) return json({ error: "Código de activo inválido" }, 400);
