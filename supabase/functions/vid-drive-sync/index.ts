@@ -144,7 +144,7 @@ async function llamarIA(instructions: string, content: unknown[], schemaName: st
         const ev = JSON.parse(d);
         if (ev.type === "response.output_text.delta") out += ev.delta;
         if (ev.type === "response.refusal.delta" || ev.type === "error" || ev.type === "response.failed") {
-          throw new Error("La IA no pudo procesar el documento.");
+          throw new Error("La IA no pudo procesar el documento: " + JSON.stringify(ev.error ?? ev.response?.error ?? ev.delta ?? ev).slice(0, 250));
         }
       } catch (e) {
         if (e instanceof SyntaxError) continue;
