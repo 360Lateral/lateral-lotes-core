@@ -1,10 +1,10 @@
 # Roadmap
-- [x] Fotos 16:9 lazy y código legible en tarjetas de /mercado; foto real y respaldo de error comprobados a 390 px y escritorio, sin cambiar base de datos.
-- [x] Menú único y 96 px en /nosotros, /contacto, /unsubscribe y /lotes/:id/ficha; verificado a 390 px sin desbordes, con páginas privadas y escritorio intactos. /nosotros y /contacto conservan su contenido actual de página no encontrada.
-- [x] Extender el menú único y los 96 px en páginas públicas también con sesión; Feedback e Inicio comprobados a 390 px sin desbordes, escritorio y dashboard intactos.
-- [x] Reutilizar el menú flotante y reservar 96 px al final en páginas públicas móviles sin sesión; verificado a 390 px, sin desbordes, con escritorio y controles de sesión intactos.
-- [x] Promedio compartido de módulos almacenados: Escobero muestra 4.0/10 y 3 de 8 en tarjeta y ficha, con sesión y sin sesión; 10 pruebas aprobadas, sin desbordes a 390 px.
-- [ ] Acceso a los ocho campos para visitantes y usuarios sin acceso a la vista: bloqueado por permisos existentes; el catálogo autorizado solo entrega jurídico, normativo y servicios. Requiere cambio de acceso en backend, excluido por el usuario.
-- [x] Unificar Score 360° en tarjetas de mercado y ficha: misma fuente, colores y tooltip; 5 pruebas aprobadas y 6 lotes comparados a 390 px sin desbordes.
-- [x] Visitante en /lotes: selector exclusivo de lotes de ejemplo y mapa visible
-- [x] Ajustes móviles en /mercado y /lotes/:id: menú flotante, espacio inferior de 96 px y zoom superior; verificados a 390 px sin desbordes. Google Maps rechaza el dominio de pruebas, por lo que el cambio de zoom sobre el mapa real queda sin verificar.
+
+## Diagnósticos VID desde Google Drive
+- [x] Cruce inicial: los 17 activos (E1–CB10) existen a nombre de Fundación Organización VID
+- [ ] Etapa 1: conexión Drive solo lectura y listado de la carpeta (espera conexión de Google Drive)
+- [ ] Etapa 2: lectura de formatos y extracción con IA (2–3 archivos de prueba)
+- [ ] Etapa 3: resumen, hallazgos y plan de acción
+- [ ] Etapa 4: cruce con lotes, bandeja "Por asignar", portafolio y ficha
+- [ ] Etapa 5: roles, protección de datos de propietarios y lista de pruebas
+- [ ] Confirmar cuenta del cliente VID (espera respuesta del usuario)
