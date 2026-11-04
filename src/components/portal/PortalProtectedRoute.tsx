@@ -2,7 +2,14 @@ import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const PortalProtectedRoute = ({
+  children,
+  permitirEquipo = false,
+}: {
+  children: React.ReactNode;
+  /** Admin/experto pueden abrir esta vista en modo consulta. */
+  permitirEquipo?: boolean;
+}) => {
   const { user, isAdminOrExperto, isPropietario, isComisionista, loading } = useAuth();
 
   if (loading) {
@@ -18,6 +25,10 @@ const PortalProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   // Admin/experto/super_admin → dashboard interno
+  if (isAdminOrExperto && permitirEquipo) {
+    return <>{children}</>;
+  }
+
   if (isAdminOrExperto) {
     return <Navigate to="/dashboard" replace />;
   }

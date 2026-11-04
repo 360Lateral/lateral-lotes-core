@@ -193,7 +193,7 @@ const App = () => (
             {/* Portal del cliente (rol inversor) */}
             <Route path="/portal" element={<PortalProtectedRoute><MisEngagements /></PortalProtectedRoute>} />
             <Route path="/portal/portafolio" element={<PortalProtectedRoute><PortafolioPropietario /></PortalProtectedRoute>} />
-            <Route path="/portal/engagement/:id" element={<PortalProtectedRoute><EngagementClienteDetalle /></PortalProtectedRoute>} />
+            <Route path="/portal/engagement/:id" element={<PortalProtectedRoute permitirEquipo><EngagementClienteDetalle /></PortalProtectedRoute>} />
 
             {/* Portal del comisionista */}
             <Route path="/comisionista" element={<ProtectedRoute allowComisionista><ComisionistaPortal /></ProtectedRoute>} />
