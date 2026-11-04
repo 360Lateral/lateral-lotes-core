@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { estadoDiagnostico, claseEstadoDiagnostico } from "@/lib/estado-diagnostico";
 import { Link, useNavigate } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
 import PortalProtectedRoute from "@/components/portal/PortalProtectedRoute";
@@ -242,7 +243,16 @@ const EngagementCard = ({
             )}
 
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary" className="capitalize">{e.estado.replace(/_/g, " ")}</Badge>
+              {estadoDiagnostico(e.estado) && (
+                <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${claseEstadoDiagnostico[estadoDiagnostico(e.estado)!.etapa]}`}>
+                  {estadoDiagnostico(e.estado)!.label}
+                </span>
+              )}
+              {resumen?.score_promedio != null && (
+                <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-semibold tabular-nums">
+                  Score 360°: {resumen.score_promedio.toFixed(1)}/10
+                </span>
+              )}
               <SlaChip e={e} />
             </div>
 
