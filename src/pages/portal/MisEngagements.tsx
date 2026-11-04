@@ -582,8 +582,8 @@ const useProximoPasoSugerencia = ({
       atrasado.lote_ciudad,
     );
     return {
-      descripcion: `Tu análisis de "${nombre}" lleva más tiempo del estimado. Contacta a tu asesor desde el detalle del engagement.`,
-      cta: "Ver engagement",
+      descripcion: `Tu análisis de "${nombre}" lleva más tiempo del estimado. Contacta a tu asesor desde el detalle del diagnóstico.`,
+      cta: "Ver diagnóstico",
       onClick: () => navigate(`/portal/engagement/${atrasado.engagement_id}`),
     };
   }

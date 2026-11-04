@@ -246,7 +246,7 @@ const SolicitarDiagnosticoDialog = ({
                 </div>
                 <p className="text-xs text-muted-foreground pt-1">
                   {esGratuito
-                    ? "Al confirmar, tu engagement se activará al instante."
+                    ? "Al confirmar, tu diagnóstico se activará al instante."
                     : "Al confirmar, te redirigiremos al pago seguro de Wompi."}
                 </p>
               </section>
