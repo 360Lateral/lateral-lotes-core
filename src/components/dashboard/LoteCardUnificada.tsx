@@ -215,7 +215,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
           ) : engagementActivoId ? (
             <Button asChild size="sm" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/engagements/${engagementActivoId}`}>
-                <Briefcase className="h-3.5 w-3.5" /> Abrir engagement{engagementLote?.cerrado ? " (cerrado)" : ""}
+                <Briefcase className="h-3.5 w-3.5" /> Abrir diagnóstico{engagementLote?.cerrado ? " (cerrado)" : ""}
               </Link>
             </Button>
           ) : (
