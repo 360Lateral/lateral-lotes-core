@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Info, Briefcase, Users, Activity, BarChart3, ExternalLink, MapPin, ImageIcon, MapPinned, Plus, Loader2 } from "lucide-react";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import { useAnalisisUnificado } from "@/hooks/useAnalisisUnificado";
-import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
+import { useEngagementDelLote } from "@/hooks/useEngagementDelLote";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { formatMetros } from "@/lib/format-moneda";
@@ -28,8 +28,9 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
     lote?.id,
     lote?.engagement_id ?? undefined,
   );
-  const { data: engagementActivoId, isLoading: loadingEngagement } =
-    useEngagementActivoDelLote(lote?.id);
+  const { data: engagementLote, isLoading: loadingEngagement } =
+    useEngagementDelLote(lote?.id);
+  const engagementActivoId = engagementLote?.id ?? null;
 
   if (!lote) return null;
 
@@ -57,7 +58,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
           ) : engagementActivoId ? (
             <Button asChild size="sm" variant="default">
               <Link to={`/dashboard/engagements/${engagementActivoId}`}>
-                <Briefcase className="mr-1 h-3 w-3" /> Abrir engagement
+                <Briefcase className="mr-1 h-3 w-3" /> Abrir engagement{engagementLote?.cerrado ? " (cerrado)" : ""}
               </Link>
             </Button>
           ) : (

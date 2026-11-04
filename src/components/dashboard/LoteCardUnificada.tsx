@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { BadgeSla } from "@/components/portafolio/BadgeSla";
-import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
+import { useEngagementDelLote } from "@/hooks/useEngagementDelLote";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
 import { formatMetros, formatCOPCompact } from "@/lib/format-moneda";
@@ -43,8 +43,9 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   const tieneEngagement = !!lote.engagement_id;
   const tieneLeads = lote.leads_count > 0;
   const porValidar = lote.estado_publicacion === "pendiente_validacion";
-  const { data: engagementActivoId, isLoading: loadingEngagement } =
-    useEngagementActivoDelLote(lote.id);
+  const { data: engagementLote, isLoading: loadingEngagement } =
+    useEngagementDelLote(lote.id);
+  const engagementActivoId = engagementLote?.id ?? null;
 
   const ubicacion = [lote.ciudad, lote.barrio].filter(Boolean).join(" · ");
   const estadoPill = porValidar
@@ -197,7 +198,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
           ) : engagementActivoId ? (
             <Button asChild size="sm" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/engagements/${engagementActivoId}`}>
-                <Briefcase className="h-3.5 w-3.5" /> Abrir engagement
+                <Briefcase className="h-3.5 w-3.5" /> Abrir engagement{engagementLote?.cerrado ? " (cerrado)" : ""}
               </Link>
             </Button>
           ) : (
