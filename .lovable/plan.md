@@ -2,6 +2,13 @@
 
 Los 17 diagnósticos de la carpeta de Drive se importan como resultados de los lotes de la Fundación Organización VID ya existentes en 360Lateral. Si un diagnóstico no coincide con ningún lote, queda en una bandeja "Por asignar" para revisarlo juntos.
 
+## Activos a revisar (código → activo)
+E1 Centro de Eventos VID · E2 Centro Logístico Metropolitano · E3 Clínica Cardio VID · E4 Casa Santa María del Encuentro · E5 TeleVID · E6 Locales Alberto Álvarez – La 33 · E7 Locales Alberto Álvarez – La Candelaria · E8 Centro Logístico Entrada Norte (CLEN) · E9 Parqueadero La Playa · A1 Lote Municipio de Apartadó · A2 Segundo Lote Municipio de Apartadó · A3 Clínica Odontológica – Casa La Palma · A4 Casa Barrio Estadio – Sede Laboratorio Dental · A5 Casa en Barrio Calasanz · CB8 Propiedad Fundación Margarita Moreno · CB9 Atardeceres VID · CB10 Parqueadero Casa Sede
+
+- Primer paso: comparar esta lista con los lotes VID en la plataforma y reportar cuáles existen, cuáles faltan y cuáles tienen otro nombre, antes de importar.
+- Cada diagnóstico se cruza primero por código (E1, A3, CB8...) o por nombre del activo. Si no hay coincidencia clara, va a "Por asignar".
+- El portafolio muestra el código y permite filtrar por grupo (E, A, CB).
+
 ## Pantallas
 1. **Importación** (admin y equipo): botón "Sincronizar con Drive", fecha de última sincronización, lista de archivos con su estado (importado, requiere revisión, por asignar, error) y selector para asignar a mano el lote correspondiente.
 2. **Portafolio VID**: tarjetas en celular y tabla en escritorio, con búsqueda y filtros por ciudad, tipo de inmueble, nivel de criticidad y fecha del diagnóstico.
