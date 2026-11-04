@@ -58,7 +58,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
           ) : engagementActivoId ? (
             <Button asChild size="sm" variant="default">
               <Link to={`/dashboard/engagements/${engagementActivoId}`}>
-                <Briefcase className="mr-1 h-3 w-3" /> Abrir engagement{engagementLote?.cerrado ? " (cerrado)" : ""}
+                <Briefcase className="mr-1 h-3 w-3" /> Abrir diagnóstico{engagementLote?.cerrado ? " (cerrado)" : ""}
               </Link>
             </Button>
           ) : (

@@ -699,7 +699,7 @@ const PortalHomeInner = () => {
     activos.filter((a) => a.estado_publicacion === "aprobado" && a.publicado_venta).length;
 
   const engagementsConPagoPendiente = useMemo(
-    () => (diagnósticos ?? []).filter((e) => e.estado_activacion === "pendiente_pago"),
+    () => (engagements ?? []).filter((e) => e.estado_activacion === "pendiente_pago"),
     [engagements]
   );
 
