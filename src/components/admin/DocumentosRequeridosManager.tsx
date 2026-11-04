@@ -371,7 +371,7 @@ const DocumentosRequeridosManager = () => {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Eliminar "{doc.nombre}" del plan. Los engagements
+                                  Eliminar "{doc.nombre}" del plan. Los diagnósticos
                                   existentes ya no lo verán como requerido, pero los
                                   documentos subidos se conservan.
                                 </AlertDialogDescription>

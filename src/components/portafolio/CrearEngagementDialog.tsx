@@ -196,7 +196,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
 
   const onSubmit = async (values: FormValues) => {
     if (vigente && !confirmDup) {
-      toast.warning("Debes confirmar que quieres crear un engagement adicional.");
+      toast.warning("Debes confirmar que quieres crear un diagnóstico adicional.");
       return;
     }
     try {
@@ -219,7 +219,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
         notas: values.notas || null,
         dias_sla: planSel?.dias_sla ?? null,
       });
-      toast.success("Engagement creado en borrador", {
+      toast.success("Diagnóstico creado en borrador", {
         description:
           "Pendiente de activación por un Super Admin. Las tareas se generarán al activarlo.",
       });
@@ -236,7 +236,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Crear engagement</DialogTitle>
+          <DialogTitle>Crear diagnóstico</DialogTitle>
           <DialogDescription>
             Asigna un plan, cliente y asesor. Las tareas de análisis se generarán automáticamente.
           </DialogDescription>
@@ -260,7 +260,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <div className="flex-1">
                   <p>
-                    Este lote ya tiene un engagement activo creado el{" "}
+                    Este lote ya tiene un diagnóstico activo creado el{" "}
                     <strong>{new Date(vigente.created_at).toLocaleDateString("es-CO")}</strong>
                     {vigente.planes_diagnostico?.nombre && (
                       <> con plan <strong>{vigente.planes_diagnostico.nombre}</strong></>
@@ -272,7 +272,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
                       checked={confirmDup}
                       onCheckedChange={(v) => setConfirmDup(!!v)}
                     />
-                    <span className="text-xs">Sí, crear otro engagement</span>
+                    <span className="text-xs">Sí, crear otro diagnóstico</span>
                   </label>
                 </div>
               </div>
@@ -329,8 +329,8 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
           {tipoCliente === "sin_cliente" && (
             <div className="rounded-md border border-blue-300 bg-blue-50 p-3 text-sm dark:bg-blue-950/30">
               <p className="text-blue-900 dark:text-blue-200">
-                💡 El engagement se creará sin cliente. Después podrás asignar un cliente desde
-                "/dashboard/usuarios → Agregar cliente" o editando el engagement.
+                💡 El diagnóstico se creará sin cliente. Después podrás asignar un cliente desde
+                "/dashboard/usuarios → Agregar cliente" o editando el diagnóstico.
               </p>
             </div>
           )}
@@ -426,7 +426,7 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
             </Button>
             <Button type="submit" disabled={formInvalid || crear.isPending}>
               {crear.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Crear engagement
+              Crear diagnóstico
             </Button>
           </DialogFooter>
         </form>

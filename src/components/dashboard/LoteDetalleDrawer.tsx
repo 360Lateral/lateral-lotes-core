@@ -64,7 +64,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
           ) : (
             <Button asChild size="sm" variant="outline">
               <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
-                <Plus className="mr-1 h-3 w-3" /> Crear engagement
+                <Plus className="mr-1 h-3 w-3" /> Crear diagnóstico
               </Link>
             </Button>
           )}
@@ -76,8 +76,8 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
             <TabsTrigger value="info" className="text-[10px]">
               <Info className="mr-1 h-3 w-3" /> Info
             </TabsTrigger>
-            <TabsTrigger value="engagement" className="text-[10px]">
-              <Briefcase className="mr-1 h-3 w-3" /> Engagement
+            <TabsTrigger value="diagnóstico" className="text-[10px]">
+              <Briefcase className="mr-1 h-3 w-3" /> Diagnóstico
             </TabsTrigger>
             <TabsTrigger value="leads" className="text-[10px]">
               <Users className="mr-1 h-3 w-3" /> Leads
@@ -132,7 +132,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
             </div>
           </TabsContent>
 
-          <TabsContent value="engagement">
+          <TabsContent value="diagnóstico">
             {lote.engagement_id ? (
               <div className="space-y-0.5">
                 <Row label="Estado" value={lote.engagement_estado} />
@@ -147,7 +147,7 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
               </div>
             ) : (
               <p className="py-6 text-center text-xs text-muted-foreground">
-                Este lote no tiene engagement activo.
+                Este lote no tiene diagnóstico activo.
               </p>
             )}
           </TabsContent>

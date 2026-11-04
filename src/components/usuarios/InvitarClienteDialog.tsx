@@ -139,7 +139,7 @@ export default function InvitarClienteDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="cliente-engagement">Asignar a engagement (opcional)</Label>
+            <Label htmlFor="cliente-engagement">Asignar a diagnóstico (opcional)</Label>
             <Select value={engagementId} onValueChange={setEngagementId}>
               <SelectTrigger id="cliente-engagement">
                 <SelectValue
@@ -160,7 +160,7 @@ export default function InvitarClienteDialog({
             </Select>
             {!loadingEng && engagements.length === 0 && (
               <p className="text-xs text-muted-foreground">
-                No hay engagements activos sin cliente.
+                No hay diagnósticos activos sin cliente.
               </p>
             )}
           </div>

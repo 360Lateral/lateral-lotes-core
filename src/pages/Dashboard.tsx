@@ -44,7 +44,7 @@ import { formatNumero } from "@/lib/format-moneda";
 
 const FILTROS: { v: FiltroLoteUnif; label: string }[] = [
   { v: "todos", label: "Todos" },
-  { v: "con_engagement", label: "Con engagement" },
+  { v: "con_engagement", label: "Con diagnóstico" },
   { v: "por_validar", label: "Por validar" },
   { v: "en_venta", label: "En venta" },
   { v: "sin_asesor", label: "Sin asesor" },
@@ -227,7 +227,7 @@ const Dashboard = () => {
     if (atrasados > 0)
       partes.push(
         `${atrasados} ${
-          atrasados === 1 ? "engagement requiere" : "engagements requieren"
+          atrasados === 1 ? "diagnóstico requiere" : "diagnósticos requieren"
         } atención`,
       );
     partes.push(`${lotes.length} lotes activos`);
@@ -307,7 +307,7 @@ const Dashboard = () => {
             <p className="text-[11px] text-muted-foreground">
               {atrasados > 0 &&
                 `${atrasados} ${
-                  atrasados === 1 ? "engagement atrasado" : "engagements atrasados"
+                  atrasados === 1 ? "diagnóstico atrasado" : "diagnósticos atrasados"
                 }`}
               {atrasados > 0 && pendientesPublicar > 0 && " · "}
               {pendientesPublicar > 0 &&
@@ -782,7 +782,7 @@ const Dashboard = () => {
         {/* Engagements */}
         <div className="rounded-3xl bg-secondary p-6 text-secondary-foreground shadow-lg">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-bold">Engagements activos</h2>
+            <h2 className="text-base font-bold">Diagnósticos activos</h2>
             <span className="text-[11px] opacity-60">
               {resumenEngagements?.total ?? 0} en curso
             </span>

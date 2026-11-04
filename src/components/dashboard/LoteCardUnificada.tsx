@@ -27,7 +27,7 @@ const colorBordeIzq = (l: LoteUnificado): string => {
 };
 
 const labelEstadoEngagement = (estado: string | null): string => {
-  if (!estado) return "Sin engagement";
+  if (!estado) return "Sin diagnóstico";
   return (
     {
       prospecto: "Prospecto",
@@ -221,7 +221,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
           ) : (
             <Button asChild size="sm" variant="outline" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
-                <Plus className="h-3.5 w-3.5" /> Crear engagement
+                <Plus className="h-3.5 w-3.5" /> Crear diagnóstico
               </Link>
             </Button>
           )}

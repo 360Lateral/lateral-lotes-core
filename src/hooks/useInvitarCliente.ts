@@ -36,7 +36,7 @@ export function useInvitarCliente() {
     onSuccess: (data, vars) => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       if (data.engagement_asignado) {
-        qc.invalidateQueries({ queryKey: ["engagements"] });
+        qc.invalidateQueries({ queryKey: ["diagnósticos"] });
         qc.invalidateQueries({ queryKey: ["engagements-sin-cliente"] });
       }
 

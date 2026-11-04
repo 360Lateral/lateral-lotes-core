@@ -166,7 +166,7 @@ const DashboardOrdenServicioDetalle = () => {
                     className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-1"
                   >
                     <ExternalLink className="h-3 w-3" />
-                    Ver engagement
+                    Ver diagnóstico
                   </Link>
                 )}
               </div>

@@ -90,7 +90,7 @@ const TablaPortafolio = ({ filas, isLoading }: Props) => {
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <Inbox className="h-8 w-8" />
                   <p className="font-body text-sm">
-                    No hay engagements que coincidan con tus filtros
+                    No hay diagnósticos que coincidan con tus filtros
                   </p>
                 </div>
               </TableCell>

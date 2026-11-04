@@ -24,7 +24,7 @@ export const useSolicitarDiagnostico = () => {
         { p_lote_id: input.lote_id, p_plan_id: input.plan_id }
       );
       if (solErr) throw solErr;
-      if (!engagementId) throw new Error("Engagement no creado");
+      if (!engagementId) throw new Error("Diagnóstico no creado");
 
       const engId = engagementId as string;
 
@@ -59,7 +59,7 @@ export const useSolicitarDiagnostico = () => {
         });
       } else {
         toast.success("Redirigiendo a la pasarela de pago...", {
-          description: "Tu engagement se activará al confirmar el pago.",
+          description: "Tu diagnóstico se activará al confirmar el pago.",
         });
       }
     },

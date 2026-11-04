@@ -24,7 +24,7 @@ const EngagementBannerLote = ({ loteId, canCreate }: Props) => {
         <Button asChild variant="outline" size="sm">
           <Link to={`/dashboard/engagements/${engagementId}`}>
             <ExternalLink className="mr-1.5 h-4 w-4" />
-            Ver engagement activo
+            Ver diagnóstico activo
           </Link>
         </Button>
       </div>
@@ -40,7 +40,7 @@ const EngagementBannerLote = ({ loteId, canCreate }: Props) => {
           <Sparkles className="h-5 w-5 shrink-0 text-primary" />
           <div className="flex-1">
             <p className="font-body text-sm font-semibold text-foreground">
-              Este lote aún no tiene engagement
+              Este lote aún no tiene diagnóstico
             </p>
             <p className="mt-1 font-body text-xs text-muted-foreground">
               Crea uno para iniciar el análisis técnico y vincular el lote al flujo de servicios 360°.
@@ -48,7 +48,7 @@ const EngagementBannerLote = ({ loteId, canCreate }: Props) => {
           </div>
           <Button onClick={() => setOpen(true)} className="sm:shrink-0">
             <Sparkles className="mr-1.5 h-4 w-4" />
-            Crear engagement
+            Crear diagnóstico
           </Button>
         </CardContent>
       </Card>

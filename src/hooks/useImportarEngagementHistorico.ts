@@ -38,7 +38,7 @@ export const useImportarEngagementHistorico = () => {
       qc.invalidateQueries({ queryKey: ["engagements-list"] });
       qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
       qc.invalidateQueries({ queryKey: ["engagements-por-lote"] });
-      toast.success("Engagement histórico importado", {
+      toast.success("Diagnóstico histórico importado", {
         description: "Quedó cerrado con los dos entregables publicados.",
       });
     },

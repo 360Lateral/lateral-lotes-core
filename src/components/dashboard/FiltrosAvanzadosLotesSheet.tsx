@@ -368,7 +368,7 @@ export const FiltrosAvanzadosLotesSheet = ({
             </div>
           </SeccionColapsable>
 
-          <SeccionColapsable titulo="Engagement" icono={Briefcase} contador={cEng}>
+          <SeccionColapsable titulo="Diagnóstico" icono={Briefcase} contador={cEng}>
             <Campo label="Plan">
               <div className="flex flex-wrap gap-1">
                 {(opciones?.planes ?? []).map((p) => (
@@ -384,7 +384,7 @@ export const FiltrosAvanzadosLotesSheet = ({
                 ))}
               </div>
             </Campo>
-            <Campo label="Estado del engagement">
+            <Campo label="Estado del diagnóstico">
               <div className="flex flex-wrap gap-1">
                 {(
                   [

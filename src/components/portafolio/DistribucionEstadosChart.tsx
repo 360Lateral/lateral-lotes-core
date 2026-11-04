@@ -46,11 +46,11 @@ const DistribucionEstadosChart = ({ data }: { data: EstadoRow[] }) => {
     <Card>
       <CardContent className="p-4">
         <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-          Engagements por estado
+          Diagnósticos por estado
         </h2>
         {visibles.length === 0 ? (
           <p className="py-12 text-center font-body text-sm text-muted-foreground">
-            Aún no hay engagements creados.
+            Aún no hay diagnósticos creados.
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-3 items-center">

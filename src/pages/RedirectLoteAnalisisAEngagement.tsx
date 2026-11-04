@@ -37,18 +37,18 @@ const RedirectLoteAnalisisAEngagement = () => {
       <Card className="mx-auto mt-8 max-w-xl p-8 text-center">
         <FileQuestion className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <h2 className="font-display text-xl font-bold text-foreground">
-          Este lote no tiene engagement activo
+          Este lote no tiene diagnóstico activo
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          El análisis 360° vive dentro del engagement del lote.
+          El análisis 360° vive dentro del diagnóstico del lote.
           {canCreate
             ? " Crea uno para empezar a capturar y gestionar los análisis técnicos."
-            : " Pide a un asesor o administrador que cree el engagement para iniciar el análisis."}
+            : " Pide a un asesor o administrador que cree el diagnóstico para iniciar el análisis."}
         </p>
         <div className="mt-6 flex flex-col items-center gap-2">
           {canCreate && (
             <Button onClick={() => setDialogOpen(true)}>
-              Crear engagement ahora
+              Crear diagnóstico ahora
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           )}

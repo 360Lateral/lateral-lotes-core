@@ -54,14 +54,14 @@ const GraficoTendencia = ({ data }: Props) => {
   return (
     <Card>
       <CardContent className="p-4">
-        <Tabs defaultValue="engagements">
+        <Tabs defaultValue="diagnósticos">
           <TabsList>
-            <TabsTrigger value="engagements">Engagements</TabsTrigger>
+            <TabsTrigger value="diagnósticos">Diagnósticos</TabsTrigger>
             <TabsTrigger value="ingresos">Ingresos</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="engagements" className="mt-4">
+          <TabsContent value="diagnósticos" className="mt-4">
             {empty ? (
               <EmptyTendencia />
             ) : (
