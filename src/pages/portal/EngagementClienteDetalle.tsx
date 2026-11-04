@@ -999,7 +999,7 @@ const EngagementClienteDetalleInner = () => {
 };
 
 const EngagementClienteDetalle = () => (
-  <PortalProtectedRoute>
+  <PortalProtectedRoute permitirEquipo>
     <PortalClienteLayout>
       <EngagementClienteDetalleInner />
     </PortalClienteLayout>
