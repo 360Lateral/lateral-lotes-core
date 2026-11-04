@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/Logo";
-import { BarChart3, Briefcase, FileSearch, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
+import { BarChart3, Briefcase, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -71,20 +71,6 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
                 <Briefcase className="h-4 w-4" />
                 Mis engagements
               </NavLink>
-              <NavLink
-                to="/portal/diagnosticos"
-                className={({ isActive }) =>
-                  cn(
-                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
-                  )
-                }
-              >
-                <FileSearch className="h-4 w-4" />
-                Diagnósticos
-              </NavLink>
             </nav>
           </div>
           <DropdownMenu>
@@ -104,15 +90,6 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="md:hidden" onClick={() => navigate("/portal/portafolio")}>
-                <BarChart3 className="h-4 w-4 mr-2" /> Portafolio
-              </DropdownMenuItem>
-              <DropdownMenuItem className="md:hidden" onClick={() => navigate("/portal")}>
-                <Briefcase className="h-4 w-4 mr-2" /> Mis engagements
-              </DropdownMenuItem>
-              <DropdownMenuItem className="md:hidden" onClick={() => navigate("/portal/diagnosticos")}>
-                <FileSearch className="h-4 w-4 mr-2" /> Diagnósticos
-              </DropdownMenuItem>
               <DropdownMenuItem disabled>
                 <UserIcon className="h-4 w-4 mr-2" /> Mi perfil
               </DropdownMenuItem>
