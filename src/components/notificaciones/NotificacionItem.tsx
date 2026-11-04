@@ -32,7 +32,7 @@ const NotificacionItem = ({ notificacion: n, onClose }: Props) => {
           ? `/dashboard/engagements/${engagementId}`
           : `/portal/engagement/${engagementId}`
       );
-    } else if (n.entidad_tipo === "diagnóstico" && engagementId) {
+    } else if (n.entidad_tipo === "engagement" && engagementId) {
       navigate(`/dashboard/engagements/${engagementId}`);
     } else if (n.entidad_tipo === "feedback_ticket") {
       navigate(isAdminOrExperto ? "/dashboard/feedback" : "/feedback/mis-tickets");
