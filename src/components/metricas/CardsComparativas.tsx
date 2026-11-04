@@ -90,7 +90,7 @@ const CardsComparativas = ({ data }: Props) => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <CompCard
-        titulo="Engagements este mes"
+        titulo="Diagnósticos este mes"
         valor={formatNumero(engActual)}
         actual={engActual}
         anterior={engPrev}
@@ -106,7 +106,7 @@ const CardsComparativas = ({ data }: Props) => {
         formato={formatCOP}
       />
       <CompCard
-        titulo="Engagements año en curso (YTD)"
+        titulo="Diagnósticos año en curso (YTD)"
         valor={formatNumero(engYtdAct)}
         actual={engYtdAct}
         anterior={engYtdAnt}

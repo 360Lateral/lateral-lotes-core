@@ -77,7 +77,7 @@ const EliminarUsuarioDialog = ({ usuario, onOpenChange }: Props) => {
             ) : (
               <ul className="space-y-1 text-muted-foreground">
                 <li>{resumen?.lotes ?? 0} lotes (quedarán sin propietario asignado)</li>
-                <li>{resumen?.engagements ?? 0} engagements</li>
+                <li>{resumen?.engagements ?? 0} diagnósticos</li>
                 <li>{resumen?.transacciones ?? 0} pagos registrados (se conservan)</li>
                 <li>{resumen?.negociaciones ?? 0} negociaciones</li>
               </ul>

@@ -133,7 +133,7 @@ export const useCrearEngagement = () => {
       qc.invalidateQueries({ queryKey: ["engagements-activos-lotes"] });
     },
     onError: (err: any) => {
-      toast.error("Error al crear engagement", { description: err.message });
+      toast.error("Error al crear diagnóstico", { description: err.message });
     },
   });
 };
@@ -151,7 +151,7 @@ export const useActualizarEngagement = () => {
       qc.invalidateQueries({ queryKey: ["engagements-activos-lotes"] });
     },
     onError: (err: any) => {
-      toast.error("Error al actualizar engagement", { description: err.message });
+      toast.error("Error al actualizar diagnóstico", { description: err.message });
     },
   });
 };
@@ -173,12 +173,12 @@ export const useActivarEngagement = () => {
       qc.invalidateQueries({ queryKey: ["engagement-detalle", engagementId] });
       qc.invalidateQueries({ queryKey: ["tareas-engagement", engagementId] });
       qc.invalidateQueries({ queryKey: ["vw-portafolio-resumen"] });
-      toast.success("Engagement activado", {
+      toast.success("Diagnóstico activado", {
         description: "Las tareas fueron creadas y el SLA comenzó a contar.",
       });
     },
     onError: (err: any) => {
-      toast.error("No se pudo activar el engagement", { description: err.message });
+      toast.error("No se pudo activar el diagnóstico", { description: err.message });
     },
   });
 };

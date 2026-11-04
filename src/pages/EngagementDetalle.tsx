@@ -82,7 +82,7 @@ const EngagementDetalle = () => {
         ) : error || !engagement ? (
           <Card className="flex flex-col items-center gap-3 py-12">
             <p className="font-body text-muted-foreground">
-              Engagement no encontrado.
+              Diagnóstico no encontrado.
             </p>
             <Button onClick={() => navigate("/dashboard/portafolio")}>
               Volver al portafolio
@@ -124,7 +124,7 @@ const EngagementDetalle = () => {
                   <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
                   <div className="flex-1 space-y-3">
                     <p className="font-body text-sm">
-                      Este engagement está en <strong>BORRADOR</strong>. Las tareas y
+                      Este diagnóstico está en <strong>BORRADOR</strong>. Las tareas y
                       el SLA aún no han iniciado. Un Super Admin debe activarlo
                       para que los expertos puedan trabajar.
                     </p>
@@ -140,7 +140,7 @@ const EngagementDetalle = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>¿Activar engagement?</AlertDialogTitle>
+                            <AlertDialogTitle>¿Activar diagnóstico?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Al activar se crearán las tareas del plan, comenzará
                               a contar el SLA y los expertos podrán empezar. Esta
@@ -159,7 +159,7 @@ const EngagementDetalle = () => {
                       </AlertDialog>
                     ) : (
                       <p className="font-body text-xs">
-                        Solicita a un Super Admin que active este engagement.
+                        Solicita a un Super Admin que active este diagnóstico.
                       </p>
                     )}
                   </div>
@@ -173,7 +173,7 @@ const EngagementDetalle = () => {
                   <Clock className="mt-0.5 h-5 w-5 shrink-0" />
                   <div className="space-y-1">
                     <p className="font-body text-sm">
-                      Esperando confirmación de pago. El engagement se activará
+                      Esperando confirmación de pago. El diagnóstico se activará
                       automáticamente cuando se confirme.
                     </p>
                     {ultimaTrans && (
@@ -232,7 +232,7 @@ const EngagementDetalle = () => {
             <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 p-3">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <p className="text-xs text-foreground">
-                Vista unificada del engagement. Estado, scores, asesor y entregables
+                Vista unificada del diagnóstico. Estado, scores, asesor y entregables
                 en un solo lugar. Para capturar datos estructurados usa el
                 <strong> Editor completo</strong>.
               </p>

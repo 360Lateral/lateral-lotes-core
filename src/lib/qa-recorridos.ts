@@ -84,7 +84,7 @@ export const RECORRIDOS: RecorridoQA[] = [
         id: "pro-portal",
         titulo: "Mi panel",
         esperado:
-          "Resumen de lotes, engagements y próximos pasos; sin tarjetas vacías ni cifras en cero sin explicación.",
+          "Resumen de lotes, diagnósticos y próximos pasos; sin tarjetas vacías ni cifras en cero sin explicación.",
         ruta: "/portal",
       },
       {
@@ -109,7 +109,7 @@ export const RECORRIDOS: RecorridoQA[] = [
       },
       {
         id: "pro-engagements",
-        titulo: "Mis engagements y documentos",
+        titulo: "Mis diagnósticos y documentos",
         esperado:
           "Se ve el avance por etapas, los documentos requeridos y se pueden subir archivos.",
         ruta: "/portal/engagements",

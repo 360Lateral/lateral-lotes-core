@@ -30,11 +30,11 @@ const DistribucionPlanesChart = ({ data }: { data: PlanRow[] }) => {
     <Card>
       <CardContent className="p-4">
         <h2 className="mb-3 font-body text-sm font-semibold text-foreground">
-          Engagements por plan
+          Diagnósticos por plan
         </h2>
         {data.length === 0 ? (
           <p className="py-12 text-center font-body text-sm text-muted-foreground">
-            Aún no hay engagements creados.
+            Aún no hay diagnósticos creados.
           </p>
         ) : (
           <div className="h-64 w-full">

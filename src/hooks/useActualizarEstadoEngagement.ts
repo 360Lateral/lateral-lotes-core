@@ -58,7 +58,7 @@ export const useActualizarEstadoEngagement = () => {
     },
     onSuccess: (_data, vars) => {
       toast.success("Estado actualizado", {
-        description: `Engagement movido a "${ESTADO_LABEL[vars.nuevoEstado]}".`,
+        description: `Diagnóstico movido a "${ESTADO_LABEL[vars.nuevoEstado]}".`,
       });
     },
     onError: (error, _vars, context) => {

@@ -110,7 +110,7 @@ export default function GenerarLinkPagoDialog({ open, onOpenChange, engagement }
           {yaActivo ? (
             <div className="flex items-start gap-2 rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-900 dark:bg-green-950/30 dark:text-green-200">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-              <p>Este engagement ya está activo. No requiere pago.</p>
+              <p>Este diagnóstico ya está activo. No requiere pago.</p>
             </div>
           ) : !resultado ? (
             <Button
@@ -126,7 +126,7 @@ export default function GenerarLinkPagoDialog({ open, onOpenChange, engagement }
               {resultado.reused && (
                 <div className="flex items-start gap-2 rounded-md border border-blue-300 bg-blue-50 p-3 text-xs text-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
                   <Info className="mt-0.5 h-4 w-4 shrink-0" />
-                  <p>Ya había un link pendiente para este engagement — reutilizando el mismo.</p>
+                  <p>Ya había un link pendiente para este diagnóstico — reutilizando el mismo.</p>
                 </div>
               )}
               <div className="space-y-2">
@@ -154,7 +154,7 @@ export default function GenerarLinkPagoDialog({ open, onOpenChange, engagement }
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Envíaselo al propietario por WhatsApp o email. Cuando pague, el engagement
+                Envíaselo al propietario por WhatsApp o email. Cuando pague, el diagnóstico
                 se activará automáticamente.
               </p>
             </div>

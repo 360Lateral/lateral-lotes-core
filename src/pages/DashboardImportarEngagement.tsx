@@ -192,7 +192,7 @@ const DashboardImportarEngagement = () => {
     <DashboardLayout>
       <div className="mb-6">
         <h1 className="font-body text-xl font-bold text-foreground">
-          Importar engagement histórico
+          Importar diagnóstico histórico
         </h1>
         <p className="mt-1 font-body text-sm text-muted-foreground">
           Carga un diagnóstico ya entregado al cliente. Quedará cerrado, con los
@@ -393,7 +393,7 @@ const DashboardImportarEngagement = () => {
           </Button>
           <Button type="submit" disabled={importar.isPending}>
             {importar.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Importar engagement
+            Importar diagnóstico
           </Button>
         </div>
       </form>

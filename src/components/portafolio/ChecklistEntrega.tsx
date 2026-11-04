@@ -162,13 +162,13 @@ export const ChecklistEntrega = ({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>¿Marcar este engagement como entregado?</AlertDialogTitle>
+              <AlertDialogTitle>¿Marcar este diagnóstico como entregado?</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-2">
                   <p>Esta acción:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Publica el Diagnóstico y la Presentación (los hace visibles al cliente).</li>
-                    <li>Marca el engagement como "entregado".</li>
+                    <li>Marca el diagnóstico como "entregado".</li>
                     <li>El SLA se calcula como cumplido a partir de este momento.</li>
                   </ul>
                   <p className="text-xs">

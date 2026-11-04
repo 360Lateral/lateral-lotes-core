@@ -52,7 +52,7 @@ const PreferenciasUsuario = () => {
                       Recibir digest diario de SLA por email
                     </Label>
                     <p className="mt-1 font-body text-xs text-muted-foreground">
-                      Cada día a las 8:00 AM recibirás un email con tus engagements en riesgo.
+                      Cada día a las 8:00 AM recibirás un email con tus diagnósticos en riesgo.
                     </p>
                   </div>
                   <Switch id="digest" checked={digest} onCheckedChange={setDigest} />

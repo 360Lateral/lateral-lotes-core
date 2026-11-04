@@ -49,13 +49,13 @@ export const motivoTransicionInvalida = (
   hacia: EstadoEngagement,
 ): string => {
   if (desde === hacia) return "Ya está en este estado.";
-  if (desde === "cerrado") return "No se puede modificar un engagement cerrado.";
-  if (desde === "cancelado") return "Engagement cancelado, no se puede reactivar.";
+  if (desde === "cerrado") return "No se puede modificar un diagnóstico cerrado.";
+  if (desde === "cancelado") return "Diagnóstico cancelado, no se puede reactivar.";
   if (desde === "activo" && hacia === "entregado") {
     return "Debe pasar por revisión antes de entregarse.";
   }
   if (desde === "prospecto" && hacia === "entregado") {
-    return "No se puede entregar un engagement sin avance.";
+    return "No se puede entregar un diagnóstico sin avance.";
   }
   return "Transición no permitida desde el estado actual.";
 };

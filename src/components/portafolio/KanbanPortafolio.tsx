@@ -119,7 +119,7 @@ const KanbanCard = ({
         {...attributes}
         {...listeners}
         className="absolute left-1 top-1.5 flex h-5 w-4 cursor-grab items-center justify-center rounded text-muted-foreground hover:bg-muted active:cursor-grabbing"
-        aria-label={`Arrastrar ${fila.lote_nombre ?? "engagement"}`}
+        aria-label={`Arrastrar ${fila.lote_nombre ?? "diagnóstico"}`}
       >
         <GripVertical className="h-3 w-3" />
       </button>
@@ -281,7 +281,7 @@ const KanbanColumna = ({
           </div>
         ) : items.length === 0 ? (
           <div className="rounded-md border border-dashed border-border/60 p-3 text-center text-[11px] text-muted-foreground">
-            Sin engagements
+            Sin diagnósticos
           </div>
         ) : (
           items.map((f) => (
@@ -373,7 +373,7 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
     if (!puedeModificar(fila)) {
       toast.error("Sin permisos", {
         description:
-          "Solo el asesor del engagement o un admin pueden cambiarlo de estado.",
+          "Solo el asesor del diagnóstico o un admin pueden cambiarlo de estado.",
       });
       return;
     }
@@ -466,7 +466,7 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {confirmTransition.nuevoEstado === "cancelado" &&
-                    "¿Cancelar este engagement?"}
+                    "¿Cancelar este diagnóstico?"}
                   {confirmTransition.nuevoEstado === "entregado" &&
                     "¿Marcar como entregado?"}
                   {confirmTransition.nuevoEstado === "cerrado" &&
@@ -474,7 +474,7 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Estás a punto de mover "
-                  {confirmTransition.fila.lote_nombre ?? "engagement"}" de "
+                  {confirmTransition.fila.lote_nombre ?? "diagnóstico"}" de "
                   {ESTADO_LABEL[
                     confirmTransition.fila.estado as EstadoEngagement
                   ] ?? confirmTransition.fila.estado}
@@ -482,7 +482,7 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
                   {confirmTransition.nuevoEstado === "cancelado" &&
                     " Esta acción no se puede revertir desde Kanban."}
                   {confirmTransition.nuevoEstado === "cerrado" &&
-                    " Un engagement cerrado no puede modificarse más."}
+                    " Un diagnóstico cerrado no puede modificarse más."}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

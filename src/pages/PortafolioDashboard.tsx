@@ -307,7 +307,7 @@ const PortafolioDashboard = () => {
           </h1>
           <p className="mt-1 font-body text-xs text-muted-foreground">
             <span className="font-medium text-foreground">
-              {filas.length} engagements activos
+              {filas.length} diagnósticos activos
             </span>
             {atrasados > 0 && (
               <>
@@ -515,12 +515,12 @@ const PortafolioDashboard = () => {
                 title={
                   busqueda || filtrosActivosCount > 0
                     ? "Sin resultados con estos filtros"
-                    : "Sin engagements activos"
+                    : "Sin diagnósticos activos"
                 }
                 description={
                   busqueda || filtrosActivosCount > 0
                     ? "Ajusta los filtros o la búsqueda."
-                    : "Aún no hay engagements en el sistema."
+                    : "Aún no hay diagnósticos en el sistema."
                 }
                 action={
                   busqueda || filtrosActivosCount > 0 ? (

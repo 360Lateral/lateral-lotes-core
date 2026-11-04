@@ -115,7 +115,7 @@ const DashboardOwnerLotes = () => {
                         onClick={() => setEngagementLoteId(lote.id)}
                       >
                         <Briefcase className="mr-2 h-4 w-4" />
-                        {activo ? "Engagement activo" : "Crear engagement"}
+                        {activo ? "Diagnóstico activo" : "Crear diagnóstico"}
                       </Button>
                     )}
                   </CardContent>

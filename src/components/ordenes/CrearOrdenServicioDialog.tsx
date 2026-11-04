@@ -147,7 +147,7 @@ const CrearOrdenServicioDialog = ({ open, onOpenChange, loteId, engagementId }: 
           <DialogTitle>Crear orden de servicio</DialogTitle>
           <DialogDescription>
             {lote?.nombre_lote ?? "Lote"}
-            {engagementId ? ` · para engagement #${engagementId.slice(0, 8)}` : ""}
+            {engagementId ? ` · para diagnóstico #${engagementId.slice(0, 8)}` : ""}
           </DialogDescription>
         </DialogHeader>
 

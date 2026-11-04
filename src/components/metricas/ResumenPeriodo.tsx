@@ -27,8 +27,8 @@ const ResumenPeriodo = ({ data, mesesAtras }: Props) => {
           Resumen últimos {mesesAtras} meses
         </p>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Mini label="Engagements creados" value={formatNumero(totalCreados)} />
-          <Mini label="Engagements completados" value={formatNumero(totalCompletados)} />
+          <Mini label="Diagnósticos creados" value={formatNumero(totalCreados)} />
+          <Mini label="Diagnósticos completados" value={formatNumero(totalCompletados)} />
           <Mini label="Ingresos totales" value={formatCOP(totalIngresos)} />
           <Mini label="Ticket promedio" value={formatCOP(Math.round(ticket))} />
         </div>

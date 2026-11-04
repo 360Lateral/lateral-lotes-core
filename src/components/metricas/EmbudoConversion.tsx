@@ -27,7 +27,7 @@ const EmbudoConversion = ({ data, isLoading }: Props) => {
       <CardHeader>
         <CardTitle className="font-body text-base">Embudo de conversión</CardTitle>
         <p className="font-body text-xs text-muted-foreground">
-          De lead a engagement entregado
+          De lead a diagnóstico entregado
         </p>
       </CardHeader>
       <CardContent>

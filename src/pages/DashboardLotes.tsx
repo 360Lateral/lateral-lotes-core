@@ -835,7 +835,7 @@ const DashboardLotes = () => {
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
-                            <Briefcase className="mr-2 h-3.5 w-3.5" /> Crear engagement
+                            <Briefcase className="mr-2 h-3.5 w-3.5" /> Crear diagnóstico
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => setOrdenLoteId(l.id)}>
                             <ClipboardList className="mr-2 h-3.5 w-3.5" /> Crear orden
