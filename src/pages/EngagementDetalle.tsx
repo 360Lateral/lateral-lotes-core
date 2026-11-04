@@ -140,7 +140,7 @@ const EngagementDetalle = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>¿Activar engagement?</AlertDialogTitle>
+                            <AlertDialogTitle>¿Activar diagnóstico?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Al activar se crearán las tareas del plan, comenzará
                               a contar el SLA y los expertos podrán empezar. Esta

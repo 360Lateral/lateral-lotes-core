@@ -466,7 +466,7 @@ export const KanbanPortafolio = ({ filas, mostrarCerrados = true }: Props) => {
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {confirmTransition.nuevoEstado === "cancelado" &&
-                    "¿Cancelar este engagement?"}
+                    "¿Cancelar este diagnóstico?"}
                   {confirmTransition.nuevoEstado === "entregado" &&
                     "¿Marcar como entregado?"}
                   {confirmTransition.nuevoEstado === "cerrado" &&
