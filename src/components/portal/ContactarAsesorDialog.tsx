@@ -60,7 +60,7 @@ const ContactarAsesorDialog = ({
         <DialogHeader>
           <DialogTitle>Contactar a {asesorNombre ?? "tu asesor"}</DialogTitle>
           <DialogDescription>
-            Tu mensaje queda registrado en el engagement. Te responderemos por este canal o por correo.
+            Tu mensaje queda registrado en el diagnóstico. Te responderemos por este canal o por correo.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
