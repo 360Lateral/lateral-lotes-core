@@ -1,4 +1,5 @@
-import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send, ImageIcon, MapPinned, Plus, Loader2 } from "lucide-react";
+import { Briefcase, Users, MapPin, User, Award, AlertCircle, Check, Send, ImageIcon, MapPinned, Plus, Loader2, ExternalLink } from "lucide-react";
+import { estadoDiagnostico, claseEstadoDiagnostico } from "@/lib/estado-diagnostico";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FotoLote } from "@/components/lotes/FotoLote";
@@ -46,6 +47,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
   const { data: engagementLote, isLoading: loadingEngagement } =
     useEngagementDelLote(lote.id);
   const engagementActivoId = engagementLote?.id ?? null;
+  const diagnostico = estadoDiagnostico(engagementLote?.estado);
 
   const ubicacion = [lote.ciudad, lote.barrio].filter(Boolean).join(" · ");
   const estadoPill = porValidar
@@ -114,12 +116,27 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
           {tieneEngagement && lote.sla_estado && (
             <BadgeSla estado={lote.sla_estado as SlaEstado} diasParaSla={lote.dias_para_sla} size="xs" />
           )}
-          {lote.score_360 != null && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-card/95 px-2.5 py-1 text-xs font-bold text-secondary shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              Score 360: {lote.score_360.toFixed(1)}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {diagnostico && engagementLote && (
+              <Link
+                to={`/portal/engagement/${engagementLote.id}`}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`Ver diagnóstico en el portal: ${diagnostico.label}`}
+                className="pointer-events-auto inline-flex items-center gap-1 rounded-lg bg-card/95 px-2.5 py-1 text-xs font-bold text-secondary shadow-sm hover:bg-card"
+              >
+                <span className={`rounded-md px-1.5 py-0.5 text-[10px] ${claseEstadoDiagnostico[diagnostico.etapa]}`}>
+                  {diagnostico.label}
+                </span>
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            )}
+            {lote.score_360 != null && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-card/95 px-2.5 py-1 text-xs font-bold text-secondary shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                Score 360: {lote.score_360.toFixed(1)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
