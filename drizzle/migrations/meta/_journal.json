@@ -15,6 +15,13 @@
       "when": 1793828119844,
       "tag": "0001_textos_cliente_diagnostico",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793828272016,
+      "tag": "0002_portal_engagement_consulta_equipo",
+      "breakpoints": true
     }
   ]
 }

@@ -69,7 +69,7 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
                 }
               >
                 <Briefcase className="h-4 w-4" />
-                Mis engagements
+                Mis diagnósticos
               </NavLink>
             </nav>
           </div>

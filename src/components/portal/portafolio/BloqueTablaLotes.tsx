@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { ExternalLink, Briefcase } from "lucide-react";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { estadoDiagnostico, claseEstadoDiagnostico } from "@/lib/estado-diagnostico";
 import type { LotePortafolio } from "@/hooks/portal/usePortafolioPropietario";
 
 interface Props {
@@ -69,10 +70,13 @@ export const BloqueTablaLotes = ({ lotes }: Props) => (
                 </TableCell>
                 <TableCell className="text-sm">{lote.plan_nombre ?? "—"}</TableCell>
                 <TableCell>
-                  {lote.estado ? (
-                    <Badge variant="outline" className="capitalize text-[10px]">
-                      {lote.estado.replace(/_/g, " ")}
-                    </Badge>
+                  {estadoDiagnostico(lote.estado) && lote.engagement_id ? (
+                    <Link
+                      to={`/portal/engagement/${lote.engagement_id}`}
+                      className={`inline-flex min-h-6 items-center rounded-md px-2 py-0.5 text-[11px] font-semibold hover:underline ${claseEstadoDiagnostico[estadoDiagnostico(lote.estado)!.etapa]}`}
+                    >
+                      {estadoDiagnostico(lote.estado)!.label}
+                    </Link>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
                   )}
