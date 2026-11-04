@@ -5,6 +5,7 @@ export interface EngagementDelLote {
   id: string;
   estado: string;
   cerrado: boolean;
+  avance_pct: number | null;
 }
 
 /**
@@ -19,16 +20,21 @@ export const useEngagementDelLote = (loteId: string | undefined) => {
     queryFn: async (): Promise<EngagementDelLote | null> => {
       const { data, error } = await (supabase as any)
         .from("engagements_lote")
-        .select("id, estado, created_at")
+        .select("id, estado, avance_pct, created_at")
         .eq("lote_id", loteId)
         .neq("estado", "cancelado")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      const lista: { id: string; estado: string }[] = data ?? [];
+      const lista: { id: string; estado: string; avance_pct: number | string | null }[] = data ?? [];
       const activo = lista.find((e) => e.estado !== "cerrado");
       const elegido = activo ?? lista[0];
       if (!elegido) return null;
-      return { id: elegido.id, estado: elegido.estado, cerrado: elegido.estado === "cerrado" };
+      return {
+        id: elegido.id,
+        estado: elegido.estado,
+        cerrado: elegido.estado === "cerrado",
+        avance_pct: elegido.avance_pct != null ? Number(elegido.avance_pct) : null,
+      };
     },
     staleTime: 60 * 1000,
   });

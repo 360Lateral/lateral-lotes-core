@@ -57,7 +57,7 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
       : lote.estado_publicacion === "rechazado"
         ? { label: "Rechazado", cls: "bg-destructive text-destructive-foreground" }
         : { label: "Privado", cls: "bg-secondary text-secondary-foreground" };
-  const avance = lote.engagement_avance_pct;
+  const avance = engagementLote?.avance_pct ?? lote.engagement_avance_pct;
 
   return (
     <article
