@@ -63,8 +63,13 @@ export const SidebarStickyLote = ({
             disabled={!puedeSolicitar || solicitudPendiente}
           >
             <Mail className="h-4 w-4 mr-2" />
-            {solicitudPendiente ? "Solicitud pendiente" : "Solicitar contacto"}
+            {solicitudPendiente ? "Solicitud enviada" : "Solicitar contacto"}
           </Button>
+          {solicitudPendiente && (
+            <p className="text-xs text-muted-foreground text-center">
+              Te avisaremos cuando el equipo 360 Lateral la revise
+            </p>
+          )}
           <Button variant="outline" className="w-full" onClick={onGenerarPdf}>
             <FileText className="h-4 w-4 mr-2" />
             Ver ficha PDF

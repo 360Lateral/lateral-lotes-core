@@ -506,7 +506,7 @@ const LoteDetalle = () => {
               ["profesional", "premium"].includes(nivel) &&
               tieneNda
             }
-            solicitudPendiente={miSolicitud?.estado === "pendiente"}
+            solicitudPendiente={miSolicitud?.estado === "pendiente" || miSolicitud?.estado === "contactado"}
             onSolicitarContacto={() => setContactoOpen(true)}
             onGenerarPdf={() => id && navigate(`/lotes/${id}/ficha`)}
           />
