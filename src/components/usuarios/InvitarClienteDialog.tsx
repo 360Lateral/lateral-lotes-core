@@ -117,12 +117,12 @@ export default function InvitarClienteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-sm:top-4 max-sm:translate-y-0 max-sm:max-h-[calc(100dvh-2rem)] max-sm:overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Agregar cliente</DialogTitle>
           <DialogDescription>
-            Crea una cuenta de cliente (rol inversor) y envíale un email para que
-            establezca su contraseña.
+            Crea una cuenta de cliente. Antes de enviar la invitación revisarás un
+            resumen; el cliente recibirá un email para establecer su contraseña.
           </DialogDescription>
         </DialogHeader>
 
@@ -222,7 +222,7 @@ export default function InvitarClienteDialog({
 
           <div className="space-y-1.5">
             <Label htmlFor="cliente-dueno">Vincular con dueño (opcional)</Label>
-            <Select value={ownerId} onValueChange={setOwnerId}>
+            <Select value={ownerId} onValueChange={(v) => { setOwnerId(v); if (v !== NO_OWNER) setSoloLectura(true); }}>
               <SelectTrigger id="cliente-dueno">
                 <SelectValue placeholder="Sin vincular" />
               </SelectTrigger>
