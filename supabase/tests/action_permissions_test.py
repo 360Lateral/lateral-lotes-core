@@ -15,10 +15,13 @@ import requests
 class ActionPermissionsTest(unittest.TestCase):
     @classmethod
     def sql(cls, query):
-        return subprocess.check_output(
+        result = subprocess.run(
             ["psql", os.environ["SUPABASE_DB_URL"], "-X", "-At", "-v", "ON_ERROR_STOP=1", "-c", query],
-            text=True, stderr=subprocess.PIPE,
-        ).strip()
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        if result.returncode:
+            raise RuntimeError("Database test query failed; connection details omitted") from None
+        return result.stdout.strip()
 
     @classmethod
     def setUpClass(cls):
@@ -44,11 +47,14 @@ class ActionPermissionsTest(unittest.TestCase):
             "'eng',(SELECT id FROM public.engagements_lote LIMIT 1),"
             "'neg',(SELECT id FROM public.negociaciones LIMIT 1))"))
         values = ",".join(f"('{cls.uid}','{p}',false)" for p in cls.permissions)
-        cls.sql("INSERT INTO public.permisos_usuario (user_id,permiso,habilitado) VALUES " + values +
-                " ON CONFLICT (user_id,permiso) DO UPDATE SET habilitado=false")
+        if os.environ.get("ACTION_PERMISSIONS_PRECONFIGURED") != "1":
+            cls.sql("INSERT INTO public.permisos_usuario (user_id,permiso,habilitado) VALUES " + values +
+                    " ON CONFLICT (user_id,permiso) DO UPDATE SET habilitado=false")
 
     @classmethod
     def tearDownClass(cls):
+        if os.environ.get("ACTION_PERMISSIONS_PRECONFIGURED") == "1":
+            return
         names = ",".join("'" + p + "'" for p in cls.permissions)
         cls.sql(f"DELETE FROM public.permisos_usuario WHERE user_id='{cls.uid}' AND permiso IN ({names})")
         for row in cls.original:
