@@ -5451,6 +5451,15 @@ export type Database = {
         }
         Returns: Json
       }
+      permite_cambio_publicacion_lote: {
+        Args: {
+          p_estado: Database["public"]["Enums"]["estado_publicacion_lote"]
+          p_id: string
+          p_publicado: boolean
+          p_publico: boolean
+        }
+        Returns: boolean
+      }
       puede_ver_engagement: {
         Args: { _engagement_id: string; _user_id: string }
         Returns: boolean

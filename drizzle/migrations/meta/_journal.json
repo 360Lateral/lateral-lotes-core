@@ -43,6 +43,13 @@
       "when": 1794255134172,
       "tag": "0005_enforce_action_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794255329833,
+      "tag": "0006_complete_action_permission_paths",
+      "breakpoints": true
     }
   ]
 }
