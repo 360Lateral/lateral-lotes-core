@@ -18,6 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useInvitarCliente } from "@/hooks/useInvitarCliente";
 import { useEngagementsSinCliente } from "@/hooks/useEngagementsSinCliente";
 
@@ -27,6 +30,7 @@ interface InvitarClienteDialogProps {
 }
 
 const NO_ENGAGEMENT = "__none__";
+const NO_OWNER = "__none__";
 
 export default function InvitarClienteDialog({
   open,
@@ -36,16 +40,35 @@ export default function InvitarClienteDialog({
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [engagementId, setEngagementId] = useState<string>(NO_ENGAGEMENT);
+  const [ownerId, setOwnerId] = useState<string>(NO_OWNER);
+  const [soloLectura, setSoloLectura] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; nombre?: string }>({});
 
   const invitar = useInvitarCliente();
   const { data: engagements = [], isLoading: loadingEng } = useEngagementsSinCliente();
+  const { data: duenos = [] } = useQuery({
+    queryKey: ["duenos-para-invitacion"],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("perfiles")
+        .select("id, nombre, email")
+        .eq("user_type", "propietario")
+        .order("nombre");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const reset = () => {
     setEmail("");
     setNombre("");
     setTelefono("");
     setEngagementId(NO_ENGAGEMENT);
+    setOwnerId(NO_OWNER);
+    setSoloLectura(false);
+    setConfirmando(false);
     setErrors({});
   };
 
@@ -66,19 +89,26 @@ export default function InvitarClienteDialog({
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+    setConfirmando(true);
+  };
 
+  const confirmarInvitacion = () => {
     invitar.mutate(
       {
-        email: emailTrim,
-        nombre_completo: nombreTrim,
+        email: email.trim(),
+        nombre_completo: nombre.trim(),
         telefono: telefono.trim() || undefined,
         engagement_id:
           engagementId !== NO_ENGAGEMENT ? engagementId : undefined,
+        owner_id: ownerId !== NO_OWNER ? ownerId : undefined,
+        solo_lectura: soloLectura,
       },
       {
         onSuccess: (data) => {
           if (!data?.conflicto_usuario_existente) {
             onOpenChange(false);
+          } else {
+            setConfirmando(false);
           }
         },
       },
@@ -96,6 +126,31 @@ export default function InvitarClienteDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {confirmando ? (
+          <div className="space-y-4">
+            <div className="rounded-md border bg-muted/40 p-3 text-sm space-y-1">
+              <p><span className="text-muted-foreground">Email:</span> {email.trim()}</p>
+              <p><span className="text-muted-foreground">Nombre:</span> {nombre.trim()}</p>
+              <p>
+                <span className="text-muted-foreground">Dueño vinculado:</span>{" "}
+                {ownerId === NO_OWNER ? "Ninguno" : duenos.find((d) => d.id === ownerId)?.nombre ?? "—"}
+              </p>
+              <p><span className="text-muted-foreground">Solo lectura:</span> {soloLectura ? "Sí" : "No"}</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              El correo de invitación se enviará solo cuando pulses "Confirmar invitación".
+            </p>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" className="min-h-11" onClick={() => setConfirmando(false)} disabled={invitar.isPending}>
+                Volver
+              </Button>
+              <Button type="button" className="min-h-11" onClick={confirmarInvitacion} disabled={invitar.isPending}>
+                {invitar.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirmar invitación
+              </Button>
+            </DialogFooter>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="cliente-email">Email *</Label>
@@ -165,6 +220,38 @@ export default function InvitarClienteDialog({
             )}
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="cliente-dueno">Vincular con dueño (opcional)</Label>
+            <Select value={ownerId} onValueChange={setOwnerId}>
+              <SelectTrigger id="cliente-dueno">
+                <SelectValue placeholder="Sin vincular" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NO_OWNER}>Sin vincular</SelectItem>
+                {duenos.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.nombre || d.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <label htmlFor="cliente-solo-lectura" className="flex min-h-11 items-start gap-3 rounded-md border p-3 cursor-pointer">
+            <Checkbox
+              id="cliente-solo-lectura"
+              checked={soloLectura}
+              onCheckedChange={(v) => setSoloLectura(v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-sm">
+              <span className="font-medium">Solo lectura</span>
+              <span className="block text-muted-foreground">
+                Solo podrá ver portafolio y diagnósticos.
+              </span>
+            </span>
+          </label>
+
           <DialogFooter className="gap-2">
             <Button
               type="button"
@@ -178,10 +265,11 @@ export default function InvitarClienteDialog({
               {invitar.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Crear y enviar invitación
+              Continuar
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

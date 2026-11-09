@@ -52,7 +52,9 @@ Deno.serve(async (req) => {
 
     // Validar body
     const body = await req.json();
-    const { email, nombre_completo, telefono, engagement_id } = body as {
+    const { email, nombre_completo, telefono, engagement_id, solo_lectura, owner_id } = body as {
+      solo_lectura?: boolean;
+      owner_id?: string;
       email?: string;
       nombre_completo?: string;
       telefono?: string;
@@ -76,6 +78,16 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    if (owner_id) {
+      const { data: ownerRol } = await adminClient
+        .from("user_roles").select("role").eq("user_id", owner_id).eq("role", "propietario").maybeSingle();
+      if (!ownerRol) {
+        return new Response(JSON.stringify({ error: "El dueño elegido no es un propietario válido" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const PUBLIC_APP_URL = Deno.env.get("PUBLIC_APP_URL");
@@ -189,6 +201,31 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Vincular con el dueño elegido
+    let ownerVinculado: string | null = null;
+    if (owner_id && owner_id !== newUserId) {
+      const { error: uoErr } = await adminClient
+        .from("usuario_owner")
+        .upsert({ user_id: newUserId, owner_id }, { onConflict: "user_id,owner_id" });
+      if (uoErr) warning = "Invitación enviada, pero no se pudo vincular con el dueño: " + uoErr.message;
+      else ownerVinculado = owner_id;
+    }
+
+    // Plantilla Solo lectura: se guarda con la sesión del administrador para que quede registrado quién la aplicó
+    let soloLecturaAplicada = false;
+    if (solo_lectura) {
+      const permisos = Object.fromEntries(
+        ["ver_portafolio", "ver_diagnosticos", "publicar_activo", "contratar_diagnostico",
+          "subir_documentos", "escribir_asesor", "gestionar_comisionistas", "sala_negociacion"]
+          .map((p) => [p, p === "ver_portafolio" || p === "ver_diagnosticos"]),
+      );
+      const { error: permErr } = await anonClient.rpc("guardar_permisos_usuario", {
+        p_user_id: newUserId, p_permisos: permisos,
+      });
+      if (permErr) warning = "Invitación enviada, pero no se pudo aplicar Solo lectura: " + permErr.message;
+      else soloLecturaAplicada = true;
+    }
+
     // Asignar engagement opcional (idempotente; aplica a usuario nuevo y reinvitado)
     let engagementAsignado: string | null = null;
     if (engagement_id) {
@@ -211,6 +248,8 @@ Deno.serve(async (req) => {
         email_enviado: emailEnviado,
         engagement_asignado: engagementAsignado,
         reinvitado: Boolean(ya),
+        owner_vinculado: ownerVinculado,
+        solo_lectura_aplicada: soloLecturaAplicada,
         ...(warning ? { warning } : {}),
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },

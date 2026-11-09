@@ -7,6 +7,8 @@ interface InvitarClienteInput {
   nombre_completo: string;
   telefono?: string;
   engagement_id?: string;
+  solo_lectura?: boolean;
+  owner_id?: string;
 }
 
 interface InvitarClienteResponse {
