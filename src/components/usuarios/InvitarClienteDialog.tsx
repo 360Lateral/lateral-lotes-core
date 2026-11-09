@@ -95,8 +95,8 @@ export default function InvitarClienteDialog({
   const confirmarInvitacion = () => {
     invitar.mutate(
       {
-        email: emailTrim,
-        nombre_completo: nombreTrim,
+        email: email.trim(),
+        nombre_completo: nombre.trim(),
         telefono: telefono.trim() || undefined,
         engagement_id:
           engagementId !== NO_ENGAGEMENT ? engagementId : undefined,
