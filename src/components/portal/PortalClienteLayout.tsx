@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/ui/Logo";
 import { BarChart3, Briefcase, ChevronDown, LogOut, Menu, Store, User as UserIcon } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const obtenerIniciales = (email?: string | null) => {
@@ -29,6 +29,7 @@ const enlacesPortal = [
 const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const nombre =
@@ -82,12 +83,16 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
               </SheetHeader>
               <nav aria-label="Navegación del portal" className="flex flex-col gap-2">
                 {[...enlacesPortal, { to: "/mercado", label: "Mercado", icon: Store, end: false }].map(({ to, label, icon: Icon, end }) => (
-                  <Button key={to} variant="ghost" asChild className="h-auto min-h-11 justify-start whitespace-normal px-3 py-2 text-base">
+                  <Button key={to} variant="ghost" asChild className={cn(
+                    "h-auto min-h-11 justify-start whitespace-normal px-3 py-2 text-base",
+                    (end ? pathname === to || pathname.startsWith(`${to}/engagement/`) : pathname === to || pathname.startsWith(`${to}/`))
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground",
+                  )}>
                     <NavLink
                       to={to}
                       end={end}
                       onClick={() => setMenuAbierto(false)}
-                      className={({ isActive }) => cn(isActive ? "bg-primary/10 text-primary" : "text-muted-foreground")}
                     >
                       <Icon className="h-5 w-5" />
                       {label}
