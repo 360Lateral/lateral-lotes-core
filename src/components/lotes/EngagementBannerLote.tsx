@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, ExternalLink } from "lucide-react";
 import { useEngagementActivoDelLote } from "@/hooks/useEngagementActivoDelLote";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
+import PermissionGate from "@/components/PermissionGate";
 
 interface Props {
   loteId: string | undefined;
@@ -46,10 +47,10 @@ const EngagementBannerLote = ({ loteId, canCreate }: Props) => {
               Crea uno para iniciar el análisis técnico y vincular el lote al flujo de servicios 360°.
             </p>
           </div>
-          <Button onClick={() => setOpen(true)} className="sm:shrink-0">
+          <PermissionGate permiso="contratar_diagnostico"><Button onClick={() => setOpen(true)} className="sm:shrink-0">
             <Sparkles className="mr-1.5 h-4 w-4" />
             Crear diagnóstico
-          </Button>
+          </Button></PermissionGate>
         </CardContent>
       </Card>
 
