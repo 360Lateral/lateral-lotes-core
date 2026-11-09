@@ -127,7 +127,7 @@ const CampanaNotificacionesPortal = () => {
                 >
                   <span
                     aria-label={n.leida ? undefined : "Sin leer"}
-                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.leida ? "bg-transparent" : "bg-accent"}`}
+                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.leida ? "bg-transparent" : "bg-orange"}`}
                   />
                   <span className="min-w-0 flex-1">
                     <span className={`block break-words text-sm ${n.leida ? "text-muted-foreground" : "text-foreground font-medium"}`}>

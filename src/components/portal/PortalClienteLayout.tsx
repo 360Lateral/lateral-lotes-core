@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/ui/Logo";
+import CampanaNotificacionesPortal from "@/components/portal/CampanaNotificacionesPortal";
 import { BarChart3, Briefcase, ChevronDown, LogOut, Menu, Store, User as UserIcon } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -112,6 +113,8 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
               </nav>
             </SheetContent>
           </Sheet>
+          <div className="flex items-center gap-1">
+          <CampanaNotificacionesPortal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2 h-10">
@@ -138,6 +141,7 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
           </div>
         </div>
       </header>
