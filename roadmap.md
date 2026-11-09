@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Aplicar los seis permisos a operaciones del servidor y RLS, ocultar acciones deshabilitadas y verificar rechazos directos.
 - [x] Menú móvil del portal: encabezado aislado comprobado a 390 px, enlaces de 44 px y texto de 16 px, resaltado y cierre; escritorio comprobado a 768/1280 px. Verificación integral del portal pendiente: la cuenta disponible es desarrollador y no tiene acceso al portal propietario.
 - [x] Fotos 16:9 lazy y código legible en tarjetas de /mercado; foto real y respaldo de error comprobados a 390 px y escritorio, sin cambiar base de datos.
 - [x] Menú único y 96 px en /nosotros, /contacto, /unsubscribe y /lotes/:id/ficha; verificado a 390 px sin desbordes, con páginas privadas y escritorio intactos. /nosotros y /contacto conservan su contenido actual de página no encontrada.
