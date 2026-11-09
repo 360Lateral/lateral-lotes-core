@@ -3498,6 +3498,30 @@ export type Database = {
         }
         Relationships: []
       }
+      permisos_usuario: {
+        Row: {
+          actualizado_en: string
+          actualizado_por: string | null
+          habilitado: boolean
+          permiso: string
+          user_id: string
+        }
+        Insert: {
+          actualizado_en?: string
+          actualizado_por?: string | null
+          habilitado?: boolean
+          permiso: string
+          user_id: string
+        }
+        Update: {
+          actualizado_en?: string
+          actualizado_por?: string | null
+          habilitado?: boolean
+          permiso?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       planes: {
         Row: {
           acceso_analisis_completo: boolean
@@ -5470,6 +5494,10 @@ export type Database = {
       }
       tiene_acceso_ficha: {
         Args: { _lote_id: string; _user_id: string }
+        Returns: boolean
+      }
+      tiene_permiso: {
+        Args: { _permiso: string; _user_id: string }
         Returns: boolean
       }
       toggle_contrato_activo: {
