@@ -169,13 +169,20 @@ const DashboardNotificaciones = () => {
           icon={Bell}
           titulo={
             filtro === "todas"
-              ? "Sin notificaciones"
+              ? "No tienes notificaciones"
               : `Sin notificaciones de tipo "${TIPO_CONFIG[filtro]?.label ?? filtro}"`
           }
           descripcion={
             filtro === "todas"
-              ? "Recibirás aquí actualizaciones sobre tu actividad y la del equipo."
+              ? "Aquí verás avisos sobre tus solicitudes, negociaciones y lotes."
               : "Cambia el filtro para ver otras notificaciones."
+          }
+          action={
+            filtro === "todas" ? (
+              <Button asChild className="min-h-11 w-full sm:w-auto">
+                <Link to="/mercado">Ir al mercado</Link>
+              </Button>
+            ) : undefined
           }
         />
       ) : (
