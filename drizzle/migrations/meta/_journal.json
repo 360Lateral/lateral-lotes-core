@@ -29,6 +29,13 @@
       "when": 1793828643067,
       "tag": "0003_avisos_equipo_diagnostico",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794254815471,
+      "tag": "0004_permisos_usuario_rls",
+      "breakpoints": true
     }
   ]
 }
