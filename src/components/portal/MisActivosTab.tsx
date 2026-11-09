@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Plus, PackageOpen, FileSearch, Users } from "lucide-react";
+import { MapPin, Plus, PackageOpen, FileSearch, Users, MessagesSquare } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import PublicarActivoDialog from "./PublicarActivoDialog";
 import GestionarComisionistasDialog from "./GestionarComisionistasDialog";
@@ -40,6 +42,27 @@ const MisActivosTab = () => {
   const { user } = useAuth();
   const { data: activos = [], isLoading } = useMisActivos(user?.id);
   const [openDialog, setOpenDialog] = useState(false);
+  const loteIds = activos.map((a) => a.id);
+  const { data: negociacionesPorLote = {} } = useQuery({
+    queryKey: ["portal-negociaciones-activas", user?.id, loteIds],
+    enabled: !!user?.id && loteIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("negociaciones")
+        .select("id, lote_id, created_at")
+        .eq("estado", "activa")
+        .eq("owner_id", user!.id)
+        .in("lote_id", loteIds)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const map: Record<string, { count: number; ultimaId: string }> = {};
+      for (const n of data ?? []) {
+        if (map[n.lote_id]) map[n.lote_id].count++;
+        else map[n.lote_id] = { count: 1, ultimaId: n.id };
+      }
+      return map;
+    },
+  });
   const [loteParaDiagnostico, setLoteParaDiagnostico] = useState<string | null>(null);
   const [loteParaComisionistas, setLoteParaComisionistas] = useState<
     { id: string; nombre: string | null } | null
@@ -114,6 +137,22 @@ const MisActivosTab = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <EstadoBadge estado={a.estado_publicacion} />
                 </div>
+
+                {negociacionesPorLote[a.id] && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge className="min-h-10 bg-blue-600 hover:bg-blue-600 text-white px-3">
+                      {negociacionesPorLote[a.id].count === 1
+                        ? "1 negociación activa"
+                        : `${negociacionesPorLote[a.id].count} negociaciones activas`}
+                    </Badge>
+                    <Button size="sm" className="min-h-10" asChild>
+                      <Link to={`/negociacion/${negociacionesPorLote[a.id].ultimaId}`}>
+                        <MessagesSquare className="mr-1 h-4 w-4" />
+                        Ir a la sala
+                      </Link>
+                    </Button>
+                  </div>
+                )}
 
                 {a.estado_publicacion === "rechazado" && a.notas_publicacion && (
                   <p className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1.5">
