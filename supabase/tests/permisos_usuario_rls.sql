@@ -39,8 +39,11 @@ BEGIN
         WHERE schemaname = 'public' AND tablename = 'permisos_usuario'
         AND roles && ARRAY['authenticated', 'public']::name[] AND cmd IN ('ALL', 'SELECT')
       LOOP
-        EXECUTE format('SELECT (%s) FROM (SELECT $1::uuid AS user_id) r', COALESCE(policy.qual, 'true'))
-          INTO allowed USING row_owner;
+        -- The test connection cannot invoke managed auth functions; bind the user ID
+        -- where auth.uid() appears while evaluating the actual installed predicates.
+        EXECUTE format('SELECT (%s) FROM (SELECT $1::uuid AS user_id) r',
+          replace(COALESCE(policy.qual, 'true'), 'auth.uid()', '$2::uuid'))
+          INTO allowed USING row_owner, actor;
         can_read := can_read OR COALESCE(allowed, false);
       END LOOP;
       IF can_read IS DISTINCT FROM (actor <> normal_id OR row_owner = normal_id) THEN
@@ -53,13 +56,14 @@ BEGIN
           AND roles && ARRAY['authenticated', 'public']::name[] AND cmd IN ('ALL', command)
         LOOP
           EXECUTE format('SELECT (%s) FROM (SELECT $1::uuid AS user_id) r',
-            CASE WHEN command = 'INSERT' THEN COALESCE(policy.with_check, policy.qual, 'true')
-              ELSE COALESCE(policy.qual, 'true') END)
-            INTO allowed USING row_owner;
+            replace(CASE WHEN command = 'INSERT' THEN COALESCE(policy.with_check, policy.qual, 'true')
+              ELSE COALESCE(policy.qual, 'true') END, 'auth.uid()', '$2::uuid'))
+            INTO allowed USING row_owner, actor;
           can_write := can_write OR COALESCE(allowed, false);
           IF command = 'UPDATE' AND allowed THEN
             EXECUTE format('SELECT (%s) FROM (SELECT $1::uuid AS user_id) r',
-              COALESCE(policy.with_check, policy.qual, 'true')) INTO allowed USING row_owner;
+              replace(COALESCE(policy.with_check, policy.qual, 'true'), 'auth.uid()', '$2::uuid'))
+              INTO allowed USING row_owner, actor;
             IF NOT COALESCE(allowed, false) THEN
               RAISE EXCEPTION 'Administrator update check must allow all rows';
             END IF;
