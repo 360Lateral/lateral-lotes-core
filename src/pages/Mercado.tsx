@@ -62,6 +62,8 @@ const StatInline = ({ value, label }: { value: number | string; label: string })
 );
 
 const Mercado = () => {
+  const { user, userType, loading: authLoading } = useAuth();
+  const esPropietario = !!user && userType === "propietario";
   const [filtrosGuardados, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
   const filtros = useMemo(() => normalizarFiltrosMercado(filtrosGuardados), [filtrosGuardados]);
   useEffect(() => {
