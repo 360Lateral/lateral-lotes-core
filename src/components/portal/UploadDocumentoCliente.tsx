@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload } from "lucide-react";
@@ -37,7 +38,7 @@ const UploadDocumentoCliente = ({
         className="hidden"
         onChange={onChange}
       />
-      <Button
+      <PermissionGate permiso="subir_documentos"><Button
         size={size}
         variant={variant}
         onClick={() => inputRef.current?.click()}
@@ -50,7 +51,7 @@ const UploadDocumentoCliente = ({
           <Upload className="mr-2 h-4 w-4" />
         )}
         {label}
-      </Button>
+      </Button></PermissionGate>
     </>
   );
 };

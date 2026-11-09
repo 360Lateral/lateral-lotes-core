@@ -24,6 +24,8 @@ import {
 import { Plus, FileText, Download, Trash2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "@/components/ui/EmptyState";
+import PermissionGate from "@/components/PermissionGate";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 
 const categoriasDoc = [
   { key: "financiero", label: "Financiero" },
@@ -36,6 +38,7 @@ const categoriasDoc = [
 
 const DashboardLoteDocs = () => {
   const { id } = useParams<{ id: string }>();
+  const { permite } = usePermisosAcciones();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -134,9 +137,9 @@ const DashboardLoteDocs = () => {
         <h1 className="font-body text-xl font-bold text-foreground">
           Documentos — {lote?.nombre_lote ?? "Cargando…"}
         </h1>
-        <Button variant="default" size="sm" onClick={() => setOpen(true)}>
+        <PermissionGate permiso="subir_documentos"><Button variant="default" size="sm" onClick={() => setOpen(true)}>
           <Plus className="mr-1 h-4 w-4" /> Subir análisis
-        </Button>
+        </Button></PermissionGate>
       </div>
 
       {categoriasDoc.map((cat) => {
@@ -186,7 +189,7 @@ const DashboardLoteDocs = () => {
           icon={FolderOpen}
           titulo="Sin documentos cargados"
           descripcion="Los documentos del lote se mostrarán aquí cuando se agreguen."
-          ctaLabel="Subir documento"
+          ctaLabel={permite("subir_documentos") ? "Subir documento" : undefined}
           onCtaClick={() => setOpen(true)}
           ctaVariant="outline"
           size="sm"
@@ -235,9 +238,9 @@ const DashboardLoteDocs = () => {
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
             </div>
-            <Button type="submit" variant="default" disabled={uploadMutation.isPending}>
+            <PermissionGate permiso="subir_documentos"><Button type="submit" variant="default" disabled={uploadMutation.isPending}>
               {uploadMutation.isPending ? "Subiendo…" : "Subir documento"}
-            </Button>
+            </Button></PermissionGate>
           </form>
         </DialogContent>
       </Dialog>

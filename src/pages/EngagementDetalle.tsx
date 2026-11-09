@@ -36,6 +36,7 @@ import { useUltimaTransaccionEngagement } from "@/hooks/useUltimaTransaccionEnga
 
 import { ClipboardList, CreditCard, FileText, Info } from "lucide-react";
 import { AlertTriangle, Clock, Loader2 } from "lucide-react";
+import PermissionGate from "@/components/PermissionGate";
 
 
 
@@ -95,13 +96,13 @@ const EngagementDetalle = () => {
             {(isSuperAdmin || isAdminOrAsesor) && (
               <div className="mt-4 flex flex-wrap justify-end gap-2">
                 {puedeGenerarLink && (
-                  <Button
+                  <PermissionGate permiso="contratar_diagnostico"><Button
                     size="sm"
                     variant="outline"
                     onClick={() => setLinkPagoOpen(true)}
                   >
                     <CreditCard className="mr-2 h-4 w-4" /> Generar link de pago
-                  </Button>
+                  </Button></PermissionGate>
                 )}
                 <Button size="sm" variant="outline" onClick={() => setOrdenOpen(true)}>
                   <ClipboardList className="mr-2 h-4 w-4" /> + Crear orden de servicio
@@ -129,7 +130,7 @@ const EngagementDetalle = () => {
                       para que los expertos puedan trabajar.
                     </p>
                     {isSuperAdmin ? (
-                      <AlertDialog>
+                      <PermissionGate permiso="contratar_diagnostico"><AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button size="sm" disabled={activar.isPending}>
                             {activar.isPending && (
@@ -156,7 +157,7 @@ const EngagementDetalle = () => {
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
-                      </AlertDialog>
+                      </AlertDialog></PermissionGate>
                     ) : (
                       <p className="font-body text-xs">
                         Solicita a un Super Admin que active este diagnóstico.

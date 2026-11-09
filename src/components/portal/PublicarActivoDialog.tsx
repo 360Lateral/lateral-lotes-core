@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -164,9 +165,9 @@ const PublicarActivoDialog = ({ open, onOpenChange }: Props) => {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting || publicar.isPending}>
+            <PermissionGate permiso="publicar_activo"><Button type="submit" disabled={isSubmitting || publicar.isPending}>
               {publicar.isPending ? "Enviando…" : "Enviar para validación"}
-            </Button>
+            </Button></PermissionGate>
           </DialogFooter>
         </form>
       </DialogContent>

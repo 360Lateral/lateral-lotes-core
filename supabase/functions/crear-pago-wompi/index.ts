@@ -79,6 +79,12 @@ Deno.serve(async (req) => {
     // CASO DIAGNOSTICO (flujo original)
     // ============================================================
     if (tipo === "diagnostico") {
+      const { data: permitido, error: permisoError } = await admin.rpc("tiene_permiso", {
+        _user_id: caller.id, _permiso: "contratar_diagnostico",
+      });
+      if (permisoError || permitido !== true) {
+        return jsonResp({ error: "No tienes permiso para contratar diagnósticos" }, 403);
+      }
       const engagement_id: string | undefined = body.engagement_id;
       if (!engagement_id) return jsonResp({ error: "engagement_id requerido" }, 400);
 

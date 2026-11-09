@@ -9,6 +9,7 @@ import { useEngagementDelLote } from "@/hooks/useEngagementDelLote";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import MapaEstaticoLote from "@/components/lotes/MapaEstaticoLote";
 import { formatMetros } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 interface Props {
   lote: LoteUnificado | null;
@@ -62,11 +63,11 @@ export const LoteDetalleDrawer = ({ lote, open, onOpenChange }: Props) => {
               </Link>
             </Button>
           ) : (
-            <Button asChild size="sm" variant="outline">
+            <PermissionGate permiso="contratar_diagnostico"><Button asChild size="sm" variant="outline">
               <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
                 <Plus className="mr-1 h-3 w-3" /> Crear diagnóstico
               </Link>
-            </Button>
+            </Button></PermissionGate>
           )}
         </div>
 

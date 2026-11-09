@@ -15,6 +15,7 @@ import { usePlanesConPrecio } from "@/hooks/usePlanesConPrecio";
 import { toast } from "sonner";
 import { Copy, ExternalLink, Info, Loader2, CheckCircle2 } from "lucide-react";
 import { formatCOP } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 interface EngagementLike {
   id: string;
@@ -113,14 +114,14 @@ export default function GenerarLinkPagoDialog({ open, onOpenChange, engagement }
               <p>Este diagnóstico ya está activo. No requiere pago.</p>
             </div>
           ) : !resultado ? (
-            <Button
+            <PermissionGate permiso="contratar_diagnostico"><Button
               className="w-full"
               onClick={handleGenerar}
               disabled={generar.isPending || !plan}
             >
               {generar.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generar link de pago Wompi
-            </Button>
+            </Button></PermissionGate>
           ) : (
             <div className="space-y-3">
               {resultado.reused && (

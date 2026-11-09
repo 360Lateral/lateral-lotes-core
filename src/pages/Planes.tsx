@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -220,9 +221,9 @@ const PlanTabla = ({ planes, mobile = false }: { planes: PlanRow[]; mobile?: boo
         <td className={mobile ? "sticky left-0 z-10 bg-background" : undefined} />
         {planes.map((p) => (
           <td key={p.id} className={`${mobile ? "p-1.5" : "p-3"} text-center`}>
-            <Button asChild size="sm" className={mobile ? "h-auto min-h-9 w-full whitespace-normal px-1 text-xs" : undefined} variant={p.destacado ? "default" : "outline"}>
+            <PermissionGate permiso="contratar_diagnostico" permitirVisitante><Button asChild size="sm" className={mobile ? "h-auto min-h-9 w-full whitespace-normal px-1 text-xs" : undefined} variant={p.destacado ? "default" : "outline"}>
               <Link to="/diagnostico">{p.codigo === "gratuito" ? "Empezar gratis" : "Comprar plan"}</Link>
-            </Button>
+            </Button></PermissionGate>
           </td>
         ))}
       </tr>
@@ -420,7 +421,7 @@ const Planes = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button
+                  <PermissionGate permiso="contratar_diagnostico" permitirVisitante><Button
                     asChild
                     className="mt-auto w-full"
                     variant={p.destacado ? "default" : "outline"}
@@ -428,7 +429,7 @@ const Planes = () => {
                     <Link to="/diagnostico">
                       {p.codigo === "gratuito" ? "Empezar gratis" : "Comprar plan"}
                     </Link>
-                  </Button>
+                  </Button></PermissionGate>
                 </Card>
                 );
               })}

@@ -11,6 +11,7 @@ import { Plus, MapPin, Loader2, Briefcase } from "lucide-react";
 import CrearEngagementDialog from "@/components/portafolio/CrearEngagementDialog";
 import { useEngagementsActivosPorLotes } from "@/hooks/useEngagements";
 import { formatMetros } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 const DashboardOwnerLotes = () => {
   const { user } = useAuth();
@@ -54,10 +55,10 @@ const DashboardOwnerLotes = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="font-heading text-xl font-bold text-foreground">Mis Lotes</h1>
-          <Button onClick={() => navigate("/dashboard/lotes/nuevo")}>
+          <PermissionGate permiso="publicar_activo"><Button onClick={() => navigate("/dashboard/lotes/nuevo")}>
             <Plus className="mr-2 h-4 w-4" />
             Publicar lote
-          </Button>
+          </Button></PermissionGate>
         </div>
 
         {isLoading ? (
@@ -70,9 +71,9 @@ const DashboardOwnerLotes = () => {
             <p className="font-body text-sm text-muted-foreground">
               Aún no has publicado ningún lote.
             </p>
-            <Button variant="link" className="mt-2 text-primary" onClick={() => navigate("/dashboard/lotes/nuevo")}>
+            <PermissionGate permiso="publicar_activo"><Button variant="link" className="mt-2 text-primary" onClick={() => navigate("/dashboard/lotes/nuevo")}>
               Publicar mi primer lote
-            </Button>
+            </Button></PermissionGate>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -107,6 +108,7 @@ const DashboardOwnerLotes = () => {
                       )}
                     </div>
                     {esPropio && (
+                      <PermissionGate permiso="contratar_diagnostico">
                       <Button
                         size="sm"
                         variant="outline"
@@ -117,6 +119,7 @@ const DashboardOwnerLotes = () => {
                         <Briefcase className="mr-2 h-4 w-4" />
                         {activo ? "Diagnóstico activo" : "Crear diagnóstico"}
                       </Button>
+                      </PermissionGate>
                     )}
                   </CardContent>
                 </Card>

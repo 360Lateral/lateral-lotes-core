@@ -24,6 +24,7 @@ import MemoizedLoteMap from "@/components/maps/MemoizedLoteMap";
 import { useCallback, useEffect as useEffectMap } from "react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { DEPARTAMENTO_NOMBRES, getMunicipios } from "@/lib/colombiaData";
+import PermissionGate from "@/components/PermissionGate";
 
 const DIAGNOSTICO_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85";
 
@@ -531,7 +532,7 @@ const Diagnostico = () => {
                 />
               </div>
 
-              <Button
+              <PermissionGate permiso="contratar_diagnostico" permitirVisitante><Button
                 onClick={handleSubmitDiagnostico}
                 disabled={submitting || !nombre.trim() || !email.trim() || !telefono.trim()}
                 className="w-full bg-orange hover:bg-orange/90 text-white"
@@ -541,7 +542,7 @@ const Diagnostico = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
                 Solicitar mi Diagnóstico Gratuito
-              </Button>
+              </Button></PermissionGate>
             </div>
           </div>
         </div>

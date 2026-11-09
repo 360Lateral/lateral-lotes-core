@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -52,9 +53,9 @@ const SidebarStickyEngagement = ({
                 </p>
               </div>
             </div>
-            <Button onClick={onContactarAsesor} className="mt-4 w-full">
+            <PermissionGate permiso="escribir_asesor"><Button onClick={onContactarAsesor} className="mt-4 w-full">
               <Mail className="mr-2 h-4 w-4" /> Contactar asesor
-            </Button>
+            </Button></PermissionGate>
           </>
         ) : (
           <p className="text-sm text-muted-foreground">Por asignar</p>

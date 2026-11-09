@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMisActivos } from "@/hooks/useMisActivos";
@@ -74,9 +75,9 @@ const MisActivosTab = () => {
         <p className="text-sm text-muted-foreground">
           Activos que has publicado o que están en proceso de validación.
         </p>
-        <Button onClick={() => setOpenDialog(true)} size="sm">
+        <PermissionGate permiso="publicar_activo"><Button onClick={() => setOpenDialog(true)} size="sm">
           <Plus className="mr-1 h-4 w-4" /> Publicar un activo
-        </Button>
+        </Button></PermissionGate>
       </div>
 
       {isLoading ? (
@@ -145,12 +146,12 @@ const MisActivosTab = () => {
                         ? "1 negociación activa"
                         : `${negociacionesPorLote[a.id].count} negociaciones activas`}
                     </Badge>
-                    <Button size="sm" className="hidden sm:inline-flex min-h-10" asChild>
+                    <PermissionGate permiso="sala_negociacion"><Button size="sm" className="hidden sm:inline-flex min-h-10" asChild>
                       <Link to={`/negociacion/${negociacionesPorLote[a.id].ultimaId}`}>
                         <MessagesSquare className="mr-1 h-4 w-4" />
                         Ir a la sala
                       </Link>
-                    </Button>
+                    </Button></PermissionGate>
                   </div>
                 )}
 
@@ -163,12 +164,12 @@ const MisActivosTab = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {negociacionesPorLote[a.id] && (
-                    <Button size="sm" className="sm:hidden min-h-11 w-full" asChild>
+                    <PermissionGate permiso="sala_negociacion"><Button size="sm" className="sm:hidden min-h-11 w-full" asChild>
                       <Link to={`/negociacion/${negociacionesPorLote[a.id].ultimaId}`}>
                         <MessagesSquare className="mr-1 h-4 w-4" />
                         Ir a la sala
                       </Link>
-                    </Button>
+                    </Button></PermissionGate>
                   )}
                   <Button
                     variant="outline"
@@ -178,7 +179,7 @@ const MisActivosTab = () => {
                   >
                     <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
                   </Button>
-                  <Button
+                  <PermissionGate permiso="contratar_diagnostico"><Button
                     variant="default"
                     size="sm"
                     className="min-h-11 w-full sm:min-h-0 sm:w-auto"
@@ -186,8 +187,8 @@ const MisActivosTab = () => {
                   >
                     <FileSearch className="mr-1 h-4 w-4" />
                     Contratar diagnóstico
-                  </Button>
-                  <Button
+                  </Button></PermissionGate>
+                  <PermissionGate permiso="gestionar_comisionistas"><Button
                     variant="outline"
                     size="sm"
                     className="min-h-11 w-full sm:min-h-0 sm:w-auto sm:col-span-2"
@@ -197,7 +198,7 @@ const MisActivosTab = () => {
                   >
                     <Users className="mr-1 h-4 w-4" />
                     Gestionar comisionistas
-                  </Button>
+                  </Button></PermissionGate>
                 </div>
               </CardContent>
             </Card>

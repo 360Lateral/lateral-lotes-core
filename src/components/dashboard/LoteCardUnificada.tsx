@@ -9,6 +9,7 @@ import { useEngagementDelLote } from "@/hooks/useEngagementDelLote";
 import type { LoteUnificado } from "@/hooks/useDashboardUnificado";
 import type { SlaEstado } from "@/lib/sla-helpers";
 import { formatMetros, formatCOPCompact } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 interface Props {
   lote: LoteUnificado;
@@ -219,11 +220,11 @@ export const LoteCardUnificada = ({ lote, onClick, selected, onToggleSelect }: P
               </Link>
             </Button>
           ) : (
-            <Button asChild size="sm" variant="outline" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
+            <PermissionGate permiso="contratar_diagnostico"><Button asChild size="sm" variant="outline" className="h-9 w-full gap-1.5 rounded-xl text-xs font-bold">
               <Link to={`/dashboard/lotes/${lote.id}/editar#engagement`}>
                 <Plus className="h-3.5 w-3.5" /> Crear diagnóstico
               </Link>
-            </Button>
+            </Button></PermissionGate>
           )}
         </div>
       </div>

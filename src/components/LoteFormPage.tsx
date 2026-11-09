@@ -35,6 +35,7 @@ import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog"
 import { useAccesosManualesLote } from "@/hooks/admin/useAccesosManualesLote";
 import { useRevocarAccesoManual } from "@/hooks/admin/useRevocarAccesoManual";
 import { Badge } from "@/components/ui/badge";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 
 const SIN_ASIGNAR = "__SIN_ASIGNAR__";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -88,6 +89,7 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdminOrAsesor, isSuperAdmin, roles } = useAuth();
+  const { permite } = usePermisosAcciones();
   const isAdminRole = roles.includes("admin");
   const isExpertoOnly = roles.includes("experto") && !isAdminRole && !isSuperAdmin;
   const canManageCortesia = isAdminRole || isSuperAdmin;
@@ -939,9 +941,9 @@ const LoteFormPage = ({ isEdit = false }: { isEdit?: boolean }) => {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button type="submit" variant="default" size="lg" disabled={saveMutation.isPending}>
+          {(isEdit || permite("publicar_activo")) && <Button type="submit" variant="default" size="lg" disabled={saveMutation.isPending}>
             {saveMutation.isPending ? "Guardando…" : "Guardar lote"}
-          </Button>
+          </Button>}
           <Button type="button" variant="outline" size="lg" onClick={() => navigate("/dashboard/lotes")}>
             Cancelar
           </Button>

@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -302,9 +303,9 @@ const Mercado = () => {
               <p className="text-muted-foreground mb-6">
                 Publica gratis y descubre su valor real con un diagnóstico jurídico, técnico y comercial.
               </p>
-              <Button asChild size="lg">
+              <PermissionGate permiso="publicar_activo" permitirVisitante><Button asChild size="lg">
                 <Link to={esPropietario ? "/portal" : "/bienvenida?rol=propietario"}>Publicar mi lote →</Link>
-              </Button>
+              </Button></PermissionGate>
             </div>
             {!user && (
             <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-8">

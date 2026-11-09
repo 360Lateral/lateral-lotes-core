@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -183,14 +184,14 @@ export default function GestionarComisionistasDialog({ open, onOpenChange, lote 
                           <FileText className="mr-1 h-4 w-4" /> Documento
                         </Button>
                       )}
-                      <Button
+                      <PermissionGate permiso="gestionar_comisionistas"><Button
                         type="button"
                         variant="destructive"
                         size="sm"
                         onClick={() => setRevocarTarget(a.id)}
                       >
                         Revocar
-                      </Button>
+                      </Button></PermissionGate>
                     </div>
                   </li>
                 ))}
@@ -270,10 +271,10 @@ export default function GestionarComisionistasDialog({ open, onOpenChange, lote 
                 </div>
 
                 <div className="flex justify-end">
-                  <Button type="submit" disabled={crear.isPending}>
+                  <PermissionGate permiso="gestionar_comisionistas"><Button type="submit" disabled={crear.isPending}>
                     {crear.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Autorizar comisionista
-                  </Button>
+                  </Button></PermissionGate>
                 </div>
               </form>
             )}

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCrearEngagement, useEngagementsPorLote } from "@/hooks/useEngagements";
 import { toast } from "sonner";
+import PermissionGate from "@/components/PermissionGate";
 
 import {
   Dialog,
@@ -424,10 +425,10 @@ const CrearEngagementDialog = ({ loteId, open, onOpenChange, onCreated }: Props)
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={formInvalid || crear.isPending}>
+            <PermissionGate permiso="contratar_diagnostico"><Button type="submit" disabled={formInvalid || crear.isPending}>
               {crear.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Crear diagnóstico
-            </Button>
+            </Button></PermissionGate>
           </DialogFooter>
         </form>
       </DialogContent>

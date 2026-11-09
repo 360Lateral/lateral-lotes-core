@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import PortalClienteLayout from "@/components/portal/PortalClienteLayout";
@@ -389,14 +390,14 @@ const AnalisisIncluidosSection = ({
             <p className="text-sm text-muted-foreground">
               ¿Quieres análisis adicionales? Mejora a un plan superior.
             </p>
-            <Button asChild size="sm">
+            <PermissionGate permiso="contratar_diagnostico"><Button asChild size="sm">
               <Link
                 to={loteIdParaCta ? `/planes?lote_id=${loteIdParaCta}` : "/planes"}
               >
                 <Sparkles className="mr-1 h-3.5 w-3.5" />
                 Mejorar plan
               </Link>
-            </Button>
+            </Button></PermissionGate>
           </div>
         )}
       </CardContent>
@@ -537,9 +538,9 @@ const SidebarEngagement = ({
                 </p>
               </div>
             </div>
-            <Button onClick={onContactarAsesor} className="mt-4 w-full">
+            <PermissionGate permiso="escribir_asesor"><Button onClick={onContactarAsesor} className="mt-4 w-full">
               <Mail className="mr-2 h-4 w-4" /> Contactar asesor
-            </Button>
+            </Button></PermissionGate>
           </>
         ) : (
           <p className="text-sm text-muted-foreground">Por asignar</p>
@@ -598,13 +599,13 @@ const SidebarEngagement = ({
             <p className="text-xs text-muted-foreground">
               Con un plan superior accedes a más análisis técnicos para tu lote.
             </p>
-            <Button size="sm" className="w-full" asChild>
+            <PermissionGate permiso="contratar_diagnostico"><Button size="sm" className="w-full" asChild>
               <Link
                 to={loteIdParaCta ? `/planes?lote_id=${loteIdParaCta}` : "/planes"}
               >
                 Ver planes superiores
               </Link>
-            </Button>
+            </Button></PermissionGate>
           </CardContent>
         </Card>
       )}
@@ -826,7 +827,7 @@ const EngagementClienteDetalleInner = () => {
                 Completa el pago de tu plan {plan?.nombre ?? ""} para que iniciemos el análisis.
               </p>
             </div>
-            <Button
+            <PermissionGate permiso="contratar_diagnostico"><Button
               onClick={handleCompletarPago}
               disabled={generarPago.isPending}
               className="shrink-0"
@@ -837,7 +838,7 @@ const EngagementClienteDetalleInner = () => {
                 <CreditCard className="mr-2 h-4 w-4" />
               )}
               Completar pago
-            </Button>
+            </Button></PermissionGate>
           </CardContent>
         </Card>
       )}
@@ -853,14 +854,14 @@ const EngagementClienteDetalleInner = () => {
                 Tu análisis lleva {Math.abs(diasParaSla ?? 0)} día(s) de retraso. Estamos trabajando en finalizarlo.
               </p>
             </div>
-            <Button
+            <PermissionGate permiso="escribir_asesor"><Button
               variant="outline"
               onClick={() => setContactoOpen(true)}
               className="shrink-0"
             >
               <Mail className="mr-2 h-4 w-4" />
               Contactar asesor
-            </Button>
+            </Button></PermissionGate>
           </CardContent>
         </Card>
       )}

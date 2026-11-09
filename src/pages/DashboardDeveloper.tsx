@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -671,9 +672,9 @@ const MisSolicitudesContacto = ({ userId }: { userId?: string }) => {
                   </p>
                   <div className="flex flex-col gap-2 sm:flex-row">
                     {label === "En contacto" && s.negociacion_id && (
-                      <Button size="sm" className="min-h-11 w-full sm:min-h-9 sm:flex-1" asChild>
+                      <PermissionGate permiso="sala_negociacion"><Button size="sm" className="min-h-11 w-full sm:min-h-9 sm:flex-1" asChild>
                         <Link to={`/negociacion/${s.negociacion_id}`}>Ir a la sala</Link>
-                      </Button>
+                      </Button></PermissionGate>
                     )}
                     <Button variant="outline" size="sm" className="min-h-11 w-full sm:min-h-9 sm:flex-1" asChild>
                       <Link to={`/lotes/${s.lote_id}`}>Ver lote</Link>
@@ -732,9 +733,9 @@ const MisNegociaciones = ({ userId }: { userId?: string }) => {
                 <p className="font-body text-xs text-muted-foreground mb-3">
                   {(n.lotes as any)?.ciudad ?? ""} · {new Date(n.created_at).toLocaleDateString("es-CO")}
                 </p>
-                <Button variant="outline" size="sm" className="w-full" asChild>
+                <PermissionGate permiso="sala_negociacion"><Button variant="outline" size="sm" className="w-full" asChild>
                   <Link to={`/negociacion/${n.id}`}>Ir a sala</Link>
-                </Button>
+                </Button></PermissionGate>
               </CardContent>
             </Card>
           ))}

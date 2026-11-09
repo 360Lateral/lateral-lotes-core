@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,9 +64,9 @@ const DashboardOwnerNegociaciones = () => {
                   <p className="font-body text-xs text-muted-foreground mb-3">
                     {(n.lotes as any)?.ciudad ?? ""} · {new Date(n.created_at).toLocaleDateString("es-CO")}
                   </p>
-                  <Button variant="outline" size="sm" className="w-full" asChild>
+                  <PermissionGate permiso="sala_negociacion"><Button variant="outline" size="sm" className="w-full" asChild>
                     <Link to={`/negociacion/${n.id}`}>Ir a sala</Link>
-                  </Button>
+                  </Button></PermissionGate>
                 </CardContent>
               </Card>
             ))}
