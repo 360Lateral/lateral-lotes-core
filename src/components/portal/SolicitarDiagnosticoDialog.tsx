@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMisActivos } from "@/hooks/useMisActivos";
@@ -263,7 +264,7 @@ const SolicitarDiagnosticoDialog = ({
             Cancelar
           </Button>
           {!sinActivos && (
-            <Button
+            <PermissionGate permiso="contratar_diagnostico"><Button
               onClick={handleConfirmar}
               disabled={
                 !loteSeleccionado || !planSeleccionado || solicitar.isPending
@@ -273,7 +274,7 @@ const SolicitarDiagnosticoDialog = ({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               {esGratuito ? "Activar diagnóstico" : "Continuar al pago"}
-            </Button>
+            </Button></PermissionGate>
           )}
         </DialogFooter>
       </DialogContent>

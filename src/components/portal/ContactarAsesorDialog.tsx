@@ -1,3 +1,4 @@
+import PermissionGate from "@/components/PermissionGate";
 import { useState } from "react";
 import {
   Dialog,
@@ -93,10 +94,10 @@ const ContactarAsesorDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={enviar.isPending}>
             Cancelar
           </Button>
-          <Button onClick={handleEnviar} disabled={enviar.isPending || !mensaje.trim()}>
+          <PermissionGate permiso="escribir_asesor"><Button onClick={handleEnviar} disabled={enviar.isPending || !mensaje.trim()}>
             {enviar.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {enviar.isPending ? "Enviando..." : "Enviar mensaje"}
-          </Button>
+          </Button></PermissionGate>
         </DialogFooter>
       </DialogContent>
     </Dialog>

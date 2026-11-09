@@ -1,3 +1,5 @@
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
+import PermissionGate from "@/components/PermissionGate";
 import { useMemo, useState } from "react";
 import { estadoDiagnostico, claseEstadoDiagnostico } from "@/lib/estado-diagnostico";
 import { Link, useNavigate } from "react-router-dom";
@@ -161,7 +163,7 @@ const EngagementCard = ({
         <div className="flex items-start gap-2 bg-blue-50 px-4 py-2.5 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span className="flex-1">Esperando confirmación de pago.</span>
-          <Button
+          <PermissionGate permiso="contratar_diagnostico"><Button
             size="sm"
             variant="default"
             onClick={handleReintentarPago}
@@ -173,7 +175,7 @@ const EngagementCard = ({
               <CreditCard className="h-3.5 w-3.5 mr-1" />
             )}
             Continuar pago
-          </Button>
+          </Button></PermissionGate>
         </div>
       )}
       {isBorrador && (
@@ -307,7 +309,7 @@ const EngagementCard = ({
 
             {e.plan_codigo && e.plan_codigo.toLowerCase() !== "premium" && (
               <div className="border-t pt-2">
-                <Button
+                <PermissionGate permiso="contratar_diagnostico"><Button
                   variant="ghost"
                   size="sm"
                   asChild
@@ -318,7 +320,7 @@ const EngagementCard = ({
                     <Sparkles className="h-3 w-3" />
                     Mejorar plan para más análisis
                   </Link>
-                </Button>
+                </Button></PermissionGate>
               </div>
             )}
           </>
@@ -357,9 +359,9 @@ const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
         <p className="text-sm text-muted-foreground">
           Diagnósticos contratados y solicitudes en curso.
         </p>
-        <Button onClick={onComprar} size="sm" variant="outline">
+        <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar} size="sm" variant="outline">
           <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
-        </Button>
+        </Button></PermissionGate>
       </div>
 
       {isLoading ? (
@@ -378,9 +380,9 @@ const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
                 Compra uno desde "Planes" para empezar a analizar tu lote.
               </p>
             </div>
-            <Button onClick={onComprar}>
+            <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar}>
               <Plus className="mr-1 h-4 w-4" /> Comprar mi primer diagnóstico
-            </Button>
+            </Button></PermissionGate>
           </CardContent>
         </Card>
       ) : (
@@ -648,7 +650,10 @@ const ProximoPasoCard = ({
   onPublicar: () => void;
 }) => {
   const sugerencia = useProximoPasoSugerencia({ onComprar, onPublicar });
+  const { permite } = usePermisosAcciones();
   if (!sugerencia) return null;
+  if ((sugerencia.onClick === onPublicar && !permite("publicar_activo")) ||
+      ((sugerencia.onClick === onComprar || sugerencia.cta === "Completar pago") && !permite("contratar_diagnostico"))) return null;
 
   return (
     <Card className="bg-primary/5 border-primary/20">
@@ -747,14 +752,14 @@ const PortalHomeInner = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setPublicarOpen(true)}>
+          <PermissionGate permiso="publicar_activo"><Button variant="outline" size="sm" onClick={() => setPublicarOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             Publicar activo
-          </Button>
-          <Button size="sm" onClick={irAComprar}>
+          </Button></PermissionGate>
+          <PermissionGate permiso="contratar_diagnostico"><Button size="sm" onClick={irAComprar}>
             <Plus className="mr-1 h-4 w-4" />
             Comprar diagnóstico
-          </Button>
+          </Button></PermissionGate>
         </div>
       </header>
 
@@ -773,7 +778,7 @@ const PortalHomeInner = () => {
                   : `Tienes ${engagementsConPagoPendiente.length} diagnósticos esperando confirmación de pago.`}
               </AlertDescription>
             </div>
-            <Button
+            <PermissionGate permiso="contratar_diagnostico"><Button
               size="sm"
               variant="default"
               onClick={handleReintentarPagoPrimero}
@@ -784,7 +789,7 @@ const PortalHomeInner = () => {
                 <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
               )}
               Continuar pago
-            </Button>
+            </Button></PermissionGate>
           </div>
         </Alert>
       )}
