@@ -12,3 +12,4 @@
 # Database rules
 - `permisos_usuario` uses `has_role` RLS for administrator writes and owner-only reads for other authenticated users; keep table grants aligned with these policies to prevent permission self-escalation.
 - User action permissions use `tiene_permiso` through restrictive RLS and guarded RPCs/triggers, plus payment-function validation; UI gates use the same RPC and never replace server authorization.
+- Admin permission edits use an atomic role-checked RPC; a database trigger stamps the authenticated actor and appends effective changes to an admin-readable audit history to prevent client-forged attribution.

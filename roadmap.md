@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Panel de permisos por usuario exclusivo de administradores, plantilla Solo lectura, confirmación y auditoría de cambios; dos pruebas de plantilla y rechazo de guardado directo no administrador aprobados.
+- [ ] Verificar guardado e historial del panel a 390 px y escritorio con una sesión administradora: requiere que el usuario indique qué cuenta administradora usar; la sesión disponible es desarrollador.
 - [x] Aplicar los seis permisos a servidor, RLS y botones; seis pruebas de rechazo directo aprobadas; controles de compra y bloqueo de sala verificados a 390/1280 px. Las pantallas exclusivas del propietario no se verificaron con la cuenta disponible (desarrollador).
 - [x] Menú móvil del portal: encabezado aislado comprobado a 390 px, enlaces de 44 px y texto de 16 px, resaltado y cierre; escritorio comprobado a 768/1280 px. Verificación integral del portal pendiente: la cuenta disponible es desarrollador y no tiene acceso al portal propietario.
 - [x] Fotos 16:9 lazy y código legible en tarjetas de /mercado; foto real y respaldo de error comprobados a 390 px y escritorio, sin cambiar base de datos.

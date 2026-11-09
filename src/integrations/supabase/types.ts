@@ -1051,6 +1051,36 @@ export type Database = {
           },
         ]
       }
+      audit_permisos_usuario: {
+        Row: {
+          cambiado_en: string
+          cambiado_por: string | null
+          habilitado_anterior: boolean
+          habilitado_nuevo: boolean
+          id: string
+          permiso: string
+          user_id: string
+        }
+        Insert: {
+          cambiado_en?: string
+          cambiado_por?: string | null
+          habilitado_anterior: boolean
+          habilitado_nuevo: boolean
+          id?: string
+          permiso: string
+          user_id: string
+        }
+        Update: {
+          cambiado_en?: string
+          cambiado_por?: string | null
+          habilitado_anterior?: boolean
+          habilitado_nuevo?: boolean
+          id?: string
+          permiso?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       autorizaciones_comisionista: {
         Row: {
           comision_pct: number
@@ -5163,6 +5193,10 @@ export type Database = {
         }[]
       }
       get_user_plan: { Args: { _user_id: string }; Returns: string }
+      guardar_permisos_usuario: {
+        Args: { p_permisos: Json; p_user_id: string }
+        Returns: undefined
+      }
       has_lot_access: {
         Args: { _lote_id: string; _user_id: string }
         Returns: boolean

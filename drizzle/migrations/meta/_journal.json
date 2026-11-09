@@ -50,6 +50,13 @@
       "when": 1794255329833,
       "tag": "0006_complete_action_permission_paths",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794255720166,
+      "tag": "0007_audit_user_permission_changes",
+      "breakpoints": true
     }
   ]
 }

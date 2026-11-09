@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import InvitarClienteDialog from "@/components/usuarios/InvitarClienteDialog";
 import CambiarNivelDialog, { NIVEL_BADGE_CLASS } from "@/components/usuarios/CambiarNivelDialog";
 import HistorialNivelDialog from "@/components/usuarios/HistorialNivelDialog";
+import PermisosUsuarioPanel from "@/components/usuarios/PermisosUsuarioPanel";
 import OtorgarAccesoLoteDialog from "@/components/admin/OtorgarAccesoLoteDialog";
 import { useAccesosManualesUsuario } from "@/hooks/admin/useAccesosManualesUsuario";
 import { useRevocarAccesoManual } from "@/hooks/admin/useRevocarAccesoManual";
@@ -474,7 +475,7 @@ const DashboardUsuarios = () => {
 
         {/* Unified edit dialog: user type + roles + owner associations */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar usuario</DialogTitle>
               <DialogDescription>
@@ -483,6 +484,14 @@ const DashboardUsuarios = () => {
             </DialogHeader>
 
             <div className="space-y-5">
+              {isAdmin && currentEditUser && (
+                <PermisosUsuarioPanel
+                  key={currentEditUser.id}
+                  userId={currentEditUser.id}
+                  nombre={currentEditUser.full_name || currentEditUser.email}
+                  nombres={Object.fromEntries(users.map((u) => [u.id, u.full_name || u.email]))}
+                />
+              )}
               {/* User type */}
               <div className="space-y-2">
                 <Label>Tipo de usuario</Label>
