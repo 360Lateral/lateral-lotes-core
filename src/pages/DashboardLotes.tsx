@@ -46,6 +46,7 @@ import { FotoLote } from "@/components/lotes/FotoLote";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCOPCompact } from "@/lib/format";
 import { formatMetros } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 const VISTA_STORAGE_KEY = "dash_lotes_vista";
 type Vista = "cards" | "tabla";
@@ -522,9 +523,9 @@ const DashboardLotes = () => {
           <Button variant="outline" size="sm" onClick={handleExportar}>
             <Download className="mr-1.5 h-3.5 w-3.5" /> Exportar
           </Button>
-          <Button size="sm" asChild>
+          <PermissionGate permiso="publicar_activo"><Button size="sm" asChild>
             <Link to="/dashboard/lotes/nuevo"><Plus className="mr-1.5 h-3.5 w-3.5" /> Nuevo lote</Link>
-          </Button>
+          </Button></PermissionGate>
         </div>
       </header>
 
@@ -639,7 +640,7 @@ const DashboardLotes = () => {
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleValidarMultiple} disabled={validarLote.isPending}>
               <Check className="mr-1 h-3 w-3" /> Validar
             </Button>
-            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handlePublicarMultiple} disabled={publicarMercado.isPending}>
+            <PermissionGate permiso="publicar_activo"><Button size="sm" variant="outline" className="h-7 text-xs" onClick={handlePublicarMultiple} disabled={publicarMercado.isPending}>
               <Eye className="mr-1 h-3 w-3" /> Publicar
             </Button>
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleDestacarMultiple}>
@@ -684,9 +685,9 @@ const DashboardLotes = () => {
                 Limpiar filtros
               </Button>
             ) : (
-              <Button size="sm" asChild>
+              <PermissionGate permiso="publicar_activo"><Button size="sm" asChild>
                 <Link to="/dashboard/lotes/nuevo"><Plus className="mr-1.5 h-3.5 w-3.5" /> Nuevo lote</Link>
-              </Button>
+              </Button></PermissionGate>
             )
           }
         />
@@ -805,7 +806,7 @@ const DashboardLotes = () => {
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                             <MoreHorizontal className="h-3.5 w-3.5" />
-                          </Button>
+            </Button></PermissionGate>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
@@ -834,13 +835,13 @@ const DashboardLotes = () => {
                               <UserPlus className="mr-2 h-3.5 w-3.5" /> Asignar propietario
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
+                          <PermissionGate permiso="contratar_diagnostico"><DropdownMenuItem onClick={() => setEngagementLoteId(l.id)}>
                             <Briefcase className="mr-2 h-3.5 w-3.5" /> Crear diagnóstico
-                          </DropdownMenuItem>
+                          </DropdownMenuItem></PermissionGate>
                           <DropdownMenuItem onClick={() => setOrdenLoteId(l.id)}>
                             <ClipboardList className="mr-2 h-3.5 w-3.5" /> Crear orden
                           </DropdownMenuItem>
-                          <DropdownMenuItem
+                          <PermissionGate permiso="publicar_activo"><DropdownMenuItem
                             onClick={() => togglePublicoMutation.mutate({ id: l.id, es_publico: !l.es_publico })}
                           >
                             {l.es_publico ? (
@@ -848,15 +849,15 @@ const DashboardLotes = () => {
                             ) : (
                               <><Eye className="mr-2 h-3.5 w-3.5" /> Hacer público</>
                             )}
-                          </DropdownMenuItem>
+                          </DropdownMenuItem></PermissionGate>
                           {l.publicado_venta ? (
                             <DropdownMenuItem onClick={() => setRetirarLote({ id: l.id, name: l.nombre_lote })}>
                               <EyeOff className="mr-2 h-3.5 w-3.5" /> Retirar del mercado
                             </DropdownMenuItem>
                           ) : (
-                            <DropdownMenuItem onClick={() => setPublicarLote({ id: l.id, name: l.nombre_lote })}>
+                            <PermissionGate permiso="publicar_activo"><DropdownMenuItem onClick={() => setPublicarLote({ id: l.id, name: l.nombre_lote })}>
                               <Store className="mr-2 h-3.5 w-3.5" /> Publicar en mercado
-                            </DropdownMenuItem>
+                            </DropdownMenuItem></PermissionGate>
                           )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -951,7 +952,7 @@ const DashboardLotes = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
+            <PermissionGate permiso="publicar_activo"><AlertDialogAction
               onClick={() => {
                 if (!publicarLote) return;
                 publicarMercado.mutate(publicarLote.id, { onSettled: () => setPublicarLote(null) });
@@ -959,7 +960,7 @@ const DashboardLotes = () => {
               disabled={publicarMercado.isPending}
             >
               {publicarMercado.isPending ? "Publicando…" : "Publicar"}
-            </AlertDialogAction>
+            </AlertDialogAction></PermissionGate>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

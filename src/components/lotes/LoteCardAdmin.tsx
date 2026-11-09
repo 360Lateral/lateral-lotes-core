@@ -18,6 +18,7 @@ import FichaConfigDialog from "./FichaConfigDialog";
 import { FotoLote } from "./FotoLote";
 import { cn } from "@/lib/utils";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 export interface LoteCardData {
   id: string;
@@ -178,11 +179,11 @@ const LoteCardAdmin = ({
 
       <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/30 px-4 py-2">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Switch
+          <PermissionGate permiso="publicar_activo"><Switch
             checked={lote.es_publico}
             onCheckedChange={onTogglePublico}
             aria-label="Visibilidad pública"
-          />
+          /></PermissionGate>
           <span>Público</span>
         </div>
         <div className="flex items-center gap-1">
@@ -210,9 +211,9 @@ const LoteCardAdmin = ({
                   Retirar del mercado
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItem onClick={onPublicarMercado}>
+                <PermissionGate permiso="publicar_activo"><DropdownMenuItem onClick={onPublicarMercado}>
                   Publicar en mercado
-                </DropdownMenuItem>
+                </DropdownMenuItem></PermissionGate>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onEliminar} className="text-destructive focus:text-destructive">

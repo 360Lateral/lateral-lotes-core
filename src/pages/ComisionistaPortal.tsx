@@ -26,6 +26,8 @@ import { KPIEstado } from "@/components/ui/KPIEstado";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FotoLote } from "@/components/lotes/FotoLote";
 import { formatCOP, formatCOPCompact, formatFecha } from "@/lib/format";
+import PermissionGate from "@/components/PermissionGate";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 
 const estadoPubBadge = (estado: string, publicado: boolean) => {
   if (estado === "pendiente_validacion")
@@ -242,9 +244,9 @@ export default function ComisionistaPortal() {
             </p>
           </div>
 
-          <Button onClick={() => setOpenDialog(true)}>
+          <PermissionGate permiso="publicar_activo"><PermissionGate permiso="gestionar_comisionistas"><Button onClick={() => setOpenDialog(true)}>
             <Plus className="mr-2 h-4 w-4" /> Cargar lote
-          </Button>
+          </Button></PermissionGate></PermissionGate>
         </header>
 
         {/* 4 KPIs cromáticos */}
