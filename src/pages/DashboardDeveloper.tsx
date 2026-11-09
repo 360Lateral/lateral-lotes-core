@@ -567,6 +567,7 @@ const DashboardDeveloper = () => {
       )}
 
       {/* Mis Negociaciones */}
+      <MisSolicitudesContacto userId={user?.id} />
       <MisNegociaciones userId={user?.id} />
     </DashboardLayout>
   );
@@ -590,6 +591,102 @@ const estadoNegLabel = (e: string) => {
     case "concretada": return "Concretada";
     default: return e;
   }
+};
+
+const estadoSolicitudLabel = (e: string) =>
+  e === "pendiente" ? "Enviada" : e === "contactado" ? "En contacto" : "Revisada";
+
+const MisSolicitudesContacto = ({ userId }: { userId?: string }) => {
+  const { data: solicitudes = [], isLoading } = useQuery({
+    queryKey: ["mis-solicitudes-contacto", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("solicitudes_contacto")
+        .select("id, lote_id, estado, created_at, lotes(nombre_lote)")
+        .eq("desarrollador_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const ids = [...new Set((data ?? []).map((d) => d.lote_id))];
+      const negs: Record<string, string> = {};
+      const codigos: Record<string, string> = {};
+      if (ids.length) {
+        const [{ data: n }, { data: c }] = await Promise.all([
+          supabase
+            .from("negociaciones")
+            .select("id, lote_id, created_at")
+            .eq("developer_id", userId!)
+            .eq("estado", "activa")
+            .in("lote_id", ids)
+            .order("created_at", { ascending: false }),
+          supabase.from("vw_mercado_publico").select("id, codigo_anonimo").in("id", ids),
+        ]);
+        for (const x of n ?? []) if (!negs[x.lote_id]) negs[x.lote_id] = x.id;
+        for (const x of (c ?? []) as any[]) if (x.id && x.codigo_anonimo) codigos[x.id] = x.codigo_anonimo;
+      }
+      return (data ?? []).map((d: any) => ({
+        id: d.id as string,
+        lote_id: d.lote_id as string,
+        estado: d.estado as string,
+        created_at: d.created_at as string,
+        nombre: (d.lotes?.nombre_lote as string) ?? "Lote",
+        codigo: codigos[d.lote_id] ?? null,
+        negociacion_id: negs[d.lote_id] ?? null,
+      }));
+    },
+  });
+
+  return (
+    <>
+      <h2 className="mb-4 mt-8 font-body text-lg font-bold text-foreground">Mis solicitudes de contacto</h2>
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {[1, 2].map((i) => <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />)}
+        </div>
+      ) : solicitudes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border px-4 py-12 text-center">
+          <p className="font-body text-sm text-muted-foreground">Aún no has solicitado contacto por ningún lote</p>
+          <Button asChild className="min-h-11 w-full sm:w-auto">
+            <Link to="/mercado">Explorar el mercado</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {solicitudes.map((s) => {
+            const label = estadoSolicitudLabel(s.estado);
+            return (
+              <Card key={s.id} className="min-w-0">
+                <CardContent className="p-4">
+                  <div className="mb-2 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-body text-sm font-semibold text-foreground break-words">{s.nombre}</p>
+                      {s.codigo && <p className="font-mono text-xs text-muted-foreground">{s.codigo}</p>}
+                    </div>
+                    <Badge variant={label === "En contacto" ? "default" : "secondary"} className="shrink-0 text-xs">
+                      {label}
+                    </Badge>
+                  </div>
+                  <p className="font-body text-xs text-muted-foreground mb-3">
+                    Enviada el {new Date(s.created_at).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    {label === "En contacto" && s.negociacion_id && (
+                      <Button size="sm" className="min-h-11 w-full sm:min-h-9 sm:flex-1" asChild>
+                        <Link to={`/negociacion/${s.negociacion_id}`}>Ir a la sala</Link>
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" className="min-h-11 w-full sm:min-h-9 sm:flex-1" asChild>
+                      <Link to={`/lotes/${s.lote_id}`}>Ver lote</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
 };
 
 const MisNegociaciones = ({ userId }: { userId?: string }) => {
