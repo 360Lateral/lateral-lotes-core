@@ -12,11 +12,12 @@ const FeedbackWidget = () => {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Enviar feedback"
-        className="inline-flex h-12 items-center gap-2 rounded-full bg-secondary px-4 text-sm font-medium text-secondary-foreground shadow-lg transition-all hover:bg-primary hover:text-primary-foreground hover:shadow-xl"
+        aria-label="Feedback"
+        title="Feedback"
+        className="inline-flex h-12 items-center justify-center gap-2 rounded-full md:w-12 md:px-0 bg-secondary px-4 text-sm font-medium text-secondary-foreground shadow-lg transition-all hover:bg-primary hover:text-primary-foreground hover:shadow-xl"
       >
         <MessageCircle className="h-5 w-5" />
-        <span className="hidden sm:inline">Feedback</span>
+        <span className="hidden sm:inline md:sr-only">Feedback</span>
       </button>
       <EnviarFeedbackDialog open={open} onOpenChange={setOpen} />
     </>
