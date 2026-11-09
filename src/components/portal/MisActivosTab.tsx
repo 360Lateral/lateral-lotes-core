@@ -145,7 +145,7 @@ const MisActivosTab = () => {
                         ? "1 negociación activa"
                         : `${negociacionesPorLote[a.id].count} negociaciones activas`}
                     </Badge>
-                    <Button size="sm" className="min-h-10" asChild>
+                    <Button size="sm" className="hidden sm:inline-flex min-h-10" asChild>
                       <Link to={`/negociacion/${negociacionesPorLote[a.id].ultimaId}`}>
                         <MessagesSquare className="mr-1 h-4 w-4" />
                         Ir a la sala
@@ -161,10 +161,19 @@ const MisActivosTab = () => {
                   </p>
                 )}
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {negociacionesPorLote[a.id] && (
+                    <Button size="sm" className="sm:hidden min-h-11 w-full" asChild>
+                      <Link to={`/negociacion/${negociacionesPorLote[a.id].ultimaId}`}>
+                        <MessagesSquare className="mr-1 h-4 w-4" />
+                        Ir a la sala
+                      </Link>
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
+                    className="min-h-11 w-full sm:min-h-0 sm:w-auto"
                     asChild
                   >
                     <Link to={`/lotes/${a.id}`}>Ver detalle</Link>
@@ -172,6 +181,7 @@ const MisActivosTab = () => {
                   <Button
                     variant="default"
                     size="sm"
+                    className="min-h-11 w-full sm:min-h-0 sm:w-auto"
                     onClick={() => setLoteParaDiagnostico(a.id)}
                   >
                     <FileSearch className="mr-1 h-4 w-4" />
@@ -180,7 +190,7 @@ const MisActivosTab = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="col-span-2"
+                    className="min-h-11 w-full sm:min-h-0 sm:w-auto sm:col-span-2"
                     onClick={() =>
                       setLoteParaComisionistas({ id: a.id, nombre: a.nombre_lote })
                     }
