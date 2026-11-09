@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Menú móvil del portal con enlaces actuales, selección resaltada y cierre al navegar o tocar fuera; comprobar a 390 px y desde 768 px.
 - [x] Fotos 16:9 lazy y código legible en tarjetas de /mercado; foto real y respaldo de error comprobados a 390 px y escritorio, sin cambiar base de datos.
 - [x] Menú único y 96 px en /nosotros, /contacto, /unsubscribe y /lotes/:id/ficha; verificado a 390 px sin desbordes, con páginas privadas y escritorio intactos. /nosotros y /contacto conservan su contenido actual de página no encontrada.
 - [x] Extender el menú único y los 96 px en páginas públicas también con sesión; Feedback e Inicio comprobados a 390 px sin desbordes, escritorio y dashboard intactos.

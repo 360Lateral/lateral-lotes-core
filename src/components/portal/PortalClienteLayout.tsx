@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/ui/Logo";
-import { BarChart3, Briefcase, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
+import { BarChart3, Briefcase, ChevronDown, LogOut, Menu, Store, User as UserIcon } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -20,9 +21,15 @@ const obtenerIniciales = (email?: string | null) => {
   return email.charAt(0).toUpperCase();
 };
 
+const enlacesPortal = [
+  { to: "/portal/portafolio", label: "Portafolio", icon: BarChart3, end: false },
+  { to: "/portal", label: "Mis diagnósticos", icon: Briefcase, end: true },
+];
+
 const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   const nombre =
     (user?.user_metadata?.full_name as string) ||
@@ -42,8 +49,11 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
           <div className="flex items-center gap-4 min-w-0">
             <Logo />
             <nav className="hidden md:flex items-center gap-1">
-              <NavLink
-                to="/portal/portafolio"
+              {enlacesPortal.map(({ to, label, icon: Icon, end }) => (
+                <NavLink
+                key={to}
+                to={to}
+                end={end}
                 className={({ isActive }) =>
                   cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
@@ -53,26 +63,50 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
                   )
                 }
               >
-                <BarChart3 className="h-4 w-4" />
-                Portafolio
+                <Icon className="h-4 w-4" />
+                {label}
               </NavLink>
-              <NavLink
-                to="/portal"
-                end
-                className={({ isActive }) =>
-                  cn(
-                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
-                  )
-                }
-              >
-                <Briefcase className="h-4 w-4" />
-                Mis diagnósticos
-              </NavLink>
+              ))}
             </nav>
           </div>
+          <div className="flex items-center gap-1 md:contents">
+          <Sheet open={menuAbierto} onOpenChange={setMenuAbierto}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 md:hidden" aria-label="Abrir menú del portal">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" aria-describedby={undefined} className="w-[min(320px,85vw)] overflow-y-auto md:hidden [&>button]:h-11 [&>button]:w-11 [&>button]:flex [&>button]:items-center [&>button]:justify-center">
+              <SheetHeader className="mb-6 pr-10 text-left">
+                <SheetTitle>Mi portal</SheetTitle>
+              </SheetHeader>
+              <nav aria-label="Navegación del portal" className="flex flex-col gap-2">
+                {[...enlacesPortal, { to: "/mercado", label: "Mercado", icon: Store, end: false }].map(({ to, label, icon: Icon, end }) => (
+                  <Button key={to} variant="ghost" asChild className="h-auto min-h-11 justify-start whitespace-normal px-3 py-2 text-base">
+                    <NavLink
+                      to={to}
+                      end={end}
+                      onClick={() => setMenuAbierto(false)}
+                      className={({ isActive }) => cn(isActive ? "bg-primary/10 text-primary" : "text-muted-foreground")}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {label}
+                    </NavLink>
+                  </Button>
+                ))}
+                <div className="my-2 border-t border-border" />
+                <Button variant="ghost" disabled className="min-h-11 justify-start text-base">
+                  <UserIcon className="h-5 w-5" /> Mi perfil
+                </Button>
+                <Button variant="ghost" className="min-h-11 justify-start text-base" onClick={() => {
+                  setMenuAbierto(false);
+                  void handleSignOut();
+                }}>
+                  <LogOut className="h-5 w-5" /> Cerrar sesión
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2 h-10">
@@ -99,6 +133,7 @@ const PortalClienteLayout = ({ children }: { children: ReactNode }) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 
