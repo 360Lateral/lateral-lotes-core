@@ -42,6 +42,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { BarrioCombobox } from "@/components/wizard/BarrioCombobox";
 import LoteScoreResult from "@/components/LoteScoreResult";
 import { formatCOP } from "@/lib/format-moneda";
+import PermissionGate from "@/components/PermissionGate";
 
 
 const STEPS = [
@@ -992,10 +993,10 @@ const LoteWizard = () => {
                       <div className="flex items-center gap-2">
                         {adjuntos.length ? <CheckCircle2 className="h-4 w-4 text-success" /> : <FileText className="h-4 w-4 text-muted-foreground" />}
                         <span className="flex-1 font-body text-sm font-medium text-foreground">{cat}</span>
-                        <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 font-body text-xs font-medium transition-colors hover:border-primary hover:text-primary">
+                        <PermissionGate permiso="subir_documentos"><label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 font-body text-xs font-medium transition-colors hover:border-primary hover:text-primary">
                           <Upload className="h-3 w-3" /> Adjuntar
                           <input type="file" className="hidden" onChange={(e) => handleDocAdd(e, cat)} />
-                        </label>
+                        </label></PermissionGate>
                       </div>
                       {adjuntos.map(({ d, i }) => (
                         <div key={i} className="mt-2 flex items-center gap-2 rounded-md bg-card px-2 py-1.5">
@@ -1029,7 +1030,7 @@ const LoteWizard = () => {
               Continuar a {STEPS[step].label} <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           ) : (
-            <Button type="button" onClick={handlePublish} disabled={publishMutation.isPending} className="font-semibold">
+            <PermissionGate permiso="publicar_activo"><Button type="button" onClick={handlePublish} disabled={publishMutation.isPending} className="font-semibold">
               {publishMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
@@ -1040,7 +1041,7 @@ const LoteWizard = () => {
                   <Send className="mr-1.5 h-4 w-4" /> Enviar activo a validación
                 </>
               )}
-            </Button>
+            </Button></PermissionGate>
           )}
         </div>
       </div>

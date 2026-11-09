@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CerrarVentaDialog from "@/components/negociaciones/CerrarVentaDialog";
 import { formatCOP, formatMetros } from "@/lib/format-moneda";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 
 const estadoBadgeClass = (e: string) => {
   switch (e) {
@@ -46,6 +47,8 @@ const estadoLabel = (e: string) => {
 const SalaNegociacion = () => {
   const { id } = useParams<{ id: string }>();
   const { user, isAdminOrAsesor } = useAuth();
+  const { permite, loading: permisosLoading } = usePermisosAcciones();
+  const salaPermitida = permite("sala_negociacion");
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -58,7 +61,7 @@ const SalaNegociacion = () => {
   // Fetch negociacion with lote and precio
   const { data: negociacion, isLoading } = useQuery({
     queryKey: ["negociacion", id],
-    enabled: !!id,
+    enabled: !!id && salaPermitida,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("negociaciones")
@@ -88,7 +91,7 @@ const SalaNegociacion = () => {
   // Fetch mensajes
   const { data: mensajes = [] } = useQuery({
     queryKey: ["mensajes", id],
-    enabled: !!id,
+    enabled: !!id && salaPermitida,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("mensajes")
@@ -114,7 +117,7 @@ const SalaNegociacion = () => {
 
   // Realtime subscription
   useEffect(() => {
-    if (!id) return;
+    if (!id || !salaPermitida) return;
     const channel = supabase
       .channel(`mensajes-${id}`)
       .on(
@@ -126,7 +129,7 @@ const SalaNegociacion = () => {
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [id, queryClient]);
+  }, [id, queryClient, salaPermitida]);
 
   // Auto-scroll
   useEffect(() => {
@@ -190,7 +193,7 @@ const SalaNegociacion = () => {
     },
   });
 
-  if (isLoading) {
+  if (permisosLoading || (salaPermitida && isLoading)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted">
         <p className="font-body text-muted-foreground">Cargando sala...</p>
@@ -198,7 +201,7 @@ const SalaNegociacion = () => {
     );
   }
 
-  if (!negociacion) {
+  if (!salaPermitida || !negociacion) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted">
         <p className="font-body text-muted-foreground">Negociación no encontrada.</p>

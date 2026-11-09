@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 
 type Notif = {
   id: string;
@@ -21,6 +22,7 @@ const fmt = (iso: string) =>
 
 const CampanaNotificacionesPortal = () => {
   const { user } = useAuth();
+  const { permite } = usePermisosAcciones();
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [abierto, setAbierto] = useState(false);
@@ -83,7 +85,7 @@ const CampanaNotificacionesPortal = () => {
 
   const pulsar = (n: Notif) => {
     if (!n.leida) marcar.mutate(n.id);
-    if (n.tipo === "negociacion" && n.negociacion_id) {
+    if (n.tipo === "negociacion" && n.negociacion_id && permite("sala_negociacion")) {
       setAbierto(false);
       navigate(`/negociacion/${n.negociacion_id}`);
     }

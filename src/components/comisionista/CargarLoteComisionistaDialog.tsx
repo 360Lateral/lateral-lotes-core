@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import PermissionGate from "@/components/PermissionGate";
 
 const BUCKET = "documentos-comisionistas";
 
@@ -268,10 +269,10 @@ export default function CargarLoteComisionistaDialog({ open, onOpenChange }: Pro
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={submitting}>
+            <PermissionGate permiso="publicar_activo"><PermissionGate permiso="gestionar_comisionistas"><Button type="submit" disabled={submitting}>
               {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Cargar lote
-            </Button>
+            </Button></PermissionGate></PermissionGate>
           </DialogFooter>
         </form>
       </DialogContent>

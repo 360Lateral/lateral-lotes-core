@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Plus, FileSearch, MapPin, Loader2, Handshake, Upload, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
+import PermissionGate from "@/components/PermissionGate";
 
 const DashboardOwner = () => {
   const { user, userType } = useAuth();
@@ -196,7 +197,7 @@ const DashboardOwner = () => {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {/* Action card: Publicar lote */}
-            <Card
+            <PermissionGate permiso="publicar_activo"><Card
               className={`cursor-pointer border-dashed border-primary/30 hover:shadow-md transition-shadow ${!canPublish ? "opacity-50 pointer-events-none" : ""}`}
               onClick={() => canPublish && navigate("/dashboard/lotes/nuevo")}
             >
@@ -204,7 +205,7 @@ const DashboardOwner = () => {
                 <Plus className="mx-auto mb-2 h-5 w-5 text-primary" />
                 <p className="text-sm font-semibold text-primary">Publicar lote</p>
               </CardContent>
-            </Card>
+            </Card></PermissionGate>
             <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/dashboard/owner/lotes")}>
               <CardContent className="pt-6 text-center">
                 <MapPin className="mx-auto mb-2 h-5 w-5 text-primary" />
