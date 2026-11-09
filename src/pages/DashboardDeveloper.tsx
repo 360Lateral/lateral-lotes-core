@@ -619,7 +619,7 @@ const MisSolicitudesContacto = ({ userId }: { userId?: string }) => {
             .eq("estado", "activa")
             .in("lote_id", ids)
             .order("created_at", { ascending: false }),
-          supabase.from("vw_mercado_publico").select("id, codigo_anonimo").in("id", ids),
+          (supabase.from("vw_mercado_publico" as any) as any).select("id, codigo_anonimo").in("id", ids),
         ]);
         for (const x of n ?? []) if (!negs[x.lote_id]) negs[x.lote_id] = x.id;
         for (const x of (c ?? []) as any[]) if (x.id && x.codigo_anonimo) codigos[x.id] = x.codigo_anonimo;
