@@ -8,3 +8,6 @@
 - Reuse `FloatingActionStack` for compact mobile actions on `/mercado`, `/lotes/:id` (including `/ficha`), and public pages in `PUBLIC_MOBILE_ACTION_PATHS`, regardless of session; the shared Footer and public fallback use that same route list for bottom clearance, while footerless public pages reserve clearance in their wrapper. Preserve desktop, print output, dashboards, and private/account user screens to avoid unrelated UI changes.
 - Keep mobile lot-detail zoom controls in `MapaHeroLote` and reuse the centralized map loader; this allows accessible touch targets without changing desktop map controls.
 - Diagnosis status labels on lot cards (admin and portal) come from `estadoDiagnostico` in `src/lib/estado-diagnostico.ts`; the portal diagnosis view admits admin/experto read-only via `PortalProtectedRoute permitirEquipo` and the RPC staff check, so staff can open what the client sees.
+
+# Database rules
+- `permisos_usuario` uses `has_role` RLS for administrator writes and owner-only reads for other authenticated users; keep table grants aligned with these policies to prevent permission self-escalation.
