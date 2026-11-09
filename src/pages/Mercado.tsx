@@ -26,6 +26,7 @@ import {
 import { useStatsMercado } from "@/hooks/useStatsMercado";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { normalizarFiltrosMercado } from "@/lib/mercado-filtros";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ORDEN_KEY = "mercado_orden";
 const PAGE_SIZE = 12;
@@ -61,6 +62,8 @@ const StatInline = ({ value, label }: { value: number | string; label: string })
 );
 
 const Mercado = () => {
+  const { user, userType, loading: authLoading } = useAuth();
+  const esPropietario = !!user && userType === "propietario";
   const [filtrosGuardados, setFiltros] = usePersistedState<FiltrosType>("mercado_filtros", {});
   const filtros = useMemo(() => normalizarFiltrosMercado(filtrosGuardados), [filtrosGuardados]);
   useEffect(() => {
@@ -229,9 +232,11 @@ const Mercado = () => {
                     <Button asChild>
                       <Link to="/planes">Ver planes</Link>
                     </Button>
-                    <Button asChild variant="outline">
-                      <Link to="/bienvenida?rol=desarrollador">Crear cuenta</Link>
-                    </Button>
+                    {!user && (
+                      <Button asChild variant="outline">
+                        <Link to="/bienvenida?rol=desarrollador">Crear cuenta</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
@@ -288,6 +293,7 @@ const Mercado = () => {
           </div>
 
           {/* CTA dual */}
+          {!authLoading && (!user || esPropietario) && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-8">
               <h2 className="font-heading text-xl font-bold text-secondary mb-2">
@@ -297,9 +303,10 @@ const Mercado = () => {
                 Publica gratis y descubre su valor real con un diagnóstico jurídico, técnico y comercial.
               </p>
               <Button asChild size="lg">
-                <Link to="/bienvenida?rol=propietario">Publicar mi lote →</Link>
+                <Link to={esPropietario ? "/portal" : "/bienvenida?rol=propietario"}>Publicar mi lote →</Link>
               </Button>
             </div>
+            {!user && (
             <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-8">
               <h2 className="font-heading text-xl font-bold text-secondary mb-2">
                 ¿Eres desarrollador?
@@ -311,7 +318,24 @@ const Mercado = () => {
                 <Link to="/bienvenida?rol=desarrollador">Crear cuenta →</Link>
               </Button>
             </div>
+            )}
           </div>
+          )}
+          {!authLoading && user && userType === "desarrollador" && (
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-8">
+              <h2 className="font-heading text-xl font-bold text-secondary mb-2">
+                Tu panel de inversión
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Revisa tus criterios, lotes guardados y negociaciones.
+              </p>
+              <Button asChild size="lg" variant="secondary">
+                <Link to="/dashboard/developer">Ir a mi panel</Link>
+              </Button>
+            </div>
+          </div>
+          )}
         </div>
       </main>
       <Footer />
