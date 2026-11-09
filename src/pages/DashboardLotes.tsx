@@ -642,7 +642,7 @@ const DashboardLotes = () => {
             </Button>
             <PermissionGate permiso="publicar_activo"><Button size="sm" variant="outline" className="h-7 text-xs" onClick={handlePublicarMultiple} disabled={publicarMercado.isPending}>
               <Eye className="mr-1 h-3 w-3" /> Publicar
-            </Button>
+            </Button></PermissionGate>
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleDestacarMultiple}>
               <Star className="mr-1 h-3 w-3" /> Destacar
             </Button>
@@ -806,7 +806,7 @@ const DashboardLotes = () => {
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                             <MoreHorizontal className="h-3.5 w-3.5" />
-            </Button></PermissionGate>
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>

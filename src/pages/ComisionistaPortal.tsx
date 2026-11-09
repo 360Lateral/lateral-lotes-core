@@ -161,6 +161,7 @@ const CardLoteRepresentado = ({ autorizacion }: CardLoteProps) => {
 
 export default function ComisionistaPortal() {
   const { user, loading, isComisionista, isAdminOrExperto } = useAuth();
+  const { permite } = usePermisosAcciones();
   const [openDialog, setOpenDialog] = useState(false);
 
   const { data: autorizaciones = [], isLoading: loadingAut } = useMisAutorizaciones();
@@ -311,7 +312,7 @@ export default function ComisionistaPortal() {
                 icon={Briefcase}
                 titulo="Aún no representas ningún lote"
                 descripcion="Carga el primer lote de un propietario para comenzar a recibir comisiones por su venta."
-                ctaLabel="Cargar primer lote"
+                ctaLabel={permite("publicar_activo") && permite("gestionar_comisionistas") ? "Cargar primer lote" : undefined}
                 onCtaClick={() => setOpenDialog(true)}
                 ctaVariant="hero"
               />
