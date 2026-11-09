@@ -36,6 +36,13 @@
       "when": 1794254815471,
       "tag": "0004_permisos_usuario_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794255134172,
+      "tag": "0005_enforce_action_permissions",
+      "breakpoints": true
     }
   ]
 }

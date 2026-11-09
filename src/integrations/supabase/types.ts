@@ -5129,6 +5129,7 @@ export type Database = {
         Returns: boolean
       }
       es_lote_ejemplo: { Args: { _lote_id: string }; Returns: boolean }
+      exigir_permiso_accion: { Args: { p_permiso: string }; Returns: undefined }
       expirar_suscripciones_y_accesos: { Args: never; Returns: undefined }
       factor_avance_por_estado: {
         Args: { p_estado: Database["public"]["Enums"]["estado_analisis"] }
