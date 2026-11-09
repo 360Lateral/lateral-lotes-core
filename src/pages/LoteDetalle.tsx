@@ -107,7 +107,7 @@ const LoteDetalle = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-24 md:pb-0">
+      <div className="min-h-screen bg-background pb-24">
         <Navbar />
         <div className="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-[1fr_320px] gap-6">
           <div className="space-y-4">
@@ -123,7 +123,7 @@ const LoteDetalle = () => {
 
   if (error || !data || data.error) {
     return (
-      <div className="min-h-screen bg-background pb-24 md:pb-0">
+      <div className="min-h-screen bg-background pb-24">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-semibold mb-3">Este lote no está disponible</h1>
@@ -144,7 +144,7 @@ const LoteDetalle = () => {
 
   if (data.bloqueado) {
     return (
-      <div className="min-h-screen bg-background pb-24 md:pb-0">
+      <div className="min-h-screen bg-background pb-24">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <div className="mx-auto mb-5 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -197,7 +197,7 @@ const LoteDetalle = () => {
   const scoresBloqueados = !verBasico;
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
+    <div className="min-h-screen bg-background pb-24">
       <Navbar />
 
       {id && <NdaModal open={ndaOpen} onOpenChange={setNdaOpen} loteId={id} />}

@@ -12,7 +12,7 @@ const Footer = () => {
   const needsMobileActionSpace = PUBLIC_MOBILE_ACTION_PATHS.includes(pathname);
 
   return (
-    <footer className={`bg-secondary text-secondary-foreground${needsMobileActionSpace ? " pb-24 md:pb-0" : ""}`}>
+    <footer className={`bg-secondary text-secondary-foreground${needsMobileActionSpace ? " pb-24" : ""}`}>
       <div className="mx-auto w-full max-w-6xl px-4 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Columna marca */}
