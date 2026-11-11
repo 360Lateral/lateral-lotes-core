@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.representa_cliente(uuid, uuid) TO anon;

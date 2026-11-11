@@ -5507,6 +5507,10 @@ export type Database = {
         Args: { p_transaccion_id: string }
         Returns: Json
       }
+      representa_cliente: {
+        Args: { _cliente_id: string; _user_id: string }
+        Returns: boolean
+      }
       resumen_cuenta_desarrollador: {
         Args: { p_user_id: string }
         Returns: Json
