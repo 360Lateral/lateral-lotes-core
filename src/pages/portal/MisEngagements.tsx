@@ -355,14 +355,14 @@ const ServiciosList = ({ onComprar, modoConsulta = false }: { onComprar: () => v
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      {!modoConsulta && <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {modoConsulta ? "" : "Diagnósticos contratados y solicitudes en curso."}
+          Diagnósticos contratados y solicitudes en curso.
         </p>
         <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar} size="sm" variant="outline">
           <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
         </Button></PermissionGate>
-      </div>
+      </div>}
 
       {isLoading ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -838,8 +838,8 @@ const PortalHomeInner = () => {
       {/* 2 columnas: tabs + sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
         <div className="min-w-0">
-          <Tabs defaultValue={initialTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-xl">
+          <Tabs key={modoConsulta ? "consulta" : "normal"} defaultValue={modoConsulta ? "servicios" : initialTab} className="w-full">
+            <TabsList className={`grid w-full max-w-xl ${modoConsulta ? "grid-cols-1" : "grid-cols-2"}`}>
               <TabsTrigger value="servicios" className="gap-2">
                 <span className="truncate">{modoConsulta ? "Diagnósticos" : "Servicios contratados"}</span>
                 {serviciosCount > 0 && (
@@ -848,22 +848,22 @@ const PortalHomeInner = () => {
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="activos" className="gap-2">
+              {!modoConsulta && <TabsTrigger value="activos" className="gap-2">
                 <span className="truncate">Activos en venta</span>
                 {activosPublicadosCount > 0 && (
                   <Badge variant="secondary" className="h-5 px-1.5">
                     {activosPublicadosCount}
                   </Badge>
                 )}
-              </TabsTrigger>
+              </TabsTrigger>}
             </TabsList>
 
             <TabsContent value="servicios" className="mt-6">
               <ServiciosList onComprar={irAComprar} modoConsulta={modoConsulta} />
             </TabsContent>
-            <TabsContent value="activos" className="mt-6">
+            {!modoConsulta && <TabsContent value="activos" className="mt-6">
               <MisActivosTab />
-            </TabsContent>
+            </TabsContent>}
           </Tabs>
         </div>
 
