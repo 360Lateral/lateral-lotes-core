@@ -119,7 +119,12 @@ const EntregableItem = ({ entregable: e }: Props) => {
       toast.error("El archivo supera el máximo de 25MB");
       return;
     }
-    nuevaVersion.mutate({ entregableAnteriorId: e.id, archivo: file });
+    nuevaVersion.mutate({
+      entregableAnteriorId: e.id,
+      archivo: file,
+      // Un maestro publicado se reemplaza por la nueva versión ya publicada.
+      publicar: isPublicado && e.tipo === "diagnostico_inmobiliario",
+    });
   };
 
   const handleGuardarNotas = () => {
@@ -200,7 +205,7 @@ const EntregableItem = ({ entregable: e }: Props) => {
                   )}
                 </DropdownMenuItem>
               )}
-              {e.storage_path && !isArchivado && (
+              {!isArchivado && (e.storage_path || (isPublicado && e.tipo === "diagnostico_inmobiliario")) && (
                 <DropdownMenuItem onClick={() => fileRef.current?.click()}>
                   <History className="mr-2" size={14} /> Subir nueva versión
                 </DropdownMenuItem>
