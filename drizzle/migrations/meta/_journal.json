@@ -64,6 +64,13 @@
       "when": 1794424219978,
       "tag": "0008_fix_portafolio_estado_engagement",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794424348011,
+      "tag": "0009_represented_owner_diagnoses_read",
+      "breakpoints": true
     }
   ]
 }
