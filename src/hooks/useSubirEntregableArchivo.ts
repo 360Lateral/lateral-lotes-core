@@ -15,14 +15,14 @@ interface SubirArgs {
 const BUCKET = "entregables-clientes";
 const MSG_SESION = "Tu sesión expiró, vuelve a iniciar sesión";
 
-class SesionExpiradaError extends Error {
+export class SesionExpiradaError extends Error {
   constructor() {
     super(MSG_SESION);
   }
 }
 
 /** Devuelve el id del usuario con una sesión vigente (renovándola si hace falta) o null. */
-const asegurarSesion = async (): Promise<string | null> => {
+export const asegurarSesion = async (): Promise<string | null> => {
   const { data } = await supabase.auth.getSession();
   const session = data.session;
   const expiraPronto = !session?.expires_at || session.expires_at * 1000 - Date.now() < 60_000;
