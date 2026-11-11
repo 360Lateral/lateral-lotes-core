@@ -117,7 +117,7 @@ export default function InvitarClienteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-sm:top-4 max-sm:translate-y-0 max-sm:max-h-[calc(100dvh-2rem)] max-sm:overflow-y-auto">
+      <DialogContent className="sm:max-w-md max-sm:top-24 max-sm:translate-y-0 max-sm:max-h-[calc(100dvh-7rem)] max-sm:overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Agregar cliente</DialogTitle>
           <DialogDescription>
