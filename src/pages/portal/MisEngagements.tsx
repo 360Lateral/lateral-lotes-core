@@ -342,7 +342,7 @@ const EngagementCard = ({
   );
 };
 
-const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
+const ServiciosList = ({ onComprar, modoConsulta = false }: { onComprar: () => void; modoConsulta?: boolean }) => {
   const navigate = useNavigate();
   const { data, isLoading } = useMisEngagementsCliente();
   const { data: resumenes } = useResumenEngagementsCliente();
@@ -357,7 +357,7 @@ const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Diagnósticos contratados y solicitudes en curso.
+          {modoConsulta ? "Aquí verás el avance y los entregables de tus activos." : "Diagnósticos contratados y solicitudes en curso."}
         </p>
         <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar} size="sm" variant="outline">
           <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
@@ -375,9 +375,9 @@ const ServiciosList = ({ onComprar }: { onComprar: () => void }) => {
           <CardContent className="py-16 flex flex-col items-center text-center gap-4">
             <Folder className="h-16 w-16 text-muted-foreground/40" />
             <div className="space-y-1 max-w-md">
-              <h3 className="text-lg font-semibold">Aún no tienes diagnósticos contratados.</h3>
+              <h3 className="text-lg font-semibold">{modoConsulta ? "Portafolio de diagnósticos" : "Aún no tienes diagnósticos contratados."}</h3>
               <p className="text-sm text-muted-foreground">
-                Compra uno desde "Planes" para empezar a analizar tu lote.
+                {modoConsulta ? "Aquí verás el avance y los entregables de tus activos." : 'Compra uno desde "Planes" para empezar a analizar tu lote.'}
               </p>
             </div>
             <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar}>
@@ -684,6 +684,8 @@ const PortalHomeInner = () => {
   const { data: resumen } = useResumenPortafolio();
   const [publicarOpen, setPublicarOpen] = useState(false);
   const generarPago = useGenerarPagoWompi();
+  const { permite, loading: permisosLoading } = usePermisosAcciones();
+  const modoConsulta = !permisosLoading && !permite("contratar_diagnostico") && !permite("publicar_activo");
 
   const irAComprar = () => navigate("/planes");
 
@@ -737,8 +739,11 @@ const PortalHomeInner = () => {
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            Hola, {nombre}.
+            {modoConsulta ? "Portafolio de diagnósticos" : `Hola, ${nombre}.`}
           </h1>
+          {modoConsulta ? (
+            <p className="text-sm text-muted-foreground">Aquí verás el avance y los entregables de tus activos</p>
+          ) : (
           <p className="text-sm text-muted-foreground">
             Tienes{" "}
             <span className="font-medium text-foreground">
@@ -750,6 +755,7 @@ const PortalHomeInner = () => {
             </span>{" "}
             en el mercado.
           </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <PermissionGate permiso="publicar_activo"><Button variant="outline" size="sm" onClick={() => setPublicarOpen(true)}>
@@ -795,6 +801,7 @@ const PortalHomeInner = () => {
       )}
 
       {/* Overview 2x2 / 4 cols */}
+      {!modoConsulta && (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricaOverview
           label="Servicios activos"
@@ -826,6 +833,7 @@ const PortalHomeInner = () => {
           sublabel="Última semana"
         />
       </div>
+      )}
 
       {/* 2 columnas: tabs + sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
@@ -833,7 +841,7 @@ const PortalHomeInner = () => {
           <Tabs defaultValue={initialTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 max-w-xl">
               <TabsTrigger value="servicios" className="gap-2">
-                <span className="truncate">Servicios contratados</span>
+                <span className="truncate">{modoConsulta ? "Diagnósticos" : "Servicios contratados"}</span>
                 {serviciosCount > 0 && (
                   <Badge variant="secondary" className="h-5 px-1.5">
                     {serviciosCount}
@@ -851,7 +859,7 @@ const PortalHomeInner = () => {
             </TabsList>
 
             <TabsContent value="servicios" className="mt-6">
-              <ServiciosList onComprar={irAComprar} />
+              <ServiciosList onComprar={irAComprar} modoConsulta={modoConsulta} />
             </TabsContent>
             <TabsContent value="activos" className="mt-6">
               <MisActivosTab />
