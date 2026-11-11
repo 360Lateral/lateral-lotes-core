@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { asegurarSesion, SesionExpiradaError } from "./useSubirEntregableArchivo";
 
 interface Args {
   entregableAnteriorId: string;
@@ -13,9 +14,12 @@ export const useNuevaVersionEntregable = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ entregableAnteriorId, archivo }: Args) => {
+      // Antes de subir: si la sesión caducó no se sube nada.
+      if (!(await asegurarSesion())) throw new SesionExpiradaError();
+
       const { data: anterior, error: errLoad } = await supabase
         .from("entregables_engagement" as any)
-        .select("engagement_id, tipo, nombre, version, notas")
+        .select("engagement_id, tipo, nombre, version, notas, tipo_analisis_id")
         .eq("id", entregableAnteriorId)
         .single();
       if (errLoad) throw errLoad;
@@ -27,7 +31,12 @@ export const useNuevaVersionEntregable = () => {
         .upload(path, archivo, { contentType: archivo.type });
       if (upErr) throw upErr;
 
-      const { data: userData } = await supabase.auth.getUser();
+      // Después de subir y antes de guardar: comprueba y renueva la sesión.
+      const userId = await asegurarSesion();
+      if (!userId) {
+        await supabase.storage.from(BUCKET).remove([path]).catch(() => {});
+        throw new SesionExpiradaError();
+      }
       const nuevaVersion = (ant.version ?? 1) + 1;
 
       const { error: insErr } = await supabase
@@ -42,10 +51,14 @@ export const useNuevaVersionEntregable = () => {
           estado: "borrador",
           version: nuevaVersion,
           notas: ant.notas,
-          subido_por: userData.user?.id ?? null,
+          subido_por: userId,
+          tipo_analisis_id: ant.tipo_analisis_id ?? null,
         });
       if (insErr) {
         await supabase.storage.from(BUCKET).remove([path]).catch(() => {});
+        if ((insErr as any).code === "42501" || /row-level security|JWT/i.test(insErr.message ?? "")) {
+          throw new SesionExpiradaError();
+        }
         throw insErr;
       }
 
