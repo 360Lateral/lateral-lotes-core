@@ -99,7 +99,7 @@ const PortafolioPropietario = () => {
             <BloqueMapaPortafolio lotes={data.lotes} />
             <BloqueTablaLotes lotes={data.lotes} />
             <BloqueSaludAreas areas={data.salud_areas} />
-            {data.alertas.length > 0 && <BloqueAlertas alertas={data.alertas} />}
+            {data.alertas.filter(Boolean).length > 0 && <BloqueAlertas alertas={data.alertas.filter(Boolean)} />}
             <BloqueAcciones
               exportandoPdf={exportandoPdf}
               onExportarPdf={() => generarPdfPortafolio(data, setExportandoPdf)}
