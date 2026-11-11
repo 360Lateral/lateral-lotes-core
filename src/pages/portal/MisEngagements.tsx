@@ -357,7 +357,7 @@ const ServiciosList = ({ onComprar, modoConsulta = false }: { onComprar: () => v
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {modoConsulta ? "Aquí verás el avance y los entregables de tus activos." : "Diagnósticos contratados y solicitudes en curso."}
+          {modoConsulta ? "" : "Diagnósticos contratados y solicitudes en curso."}
         </p>
         <PermissionGate permiso="contratar_diagnostico"><Button onClick={onComprar} size="sm" variant="outline">
           <Plus className="mr-1 h-4 w-4" /> Comprar diagnóstico
