@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useNuevaVersionEntregable } from "@/hooks/useNuevaVersionEntregable";
-import { useFirmarUrlEntregable } from "@/hooks/useFirmarUrlEntregable";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,6 @@ const TarjetaMaestro = ({
   const actualizar = useActualizarEntregable();
   const nuevaVersion = useNuevaVersionEntregable();
   const fileRef = useRef<HTMLInputElement>(null);
-  const { firmar } = useFirmarUrlEntregable();
   const [abriendo, setAbriendo] = useState(false);
 
   // Nombre legible del archivo: quita la carpeta y el prefijo de fecha.
@@ -62,13 +61,26 @@ const TarjetaMaestro = ({
     : null;
 
   const abrirArchivo = async () => {
-    if (!entregable) return;
+    if (!entregable?.storage_path) return;
+    // Abre la pestaña de inmediato para que el navegador no la bloquee.
+    const pestana = window.open("", "_blank");
     try {
       setAbriendo(true);
-      const url = await firmar(entregable.id);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (err: any) {
-      toast.error(err?.message ?? "No se pudo abrir el archivo");
+      // Enlace firmado de 10 minutos. El almacenamiento solo lo permite al
+      // equipo interno (los clientes solo acceden a entregables publicados).
+      const { data, error } = await supabase.storage
+        .from("entregables-clientes")
+        .createSignedUrl(entregable.storage_path, 600);
+      if (error || !data?.signedUrl) throw error ?? new Error("sin enlace");
+      if (pestana) {
+        pestana.opener = null;
+        pestana.location.href = data.signedUrl;
+      } else {
+        window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      }
+    } catch {
+      pestana?.close();
+      toast.error("No se pudo abrir el archivo. Verifica tu sesión e inténtalo de nuevo.");
     } finally {
       setAbriendo(false);
     }
