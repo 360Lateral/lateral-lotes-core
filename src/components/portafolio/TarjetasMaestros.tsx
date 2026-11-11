@@ -156,7 +156,7 @@ const TarjetaMaestro = ({
           </p>
         )}
 
-        {borrador && nombreArchivo && (
+        {(borrador || publicado) && nombreArchivo && (
           <p className="break-all font-body text-sm text-foreground">
             {nombreArchivo}{" "}
             <span className="text-muted-foreground">(v{entregable!.version})</span>
@@ -181,7 +181,7 @@ const TarjetaMaestro = ({
               Abrir en Drive
             </Button>
           )}
-          {borrador && nombreArchivo && (
+          {(borrador || publicado) && nombreArchivo && (
             <Button
               size="sm"
               variant="outline"
