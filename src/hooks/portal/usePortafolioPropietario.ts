@@ -17,6 +17,7 @@ export interface LotePortafolio {
   engagement_id: string | null;
   plan_codigo: string | null;
   plan_nombre: string | null;
+  entregables_publicados?: number | null;
 }
 
 export interface AreaSaludPortafolio {
