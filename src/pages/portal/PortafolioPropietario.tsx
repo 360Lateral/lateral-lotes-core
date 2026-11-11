@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Building2, Plus, AlertCircle } from "lucide-react";
+import { usePermisosAcciones } from "@/hooks/usePermisosAcciones";
 import { usePortafolioPropietario } from "@/hooks/portal/usePortafolioPropietario";
 import { generarPdfPortafolio } from "@/lib/generar-pdf-portafolio";
 import { BloqueHeroEjecutivo } from "@/components/portal/portafolio/BloqueHeroEjecutivo";
@@ -14,6 +15,15 @@ import { BloqueTablaLotes } from "@/components/portal/portafolio/BloqueTablaLote
 import { BloqueSaludAreas } from "@/components/portal/portafolio/BloqueSaludAreas";
 import { BloqueAlertas } from "@/components/portal/portafolio/BloqueAlertas";
 import { BloqueAcciones } from "@/components/portal/portafolio/BloqueAcciones";
+
+const PortafolioSinAsignar = () => (
+  <Card className="p-8 sm:p-12 text-center max-w-xl mx-auto">
+    <Building2 className="h-12 w-12 text-muted-foreground/60 mx-auto mb-4" />
+    <h2 className="font-display text-xl font-semibold">
+      Aún no hay activos asignados a tu cuenta
+    </h2>
+  </Card>
+);
 
 const PortafolioEmpty = () => (
   <Card className="p-12 text-center max-w-xl mx-auto">
@@ -48,6 +58,7 @@ const PortafolioLoading = () => (
 const PortafolioPropietario = () => {
   const { data, isLoading, error } = usePortafolioPropietario();
   const [exportandoPdf, setExportandoPdf] = useState(false);
+  const { permite, loading: permisosLoading } = usePermisosAcciones();
 
   return (
     <PortalClienteLayout>
@@ -77,7 +88,9 @@ const PortafolioPropietario = () => {
           </Card>
         )}
 
-        {data && data.total_lotes === 0 && <PortafolioEmpty />}
+        {data && data.total_lotes === 0 && !permisosLoading && (
+          permite("publicar_activo") ? <PortafolioEmpty /> : <PortafolioSinAsignar />
+        )}
 
         {data && data.total_lotes > 0 && (
           <>
