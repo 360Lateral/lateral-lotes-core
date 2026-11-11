@@ -80,6 +80,11 @@ export const BloqueTablaLotes = ({ lotes }: Props) => (
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
                   )}
+                  <p className="mt-1 text-xs text-muted-foreground whitespace-nowrap">
+                    {(lote.entregables_publicados ?? 0) > 0
+                      ? `${lote.entregables_publicados} ${lote.entregables_publicados === 1 ? "entregable publicado" : "entregables publicados"}`
+                      : "En elaboración"}
+                  </p>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="inline-flex gap-1">
