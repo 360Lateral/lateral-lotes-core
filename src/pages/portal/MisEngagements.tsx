@@ -701,6 +701,8 @@ const PortalHomeInner = () => {
       (e) => e.estado !== "cancelado" && e.estado !== "cerrado"
     ).length;
 
+  const diagnosticosVisibles = (engagements ?? []).filter((e) => e.estado !== "cancelado").length;
+
   const activosPublicadosCount =
     resumen?.activosPublicados ??
     activos.filter((a) => a.estado_publicacion === "aprobado" && a.publicado_venta).length;
@@ -742,7 +744,12 @@ const PortalHomeInner = () => {
             {modoConsulta ? "Portafolio de diagnósticos" : `Hola, ${nombre}.`}
           </h1>
           {modoConsulta ? (
-            <p className="text-sm text-muted-foreground">Aquí verás el avance y los entregables de tus activos</p>
+            <>
+              <p className="text-sm text-muted-foreground">
+                Tienes <span className="font-medium text-foreground">{diagnosticosVisibles} {diagnosticosVisibles === 1 ? "diagnóstico" : "diagnósticos"}</span> en tu portafolio.
+              </p>
+              <p className="text-sm text-muted-foreground">Aquí verás el avance y los entregables de tus activos</p>
+            </>
           ) : (
           <p className="text-sm text-muted-foreground">
             Tienes{" "}
