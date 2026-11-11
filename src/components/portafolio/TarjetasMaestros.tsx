@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useNuevaVersionEntregable } from "@/hooks/useNuevaVersionEntregable";
+import { useFirmarUrlEntregable } from "@/hooks/useFirmarUrlEntregable";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,26 @@ const TarjetaMaestro = ({
   const actualizar = useActualizarEntregable();
   const nuevaVersion = useNuevaVersionEntregable();
   const fileRef = useRef<HTMLInputElement>(null);
+  const { firmar } = useFirmarUrlEntregable();
+  const [abriendo, setAbriendo] = useState(false);
+
+  // Nombre legible del archivo: quita la carpeta y el prefijo de fecha.
+  const nombreArchivo = entregable?.storage_path
+    ? entregable.storage_path.split("/").pop()!.replace(/^\d+_/, "")
+    : null;
+
+  const abrirArchivo = async () => {
+    if (!entregable) return;
+    try {
+      setAbriendo(true);
+      const url = await firmar(entregable.id);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err: any) {
+      toast.error(err?.message ?? "No se pudo abrir el archivo");
+    } finally {
+      setAbriendo(false);
+    }
+  };
 
   const handleReemplazar = (file: File | null) => {
     if (!file || !entregable) return;
@@ -123,6 +144,13 @@ const TarjetaMaestro = ({
           </p>
         )}
 
+        {borrador && nombreArchivo && (
+          <p className="break-all font-body text-sm text-foreground">
+            {nombreArchivo}{" "}
+            <span className="text-muted-foreground">(v{entregable!.version})</span>
+          </p>
+        )}
+
         {borrador && (
           <p className="font-body text-xs text-yellow-700">
             No visible para el cliente hasta publicar.
@@ -139,6 +167,22 @@ const TarjetaMaestro = ({
             >
               <ExternalLink className="h-4 w-4" />
               Abrir en Drive
+            </Button>
+          )}
+          {borrador && nombreArchivo && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={abrirArchivo}
+              disabled={abriendo}
+              aria-label={`Abrir archivo de ${titulo}`}
+            >
+              {abriendo ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ExternalLink className="h-4 w-4" />
+              )}
+              Abrir archivo
             </Button>
           )}
           {borrador && (
