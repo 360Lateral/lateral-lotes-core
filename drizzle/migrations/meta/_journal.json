@@ -78,6 +78,13 @@
       "when": 1794424367415,
       "tag": "0010_representa_cliente_execute_anon",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794426739814,
+      "tag": "0011_portafolio_represented_owners",
+      "breakpoints": true
     }
   ]
 }
