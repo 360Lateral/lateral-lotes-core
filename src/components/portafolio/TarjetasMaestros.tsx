@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { useNuevaVersionEntregable } from "@/hooks/useNuevaVersionEntregable";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Presentation, ExternalLink, Plus, Loader2 } from "lucide-react";
+import { BookOpen, Presentation, ExternalLink, Plus, Loader2, FileUp } from "lucide-react";
 import type { Entregable, TipoEntregable } from "@/hooks/useEntregablesEngagement";
 import { useActualizarEntregable } from "@/hooks/useActualizarEntregable";
 import SubirEntregableDialog from "@/components/entregables/SubirEntregableDialog";
@@ -48,6 +50,22 @@ const TarjetaMaestro = ({
 }: TarjetaProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const actualizar = useActualizarEntregable();
+  const nuevaVersion = useNuevaVersionEntregable();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleReemplazar = (file: File | null) => {
+    if (!file || !entregable) return;
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      toast.error("Solo se permiten archivos PDF");
+      return;
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error("El archivo supera el máximo de 25MB");
+      return;
+    }
+    // Nueva versión en borrador; la anterior queda archivada (no se borra).
+    nuevaVersion.mutate({ entregableAnteriorId: entregable.id, archivo: file, publicar: false });
+  };
 
   const publicado = entregable && entregable.estado === "publicado";
   const borrador = entregable && entregable.estado === "borrador";
@@ -135,6 +153,34 @@ const TarjetaMaestro = ({
               )}
               Publicar
             </Button>
+          )}
+          {borrador && puedeSubir && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fileRef.current?.click()}
+                disabled={nuevaVersion.isPending}
+                aria-label={`Reemplazar ${titulo} por archivo`}
+              >
+                {nuevaVersion.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileUp className="h-4 w-4" />
+                )}
+                Reemplazar por archivo
+              </Button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="application/pdf,.pdf"
+                className="hidden"
+                onChange={(ev) => {
+                  handleReemplazar(ev.target.files?.[0] ?? null);
+                  ev.target.value = "";
+                }}
+              />
+            </>
           )}
           {!entregable && puedeSubir && (
             <Button
