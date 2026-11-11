@@ -6,6 +6,7 @@ import { asegurarSesion, SesionExpiradaError } from "./useSubirEntregableArchivo
 interface Args {
   entregableAnteriorId: string;
   archivo: File;
+  publicar?: boolean;
 }
 
 const BUCKET = "entregables-clientes";
@@ -13,7 +14,7 @@ const BUCKET = "entregables-clientes";
 export const useNuevaVersionEntregable = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ entregableAnteriorId, archivo }: Args) => {
+    mutationFn: async ({ entregableAnteriorId, archivo, publicar }: Args) => {
       // Antes de subir: si la sesión caducó no se sube nada.
       if (!(await asegurarSesion())) throw new SesionExpiradaError();
 
@@ -48,7 +49,7 @@ export const useNuevaVersionEntregable = () => {
           storage_path: path,
           mime_type: archivo.type || null,
           tamano_bytes: archivo.size,
-          estado: "borrador",
+          estado: publicar ? "publicado" : "borrador",
           version: nuevaVersion,
           notas: ant.notas,
           subido_por: userId,
